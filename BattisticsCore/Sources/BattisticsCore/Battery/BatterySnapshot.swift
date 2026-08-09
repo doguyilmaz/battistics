@@ -103,7 +103,21 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.adapter = adapter
     }
 
+    /// The capacity the battery can currently hold. Prefers the controller's
+    /// smoothed NominalChargeCapacity, the same value macOS bases its own
+    /// health percentage on, so Battistics never contradicts System Settings.
+    public var currentMaxCapacity: Int {
+        nominalCapacity ?? rawMaxCapacity
+    }
+
     public var healthPercent: Double {
+        guard designCapacity > 0 else { return 0 }
+        return Double(currentMaxCapacity) / Double(designCapacity) * 100
+    }
+
+    /// Health from the instantaneous measured full-charge capacity. More
+    /// volatile than `healthPercent`; shown as a secondary stat.
+    public var measuredHealthPercent: Double {
         guard designCapacity > 0 else { return 0 }
         return Double(rawMaxCapacity) / Double(designCapacity) * 100
     }

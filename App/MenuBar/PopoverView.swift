@@ -93,7 +93,7 @@ struct PopoverView: View {
                         ("Time on Battery", "Active time since the power adapter was last unplugged."),
                     ])
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
-                StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
+                StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
                 StatRow(label: "Time on Battery", value: timeOnBattery)
             }

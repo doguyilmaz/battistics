@@ -44,9 +44,13 @@ struct BatteryMathTests {
         )
     }
 
-    @Test func healthPercentUsesRawMaxOverDesign() {
+    @Test func healthPercentPrefersNominalToMatchSystemSettings() {
+        // nominal 5900 / design 6075
         let snapshot = makeSnapshot()
-        #expect(abs(snapshot.healthPercent - 97.79) < 0.01)
+        #expect(abs(snapshot.healthPercent - 97.12) < 0.01)
+        #expect(snapshot.currentMaxCapacity == 5900)
+        // measured uses rawMax 5941 / design 6075
+        #expect(abs(snapshot.measuredHealthPercent - 97.79) < 0.01)
         #expect(snapshot.healthStatus == .good)
     }
 

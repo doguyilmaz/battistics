@@ -66,10 +66,8 @@ struct OverviewPane: View {
             VStack(spacing: 7) {
                 SectionHeader(title: "Capacity")
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
-                StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
-                if let nominal = snapshot.nominalCapacity {
-                    StatRow(label: "Nominal", value: Formatting.mAh(nominal))
-                }
+                StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
+                StatRow(label: "Measured Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
                 StatRow(
                     label: "Health",

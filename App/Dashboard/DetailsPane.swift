@@ -30,12 +30,12 @@ struct DetailsPane: View {
                 }
                 Section("Capacity") {
                     LabeledContent("Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
-                    LabeledContent("Current Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
-                    if let nominal = snapshot.nominalCapacity {
-                        LabeledContent("Nominal Capacity", value: Formatting.mAh(nominal))
-                    }
+                    LabeledContent("Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
+                    LabeledContent("Measured Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
                     LabeledContent("Design Capacity", value: Formatting.mAh(snapshot.designCapacity))
                     LabeledContent("Health", value: Formatting.percentPrecise(snapshot.healthPercent))
+                    LabeledContent(
+                        "Measured Health", value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
                     if let system = snapshot.systemHealthStatus {
                         LabeledContent("System Status", value: system)
                     }
