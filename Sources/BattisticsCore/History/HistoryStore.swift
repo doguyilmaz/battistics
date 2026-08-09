@@ -250,7 +250,10 @@ public actor HistoryStore {
     /// charge samples are kept 400 days. Health snapshots are kept forever.
     public func runRetention(now: Date = Date()) {
         guard ensureOpen() else { return }
-        let powerCutoff = Int64(now.timeIntervalSince1970 - 30 * 24 * 3600)
+        // Hour-aligned cutoff: only complete hours are rolled up, so the
+        // ON CONFLICT guard can never discard the second half of a
+        // partially aggregated hour.
+        let powerCutoff = Int64(now.timeIntervalSince1970 - 30 * 24 * 3600) / 3600 * 3600
         let chargeCutoff = Int64(now.timeIntervalSince1970 - 400 * 24 * 3600)
         run(
             """
@@ -297,6 +300,12 @@ public actor HistoryStore {
             lines.append(
                 "power,\(sqlite3_column_int64(statement, 0)),\(sqlite3_column_double(statement, 1)),\(volts),\(amps),\(temp)")
         }
+        query("SELECT hour_ts, avg_watts, max_watts, avg_temp FROM power_hourly ORDER BY hour_ts") { statement in
+            let temp = sqlite3_column_type(statement, 3) == SQLITE_NULL ? "" : "\(sqlite3_column_double(statement, 3))"
+            lines.append(
+                "hourly,\(sqlite3_column_int64(statement, 0)),\(sqlite3_column_double(statement, 1)),"
+                    + "\(sqlite3_column_double(statement, 2)),\(temp)")
+        }
         query("SELECT day, ts, health_pct, raw_max, nominal, design, cycles FROM health_snapshots ORDER BY day") { statement in
             let day = String(cString: sqlite3_column_text(statement, 0))
             let nominal = sqlite3_column_type(statement, 4) == SQLITE_NULL ? "" : "\(sqlite3_column_int64(statement, 4))"
@@ -330,6 +339,15 @@ public actor HistoryStore {
                 ]
             )
         }
+        for row in parsed.hourlyRows {
+            run(
+                "INSERT OR IGNORE INTO power_hourly (hour_ts, avg_watts, max_watts, avg_temp) VALUES (?,?,?,?)",
+                bind: [
+                    .int(row.hourTs), .real(row.avgWatts), .real(row.maxWatts),
+                    row.avgTemp.map(SQLiteValue.real) ?? .null,
+                ]
+            )
+        }
         for row in parsed.healthRows {
             run(
                 """
@@ -343,7 +361,7 @@ public actor HistoryStore {
                 ]
             )
         }
-        return parsed.chargeSamples.count + parsed.powerRows.count + parsed.healthRows.count
+        return parsed.rowCount
     }
 
     // MARK: - SQLite plumbing
@@ -355,10 +373,12 @@ public actor HistoryStore {
         case null
     }
 
+    /// Uses the local timezone so "one health snapshot per day" means the
+    /// user's calendar day, not UTC's.
     private static func dayKey(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.timeZone = .current
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date)
     }

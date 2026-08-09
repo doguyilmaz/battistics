@@ -36,7 +36,8 @@ public enum BatteryReader {
         if maxCapacityKey == 100 {
             percent = min(max(currentCapacityKey, 0), 100)
         } else if rawMax > 0 {
-            percent = Int((Double(rawCurrent) / Double(rawMax) * 100).rounded())
+            // rawCurrent can transiently exceed rawMax near full charge.
+            percent = min(max(Int((Double(rawCurrent) / Double(rawMax) * 100).rounded()), 0), 100)
         } else {
             percent = 0
         }
@@ -63,6 +64,7 @@ public enum BatteryReader {
         // Silicon packs report opaque blobs there, in which case the serial
         // number's week code is the reliable source.
         var manufactureDate: Date?
+        var manufactureDateIsApproximate = false
         if let packed = int("ManufactureDate"), packed <= 0xFFFF {
             manufactureDate = Self.manufactureDate(fromSMBus: packed)
         }
@@ -73,6 +75,7 @@ public enum BatteryReader {
         }
         if manufactureDate == nil, let serial = props["Serial"] as? String {
             manufactureDate = Self.manufactureDate(fromSerial: serial, now: now)
+            manufactureDateIsApproximate = manufactureDate != nil
         }
 
         return BatterySnapshot(
@@ -99,6 +102,7 @@ public enum BatteryReader {
             serialNumber: props["Serial"] as? String,
             deviceName: props["DeviceName"] as? String,
             manufactureDate: manufactureDate,
+            manufactureDateIsApproximate: manufactureDateIsApproximate,
             adapter: adapter
         )
     }
@@ -117,7 +121,9 @@ public enum BatteryReader {
     /// (F8Y 1 49 20... = week 49 of 2021).
     public static func manufactureDate(fromSerial serial: String, now: Date = Date()) -> Date? {
         let chars = Array(serial)
-        guard chars.count >= 6,
+        // Battery pack serials are long (~17 chars); requiring length keeps
+        // short randomized device serials from fabricating a date.
+        guard chars.count >= 12,
             let yearDigit = chars[3].wholeNumberValue,
             let weekTens = chars[4].wholeNumberValue,
             let weekOnes = chars[5].wholeNumberValue

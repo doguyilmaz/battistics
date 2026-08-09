@@ -52,6 +52,9 @@ public struct BatterySnapshot: Sendable, Equatable {
     public let serialNumber: String?
     public let deviceName: String?
     public let manufactureDate: Date?
+    /// True when the date was derived from the serial week code, which
+    /// only carries week precision, not a calendar day.
+    public let manufactureDateIsApproximate: Bool
     public let adapter: AdapterInfo?
 
     public init(
@@ -78,6 +81,7 @@ public struct BatterySnapshot: Sendable, Equatable {
         serialNumber: String?,
         deviceName: String?,
         manufactureDate: Date?,
+        manufactureDateIsApproximate: Bool = false,
         adapter: AdapterInfo?
     ) {
         self.timestamp = timestamp
@@ -103,6 +107,7 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.serialNumber = serialNumber
         self.deviceName = deviceName
         self.manufactureDate = manufactureDate
+        self.manufactureDateIsApproximate = manufactureDateIsApproximate
         self.adapter = adapter
     }
 

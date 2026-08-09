@@ -137,30 +137,54 @@ struct HistoryStoreTests {
         #expect(series.contains { abs($0.value - 5) < 0.001 })
     }
 
-    @Test func csvRoundTrip() async throws {
+    @Test func csvRoundTripIncludesHourlyRollups() async throws {
         let store = makeStore()
         let base = Date(timeIntervalSince1970: 1_700_000_000)
         await store.recordChargeSample(ChargeSample(date: base, percent: 88, externalConnected: false, isCharging: false))
         await store.recordPowerSample(date: base, watts: 7.5, volts: 12.07, amps: -0.62, temperatureC: 33.2)
+        // A sample old enough for retention to compact it into power_hourly.
+        await store.recordPowerSample(
+            date: base.addingTimeInterval(-40 * 24 * 3600), watts: 9, volts: 12, amps: -0.7,
+            temperatureC: 30)
+        await store.runRetention(now: base)
         await store.recordHealthSnapshot(
             date: base, healthPercent: 97.8, rawMaxCapacity: 5941, nominalCapacity: 5900,
             designCapacity: 6075, cycleCount: 47)
 
         let csv = await store.exportCSV()
         #expect(csv.hasPrefix(CSVPort.header))
+        #expect(csv.contains("\nhourly,"))
 
         let other = makeStore()
         let imported = try await other.importCSV(csv)
-        #expect(imported == 3)
+        #expect(imported == 4)
 
         let reExported = await other.exportCSV()
         #expect(reExported == csv)
+    }
+
+    @Test func csvImportsCRLFLineEndings() async throws {
+        let store = makeStore()
+        let crlf = "# Battistics history export v1\r\ncharge,1700000000,88,0,0\r\n"
+        let imported = try await store.importCSV(crlf)
+        #expect(imported == 1)
     }
 
     @Test func csvRejectsGarbage() async {
         let store = makeStore()
         await #expect(throws: HistoryError.self) {
             try await store.importCSV("nonsense,1,2,3\n")
+        }
+    }
+
+    @Test func csvRejectsOutOfRangeTimestamps() async {
+        let store = makeStore()
+        // Would otherwise trap in the Int64 -> Date -> Int64 round trip.
+        await #expect(throws: HistoryError.self) {
+            try await store.importCSV("charge,9223372036854775807,50,0,0\n")
+        }
+        await #expect(throws: HistoryError.self) {
+            try await store.importCSV("charge,-5,50,0,0\n")
         }
     }
 }

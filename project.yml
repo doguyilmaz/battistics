@@ -50,6 +50,9 @@ targets:
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "MIT License"
+        CFBundleURLTypes:
+          - CFBundleURLName: com.dogukyilmaz.Battistics
+            CFBundleURLSchemes: [battistics]
         SUFeedURL: https://github.com/doguyilmaz/battistics/releases/latest/download/appcast.xml
         SUEnableAutomaticChecks: true
         SUPublicEDKey: j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=

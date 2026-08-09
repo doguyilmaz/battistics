@@ -124,7 +124,19 @@ struct BatteryMathTests {
     @Test func manufactureDateFromSerialRejectsBadWeek() {
         #expect(BatteryReader.manufactureDate(fromSerial: "F8Y19920EWMQ1LTAL") == nil)
         #expect(BatteryReader.manufactureDate(fromSerial: "F8Y") == nil)
-        #expect(BatteryReader.manufactureDate(fromSerial: "F8YX4920") == nil)
+        #expect(BatteryReader.manufactureDate(fromSerial: "F8YX4920EWMQ1LTAL") == nil)
+        // Short randomized device serials must never fabricate a date.
+        #expect(BatteryReader.manufactureDate(fromSerial: "XK92JQW3AB") == nil)
+    }
+
+    @Test func percentClampsAboveHundred() {
+        let props: [String: Any] = [
+            "CurrentCapacity": 6000, "MaxCapacity": 5941,
+            "AppleRawCurrentCapacity": 6000, "AppleRawMaxCapacity": 5941,
+            "DesignCapacity": 6075, "CycleCount": 47,
+        ]
+        let snapshot = BatteryReader.snapshot(from: props, iops: nil, now: Date())
+        #expect(snapshot.percent == 100)
     }
 
     @Test func opaqueManufactureDateBlobFallsBackToSerial() {

@@ -20,7 +20,13 @@ struct DetailsPane: View {
                         LabeledContent("Serial Number", value: serial)
                     }
                     if let date = snapshot.manufactureDate {
-                        LabeledContent("Manufacture Date", value: date.formatted(date: .abbreviated, time: .omitted))
+                        // Serial-derived dates only carry week precision, so
+                        // pretending to know the day would be dishonest.
+                        LabeledContent(
+                            "Manufacture Date",
+                            value: snapshot.manufactureDateIsApproximate
+                                ? date.formatted(.dateTime.month(.wide).year())
+                                : date.formatted(date: .abbreviated, time: .omitted))
                         LabeledContent("Age", value: Formatting.age(from: date))
                     }
                     LabeledContent("Cycle Count", value: "\(snapshot.cycleCount)")

@@ -21,7 +21,10 @@ final class AppModel {
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
     @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
-    @ObservationIgnored private var dashboardWindowCount = 0
+    @ObservationIgnored private var defaultsObserver: NSObjectProtocol?
+    /// Baseline for transition detection, updated only when a transition is
+    /// handled so no read path can mask another's changes.
+    @ObservationIgnored private var lastTransitionSnapshot: BatterySnapshot?
 
     init(historyDirectory: URL? = nil) {
         Prefs.registerDefaults()
@@ -31,27 +34,68 @@ final class AppModel {
             .appendingPathComponent("Battistics", isDirectory: true)
         history = HistoryStore(directory: directory)
 
-        handlePowerEvent()
+        refreshSensors()
         startMonitoring()
         restartPowerSampling()
         observeWake()
-        applyActivationPolicy()
+        observeDefaults()
+        // Deferred: NSApplication does not exist yet during App.init.
+        Task { @MainActor [weak self] in
+            self?.applyActivationPolicy()
+        }
 
         Task { [weak self] in
             guard let self else { return }
             await self.history.runRetention()
             if self.snapshot?.externalConnected == false,
                 let storedUnplug = await self.history.lastUnplugDate() {
+                // Restore the real unplug moment across relaunches, both for
+                // the UI and for the on-battery duration alert.
                 self.lastUnplugDate = storedUnplug
+                self.alertState.unpluggedAt = storedUnplug
             }
         }
     }
 
     // MARK: - Live data
 
-    /// Re-reads sensors without recording. Driven by visible UI only.
+    /// Re-reads the battery and funnels the result through the single
+    /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
-        snapshot = BatteryReader.read()
+        guard let current = BatteryReader.read() else {
+            snapshot = nil
+            return
+        }
+        ingest(current)
+    }
+
+    /// Every snapshot from every source passes through here, so state
+    /// transitions are recorded and alerted no matter which path (power
+    /// event, UI poll, background sampler) observed them first.
+    private func ingest(_ current: BatterySnapshot) {
+        let previous = lastTransitionSnapshot
+        snapshot = current
+        evaluateAlerts(for: current)
+
+        let changed =
+            previous == nil
+            || previous?.percent != current.percent
+            || previous?.externalConnected != current.externalConnected
+            || previous?.isCharging != current.isCharging
+        guard changed else { return }
+        lastTransitionSnapshot = current
+
+        trackUnplug(previous: previous, current: current)
+        let sample = ChargeSample(
+            date: current.timestamp,
+            percent: current.percent,
+            externalConnected: current.externalConnected,
+            isCharging: current.isCharging
+        )
+        Task { [weak self] in
+            await self?.history.recordChargeSample(sample)
+        }
+        maybeRecordDailyHealth(current)
     }
 
     func loadSparkline() async {
@@ -64,38 +108,9 @@ final class AppModel {
         let events = monitor.start()
         monitorTask = Task { [weak self] in
             for await _ in events {
-                self?.handlePowerEvent()
+                self?.refreshSensors()
             }
         }
-    }
-
-    private func handlePowerEvent() {
-        let previous = snapshot
-        guard let current = BatteryReader.read() else {
-            snapshot = nil
-            return
-        }
-        snapshot = current
-
-        let changed =
-            previous == nil
-            || previous?.percent != current.percent
-            || previous?.externalConnected != current.externalConnected
-            || previous?.isCharging != current.isCharging
-        guard changed else { return }
-
-        trackUnplug(previous: previous, current: current)
-        let sample = ChargeSample(
-            date: current.timestamp,
-            percent: current.percent,
-            externalConnected: current.externalConnected,
-            isCharging: current.isCharging
-        )
-        Task { [weak self] in
-            await self?.history.recordChargeSample(sample)
-        }
-        evaluateAlerts(for: current)
-        maybeRecordDailyHealth(current)
     }
 
     private func trackUnplug(previous: BatterySnapshot?, current: BatterySnapshot) {
@@ -126,8 +141,7 @@ final class AppModel {
 
     private func recordPowerSample() async {
         guard let current = BatteryReader.read() else { return }
-        snapshot = current
-        evaluateAlerts(for: current)
+        ingest(current)
         guard current.batteryInstalled, let watts = current.watts else { return }
         await history.recordPowerSample(
             date: current.timestamp,
@@ -153,6 +167,9 @@ final class AppModel {
         Task { [weak self] in
             guard let self else { return }
             guard !(await self.history.hasHealthSnapshot(forDay: snapshot.timestamp)) else { return }
+            // Piggyback retention on the daily snapshot so long-running
+            // sessions keep compacting without a relaunch.
+            await self.history.runRetention()
             let previous = await self.history.recordHealthSnapshot(
                 date: snapshot.timestamp,
                 healthPercent: snapshot.healthPercent,
@@ -174,30 +191,44 @@ final class AppModel {
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
-                self?.handlePowerEvent()
+                self?.refreshSensors()
+            }
+        }
+    }
+
+    /// Keeps the app reachable: if both the menu bar icon and the Dock icon
+    /// end up disabled (e.g. the user Cmd-drags the icon off the menu bar),
+    /// force the Dock icon back on.
+    private func observeDefaults() {
+        defaultsObserver = NotificationCenter.default.addObserver(
+            forName: UserDefaults.didChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            // Deferred out of the notification callback: defaults change
+            // notifications can fire inside NSApplication's own init.
+            Task { @MainActor in
+                let defaults = UserDefaults.standard
+                if !defaults.bool(forKey: Prefs.showMenuBarIcon),
+                    !defaults.bool(forKey: Prefs.showDockIcon) {
+                    defaults.set(true, forKey: Prefs.showDockIcon)
+                }
+                self?.applyActivationPolicy()
             }
         }
     }
 
     // MARK: - Dock icon policy
 
-    func dashboardDidAppear() {
-        dashboardWindowCount += 1
-        applyActivationPolicy()
-    }
-
-    func dashboardDidDisappear() {
-        dashboardWindowCount = max(0, dashboardWindowCount - 1)
-        applyActivationPolicy()
-    }
-
+    /// The Dock icon strictly follows the preference. Windows open fine
+    /// under the accessory policy, they just do not appear in Cmd-Tab.
     func applyActivationPolicy() {
+        // Never force-create the application object here: this can run
+        // while NSApplication is still initializing (UserDefaults writes
+        // during its init post notifications), and touching
+        // NSApplication.shared reentrantly asserts. Once the app exists,
+        // NSApp is non-nil and this becomes effective.
+        guard let app = NSApp else { return }
         let showDock = UserDefaults.standard.bool(forKey: Prefs.showDockIcon)
-        let policy: NSApplication.ActivationPolicy =
-            (showDock || dashboardWindowCount > 0) ? .regular : .accessory
-        // NSApplication.shared, not NSApp: this can run from AppModel.init
-        // before the NSApp global is populated.
-        let app = NSApplication.shared
+        let policy: NSApplication.ActivationPolicy = showDock ? .regular : .accessory
         if app.activationPolicy() != policy {
             app.setActivationPolicy(policy)
         }

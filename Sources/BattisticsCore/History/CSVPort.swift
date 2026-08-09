@@ -4,9 +4,14 @@ import Foundation
 /// single export holds the full history and stays trivially greppable:
 ///   charge,<unix ts>,<percent>,<external 0|1>,<charging 0|1>
 ///   power,<unix ts>,<watts>,<volts?>,<amps?>,<temp_c?>
+///   hourly,<hour ts>,<avg watts>,<max watts>,<avg temp?>
 ///   health,<yyyy-mm-dd>,<unix ts>,<health pct>,<raw max>,<nominal?>,<design>,<cycles>
 public enum CSVPort {
     public static let header = "# Battistics history export v1"
+
+    /// Sanity window for imported unix timestamps (through year 2100);
+    /// also prevents Int64 -> Date -> Int64 round-trip overflow traps.
+    static let timestampRange: ClosedRange<Int64> = 0...4_102_444_800
 
     public struct PowerRow: Sendable, Equatable {
         public let ts: Int64
@@ -44,24 +49,45 @@ public enum CSVPort {
         }
     }
 
+    public struct HourlyRow: Sendable, Equatable {
+        public let hourTs: Int64
+        public let avgWatts: Double
+        public let maxWatts: Double
+        public let avgTemp: Double?
+
+        public init(hourTs: Int64, avgWatts: Double, maxWatts: Double, avgTemp: Double?) {
+            self.hourTs = hourTs
+            self.avgWatts = avgWatts
+            self.maxWatts = maxWatts
+            self.avgTemp = avgTemp
+        }
+    }
+
     public struct Parsed: Sendable {
         public var chargeSamples: [ChargeSample] = []
         public var powerRows: [PowerRow] = []
+        public var hourlyRows: [HourlyRow] = []
         public var healthRows: [HealthRow] = []
 
         public init() {}
+
+        public var rowCount: Int {
+            chargeSamples.count + powerRows.count + hourlyRows.count + healthRows.count
+        }
     }
 
     public static func parse(_ text: String) throws -> Parsed {
         var parsed = Parsed()
-        for rawLine in text.split(separator: "\n", omittingEmptySubsequences: true) {
-            let line = rawLine.trimmingCharacters(in: .whitespaces)
+        // isNewline splits CRLF correctly; "\r\n" is a single Character in
+        // Swift, so splitting on "\n" would not split those files at all.
+        for rawLine in text.split(whereSeparator: \.isNewline) {
+            let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
             if line.isEmpty || line.hasPrefix("#") { continue }
             let fields = line.split(separator: ",", omittingEmptySubsequences: false).map(String.init)
             switch fields.first {
             case "charge":
                 guard fields.count == 5,
-                    let ts = Int64(fields[1]), let percent = Int(fields[2]),
+                    let ts = timestamp(fields[1]), let percent = Int(fields[2]),
                     let external = Int(fields[3]), let charging = Int(fields[4])
                 else { throw HistoryError.importFailed("Bad charge row: \(line)") }
                 parsed.chargeSamples.append(
@@ -72,16 +98,23 @@ public enum CSVPort {
                         isCharging: charging != 0
                     ))
             case "power":
-                guard fields.count == 6, let ts = Int64(fields[1]), let watts = Double(fields[2])
+                guard fields.count == 6, let ts = timestamp(fields[1]), let watts = Double(fields[2])
                 else { throw HistoryError.importFailed("Bad power row: \(line)") }
                 parsed.powerRows.append(
                     PowerRow(
                         ts: ts, watts: watts,
                         volts: Double(fields[3]), amps: Double(fields[4]), tempC: Double(fields[5])
                     ))
+            case "hourly":
+                guard fields.count == 5,
+                    let ts = timestamp(fields[1]), let avg = Double(fields[2]),
+                    let max = Double(fields[3])
+                else { throw HistoryError.importFailed("Bad hourly row: \(line)") }
+                parsed.hourlyRows.append(
+                    HourlyRow(hourTs: ts, avgWatts: avg, maxWatts: max, avgTemp: Double(fields[4])))
             case "health":
                 guard fields.count == 8,
-                    let ts = Int64(fields[2]), let health = Double(fields[3]),
+                    let ts = timestamp(fields[2]), let health = Double(fields[3]),
                     let rawMax = Int64(fields[4]), let design = Int64(fields[6]),
                     let cycles = Int64(fields[7])
                 else { throw HistoryError.importFailed("Bad health row: \(line)") }
@@ -95,5 +128,10 @@ public enum CSVPort {
             }
         }
         return parsed
+    }
+
+    private static func timestamp(_ field: String) -> Int64? {
+        guard let value = Int64(field), timestampRange.contains(value) else { return nil }
+        return value
     }
 }

@@ -47,8 +47,6 @@ struct DashboardView: View {
         }
         .frame(minWidth: 740, minHeight: 500)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
-        .onAppear { model.dashboardDidAppear() }
-        .onDisappear { model.dashboardDidDisappear() }
         .task {
             while !Task.isCancelled {
                 model.refreshSensors()

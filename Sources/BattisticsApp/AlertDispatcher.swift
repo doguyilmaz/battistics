@@ -6,7 +6,10 @@ import UserNotifications
 /// requested lazily on the first alert, never at launch.
 @MainActor
 final class AlertDispatcher {
-    private var authorizationRequested = false
+    /// Single shared authorization request so alerts arriving while the
+    /// permission prompt is still open wait for its outcome instead of
+    /// reading .notDetermined and getting dropped.
+    private var authorizationTask: Task<Void, Never>?
 
     func deliver(_ alert: BatteryAlert) {
         Task { [weak self] in
@@ -16,10 +19,13 @@ final class AlertDispatcher {
 
     private func deliverAsync(_ alert: BatteryAlert) async {
         let center = UNUserNotificationCenter.current()
-        if !authorizationRequested {
-            authorizationRequested = true
-            _ = try? await center.requestAuthorization(options: [.alert, .sound])
+        if authorizationTask == nil {
+            authorizationTask = Task {
+                _ = try? await UNUserNotificationCenter.current()
+                    .requestAuthorization(options: [.alert, .sound])
+            }
         }
+        await authorizationTask?.value
         let settings = await center.notificationSettings()
         guard settings.authorizationStatus == .authorized
             || settings.authorizationStatus == .provisional

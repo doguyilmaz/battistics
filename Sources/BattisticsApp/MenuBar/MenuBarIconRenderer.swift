@@ -19,34 +19,53 @@ struct MenuBarConfig: Equatable {
 @MainActor
 enum MenuBarIconRenderer {
     private static let cache = NSCache<NSString, NSImage>()
-    private static let height: CGFloat = 17
-    private static let glyphSize = NSSize(width: 24, height: 14)
+    private static let height: CGFloat = 18
+    private static let glyphSize = NSSize(width: 27, height: 17)
     private static let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
 
     static func image(snapshot: BatterySnapshot?, config: MenuBarConfig) -> NSImage {
-        let percent = snapshot?.percent ?? 0
-        let charging = snapshot?.isCharging ?? false
-        let external = snapshot?.externalConnected ?? false
+        // No battery (desktop Macs, read failure): neutral empty template
+        // glyph, never a red zero.
+        guard let snapshot, snapshot.batteryInstalled else {
+            return cachedRender(
+                key: "no-battery", percent: nil, charging: false, texts: [],
+                showGlyph: true, tint: nil)
+        }
+        let percent = snapshot.percent
+        let charging = snapshot.isCharging
+        let external = snapshot.externalConnected
         let texts = [config.primaryText, config.secondaryText]
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
         let tint = tintColor(percent: percent, charging: charging, external: external, config: config)
 
-        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")" as NSString
-        if let cached = cache.object(forKey: key) { return cached }
+        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")"
+        return cachedRender(
+            key: key, percent: percent, charging: charging, texts: texts,
+            showGlyph: config.showGlyph, tint: tint)
+    }
 
+    private static func cachedRender(
+        key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?
+    ) -> NSImage {
+        if let cached = cache.object(forKey: key as NSString) { return cached }
         let image = render(
             percent: percent, charging: charging, texts: texts,
-            showGlyph: config.showGlyph, tint: tint)
-        cache.setObject(image, forKey: key)
+            showGlyph: showGlyph, tint: tint)
+        cache.setObject(image, forKey: key as NSString)
         return image
     }
 
+    /// Status ladder: charging blue, critical red, low orange, full green,
+    /// monochrome template otherwise. Each rung is user-toggleable.
     private static func tintColor(
         percent: Int, charging: Bool, external: Bool, config: MenuBarConfig
     ) -> NSColor? {
-        if config.colorLow, !external, percent <= config.lowThreshold { return .systemRed }
-        if config.colorCharging, charging { return .systemGreen }
-        if config.colorHigh, percent >= 80 { return .systemGreen }
+        if config.colorCharging, charging { return .systemBlue }
+        if config.colorLow, !external {
+            if percent <= 10 { return .systemRed }
+            if percent <= config.lowThreshold { return .systemOrange }
+        }
+        if config.colorHigh, percent >= 95 { return .systemGreen }
         return nil
     }
 
@@ -75,7 +94,7 @@ enum MenuBarIconRenderer {
     }
 
     private static func render(
-        percent: Int, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?
+        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?
     ) -> NSImage {
         let color = tint ?? .black
         let string = texts.joined(separator: " ")
@@ -99,7 +118,7 @@ enum MenuBarIconRenderer {
                     in: glyphRect,
                     style: BatGlyph.Style(
                         color: color, charging: charging,
-                        fillFraction: CGFloat(percent) / 100))
+                        fillFraction: percent.map { CGFloat($0) / 100 }))
                 x += glyphSize.width + 4
             }
             if !string.isEmpty {

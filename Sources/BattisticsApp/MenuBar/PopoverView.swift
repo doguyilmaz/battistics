@@ -10,7 +10,7 @@ struct PopoverView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
-    @State private var hostWindow: NSWindow?
+    @State private var windowVisible = true
 
     private var temperatureUnit: TemperatureUnit {
         TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
@@ -54,13 +54,14 @@ struct PopoverView: View {
         }
         .padding(14)
         .frame(width: 340)
-        .background(HostWindowReader(window: $hostWindow))
-        .task {
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
+        // Keyed on visibility: the loop dies when the window hides and a
+        // fresh one starts when it shows again, even if MenuBarExtra keeps
+        // the view alive across popover open/close.
+        .task(id: windowVisible) {
+            guard windowVisible else { return }
             await model.loadSparkline()
-            while !Task.isCancelled {
-                // Belt and suspenders: stop sampling if the hosting window
-                // is hidden but the view was kept alive.
-                if let hostWindow, !hostWindow.isVisible { break }
+            while !Task.isCancelled && windowVisible {
                 model.refreshSensors()
                 try? await Task.sleep(for: .seconds(2))
             }
@@ -213,25 +214,57 @@ struct PopoverView: View {
         }
     }
 
-    /// Publishes the hosting NSWindow so the sampling loop can check
-    /// visibility.
-    private struct HostWindowReader: NSViewRepresentable {
-        @Binding var window: NSWindow?
+    /// Publishes the hosting window's visibility, driven by occlusion
+    /// state changes, so sampling is strictly event gated.
+    private struct WindowVisibilityReader: NSViewRepresentable {
+        @Binding var isVisible: Bool
 
-        func makeNSView(context: Context) -> NSView {
-            let view = NSView()
-            Task { @MainActor in
-                window = view.window
+        func makeNSView(context: Context) -> TrackerView {
+            let view = TrackerView()
+            view.onChange = { visible in
+                Task { @MainActor in
+                    isVisible = visible
+                }
             }
             return view
         }
 
-        func updateNSView(_ nsView: NSView, context: Context) {
-            if window !== nsView.window {
-                let current = nsView.window
-                Task { @MainActor in
-                    window = current
+        func updateNSView(_ nsView: TrackerView, context: Context) {}
+
+        final class TrackerView: NSView {
+            var onChange: ((Bool) -> Void)?
+            private var observerToken: ObserverToken?
+
+            override func viewDidMoveToWindow() {
+                super.viewDidMoveToWindow()
+                observerToken = nil
+                guard let window else { return }
+                onChange?(window.occlusionState.contains(.visible))
+                let token = NotificationCenter.default.addObserver(
+                    forName: NSWindow.didChangeOcclusionStateNotification,
+                    object: window, queue: .main
+                ) { [weak self, weak window] _ in
+                    MainActor.assumeIsolated {
+                        guard let self, let window else { return }
+                        self.onChange?(window.occlusionState.contains(.visible))
+                    }
                 }
+                observerToken = ObserverToken(token)
+            }
+        }
+
+        /// Removes the notification observer when released, so TrackerView
+        /// needs no deinit of its own (an actor-isolated class cannot touch
+        /// non-Sendable stored state from its nonisolated deinit).
+        private final class ObserverToken: @unchecked Sendable {
+            private let token: any NSObjectProtocol
+
+            init(_ token: any NSObjectProtocol) {
+                self.token = token
+            }
+
+            deinit {
+                NotificationCenter.default.removeObserver(token)
             }
         }
     }
