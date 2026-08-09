@@ -7,10 +7,18 @@ options:
 
 packages:
   BattisticsCore:
-    path: BattisticsCore
+    path: .
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.6.0"
+
+fileGroups:
+  - README.md
+  - CHANGELOG.md
+  - RELEASING.md
+  - Makefile
+  - project.yml
+  - scripts
 
 settings:
   base:

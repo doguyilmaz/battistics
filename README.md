@@ -79,18 +79,18 @@ The `.xcodeproj` is generated from `project.yml` and never committed.
 ## Architecture
 
 ```
-BattisticsCore/   Swift package, no UI imports, fully unit tested
-  Battery/        IOKit smart battery reader, event driven power monitor
-  History/        SQLite store, retention, CSV port, time totals math
-  Alerts/         pure alert rule reducer
-  Peripherals/    HID battery levels
-  EnergyHogs/     per-process energy sampling
-App/              SwiftUI app: menu bar scene, dashboard, settings
+Sources/BattisticsCore/   Swift package, no UI imports, fully unit tested
+  Battery/                IOKit smart battery reader, event driven power monitor
+  History/                SQLite store, retention, CSV port, time totals math
+  Alerts/                 pure alert rule reducer
+  Peripherals/            HID battery levels
+  EnergyHogs/             per-process energy sampling
+Tests/                    swift-testing suites for the core package
+App/                      SwiftUI app: menu bar scene, dashboard, settings
 ```
 
-The core package carries all logic and the tests (`swift test` inside
-`BattisticsCore/`). The app layer stays thin: it consumes core event streams
-and renders.
+The core package carries all logic and the tests (`swift test` at the repo
+root). The app layer stays thin: it consumes core event streams and renders.
 
 ## Roadmap
 

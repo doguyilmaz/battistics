@@ -18,6 +18,3 @@ xcuserdata/
 *.xcarchive
 *.dmg
 *.zip
-
-# Reference screenshots stay local, never commit
-refs/screenshots/*

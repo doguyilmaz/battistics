@@ -15,7 +15,7 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Core tests
-        run: cd BattisticsCore && swift test
+        run: swift test
       - name: Build app
         run: |
           xcodegen generate

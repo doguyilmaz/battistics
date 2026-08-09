@@ -14,7 +14,7 @@ build: gen
 		-derivedDataPath $(DERIVED) build
 
 test:
-	cd BattisticsCore && swift test
+	swift test
 
 app: gen
 	xcodebuild -project Battistics.xcodeproj -scheme Battistics -configuration Release \
@@ -31,13 +31,8 @@ install: app
 	ditto $(APP) /Applications/Battistics.app
 	@echo "Installed to /Applications/Battistics.app"
 
-# Prefers real artwork at art/icon-art.png, falls back to the code-drawn mark.
 icon:
-	@if [ -f art/icon-art.png ]; then \
-		swift scripts/make-icon-from-art.swift art/icon-art.png App/Resources/Assets.xcassets/AppIcon.appiconset; \
-	else \
-		swift scripts/make-app-icon.swift App/Resources/Assets.xcassets/AppIcon.appiconset; \
-	fi
+	swift scripts/make-icon-from-art.swift art/icon-art.png App/Resources/Assets.xcassets/AppIcon.appiconset
 
 dmg: app
 	bash scripts/make-dmg.sh
