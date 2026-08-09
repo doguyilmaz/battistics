@@ -19,7 +19,6 @@ fileGroups:
   - Makefile
   - project.yml
   - scripts
-  - art
 
 settings:
   base:
