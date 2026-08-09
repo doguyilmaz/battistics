@@ -79,13 +79,17 @@ struct BattisticsApp: App {
             CommandGroup(after: .appInfo) {
                 CheckForUpdatesButton(updater: updater)
             }
-        }
-
-        Settings {
-            SettingsView()
-                .environment(model)
-                .environment(updater)
-                .preferredColorScheme(colorScheme)
+            // Settings live inside the dashboard; keep the standard app
+            // menu item and Cmd+, pointing there.
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings…") {
+                    model.dashboardPane = .general
+                    if let url = URL(string: "battistics://dashboard") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
         }
     }
 }

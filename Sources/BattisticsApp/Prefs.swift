@@ -2,6 +2,20 @@ import BattisticsCore
 import Foundation
 import SwiftUI
 
+enum MenuBarIconStyle: String, CaseIterable, Identifiable {
+    case bat
+    case classic
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .bat: String(localized: "Bat")
+        case .classic: String(localized: "Classic")
+        }
+    }
+}
+
 enum MenuBarText: String, CaseIterable, Identifiable {
     case none
     case chargePercent
@@ -58,6 +72,7 @@ enum Prefs {
     static let theme = "theme"
     static let temperatureUnit = "temperatureUnit"
 
+    static let menuBarIconStyle = "menuBarIconStyle"
     static let menuBarShowGlyph = "menuBarShowGlyph"
     static let menuBarPrimaryText = "menuBarPrimaryText"
     static let menuBarSecondaryText = "menuBarSecondaryText"
@@ -92,6 +107,7 @@ enum Prefs {
             theme: ThemePreference.automatic.rawValue,
             temperatureUnit: TemperatureUnit.both.rawValue,
 
+            menuBarIconStyle: MenuBarIconStyle.bat.rawValue,
             menuBarShowGlyph: true,
             menuBarPrimaryText: MenuBarText.chargePercent.rawValue,
             menuBarSecondaryText: MenuBarText.none.rawValue,

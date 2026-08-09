@@ -8,7 +8,6 @@ struct GeneralSettings: View {
     @AppStorage(Prefs.showDockIcon) private var showDockIcon = false
     @AppStorage(Prefs.openDashboardAtLaunch) private var openDashboardAtLaunch = false
     @AppStorage(Prefs.keepDashboardOnTop) private var keepDashboardOnTop = false
-    @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
 
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -41,12 +40,7 @@ struct GeneralSettings: View {
                     .foregroundStyle(.secondary)
                 Toggle("Keep dashboard window on top", isOn: $keepDashboardOnTop)
             }
-            Section("Appearance") {
-                Picker("Theme", selection: $themeRaw) {
-                    ForEach(ThemePreference.allCases) { theme in
-                        Text(theme.label).tag(theme.rawValue)
-                    }
-                }
+            Section("Units") {
                 Picker("Temperature unit", selection: $temperatureUnitRaw) {
                     Text("Celsius and Fahrenheit").tag(TemperatureUnit.both.rawValue)
                     Text("Celsius").tag(TemperatureUnit.celsius.rawValue)

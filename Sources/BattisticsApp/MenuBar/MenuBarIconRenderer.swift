@@ -2,6 +2,7 @@ import AppKit
 import BattisticsCore
 
 struct MenuBarConfig: Equatable {
+    var iconStyle = MenuBarIconStyle.bat
     var showGlyph = true
     var primaryText = MenuBarText.chargePercent
     var secondaryText = MenuBarText.none
@@ -28,8 +29,8 @@ enum MenuBarIconRenderer {
         // glyph, never a red zero.
         guard let snapshot, snapshot.batteryInstalled else {
             return cachedRender(
-                key: "no-battery", percent: nil, charging: false, texts: [],
-                showGlyph: true, tint: nil)
+                key: "no-battery|\(config.iconStyle.rawValue)", percent: nil, charging: false,
+                texts: [], showGlyph: true, tint: nil, shape: config.iconStyle)
         }
         let percent = snapshot.percent
         let charging = snapshot.isCharging
@@ -38,26 +39,28 @@ enum MenuBarIconRenderer {
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
         let tint = tintColor(percent: percent, charging: charging, external: external, config: config)
 
-        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")"
+        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(config.iconStyle.rawValue)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")"
         return cachedRender(
             key: key, percent: percent, charging: charging, texts: texts,
-            showGlyph: config.showGlyph, tint: tint)
+            showGlyph: config.showGlyph, tint: tint, shape: config.iconStyle)
     }
 
     private static func cachedRender(
-        key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?
+        key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
+        tint: NSColor?, shape: MenuBarIconStyle
     ) -> NSImage {
         if let cached = cache.object(forKey: key as NSString) { return cached }
         let image = render(
             percent: percent, charging: charging, texts: texts,
-            showGlyph: showGlyph, tint: tint)
+            showGlyph: showGlyph, tint: tint, shape: shape)
         cache.setObject(image, forKey: key as NSString)
         return image
     }
 
     /// Status ladder: charging blue, critical red, low orange, full green,
     /// monochrome template otherwise. Each rung is user-toggleable.
-    private static func tintColor(
+    /// Internal so the appearance settings can render true previews.
+    static func tintColor(
         percent: Int, charging: Bool, external: Bool, config: MenuBarConfig
     ) -> NSColor? {
         if config.colorCharging, charging { return .systemBlue }
@@ -94,7 +97,8 @@ enum MenuBarIconRenderer {
     }
 
     private static func render(
-        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?
+        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
+        shape: MenuBarIconStyle
     ) -> NSImage {
         let color = tint ?? .black
         let string = texts.joined(separator: " ")
@@ -118,7 +122,8 @@ enum MenuBarIconRenderer {
                     in: glyphRect,
                     style: BatGlyph.Style(
                         color: color, charging: charging,
-                        fillFraction: percent.map { CGFloat($0) / 100 }))
+                        fillFraction: percent.map { CGFloat($0) / 100 },
+                        shape: shape))
                 x += glyphSize.width + 4
             }
             if !string.isEmpty {

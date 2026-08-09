@@ -12,6 +12,9 @@ final class AppModel {
     private(set) var snapshot: BatterySnapshot?
     private(set) var lastUnplugDate: Date?
     private(set) var sparkline: [SeriesPoint] = []
+    /// Which dashboard pane is showing; settable from the popover and the
+    /// Settings menu command so they can deep-link into the window.
+    var dashboardPane: DashboardPane = .overview
 
     let history: HistoryStore
 

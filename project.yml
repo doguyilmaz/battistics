@@ -49,7 +49,7 @@ targets:
         CFBundleVersion: "0.1.0"
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
-        NSHumanReadableCopyright: "MIT License"
+        NSHumanReadableCopyright: "© 2026 Dogu Yilmaz · MIT License"
         CFBundleURLTypes:
           - CFBundleURLName: com.dogukyilmaz.Battistics
             CFBundleURLSchemes: [battistics]

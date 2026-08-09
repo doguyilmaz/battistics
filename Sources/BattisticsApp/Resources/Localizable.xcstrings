@@ -1518,6 +1518,119 @@
           }
         }
       }
+    },
+    "Bat": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yarasa"
+          }
+        }
+      }
+    },
+    "Classic": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasik"
+          }
+        }
+      }
+    },
+    "Icon Style": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simge Stili"
+          }
+        }
+      }
+    },
+    "Preview": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önizleme"
+          }
+        }
+      }
+    },
+    "Full": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dolu"
+          }
+        }
+      }
+    },
+    "Normal": {
+      "shouldTranslate": false
+    },
+    "Low": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük"
+          }
+        }
+      }
+    },
+    "Critical": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kritik"
+          }
+        }
+      }
+    },
+    "Monitor": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzleme"
+          }
+        }
+      }
+    },
+    "Units": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birimler"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar…"
+          }
+        }
+      }
+    },
+    "Toggle sidebar": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kenar çubuğunu aç/kapat"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

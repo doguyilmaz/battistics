@@ -6,8 +6,16 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     case details
     case peripherals
     case energy
+    case general
+    case appearance
+    case notifications
+    case data
+    case about
 
     var id: String { rawValue }
+
+    static let monitorPanes: [DashboardPane] = [.overview, .history, .details, .peripherals, .energy]
+    static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data, .about]
 
     var title: String {
         switch self {
@@ -16,6 +24,11 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: String(localized: "Details")
         case .peripherals: String(localized: "Peripherals")
         case .energy: String(localized: "Energy")
+        case .general: String(localized: "General")
+        case .appearance: String(localized: "Appearance")
+        case .notifications: String(localized: "Notifications")
+        case .data: String(localized: "Data")
+        case .about: String(localized: "About")
         }
     }
 
@@ -26,6 +39,11 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: "list.bullet.rectangle"
         case .peripherals: "keyboard"
         case .energy: "bolt.circle"
+        case .general: "gearshape"
+        case .appearance: "paintbrush"
+        case .notifications: "bell.badge"
+        case .data: "internaldrive"
+        case .about: "info.circle"
         }
     }
 }
@@ -37,7 +55,6 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 struct DashboardView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
-    @State private var selection: DashboardPane? = .overview
     @State private var sidebarVisible = true
 
     var body: some View {
@@ -63,7 +80,7 @@ struct DashboardView: View {
                 .keyboardShortcut("s", modifiers: [.command, .control])
             }
         }
-        .navigationTitle((selection ?? .overview).title)
+        .navigationTitle(model.dashboardPane.title)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
         .task {
             while !Task.isCancelled {
@@ -73,26 +90,47 @@ struct DashboardView: View {
         }
     }
 
+    private var selectionBinding: Binding<DashboardPane?> {
+        Binding(
+            get: { model.dashboardPane },
+            set: { model.dashboardPane = $0 ?? .overview }
+        )
+    }
+
     private var sidebar: some View {
-        List(DashboardPane.allCases, selection: $selection) { pane in
-            Label(pane.title, systemImage: pane.icon).tag(pane)
+        List(selection: selectionBinding) {
+            Section("Monitor") {
+                ForEach(DashboardPane.monitorPanes) { pane in
+                    Label(pane.title, systemImage: pane.icon).tag(pane)
+                }
+            }
+            Section("Settings") {
+                ForEach(DashboardPane.settingsPanes) { pane in
+                    Label(pane.title, systemImage: pane.icon).tag(pane)
+                }
+            }
         }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .frame(width: 180)
-        .background(SidebarBackground())
+        .background(SidebarBackground().ignoresSafeArea())
         .overlay(alignment: .trailing) {
             Divider().ignoresSafeArea()
         }
     }
 
     @ViewBuilder private var detailView: some View {
-        switch selection ?? .overview {
+        switch model.dashboardPane {
         case .overview: OverviewPane()
         case .history: HistoryPane()
         case .details: DetailsPane()
         case .peripherals: PeripheralsPane()
         case .energy: EnergyPane()
+        case .general: GeneralSettings()
+        case .appearance: AppearanceSettings()
+        case .notifications: NotificationSettings()
+        case .data: HistorySettings()
+        case .about: AboutSettings()
         }
     }
 }

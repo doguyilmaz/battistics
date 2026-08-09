@@ -10,13 +10,14 @@ enum BatGlyph {
         var charging = false
         /// 0...1 fill level, nil hides the fill bar.
         var fillFraction: CGFloat?
+        var shape: MenuBarIconStyle = .bat
     }
 
     /// Draws the glyph into `rect` (non-flipped coordinates).
     static func draw(in rect: NSRect, style: Style) {
         let stroke = max(rect.height * 0.075, 1.2)
-        let earHeight = rect.height * 0.20
-        let wingHeight = rect.height * 0.16
+        let earHeight = style.shape == .bat ? rect.height * 0.20 : 0
+        let wingHeight = style.shape == .bat ? rect.height * 0.16 : 0
         let bodyWidth = rect.width * 0.87
         let left = rect.minX + stroke / 2
         let right = left + bodyWidth
@@ -32,6 +33,18 @@ enum BatGlyph {
         outline.lineWidth = stroke
         outline.lineJoinStyle = .round
         outline.lineCapStyle = .round
+
+        if style.shape == .classic {
+            // Plain battery: simple rounded rectangle body.
+            outline.appendRoundedRect(
+                NSRect(x: left, y: bottom, width: bodyWidth, height: top - bottom),
+                xRadius: radius, yRadius: radius)
+            outline.stroke()
+            drawNubAndInterior(
+                in: rect, style: style, stroke: stroke, left: left, right: right,
+                top: top, bottom: bottom, bodyWidth: bodyWidth, midX: midX)
+            return
+        }
 
         // Left edge, bottom to top.
         outline.move(to: NSPoint(x: left, y: bottom + radius))
@@ -84,6 +97,16 @@ enum BatGlyph {
         outline.close()
         outline.stroke()
 
+        drawNubAndInterior(
+            in: rect, style: style, stroke: stroke, left: left, right: right,
+            top: top, bottom: bottom, bodyWidth: bodyWidth, midX: midX)
+    }
+
+    private static func drawNubAndInterior(
+        in rect: NSRect, style: Style, stroke: CGFloat,
+        left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat,
+        bodyWidth: CGFloat, midX: CGFloat
+    ) {
         // Terminal nub on the right.
         let nubHeight = (top - bottom) * 0.40
         let nub = NSRect(
@@ -127,12 +150,16 @@ enum BatGlyph {
     }
 
     /// Standalone glyph image, template unless a color is given.
-    static func image(size: NSSize, fillFraction: CGFloat?, charging: Bool, color: NSColor? = nil) -> NSImage {
+    static func image(
+        size: NSSize, fillFraction: CGFloat?, charging: Bool, color: NSColor? = nil,
+        shape: MenuBarIconStyle = .bat
+    ) -> NSImage {
         let image = NSImage(size: size, flipped: false) { rect in
             draw(
                 in: rect,
                 style: Style(
-                    color: color ?? .black, charging: charging, fillFraction: fillFraction))
+                    color: color ?? .black, charging: charging, fillFraction: fillFraction,
+                    shape: shape))
             return true
         }
         image.isTemplate = color == nil

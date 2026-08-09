@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuBarLabelView: View {
     var model: AppModel
 
+    @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
     @AppStorage(Prefs.menuBarSecondaryText) private var secondaryRaw = MenuBarText.none.rawValue
@@ -15,6 +16,7 @@ struct MenuBarLabelView: View {
 
     private var config: MenuBarConfig {
         MenuBarConfig(
+            iconStyle: MenuBarIconStyle(rawValue: iconStyleRaw) ?? .bat,
             showGlyph: showGlyph,
             primaryText: MenuBarText(rawValue: primaryRaw) ?? .chargePercent,
             secondaryText: MenuBarText(rawValue: secondaryRaw) ?? .none,
