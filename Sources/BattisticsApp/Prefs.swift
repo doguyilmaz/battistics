@@ -22,6 +22,40 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
     }
 }
 
+enum AppIconStyle: String, CaseIterable, Identifiable {
+    case original
+    case gauge
+    case batBattery
+    case stats
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .original: String(localized: "Original")
+        case .gauge: String(localized: "Gauge")
+        case .batBattery: String(localized: "Bat Battery")
+        case .stats: String(localized: "Stats")
+        }
+    }
+
+    var resourceName: String {
+        switch self {
+        case .original: "appicon-original"
+        case .gauge: "appicon-gauge"
+        case .batBattery: "appicon-batbattery"
+        case .stats: "appicon-stats"
+        }
+    }
+
+    var image: NSImage? {
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "png") else {
+            return nil
+        }
+        return NSImage(contentsOf: url)
+    }
+}
+
 enum MenuBarText: String, CaseIterable, Identifiable {
     case none
     case chargePercent
@@ -78,6 +112,7 @@ enum Prefs {
     static let theme = "theme"
     static let temperatureUnit = "temperatureUnit"
 
+    static let appIconStyle = "appIconStyle"
     static let menuBarIconStyle = "menuBarIconStyle"
     static let menuBarShowGlyph = "menuBarShowGlyph"
     static let menuBarPrimaryText = "menuBarPrimaryText"
@@ -113,6 +148,7 @@ enum Prefs {
             theme: ThemePreference.automatic.rawValue,
             temperatureUnit: TemperatureUnit.both.rawValue,
 
+            appIconStyle: AppIconStyle.original.rawValue,
             menuBarIconStyle: MenuBarIconStyle.bat.rawValue,
             menuBarShowGlyph: true,
             menuBarPrimaryText: MenuBarText.chargePercent.rawValue,

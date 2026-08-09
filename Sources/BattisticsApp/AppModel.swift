@@ -45,6 +45,7 @@ final class AppModel {
         // Deferred: NSApplication does not exist yet during App.init.
         Task { @MainActor [weak self] in
             self?.applyActivationPolicy()
+            self?.applyAppIcon()
         }
 
         Task { [weak self] in
@@ -220,6 +221,16 @@ final class AppModel {
     }
 
     // MARK: - Dock icon policy
+
+    /// Applies the chosen app icon to the Dock and Cmd-Tab at runtime.
+    /// Finder always shows the bundle's default icon; that is a macOS limit.
+    func applyAppIcon() {
+        guard let app = NSApp else { return }
+        let style = AppIconStyle(
+            rawValue: UserDefaults.standard.string(forKey: Prefs.appIconStyle) ?? ""
+        ) ?? .original
+        app.applicationIconImage = style == .original ? nil : style.image
+    }
 
     /// The Dock icon strictly follows the preference. Windows open fine
     /// under the accessory policy, they just do not appear in Cmd-Tab.

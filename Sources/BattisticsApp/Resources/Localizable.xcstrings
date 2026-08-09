@@ -1661,6 +1661,46 @@
           }
         }
       }
+    },
+    "App Icon": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama Simgesi"
+          }
+        }
+      }
+    },
+    "Original": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orijinal"
+          }
+        }
+      }
+    },
+    "Bat Battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yarasa Pil"
+          }
+        }
+      }
+    },
+    "Applies to the Dock and the app switcher while Battistics runs.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics çalışırken Dock ve uygulama değiştiricide geçerlidir."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

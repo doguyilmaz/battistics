@@ -4,7 +4,9 @@ import SwiftUI
 /// Theme plus everything about the menu bar item: icon style with visual
 /// previews, live status preview strip, text slots and color rules.
 struct AppearanceSettings: View {
+    @Environment(AppModel.self) private var model
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
+    @AppStorage(Prefs.appIconStyle) private var appIconRaw = AppIconStyle.original.rawValue
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
@@ -36,6 +38,17 @@ struct AppearanceSettings: View {
                         Text(theme.label).tag(theme.rawValue)
                     }
                 }
+            }
+            Section("App Icon") {
+                HStack(spacing: 14) {
+                    ForEach(AppIconStyle.allCases) { style in
+                        appIconPicker(style)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                Text("Applies to the Dock and the app switcher while Battistics runs.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             Section("Icon Style") {
                 HStack(spacing: 14) {
@@ -93,6 +106,44 @@ struct AppearanceSettings: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private func appIconPicker(_ style: AppIconStyle) -> some View {
+        let selected = style.rawValue == appIconRaw
+        return VStack(spacing: 8) {
+            Group {
+                if let image = style.image {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    Image(systemName: "questionmark.square.dashed")
+                        .font(.largeTitle)
+                }
+            }
+            .frame(width: 56, height: 56)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            Text(style.label)
+                .font(.caption)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(selected ? Color.accentColor.opacity(0.14) : Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(
+                    selected ? Color.accentColor : Color.secondary.opacity(0.25),
+                    lineWidth: selected ? 2 : 1)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 10))
+        .onTapGesture {
+            appIconRaw = style.rawValue
+            model.applyAppIcon()
+        }
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
     private func stylePicker(_ style: MenuBarIconStyle) -> some View {
