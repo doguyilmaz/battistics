@@ -30,37 +30,59 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     }
 }
 
+/// Custom split layout instead of NavigationSplitView: AppKit's sidebar
+/// expand animation slides the detail as a frozen layer and reflows it only
+/// at the end (the "shift right then jump"). Owning the layout lets SwiftUI
+/// interpolate the real frames, so opening reflows as smoothly as closing.
 struct DashboardView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
     @State private var selection: DashboardPane? = .overview
-    @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var sidebarVisible = true
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            List(DashboardPane.allCases, selection: $selection) { pane in
-                Label(pane.title, systemImage: pane.icon).tag(pane)
+        HStack(spacing: 0) {
+            if sidebarVisible {
+                sidebar
+                    .transition(.move(edge: .leading))
             }
-            .navigationSplitViewColumnWidth(180)
-        } detail: {
             detailView
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        // Balanced: the detail resizes while the sidebar appears instead of
-        // being pushed aside and reflowed at the end.
-        .navigationSplitViewStyle(.balanced)
         .frame(width: 860, height: 545)
-        .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
-        .onAppear {
-            // The split view otherwise restores a previously collapsed
-            // sidebar; the dashboard always opens with it visible.
-            columnVisibility = .all
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        sidebarVisible.toggle()
+                    }
+                } label: {
+                    Image(systemName: "sidebar.left")
+                }
+                .help("Toggle sidebar")
+                .keyboardShortcut("s", modifiers: [.command, .control])
+            }
         }
+        .navigationTitle((selection ?? .overview).title)
+        .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
         .task {
             while !Task.isCancelled {
                 model.refreshSensors()
                 try? await Task.sleep(for: .seconds(3))
             }
+        }
+    }
+
+    private var sidebar: some View {
+        List(DashboardPane.allCases, selection: $selection) { pane in
+            Label(pane.title, systemImage: pane.icon).tag(pane)
+        }
+        .listStyle(.sidebar)
+        .scrollContentBackground(.hidden)
+        .frame(width: 180)
+        .background(SidebarBackground())
+        .overlay(alignment: .trailing) {
+            Divider().ignoresSafeArea()
         }
     }
 
@@ -75,3 +97,16 @@ struct DashboardView: View {
     }
 }
 
+/// The translucent material NavigationSplitView gives its sidebar, applied
+/// to the custom one.
+private struct SidebarBackground: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .sidebar
+        view.blendingMode = .behindWindow
+        view.state = .followsWindowActiveState
+        return view
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+}
