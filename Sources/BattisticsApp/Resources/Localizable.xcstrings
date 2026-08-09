@@ -1631,6 +1631,36 @@
           }
         }
       }
+    },
+    "Gauge": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gösterge"
+          }
+        }
+      }
+    },
+    "Stats": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İstatistik"
+          }
+        }
+      }
+    },
+    "Wings": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanat"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

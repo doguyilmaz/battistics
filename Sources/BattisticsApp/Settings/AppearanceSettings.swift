@@ -107,7 +107,7 @@ struct AppearanceSettings: View {
             Text(style.label)
                 .font(.caption)
         }
-        .padding(.horizontal, 22)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)

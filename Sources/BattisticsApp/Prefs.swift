@@ -5,6 +5,9 @@ import SwiftUI
 enum MenuBarIconStyle: String, CaseIterable, Identifiable {
     case bat
     case classic
+    case gauge
+    case stats
+    case wings
 
     var id: String { rawValue }
 
@@ -12,6 +15,9 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
         switch self {
         case .bat: String(localized: "Bat")
         case .classic: String(localized: "Classic")
+        case .gauge: String(localized: "Gauge")
+        case .stats: String(localized: "Stats")
+        case .wings: String(localized: "Wings")
         }
     }
 }
