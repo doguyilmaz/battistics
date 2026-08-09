@@ -11,6 +11,7 @@ struct PopoverView: View {
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
     @State private var windowVisible = true
+    @State private var sparklineSelection: Date?
 
     private var temperatureUnit: TemperatureUnit {
         TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
@@ -159,28 +160,56 @@ struct PopoverView: View {
             VStack(alignment: .leading, spacing: 6) {
                 SectionHeader(title: "Last 24 Hours")
                 if model.sparkline.count > 1 {
-                    Chart(model.sparkline) { point in
-                        AreaMark(
-                            x: .value("Time", point.date),
-                            y: .value("Charge", point.value)
-                        )
-                        .interpolationMethod(.monotone)
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
-                                startPoint: .top, endPoint: .bottom))
-                        LineMark(
-                            x: .value("Time", point.date),
-                            y: .value("Charge", point.value)
-                        )
-                        .interpolationMethod(.monotone)
-                        .foregroundStyle(Color.green)
-                        .lineStyle(StrokeStyle(lineWidth: 1.5))
+                    Chart {
+                        ForEach(model.sparkline) { point in
+                            AreaMark(
+                                x: .value("Time", point.date),
+                                y: .value("Charge", point.value)
+                            )
+                            .interpolationMethod(.monotone)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
+                                    startPoint: .top, endPoint: .bottom))
+                            LineMark(
+                                x: .value("Time", point.date),
+                                y: .value("Charge", point.value)
+                            )
+                            .interpolationMethod(.monotone)
+                            .foregroundStyle(Color.green)
+                            .lineStyle(StrokeStyle(lineWidth: 1.5))
+                        }
+                        if let selected = nearestSparklinePoint {
+                            RuleMark(x: .value("Time", selected.date))
+                                .foregroundStyle(.secondary.opacity(0.35))
+                            PointMark(
+                                x: .value("Time", selected.date),
+                                y: .value("Charge", selected.value)
+                            )
+                            .foregroundStyle(Color.green)
+                            .symbolSize(28)
+                            .annotation(
+                                position: .top,
+                                overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
+                            ) {
+                                HStack(spacing: 4) {
+                                    Text("\(Int(selected.value.rounded()))%")
+                                        .font(.caption2.weight(.semibold))
+                                    Text(selected.date, format: .dateTime.hour().minute())
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 5))
+                            }
+                        }
                     }
                     .chartYScale(domain: 0...100)
                     .chartXAxis(.hidden)
                     .chartYAxis(.hidden)
-                    .frame(height: 42)
+                    .chartXSelection(value: $sparklineSelection)
+                    .frame(height: 46)
                 } else {
                     Text("Charge history appears here as Battistics runs.")
                         .font(.caption)
@@ -273,6 +302,14 @@ struct PopoverView: View {
         guard let unplugged = model.lastUnplugDate else { return "N/A" }
         let minutes = Int(Date().timeIntervalSince(unplugged) / 60)
         return Formatting.duration(minutes: max(minutes, 0))
+    }
+
+    private var nearestSparklinePoint: SeriesPoint? {
+        guard let sparklineSelection, !model.sparkline.isEmpty else { return nil }
+        return model.sparkline.min {
+            abs($0.date.timeIntervalSince(sparklineSelection))
+                < abs($1.date.timeIntervalSince(sparklineSelection))
+        }
     }
 
     private func statusText(_ snapshot: BatterySnapshot) -> String {

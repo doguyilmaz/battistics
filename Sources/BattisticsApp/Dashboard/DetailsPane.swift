@@ -22,12 +22,13 @@ struct DetailsPane: View {
                     if let date = snapshot.manufactureDate {
                         // Serial-derived dates only carry week precision, so
                         // pretending to know the day would be dishonest.
+                        let dateText =
+                            snapshot.manufactureDateIsApproximate
+                            ? date.formatted(.dateTime.month(.wide).year())
+                            : date.formatted(date: .abbreviated, time: .omitted)
                         LabeledContent(
                             "Manufacture Date",
-                            value: snapshot.manufactureDateIsApproximate
-                                ? date.formatted(.dateTime.month(.wide).year())
-                                : date.formatted(date: .abbreviated, time: .omitted))
-                        LabeledContent("Age", value: Formatting.age(from: date))
+                            value: "\(dateText) · \(Formatting.age(from: date))")
                     }
                     LabeledContent("Cycle Count", value: "\(snapshot.cycleCount)")
                     if let designCycles = snapshot.designCycleCount {
@@ -42,9 +43,6 @@ struct DetailsPane: View {
                     LabeledContent("Health", value: Formatting.percentPrecise(snapshot.healthPercent))
                     LabeledContent(
                         "Measured Health", value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
-                    if let system = snapshot.systemHealthStatus {
-                        LabeledContent("System Status", value: system)
-                    }
                 }
                 Section("Electrical") {
                     if let temperature = snapshot.temperatureC {

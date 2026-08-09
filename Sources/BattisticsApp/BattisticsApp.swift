@@ -12,8 +12,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// This works in every icon configuration; a view-based approach only
     /// runs when the menu bar label happens to exist.
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if UserDefaults.standard.bool(forKey: Prefs.openDashboardAtLaunch),
-            let url = URL(string: "battistics://dashboard") {
+        if UserDefaults.standard.bool(forKey: Prefs.openDashboardAtLaunch) {
+            Self.openDashboard()
+        }
+    }
+
+    /// Clicking the Dock icon with no open windows sends "reopen"; answer
+    /// it with the dashboard, the expected macOS behavior.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        if !hasVisibleWindows {
+            Self.openDashboard()
+        }
+        return true
+    }
+
+    private static func openDashboard() {
+        if let url = URL(string: "battistics://dashboard") {
             NSWorkspace.shared.open(url)
         }
     }

@@ -73,9 +73,9 @@ struct OverviewPane: View {
                     label: "Health",
                     value: Formatting.percentPrecise(snapshot.healthPercent),
                     valueColor: .health(percent: snapshot.healthPercent))
-                if let system = snapshot.systemHealthStatus {
-                    StatRow(label: "System Status", value: system)
-                }
+                StatRow(
+                    label: "Measured Health",
+                    value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
             }
         }
     }
@@ -102,14 +102,14 @@ struct OverviewPane: View {
                 if let voltage = snapshot.voltageMV {
                     StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
                 }
-                if let unplugged = model.lastUnplugDate {
-                    StatRow(
-                        label: "Time on Battery",
-                        value: Formatting.duration(
-                            minutes: max(Int(Date().timeIntervalSince(unplugged) / 60), 0)))
-                }
+                StatRow(label: "Time on Battery", value: timeOnBattery)
             }
         }
+    }
+
+    private var timeOnBattery: String {
+        guard let unplugged = model.lastUnplugDate else { return "N/A" }
+        return Formatting.duration(minutes: max(Int(Date().timeIntervalSince(unplugged) / 60), 0))
     }
 
     private func adapterCard(_ adapter: AdapterInfo) -> some View {

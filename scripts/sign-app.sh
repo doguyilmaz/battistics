@@ -6,22 +6,28 @@
 set -euo pipefail
 
 APP="${1:?usage: sign-app.sh <path-to.app>}"
-IDENTITY="${SIGN_IDENTITY:?SIGN_IDENTITY must be set to a Developer ID identity}"
+IDENTITY="${SIGN_IDENTITY:-"-"}"
+
+# Real identities get hardened runtime + timestamp (required for
+# notarization). Ad-hoc local builds get neither: hardened runtime's
+# library validation treats a team-less binary as matching no team, which
+# would block loading the equally team-less Sparkle framework.
+FLAGS=(-f -s "$IDENTITY")
+if [ "$IDENTITY" != "-" ]; then
+    FLAGS+=(-o runtime --timestamp)
+fi
 
 SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
 
 if [ -d "$SPARKLE" ]; then
-    codesign -f -s "$IDENTITY" -o runtime --timestamp --preserve-metadata=entitlements \
+    codesign "${FLAGS[@]}" --preserve-metadata=entitlements \
         "$SPARKLE/Versions/B/XPCServices/Downloader.xpc"
-    codesign -f -s "$IDENTITY" -o runtime --timestamp \
-        "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
-    codesign -f -s "$IDENTITY" -o runtime --timestamp \
-        "$SPARKLE/Versions/B/Autoupdate"
-    codesign -f -s "$IDENTITY" -o runtime --timestamp \
-        "$SPARKLE/Versions/B/Updater.app"
-    codesign -f -s "$IDENTITY" -o runtime --timestamp "$SPARKLE"
+    codesign "${FLAGS[@]}" "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
+    codesign "${FLAGS[@]}" "$SPARKLE/Versions/B/Autoupdate"
+    codesign "${FLAGS[@]}" "$SPARKLE/Versions/B/Updater.app"
+    codesign "${FLAGS[@]}" "$SPARKLE"
 fi
 
-codesign -f -s "$IDENTITY" -o runtime --timestamp "$APP"
+codesign "${FLAGS[@]}" "$APP"
 codesign --verify --deep --strict "$APP"
 echo "Signed $APP with $IDENTITY"
