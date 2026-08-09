@@ -19,9 +19,10 @@ test:
 app: gen
 	xcodebuild -project Battistics.xcodeproj -scheme Battistics -configuration Release \
 		-derivedDataPath $(DERIVED) build \
-		CODE_SIGN_IDENTITY="$(SIGN_IDENTITY)" $(if $(filter -,$(SIGN_IDENTITY)),,CODE_SIGN_STYLE=Manual OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime")
+		CODE_SIGN_IDENTITY="$(SIGN_IDENTITY)" $(if $(filter -,$(SIGN_IDENTITY)),,CODE_SIGN_STYLE=Manual CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime")
 	rm -rf dist && mkdir -p dist
 	ditto $(DERIVED)/Build/Products/Release/Battistics.app $(APP)
+	$(if $(filter -,$(SIGN_IDENTITY)),,SIGN_IDENTITY="$(SIGN_IDENTITY)" bash scripts/sign-app.sh $(APP))
 
 run: build
 	open $(DERIVED)/Build/Products/Debug/Battistics.app

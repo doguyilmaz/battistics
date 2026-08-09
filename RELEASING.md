@@ -54,11 +54,17 @@ If CI is unavailable, a full release can run locally:
 ```sh
 make test
 SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" make dmg
-xcrun notarytool submit dist/Battistics-*.dmg --apple-id ... --team-id ... --password ... --wait
+xcrun notarytool submit dist/Battistics-*.dmg --keychain-profile battistics --wait
 xcrun stapler staple dist/Battistics-*.dmg
 make appcast   # requires the Sparkle key in the login Keychain
 make release   # needs gh auth
 ```
+
+The `battistics` notary profile is stored in the login Keychain
+(`notarytool store-credentials`). Signing note: `make app` re-signs
+Sparkle's nested XPC services and helpers with the Developer ID
+(`scripts/sign-app.sh`); CLI builds keep Sparkle's own signature otherwise
+and notarization rejects it.
 
 ## Checklist before tagging
 
