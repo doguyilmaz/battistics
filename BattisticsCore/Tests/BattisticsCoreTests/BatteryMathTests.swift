@@ -1,0 +1,157 @@
+import Foundation
+import Testing
+
+@testable import BattisticsCore
+
+@Suite("Battery snapshot math")
+struct BatteryMathTests {
+    private func makeSnapshot(
+        percent: Int = 80,
+        rawMax: Int = 5941,
+        design: Int = 6075,
+        voltageMV: Int? = 12070,
+        amperageMA: Int? = -650,
+        isCharging: Bool = false,
+        externalConnected: Bool = false,
+        fullyCharged: Bool = false,
+        avgTimeToEmptyMin: Int? = 312,
+        avgTimeToFullMin: Int? = nil
+    ) -> BatterySnapshot {
+        BatterySnapshot(
+            timestamp: Date(timeIntervalSince1970: 1_700_000_000),
+            batteryInstalled: true,
+            percent: percent,
+            rawCurrentCapacity: 4387,
+            rawMaxCapacity: rawMax,
+            nominalCapacity: 5900,
+            designCapacity: design,
+            cycleCount: 47,
+            designCycleCount: 1000,
+            temperatureC: 34.5,
+            voltageMV: voltageMV,
+            amperageMA: amperageMA,
+            isCharging: isCharging,
+            externalConnected: externalConnected,
+            fullyCharged: fullyCharged,
+            avgTimeToEmptyMin: avgTimeToEmptyMin,
+            avgTimeToFullMin: avgTimeToFullMin,
+            systemTimeRemainingMin: nil,
+            systemHealthStatus: nil,
+            serialNumber: nil,
+            deviceName: nil,
+            manufactureDate: nil,
+            adapter: nil
+        )
+    }
+
+    @Test func healthPercentUsesRawMaxOverDesign() {
+        let snapshot = makeSnapshot()
+        #expect(abs(snapshot.healthPercent - 97.79) < 0.01)
+        #expect(snapshot.healthStatus == .good)
+    }
+
+    @Test func healthStatusBoundaries() {
+        #expect(HealthStatus(healthPercent: 80) == .good)
+        #expect(HealthStatus(healthPercent: 79.9) == .fair)
+        #expect(HealthStatus(healthPercent: 60) == .fair)
+        #expect(HealthStatus(healthPercent: 59.9) == .poor)
+    }
+
+    @Test func wattsIsSignedVoltsTimesAmps() {
+        let snapshot = makeSnapshot()
+        let watts = try! #require(snapshot.watts)
+        #expect(abs(watts - (-7.8455)) < 0.001)
+    }
+
+    @Test func timeRemainingPicksSideByState() {
+        let discharging = makeSnapshot(avgTimeToEmptyMin: 312)
+        #expect(discharging.timeRemainingMin == 312)
+
+        let charging = makeSnapshot(
+            isCharging: true, externalConnected: true,
+            avgTimeToEmptyMin: nil, avgTimeToFullMin: 84)
+        #expect(charging.timeRemainingMin == 84)
+
+        let idle = makeSnapshot(externalConnected: true)
+        #expect(idle.timeRemainingMin == nil)
+    }
+
+    @Test func settlingSentinelIsRejected() {
+        let settling = makeSnapshot(avgTimeToEmptyMin: 65535)
+        #expect(settling.timeRemainingMin == nil)
+    }
+
+    @Test func signedMilliampsUnwrapsTwosComplement() {
+        #expect(BatteryReader.signedMilliamps(4_294_966_646) == -650)
+        #expect(BatteryReader.signedMilliamps(-650) == -650)
+        #expect(BatteryReader.signedMilliamps(1200) == 1200)
+        #expect(BatteryReader.signedMilliamps(nil) == nil)
+    }
+
+    @Test func smbusManufactureDateDecodes() {
+        // 7 Dec 2021: ((2021-1980) << 9) | (12 << 5) | 7
+        let packed = (41 << 9) | (12 << 5) | 7
+        let date = try! #require(BatteryReader.manufactureDate(fromSMBus: packed))
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let components = calendar.dateComponents([.year, .month, .day], from: date)
+        #expect(components.year == 2021)
+        #expect(components.month == 12)
+        #expect(components.day == 7)
+    }
+
+    @Test func smbusManufactureDateRejectsGarbage() {
+        #expect(BatteryReader.manufactureDate(fromSMBus: 0) == nil)
+        #expect(BatteryReader.manufactureDate(fromSMBus: 0xFFFF) == nil)
+    }
+
+    @Test func snapshotParsingFromRegistryDictionary() {
+        let props: [String: Any] = [
+            "CurrentCapacity": 80,
+            "MaxCapacity": 100,
+            "AppleRawCurrentCapacity": 4387,
+            "AppleRawMaxCapacity": 5941,
+            "NominalChargeCapacity": 5900,
+            "DesignCapacity": 6075,
+            "CycleCount": 47,
+            "Temperature": 3450,
+            "Voltage": 12070,
+            "Amperage": -650,
+            "IsCharging": false,
+            "ExternalConnected": true,
+            "FullyCharged": false,
+            "Serial": "F8Y1234ABCD",
+            "AdapterDetails": ["Watts": 96, "Name": "96W USB-C Power Adapter"] as [String: Any],
+        ]
+        let snapshot = BatteryReader.snapshot(from: props, iops: nil, now: Date())
+        #expect(snapshot.percent == 80)
+        #expect(snapshot.rawMaxCapacity == 5941)
+        #expect(snapshot.temperatureC == 34.5)
+        #expect(snapshot.adapter?.watts == 96)
+        #expect(snapshot.externalConnected)
+        #expect(!snapshot.isCharging)
+    }
+}
+
+@Suite("Formatting")
+struct FormattingTests {
+    @Test func temperatureUnits() {
+        #expect(Formatting.temperature(34.5, unit: .celsius) == "34.5°C")
+        #expect(Formatting.temperature(34.5, unit: .fahrenheit) == "94.1°F")
+        #expect(Formatting.temperature(34.5, unit: .both) == "34.5°C / 94.1°F")
+    }
+
+    @Test func durations() {
+        #expect(Formatting.duration(minutes: 134) == "2h 14m")
+        #expect(Formatting.duration(minutes: 45) == "45m")
+        #expect(Formatting.clock(minutes: 134) == "2:14")
+        #expect(Formatting.clock(minutes: 5) == "0:05")
+    }
+
+    @Test func age() {
+        let fourYearsAgo = Date().addingTimeInterval(-4.7 * 365.25 * 24 * 3600)
+        #expect(Formatting.age(from: fourYearsAgo) == "4.7 years")
+        let eightMonthsAgo = Date().addingTimeInterval(-8 * 30.44 * 24 * 3600)
+        #expect(Formatting.age(from: eightMonthsAgo) == "8 months")
+    }
+}
