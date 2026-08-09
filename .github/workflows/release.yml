@@ -1,0 +1,83 @@
+name: Release
+
+# Push a version tag to ship: git tag v1.0.1 && git push --tags
+# The tag is the single source of truth for the version. project.yml is
+# stamped from it before generating the project.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Import signing certificate
+        env:
+          CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASS=$(uuidgen)
+          security create-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN"
+          echo "$CERT_P12" | base64 --decode > cert.p12
+          security import cert.p12 -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          rm cert.p12
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain
+
+      - name: Stamp version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -E -i '' "s/CFBundleShortVersionString: \"[^\"]*\"/CFBundleShortVersionString: \"$VERSION\"/" project.yml
+          sed -E -i '' "s/CFBundleVersion: \"[^\"]*\"/CFBundleVersion: \"$VERSION\"/" project.yml
+
+      - name: Core tests
+        run: cd BattisticsCore && swift test
+
+      - name: Build signed DMG
+        env:
+          SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+        run: make dmg
+
+      - name: Notarize and staple
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: |
+          xcrun notarytool submit dist/Battistics-*.dmg \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
+            --password "$NOTARY_PASSWORD" --wait
+          xcrun stapler staple dist/Battistics-*.dmg
+
+      - name: Generate signed appcast
+        env:
+          SPARKLE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          rm -rf dist/release && mkdir -p dist/release
+          cp "dist/Battistics-$VERSION.dmg" dist/release/
+          KEY_FILE="$RUNNER_TEMP/sparkle_key"
+          printf '%s' "$SPARKLE_KEY" > "$KEY_FILE"
+          .build/xcode/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast dist/release \
+            --ed-key-file "$KEY_FILE" \
+            --download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/${GITHUB_REF_NAME}/"
+          rm "$KEY_FILE"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/release/Battistics-*.dmg dist/release/appcast.xml \
+            --title "Battistics ${GITHUB_REF_NAME#v}" --generate-notes

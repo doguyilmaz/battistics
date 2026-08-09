@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    # macos-26 image: builds link against the macOS 26 SDK so the app gets
+    # the current system appearance (Liquid Glass) instead of compatibility mode.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Core tests
+        run: cd BattisticsCore && swift test
+      - name: Build app
+        run: |
+          xcodegen generate
+          xcodebuild -project Battistics.xcodeproj -scheme Battistics \
+            -configuration Debug -derivedDataPath .build/xcode build \
+            CODE_SIGN_IDENTITY="-"

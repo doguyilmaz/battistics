@@ -195,8 +195,11 @@ final class AppModel {
         let showDock = UserDefaults.standard.bool(forKey: Prefs.showDockIcon)
         let policy: NSApplication.ActivationPolicy =
             (showDock || dashboardWindowCount > 0) ? .regular : .accessory
-        if NSApp.activationPolicy() != policy {
-            NSApp.setActivationPolicy(policy)
+        // NSApplication.shared, not NSApp: this can run from AppModel.init
+        // before the NSApp global is populated.
+        let app = NSApplication.shared
+        if app.activationPolicy() != policy {
+            app.setActivationPolicy(policy)
         }
     }
 }

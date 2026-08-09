@@ -42,7 +42,7 @@ targets:
         NSHumanReadableCopyright: "MIT License"
         SUFeedURL: https://github.com/doguyilmaz/battistics/releases/latest/download/appcast.xml
         SUEnableAutomaticChecks: true
-        SUPublicEDKey: REPLACE_WITH_SPARKLE_PUBLIC_KEY
+        SUPublicEDKey: j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.dogukyilmaz.Battistics
