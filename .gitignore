@@ -1,0 +1,23 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj
+!project.yml
+xcuserdata/
+*.xcuserstate
+*.moved-aside
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Archives
+*.xcarchive
+*.dmg
+*.zip
+
+# Reference screenshots stay local, never commit
+refs/screenshots/*
