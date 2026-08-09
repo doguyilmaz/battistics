@@ -92,6 +92,12 @@ App/                      SwiftUI app: menu bar scene, dashboard, settings
 The core package carries all logic and the tests (`swift test` at the repo
 root). The app layer stays thin: it consumes core event streams and renders.
 
+## Languages
+
+English and Turkish. Translations live in
+`Sources/BattisticsApp/Resources/Localizable.xcstrings`; pull requests for
+more languages are welcome.
+
 ## Roadmap
 
 - iPhone and iPad battery monitoring

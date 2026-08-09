@@ -11,11 +11,11 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .overview: "Overview"
-        case .history: "History"
-        case .details: "Details"
-        case .peripherals: "Peripherals"
-        case .energy: "Energy"
+        case .overview: String(localized: "Overview")
+        case .history: String(localized: "History")
+        case .details: String(localized: "Details")
+        case .peripherals: String(localized: "Peripherals")
+        case .energy: String(localized: "Energy")
         }
     }
 

@@ -12,10 +12,10 @@ enum HistoryTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .charge: "Charge"
-        case .power: "Power"
-        case .temperature: "Temperature"
-        case .health: "Health"
+        case .charge: String(localized: "Charge")
+        case .power: String(localized: "Power")
+        case .temperature: String(localized: "Temperature")
+        case .health: String(localized: "Health")
         }
     }
 
@@ -39,10 +39,10 @@ enum HistoryRange: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .day: "Day"
-        case .week: "Week"
-        case .month: "Month"
-        case .year: "Year"
+        case .day: String(localized: "Day")
+        case .week: String(localized: "Week")
+        case .month: String(localized: "Month")
+        case .year: String(localized: "Year")
         }
     }
 

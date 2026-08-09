@@ -40,27 +40,48 @@ final class AlertDispatcher {
     static func message(for alert: BatteryAlert) -> (title: String, body: String) {
         switch alert {
         case .lowBattery(let percent):
-            ("Battery Low", "Charge is at \(percent)%. Connect power soon.")
+            (
+                String(localized: "Battery Low"),
+                String(localized: "Charge is at \(percent)%. Connect power soon.")
+            )
         case .significantDrop(let percent):
-            ("Battery Draining", "Charge dropped to \(percent)%.")
+            (
+                String(localized: "Battery Draining"),
+                String(localized: "Charge dropped to \(percent)%.")
+            )
         case .chargeLimitReached(let percent):
-            ("Charge Limit Reached", "Battery is at \(percent)%. Unplug now to reduce battery wear.")
+            (
+                String(localized: "Charge Limit Reached"),
+                String(localized: "Battery is at \(percent)%. Unplug now to reduce battery wear.")
+            )
         case .fullyCharged:
-            ("Fully Charged", "Battery is fully charged. You can unplug the power adapter.")
+            (
+                String(localized: "Fully Charged"),
+                String(localized: "Battery is fully charged. You can unplug the power adapter.")
+            )
         case .highTemperature(let celsius):
             (
-                "Battery Running Hot",
-                "Battery temperature is \(Formatting.temperature(celsius, unit: Prefs.temperatureUnitValue))."
+                String(localized: "Battery Running Hot"),
+                String(
+                    localized:
+                        "Battery temperature is \(Formatting.temperature(celsius, unit: Prefs.temperatureUnitValue))."
+                )
             )
         case .onBatteryDuration(let hours):
             (
-                "Still on Battery",
-                "The Mac has been on battery power for \(Formatting.duration(minutes: Int(hours * 60)))."
+                String(localized: "Still on Battery"),
+                String(
+                    localized:
+                        "The Mac has been on battery power for \(Formatting.duration(minutes: Int(hours * 60)))."
+                )
             )
         case .healthDropped(let from, let to):
             (
-                "Battery Health Declined",
-                "Maximum capacity dropped from \(Formatting.percentPrecise(from)) to \(Formatting.percentPrecise(to))."
+                String(localized: "Battery Health Declined"),
+                String(
+                    localized:
+                        "Maximum capacity dropped from \(Formatting.percentPrecise(from)) to \(Formatting.percentPrecise(to))."
+                )
             )
         }
     }

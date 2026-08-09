@@ -217,9 +217,9 @@ struct PopoverView: View {
 
     private func statusWord(_ status: HealthStatus) -> String {
         switch status {
-        case .good: "Good"
-        case .fair: "Fair"
-        case .poor: "Service"
+        case .good: String(localized: "Good")
+        case .fair: String(localized: "Fair")
+        case .poor: String(localized: "Service")
         }
     }
 

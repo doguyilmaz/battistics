@@ -18,9 +18,7 @@ struct UpdatesSettings: View {
                 .disabled(!updater.canCheckForUpdates)
             }
             Section {
-                Text(
-                    "Updates are the only network traffic Battistics ever makes. "
-                        + "No analytics, no tracking, nothing else leaves this Mac.")
+                Text("Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -2,7 +2,7 @@ APP = dist/Battistics.app
 DERIVED = .build/xcode
 SPARKLE_BIN = $(DERIVED)/SourcePackages/artifacts/sparkle/Sparkle/bin
 SIGN_IDENTITY ?= -
-VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' App/Support/Info.plist)
+VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 
 .PHONY: gen build test app run install icon dmg appcast release clean
 
@@ -32,7 +32,7 @@ install: app
 	@echo "Installed to /Applications/Battistics.app"
 
 icon:
-	swift scripts/make-icon-from-art.swift art/icon-art.png App/Resources/Assets.xcassets/AppIcon.appiconset
+	swift scripts/make-icon-from-art.swift art/icon-art.png Sources/BattisticsApp/Resources/Assets.xcassets/AppIcon.appiconset
 
 dmg: app
 	bash scripts/make-dmg.sh

@@ -15,13 +15,13 @@ enum MenuBarText: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .none: "Nothing"
-        case .chargePercent: "Charge %"
-        case .healthPercent: "Health %"
-        case .timeRemaining: "Time remaining"
-        case .temperature: "Temperature"
-        case .watts: "Power (W)"
-        case .currentmAh: "Charge (mAh)"
+        case .none: String(localized: "Nothing")
+        case .chargePercent: String(localized: "Charge %")
+        case .healthPercent: String(localized: "Health %")
+        case .timeRemaining: String(localized: "Time remaining")
+        case .temperature: String(localized: "Temperature")
+        case .watts: String(localized: "Power (W)")
+        case .currentmAh: String(localized: "Charge (mAh)")
         }
     }
 }
@@ -35,9 +35,9 @@ enum ThemePreference: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .automatic: "Automatic"
-        case .light: "Light"
-        case .dark: "Dark"
+        case .automatic: String(localized: "Automatic")
+        case .light: String(localized: "Light")
+        case .dark: String(localized: "Dark")
         }
     }
 

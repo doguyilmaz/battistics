@@ -3,7 +3,7 @@
 # shortcut. Signs the image when SIGN_IDENTITY is a real identity.
 set -euo pipefail
 
-VERSION=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' App/Support/Info.plist)
+VERSION=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 APP="dist/Battistics.app"
 STAGE="dist/dmg-stage"
 DMG="dist/Battistics-$VERSION.dmg"

@@ -14,9 +14,7 @@ struct HistorySettings: View {
     var body: some View {
         Form {
             Section("Recording") {
-                Text(
-                    "Charge history is event driven and costs nothing while idle. "
-                        + "Power and temperature history need one lightweight reading on a timer.")
+                Text("Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Record power and temperature", isOn: $samplingEnabled)
