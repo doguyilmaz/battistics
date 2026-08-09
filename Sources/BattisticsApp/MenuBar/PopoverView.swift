@@ -151,6 +151,15 @@ struct PopoverView: View {
                 if let voltage = snapshot.voltageMV {
                     StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
                 }
+                if let date = snapshot.manufactureDate {
+                    let dateText =
+                        snapshot.manufactureDateIsApproximate
+                        ? date.formatted(.dateTime.month(.wide).year())
+                        : date.formatted(date: .abbreviated, time: .omitted)
+                    StatRow(
+                        label: "Manufacture Date",
+                        value: "\(dateText) · \(Formatting.age(from: date))")
+                }
             }
         }
     }

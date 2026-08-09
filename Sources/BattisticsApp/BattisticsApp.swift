@@ -63,7 +63,7 @@ struct BattisticsApp: App {
                 .environment(updater)
                 .preferredColorScheme(colorScheme)
         }
-        .defaultSize(width: 840, height: 560)
+        .windowResizability(.contentSize)
         .handlesExternalEvents(matching: ["dashboard"])
 
         // Compact always-on-top stats window ("pinned popover").

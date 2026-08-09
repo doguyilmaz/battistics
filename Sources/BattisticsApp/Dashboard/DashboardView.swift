@@ -34,19 +34,25 @@ struct DashboardView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
     @State private var selection: DashboardPane? = .overview
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             List(DashboardPane.allCases, selection: $selection) { pane in
                 Label(pane.title, systemImage: pane.icon).tag(pane)
             }
-            .navigationSplitViewColumnWidth(min: 170, ideal: 180, max: 220)
+            .navigationSplitViewColumnWidth(180)
         } detail: {
             detailView
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 740, minHeight: 500)
+        .frame(width: 860, height: 545)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
+        .onAppear {
+            // The split view otherwise restores a previously collapsed
+            // sidebar; the dashboard always opens with it visible.
+            columnVisibility = .all
+        }
         .task {
             while !Task.isCancelled {
                 model.refreshSensors()

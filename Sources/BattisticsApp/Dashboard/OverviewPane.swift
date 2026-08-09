@@ -11,19 +11,20 @@ struct OverviewPane: View {
 
     var body: some View {
         if let snapshot = model.snapshot, snapshot.batteryInstalled {
-            ScrollView {
-                VStack(spacing: 16) {
-                    hero(snapshot)
-                    HStack(alignment: .top, spacing: 16) {
-                        capacityCard(snapshot)
-                        liveCard(snapshot)
-                    }
-                    if let adapter = snapshot.adapter, snapshot.externalConnected {
-                        adapterCard(adapter)
-                    }
+            // No ScrollView: the window is fixed-size and sized so the
+            // overview always fits.
+            VStack(spacing: 16) {
+                hero(snapshot)
+                HStack(alignment: .top, spacing: 16) {
+                    capacityCard(snapshot)
+                    liveCard(snapshot)
                 }
-                .padding(20)
+                if let adapter = snapshot.adapter, snapshot.externalConnected {
+                    adapterCard(adapter)
+                }
             }
+            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .navigationTitle("Overview")
         } else {
             ContentUnavailableView(
