@@ -45,6 +45,10 @@ struct DetailsPane: View {
                         LabeledContent(
                             "Temperature", value: Formatting.temperature(temperature, unit: temperatureUnit))
                     }
+                    if let cell = snapshot.cellTemperatureC, cell != snapshot.temperatureC {
+                        LabeledContent(
+                            "Cell Sensor", value: Formatting.temperature(cell, unit: temperatureUnit))
+                    }
                     if let voltage = snapshot.voltageMV {
                         LabeledContent("Voltage", value: Formatting.volts(millivolts: voltage))
                     }

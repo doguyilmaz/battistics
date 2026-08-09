@@ -2,11 +2,15 @@ import BattisticsCore
 import Charts
 import SwiftUI
 
-/// The at-a-glance view behind the menu bar icon.
+/// The at-a-glance view behind the menu bar icon. Also serves as the
+/// content of the pinned always-on-top mini window.
 struct PopoverView: View {
+    var isPinnedWindow = false
+
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
+    @State private var hostWindow: NSWindow?
 
     private var temperatureUnit: TemperatureUnit {
         TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
@@ -50,9 +54,13 @@ struct PopoverView: View {
         }
         .padding(14)
         .frame(width: 340)
+        .background(HostWindowReader(window: $hostWindow))
         .task {
             await model.loadSparkline()
             while !Task.isCancelled {
+                // Belt and suspenders: stop sampling if the hosting window
+                // is hidden but the view was kept alive.
+                if let hostWindow, !hostWindow.isVisible { break }
                 model.refreshSensors()
                 try? await Task.sleep(for: .seconds(2))
             }
@@ -70,6 +78,18 @@ struct PopoverView: View {
             Text("Battistics")
                 .font(.headline)
             Spacer()
+            if !isPinnedWindow {
+                Button {
+                    openWindow(id: "mini")
+                    NSApp.activate()
+                } label: {
+                    Image(systemName: "pin")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Open as a floating window that stays on top")
+            }
             if let status = model.snapshot?.healthStatus {
                 Text(statusWord(status))
                     .font(.caption.weight(.semibold))
@@ -169,26 +189,51 @@ struct PopoverView: View {
         }
     }
 
-    private var footer: some View {
-        HStack {
-            Button {
-                openWindow(id: "dashboard")
-                NSApp.activate()
-            } label: {
-                Label("Dashboard", systemImage: "chart.xyaxis.line")
+    @ViewBuilder private var footer: some View {
+        if !isPinnedWindow {
+            HStack {
+                Button {
+                    openWindow(id: "dashboard")
+                    NSApp.activate()
+                } label: {
+                    Label("Dashboard", systemImage: "chart.xyaxis.line")
+                }
+                SettingsLink {
+                    Label("Settings", systemImage: "gearshape")
+                }
+                Spacer()
+                Button {
+                    NSApp.terminate(nil)
+                } label: {
+                    Image(systemName: "power")
+                }
+                .help("Quit Battistics")
             }
-            SettingsLink {
-                Label("Settings", systemImage: "gearshape")
-            }
-            Spacer()
-            Button {
-                NSApp.terminate(nil)
-            } label: {
-                Image(systemName: "power")
-            }
-            .help("Quit Battistics")
+            .controlSize(.small)
         }
-        .controlSize(.small)
+    }
+
+    /// Publishes the hosting NSWindow so the sampling loop can check
+    /// visibility.
+    private struct HostWindowReader: NSViewRepresentable {
+        @Binding var window: NSWindow?
+
+        func makeNSView(context: Context) -> NSView {
+            let view = NSView()
+            Task { @MainActor in
+                window = view.window
+            }
+            return view
+        }
+
+        func updateNSView(_ nsView: NSView, context: Context) {
+            if window !== nsView.window {
+                let current = nsView.window
+                Task { @MainActor in
+                    window = current
+                }
+            }
+        }
     }
 
     private var timeOnBattery: String {

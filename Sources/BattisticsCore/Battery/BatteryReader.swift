@@ -41,7 +41,12 @@ public enum BatteryReader {
             percent = 0
         }
 
-        let temperature = (int("Temperature") ?? int("VirtualTemperature")).map { Double($0) / 100 }
+        // VirtualTemperature is the modeled value macOS bases thermal
+        // decisions on and what users compare against; the raw cell sensor
+        // (Temperature) is kept as a secondary reading.
+        let cellTemperature = int("Temperature").map { Double($0) / 100 }
+        let virtualTemperature = int("VirtualTemperature").map { Double($0) / 100 }
+        let temperature = virtualTemperature ?? cellTemperature
 
         var adapter: AdapterInfo?
         if let details = props["AdapterDetails"] as? [String: Any] {
@@ -54,14 +59,20 @@ public enum BatteryReader {
             }
         }
 
+        // Some controllers pack the date SMBus style (16 bits); Apple
+        // Silicon packs report opaque blobs there, in which case the serial
+        // number's week code is the reliable source.
         var manufactureDate: Date?
-        if let packed = int("ManufactureDate") {
+        if let packed = int("ManufactureDate"), packed <= 0xFFFF {
             manufactureDate = Self.manufactureDate(fromSMBus: packed)
         }
         if manufactureDate == nil,
             let batteryData = props["BatteryData"] as? [String: Any],
-            let packed = batteryData["ManufactureDate"] as? Int {
+            let packed = batteryData["ManufactureDate"] as? Int, packed <= 0xFFFF {
             manufactureDate = Self.manufactureDate(fromSMBus: packed)
+        }
+        if manufactureDate == nil, let serial = props["Serial"] as? String {
+            manufactureDate = Self.manufactureDate(fromSerial: serial, now: now)
         }
 
         return BatterySnapshot(
@@ -75,6 +86,7 @@ public enum BatteryReader {
             cycleCount: int("CycleCount") ?? 0,
             designCycleCount: int("DesignCycleCount9C"),
             temperatureC: temperature,
+            cellTemperatureC: cellTemperature,
             voltageMV: int("Voltage"),
             amperageMA: signedMilliamps(int("Amperage")),
             isCharging: bool("IsCharging") ?? false,
@@ -98,6 +110,39 @@ public enum BatteryReader {
             value -= Int(UInt32.max) + 1
         }
         return value
+    }
+
+    /// Battery serials encode the manufacture week after a 3 character
+    /// site code: one year digit and two week digits
+    /// (F8Y 1 49 20... = week 49 of 2021).
+    public static func manufactureDate(fromSerial serial: String, now: Date = Date()) -> Date? {
+        let chars = Array(serial)
+        guard chars.count >= 6,
+            let yearDigit = chars[3].wholeNumberValue,
+            let weekTens = chars[4].wholeNumberValue,
+            let weekOnes = chars[5].wholeNumberValue
+        else { return nil }
+        let week = weekTens * 10 + weekOnes
+        guard (1...53).contains(week) else { return nil }
+
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let currentYear = calendar.component(.yearForWeekOfYear, from: now)
+        // The year is a single digit: pick the most recent matching year
+        // that does not put the date in the future.
+        var year = currentYear - ((currentYear - yearDigit) % 10 + 10) % 10
+        var components = DateComponents()
+        components.yearForWeekOfYear = year
+        components.weekOfYear = week
+        components.weekday = 4
+        guard var date = calendar.date(from: components) else { return nil }
+        if date > now {
+            year -= 10
+            components.yearForWeekOfYear = year
+            guard let earlier = calendar.date(from: components) else { return nil }
+            date = earlier
+        }
+        return date
     }
 
     /// SMBus packed date: bits 0-4 day, 5-8 month, 9-15 years since 1980.

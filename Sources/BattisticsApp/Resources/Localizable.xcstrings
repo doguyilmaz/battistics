@@ -7,6 +7,8 @@
     "Celsius" : { "shouldTranslate" : false },
     "Fahrenheit" : { "shouldTranslate" : false },
     "Charge" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şarj" } } } },
+    "Cell Sensor" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hücre Sensörü" } } } },
+    "Open as a floating window that stays on top" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "Üstte kalan ayrı bir pencere olarak aç" } } } },
     "Health" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sağlık" } } } },
     "Charging" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "Şarj oluyor" } } } },
     "Good" : { "localizations" : { "tr" : { "stringUnit" : { "state" : "translated", "value" : "İyi" } } } },

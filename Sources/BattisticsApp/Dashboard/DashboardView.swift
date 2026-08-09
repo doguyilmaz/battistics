@@ -46,7 +46,7 @@ struct DashboardView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 740, minHeight: 500)
-        .background(WindowConfigurator(keepOnTop: keepOnTop))
+        .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
         .onAppear { model.dashboardDidAppear() }
         .onDisappear { model.dashboardDidDisappear() }
         .task {
@@ -68,23 +68,3 @@ struct DashboardView: View {
     }
 }
 
-/// Applies NSWindow-level behavior SwiftUI does not expose (float on top).
-private struct WindowConfigurator: NSViewRepresentable {
-    var keepOnTop: Bool
-
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        Task { @MainActor in
-            apply(to: view.window)
-        }
-        return view
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {
-        apply(to: nsView.window)
-    }
-
-    private func apply(to window: NSWindow?) {
-        window?.level = keepOnTop ? .floating : .normal
-    }
-}

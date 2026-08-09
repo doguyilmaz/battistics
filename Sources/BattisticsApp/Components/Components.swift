@@ -140,6 +140,27 @@ struct SectionHeader: View {
     }
 }
 
+/// Applies NSWindow-level behavior SwiftUI does not expose (float on top).
+struct WindowLevelConfigurator: NSViewRepresentable {
+    var keepOnTop: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        Task { @MainActor in
+            apply(to: view.window)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        apply(to: nsView.window)
+    }
+
+    private func apply(to window: NSWindow?) {
+        window?.level = keepOnTop ? .floating : .normal
+    }
+}
+
 extension Color {
     /// Charge level color ramp shared by gauges and charts.
     static func charge(percent: Double) -> Color {

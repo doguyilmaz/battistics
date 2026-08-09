@@ -39,6 +39,7 @@ public struct BatterySnapshot: Sendable, Equatable {
     public let cycleCount: Int
     public let designCycleCount: Int?
     public let temperatureC: Double?
+    public let cellTemperatureC: Double?
     public let voltageMV: Int?
     public let amperageMA: Int?
     public let isCharging: Bool
@@ -64,6 +65,7 @@ public struct BatterySnapshot: Sendable, Equatable {
         cycleCount: Int,
         designCycleCount: Int?,
         temperatureC: Double?,
+        cellTemperatureC: Double? = nil,
         voltageMV: Int?,
         amperageMA: Int?,
         isCharging: Bool,
@@ -88,6 +90,7 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.cycleCount = cycleCount
         self.designCycleCount = designCycleCount
         self.temperatureC = temperatureC
+        self.cellTemperatureC = cellTemperatureC
         self.voltageMV = voltageMV
         self.amperageMA = amperageMA
         self.isCharging = isCharging

@@ -109,6 +109,52 @@ struct BatteryMathTests {
         #expect(BatteryReader.manufactureDate(fromSMBus: 0xFFFF) == nil)
     }
 
+    @Test func manufactureDateFromSerialWeekCode() {
+        // F8Y|1|49|... = week 49 of 2021 (early December).
+        let now = Date(timeIntervalSince1970: 1_786_307_126)  // Aug 2026
+        let date = try! #require(
+            BatteryReader.manufactureDate(fromSerial: "F8Y14920EWMQ1LTAL", now: now))
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let components = calendar.dateComponents([.year, .month], from: date)
+        #expect(components.year == 2021)
+        #expect(components.month == 12)
+    }
+
+    @Test func manufactureDateFromSerialRejectsBadWeek() {
+        #expect(BatteryReader.manufactureDate(fromSerial: "F8Y19920EWMQ1LTAL") == nil)
+        #expect(BatteryReader.manufactureDate(fromSerial: "F8Y") == nil)
+        #expect(BatteryReader.manufactureDate(fromSerial: "F8YX4920") == nil)
+    }
+
+    @Test func opaqueManufactureDateBlobFallsBackToSerial() {
+        let props: [String: Any] = [
+            "CurrentCapacity": 80, "MaxCapacity": 100,
+            "AppleRawCurrentCapacity": 4387, "AppleRawMaxCapacity": 5791,
+            "DesignCapacity": 6075, "CycleCount": 47,
+            "Serial": "F8Y14920EWMQ1LTAL",
+            "BatteryData": ["ManufactureDate": 54_083_070_277_938] as [String: Any],
+        ]
+        let now = Date(timeIntervalSince1970: 1_786_307_126)
+        let snapshot = BatteryReader.snapshot(from: props, iops: nil, now: now)
+        let date = try! #require(snapshot.manufactureDate)
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        #expect(calendar.component(.year, from: date) == 2021)
+    }
+
+    @Test func temperaturePrefersVirtualReading() {
+        let props: [String: Any] = [
+            "CurrentCapacity": 80, "MaxCapacity": 100,
+            "AppleRawCurrentCapacity": 4387, "AppleRawMaxCapacity": 5791,
+            "DesignCapacity": 6075, "CycleCount": 47,
+            "Temperature": 3062, "VirtualTemperature": 3300,
+        ]
+        let snapshot = BatteryReader.snapshot(from: props, iops: nil, now: Date())
+        #expect(snapshot.temperatureC == 33.0)
+        #expect(snapshot.cellTemperatureC == 30.62)
+    }
+
     @Test func snapshotParsingFromRegistryDictionary() {
         let props: [String: Any] = [
             "CurrentCapacity": 80,

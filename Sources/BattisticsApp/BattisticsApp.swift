@@ -1,7 +1,17 @@
 import SwiftUI
 
+/// A menu bar app must survive its last window closing; SwiftUI's default
+/// is to terminate once no regular windows remain, which kills the app the
+/// moment Settings closes while the Dock icon is enabled.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
+}
+
 @main
 struct BattisticsApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = AppModel()
     @State private var updater = UpdaterModel()
 
@@ -30,6 +40,16 @@ struct BattisticsApp: App {
                 .preferredColorScheme(colorScheme)
         }
         .defaultSize(width: 840, height: 560)
+
+        // Compact always-on-top stats window ("pinned popover").
+        Window("Battistics", id: "mini") {
+            PopoverView(isPinnedWindow: true)
+                .environment(model)
+                .environment(updater)
+                .preferredColorScheme(colorScheme)
+                .background(WindowLevelConfigurator(keepOnTop: true))
+        }
+        .windowResizability(.contentSize)
         .commands {
             CommandGroup(after: .appInfo) {
                 CheckForUpdatesButton(updater: updater)
