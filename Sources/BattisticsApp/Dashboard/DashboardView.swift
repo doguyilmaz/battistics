@@ -43,13 +43,13 @@ struct DashboardView: View {
             }
             .navigationSplitViewColumnWidth(180)
         } detail: {
-            // Fixed detail width: the window grows and shrinks with the
-            // sidebar instead of reflowing this content, which is what kept
-            // the open animation from being smooth.
             detailView
-                .frame(width: 680)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 545)
+        // Balanced: the detail resizes while the sidebar appears instead of
+        // being pushed aside and reflowed at the end.
+        .navigationSplitViewStyle(.balanced)
+        .frame(width: 860, height: 545)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
         .onAppear {
             // The split view otherwise restores a previously collapsed
