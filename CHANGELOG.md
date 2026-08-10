@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0
+
+First public release.
+
+- New app icon artwork across all four selectable styles
+- Dock icons chosen in-app now match the size of other Dock icons
+- Icon pipeline simplified to pre-rendered PNGs; generation scripts removed
+
 ## 0.1.1
 
 - Settings merged into the dashboard with a sectioned sidebar
