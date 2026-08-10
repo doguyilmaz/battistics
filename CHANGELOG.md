@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1
+
+- Settings merged into the dashboard with a sectioned sidebar
+- Five menu bar icon styles with status colors and live previews
+- Selectable app icon with four artworks
+- Pinned always-on-top stats window
+- Apple's own health rating and condition shown alongside measured values
+- Manufacture date decoding fixed and shown with battery age
+- Smooth sidebar animation, fixed-size dashboard, popover hover tooltips
+- Deep links (battistics://dashboard/...), Dock icon reopen support
+- Many correctness fixes from a full code review
+
 ## 0.1.0
 
 Initial version.
