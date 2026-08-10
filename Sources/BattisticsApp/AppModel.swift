@@ -31,8 +31,14 @@ final class AppModel {
     /// Baseline for transition detection, updated only when a transition is
     /// handled so no read path can mask another's changes.
     @ObservationIgnored private var lastTransitionSnapshot: BatterySnapshot?
+    /// Injectable for tests; production reads IOKit.
+    @ObservationIgnored private let batteryProvider: () -> BatterySnapshot?
 
-    init(historyDirectory: URL? = nil) {
+    init(
+        historyDirectory: URL? = nil,
+        batteryProvider: @escaping () -> BatterySnapshot? = { BatteryReader.read() }
+    ) {
+        self.batteryProvider = batteryProvider
         Prefs.registerDefaults()
         let directory =
             historyDirectory
@@ -70,7 +76,7 @@ final class AppModel {
     /// Re-reads the battery and funnels the result through the single
     /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
-        guard let current = BatteryReader.read() else {
+        guard let current = batteryProvider() else {
             snapshot = nil
             return
         }
@@ -156,7 +162,7 @@ final class AppModel {
     }
 
     private func recordPowerSample() async {
-        guard let current = BatteryReader.read() else { return }
+        guard let current = batteryProvider() else { return }
         ingest(current)
         guard current.batteryInstalled, let watts = current.watts else { return }
         await history.recordPowerSample(
