@@ -262,7 +262,7 @@ final class AppModel {
         let style = AppIconStyle(
             rawValue: UserDefaults.standard.string(forKey: Prefs.appIconStyle) ?? ""
         ) ?? .original
-        app.applicationIconImage = style == .original ? nil : style.image
+        app.applicationIconImage = style == .original ? nil : style.dockImage
     }
 
     /// The Dock icon strictly follows the preference. Windows open fine

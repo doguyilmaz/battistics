@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Sources/BattisticsApp/Resources/AppIcons/appicon-original.png" width="128" alt="Battistics">
+  <img src="Sources/BattisticsApp/Resources/AppIcons/original.png" width="128" alt="Battistics">
 </p>
 
 <h1 align="center">Battistics</h1>
@@ -49,4 +49,4 @@ Runs entirely on your Mac. The only network request is the optional update check
 
 ## License
 
-MIT · Created by [Dogu Yilmaz](https://github.com/doguyilmaz)
+MIT

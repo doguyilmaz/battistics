@@ -41,10 +41,10 @@ enum AppIconStyle: String, CaseIterable, Identifiable {
 
     var resourceName: String {
         switch self {
-        case .original: "appicon-original"
-        case .gauge: "appicon-gauge"
-        case .batBattery: "appicon-batbattery"
-        case .stats: "appicon-stats"
+        case .original: "original"
+        case .gauge: "gauge"
+        case .batBattery: "batbattery"
+        case .stats: "stats"
         }
     }
 
@@ -53,6 +53,19 @@ enum AppIconStyle: String, CaseIterable, Identifiable {
             return nil
         }
         return NSImage(contentsOf: url)
+    }
+
+    /// The Dock frames the bundle icon to the system icon grid but draws
+    /// runtime-set icons as-is, so a full-bleed PNG looks oversized next to
+    /// other Dock icons. Inset the artwork to the standard grid (824/1024).
+    var dockImage: NSImage? {
+        guard let art = image else { return nil }
+        let side: CGFloat = 1024
+        let inset = (side - 824) / 2
+        return NSImage(size: NSSize(width: side, height: side), flipped: false) { rect in
+            art.draw(in: rect.insetBy(dx: inset, dy: inset))
+            return true
+        }
     }
 }
 

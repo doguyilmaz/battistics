@@ -4,7 +4,7 @@ SPARKLE_BIN = $(DERIVED)/SourcePackages/artifacts/sparkle/Sparkle/bin
 SIGN_IDENTITY ?= -
 VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 
-.PHONY: gen build test app run install icon dmg appcast release clean
+.PHONY: gen build test app run install dmg appcast release clean
 
 gen:
 	xcodegen generate
@@ -31,13 +31,6 @@ install: app
 	rm -rf /Applications/Battistics.app
 	ditto $(APP) /Applications/Battistics.app
 	@echo "Installed to /Applications/Battistics.app"
-
-# Regenerates the AppIcon set when rebranding. Drop the master artwork at
-# art/icon-art.png first; the generated sizes in the asset catalog are the
-# tracked output.
-icon:
-	@test -f art/icon-art.png || { echo "error: put the master artwork at art/icon-art.png first"; exit 1; }
-	swift scripts/make-icon-from-art.swift art/icon-art.png Sources/BattisticsApp/Resources/Assets.xcassets/AppIcon.appiconset
 
 dmg: app
 	bash scripts/make-dmg.sh
