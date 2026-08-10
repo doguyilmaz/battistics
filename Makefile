@@ -50,7 +50,7 @@ appcast:
 
 release: appcast
 	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg dist/release/appcast.xml \
-		--title "Battistics $(VERSION)" --generate-notes
+		--title "Battistics-$(VERSION)" --generate-notes
 
 clean:
 	rm -rf .build dist Battistics.xcodeproj

@@ -15,6 +15,9 @@ final class AppModel {
     /// Which dashboard pane is showing; settable from the popover and the
     /// Settings menu command so they can deep-link into the window.
     var dashboardPane: DashboardPane = .overview
+    /// macOS's own health verdict, fetched lazily once per launch.
+    private(set) var appleHealth: AppleHealthInfo?
+    @ObservationIgnored private var appleHealthTask: Task<Void, Never>?
 
     let history: HistoryStore
 
@@ -42,6 +45,7 @@ final class AppModel {
         restartPowerSampling()
         observeWake()
         observeDefaults()
+        observePaneLinks()
         // Deferred: NSApplication does not exist yet during App.init.
         Task { @MainActor [weak self] in
             self?.applyActivationPolicy()
@@ -100,6 +104,14 @@ final class AppModel {
             await self?.history.recordChargeSample(sample)
         }
         maybeRecordDailyHealth(current)
+    }
+
+    func loadAppleHealthIfNeeded() {
+        guard appleHealth == nil, appleHealthTask == nil else { return }
+        appleHealthTask = Task { [weak self] in
+            let info = await AppleHealthReader.fetch()
+            self?.appleHealth = info ?? AppleHealthInfo(maximumCapacityPercent: nil, condition: nil)
+        }
     }
 
     func loadSparkline() async {
@@ -186,6 +198,21 @@ final class AppModel {
             if let alert = AlertRules.healthDropAlert(
                 previous: previous, current: snapshot.healthPercent, enabled: enabled) {
                 self.alertDispatcher.deliver(alert)
+            }
+        }
+    }
+
+    /// battistics://dashboard/<pane> deep links, forwarded by the app
+    /// delegate.
+    private func observePaneLinks() {
+        NotificationCenter.default.addObserver(
+            forName: .battisticsSelectPane, object: nil, queue: .main
+        ) { [weak self] notification in
+            let raw = notification.userInfo?["pane"] as? String
+            Task { @MainActor in
+                if let raw, let pane = DashboardPane(rawValue: raw) {
+                    self?.dashboardPane = pane
+                }
             }
         }
     }

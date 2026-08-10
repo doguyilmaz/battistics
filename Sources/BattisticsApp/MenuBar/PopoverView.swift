@@ -237,14 +237,15 @@ struct PopoverView: View {
                 } label: {
                     Label("Dashboard", systemImage: "chart.xyaxis.line")
                 }
+                Spacer()
                 Button {
                     model.dashboardPane = .general
                     openWindow(id: "dashboard")
                     NSApp.activate()
                 } label: {
-                    Label("Settings", systemImage: "gearshape")
+                    Image(systemName: "gearshape")
                 }
-                Spacer()
+                .help("Settings")
                 Button {
                     NSApp.terminate(nil)
                 } label: {

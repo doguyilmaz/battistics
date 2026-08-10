@@ -155,6 +155,23 @@ struct BatteryMathTests {
         #expect(calendar.component(.year, from: date) == 2021)
     }
 
+    @Test func appleHealthParsesSystemProfilerJSON() {
+        let json = """
+            {"SPPowerDataType": [
+              {"_name": "spbattery_information",
+               "sppower_battery_health_info": {
+                 "sppower_battery_cycle_count": 47,
+                 "sppower_battery_health": "Good",
+                 "sppower_battery_health_maximum_capacity": "92"}},
+              {"_name": "sppower_ac_charger_information"}
+            ]}
+            """.data(using: .utf8)!
+        let info = try! #require(AppleHealthReader.parse(json))
+        #expect(info.maximumCapacityPercent == 92)
+        #expect(info.condition == "Good")
+        #expect(AppleHealthReader.parse(Data("nonsense".utf8)) == nil)
+    }
+
     @Test func temperaturePrefersVirtualReading() {
         let props: [String: Any] = [
             "CurrentCapacity": 80, "MaxCapacity": 100,

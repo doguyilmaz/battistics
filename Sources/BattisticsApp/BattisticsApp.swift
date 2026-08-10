@@ -31,6 +31,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSWorkspace.shared.open(url)
         }
     }
+
+    /// battistics://dashboard/<pane> deep links select a dashboard pane.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls where url.scheme == "battistics" {
+            guard let pane = url.pathComponents.dropFirst().first else { continue }
+            NotificationCenter.default.post(
+                name: .battisticsSelectPane, object: nil, userInfo: ["pane": pane])
+        }
+    }
+}
+
+extension Notification.Name {
+    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
 }
 
 @main
@@ -75,6 +88,7 @@ struct BattisticsApp: App {
                 .background(WindowLevelConfigurator(keepOnTop: true))
         }
         .windowResizability(.contentSize)
+        .handlesExternalEvents(matching: ["mini"])
         .commands {
             CommandGroup(after: .appInfo) {
                 CheckForUpdatesButton(updater: updater)

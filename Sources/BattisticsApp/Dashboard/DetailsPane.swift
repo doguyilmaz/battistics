@@ -43,6 +43,12 @@ struct DetailsPane: View {
                     LabeledContent("Health", value: Formatting.percentPrecise(snapshot.healthPercent))
                     LabeledContent(
                         "Measured Health", value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
+                    if let percent = model.appleHealth?.maximumCapacityPercent {
+                        LabeledContent("Apple Rated Health", value: "\(percent)%")
+                    }
+                    if let condition = model.appleHealth?.condition {
+                        LabeledContent("Condition", value: condition)
+                    }
                 }
                 Section("Electrical") {
                     if let temperature = snapshot.temperatureC {
@@ -87,6 +93,9 @@ struct DetailsPane: View {
             }
             .formStyle(.grouped)
             .navigationTitle("Details")
+            .task {
+                model.loadAppleHealthIfNeeded()
+            }
         } else {
             ContentUnavailableView(
                 "No battery found",

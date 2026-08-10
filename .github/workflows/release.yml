@@ -80,4 +80,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             dist/release/Battistics-*.dmg dist/release/appcast.xml \
-            --title "Battistics ${GITHUB_REF_NAME#v}" --generate-notes
+            --title "Battistics-${GITHUB_REF_NAME#v}" --generate-notes

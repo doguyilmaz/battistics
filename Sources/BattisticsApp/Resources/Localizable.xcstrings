@@ -1701,6 +1701,26 @@
           }
         }
       }
+    },
+    "Apple Rated Health": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Sağlık Değeri"
+          }
+        }
+      }
+    },
+    "Condition": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durum"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
