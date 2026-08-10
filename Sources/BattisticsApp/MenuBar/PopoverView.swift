@@ -232,6 +232,7 @@ struct PopoverView: View {
         if !isPinnedWindow {
             HStack {
                 Button {
+                    model.dashboardPane = .overview
                     openWindow(id: "dashboard")
                     NSApp.activate()
                 } label: {
