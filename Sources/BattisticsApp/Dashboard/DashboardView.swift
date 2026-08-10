@@ -113,7 +113,6 @@ struct DashboardView: View {
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .frame(width: 180)
-        .background(SidebarBackground().ignoresSafeArea())
         .overlay(alignment: .trailing) {
             Divider().ignoresSafeArea()
         }
@@ -133,18 +132,4 @@ struct DashboardView: View {
         case .about: AboutSettings()
         }
     }
-}
-
-/// The translucent material NavigationSplitView gives its sidebar, applied
-/// to the custom one.
-private struct SidebarBackground: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = .sidebar
-        view.blendingMode = .behindWindow
-        view.state = .followsWindowActiveState
-        return view
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }
