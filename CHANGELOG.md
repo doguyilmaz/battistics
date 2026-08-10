@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- Uniform dashboard background: the sidebar is no longer translucent
+- Refreshed README screenshots
+
 ## 1.0.0
 
 First public release.
