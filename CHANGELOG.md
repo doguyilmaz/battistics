@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- Native macOS 26 app icon (Icon Composer format): the update dialog and
+  launchers no longer show the icon shrunken on a light tile
+- Legacy icon set refitted to the standard 824/1024 grid for macOS 14/15
+
 ## 1.0.1
 
 - Uniform dashboard background: the sidebar is no longer translucent
