@@ -81,14 +81,14 @@ struct HistoryStoreTests {
         let first = await store.recordHealthSnapshot(
             date: day1, healthPercent: 95, rawMaxCapacity: 5800, nominalCapacity: nil,
             designCapacity: 6075, cycleCount: 100)
-        #expect(first == nil)
+        #expect(first.isEmpty)
         #expect(await store.hasHealthSnapshot(forDay: day1))
         #expect(!(await store.hasHealthSnapshot(forDay: day2)))
 
-        let previous = await store.recordHealthSnapshot(
+        let baseline = await store.recordHealthSnapshot(
             date: day2, healthPercent: 94.5, rawMaxCapacity: 5770, nominalCapacity: nil,
             designCapacity: 6075, cycleCount: 101)
-        #expect(previous == 95)
+        #expect(baseline == [95])
 
         let series = await store.healthSeries()
         #expect(series.count == 2)

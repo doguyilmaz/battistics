@@ -60,9 +60,14 @@ public actor HistoryStore {
         )
     }
 
-    /// Records at most one health snapshot per calendar day.
-    /// Returns the previous day's health percent when one exists so the
-    /// caller can detect drops.
+    /// How many prior days form the decline baseline. Long enough that the
+    /// daily gauge swing cannot move the median, short enough that a real
+    /// decline is noticed within about a month.
+    public static let healthBaselineDays = 30
+
+    /// Records at most one health snapshot per calendar day. Returns the
+    /// preceding days' health percentages so the caller can compare against
+    /// their median; a single prior day is far too noisy to compare against.
     @discardableResult
     public func recordHealthSnapshot(
         date: Date,
@@ -71,15 +76,15 @@ public actor HistoryStore {
         nominalCapacity: Int?,
         designCapacity: Int,
         cycleCount: Int
-    ) -> Double? {
-        guard ensureOpen() else { return nil }
+    ) -> [Double] {
+        guard ensureOpen() else { return [] }
         let day = Self.dayKey(for: date)
-        var previous: Double?
+        var baseline: [Double] = []
         query(
-            "SELECT health_pct FROM health_snapshots WHERE day < ? ORDER BY day DESC LIMIT 1",
-            bind: [.text(day)]
+            "SELECT health_pct FROM health_snapshots WHERE day < ? ORDER BY day DESC LIMIT ?",
+            bind: [.text(day), .int(Int64(Self.healthBaselineDays))]
         ) { statement in
-            previous = sqlite3_column_double(statement, 0)
+            baseline.append(sqlite3_column_double(statement, 0))
         }
         run(
             """
@@ -99,7 +104,7 @@ public actor HistoryStore {
                 .int(Int64(cycleCount)),
             ]
         )
-        return previous
+        return baseline
     }
 
     public func hasHealthSnapshot(forDay date: Date) -> Bool {
@@ -177,10 +182,17 @@ public actor HistoryStore {
         return points
     }
 
-    public func healthSeries() -> [HealthPoint] {
+    /// Every snapshot by default; pass `from` to bound it (the Overview
+    /// sparkline only wants the last year).
+    public func healthSeries(from: Date? = nil) -> [HealthPoint] {
         guard ensureOpen() else { return [] }
         var points: [HealthPoint] = []
-        query("SELECT ts, health_pct, raw_max, cycles FROM health_snapshots ORDER BY ts") { statement in
+        let sql =
+            from == nil
+            ? "SELECT ts, health_pct, raw_max, cycles FROM health_snapshots ORDER BY ts"
+            : "SELECT ts, health_pct, raw_max, cycles FROM health_snapshots WHERE ts >= ? ORDER BY ts"
+        let bindings: [SQLiteValue] = from.map { [.int(Int64($0.timeIntervalSince1970))] } ?? []
+        query(sql, bind: bindings) { statement in
             points.append(
                 HealthPoint(
                     date: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 0))),

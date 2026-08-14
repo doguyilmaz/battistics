@@ -12,6 +12,9 @@ final class AppModel {
     private(set) var snapshot: BatterySnapshot?
     private(set) var lastUnplugDate: Date?
     private(set) var sparkline: [SeriesPoint] = []
+    /// Daily health snapshots for the last year, behind the Overview
+    /// sparkline. Loaded when that pane appears, never on a refresh tick.
+    private(set) var healthTrend: [HealthPoint] = []
     /// Which dashboard pane is showing; settable from the popover and the
     /// Settings menu command so they can deep-link into the window.
     var dashboardPane: DashboardPane = .overview
@@ -120,6 +123,11 @@ final class AppModel {
         }
     }
 
+    func loadHealthTrend() async {
+        healthTrend = await history.healthSeries(
+            from: Date().addingTimeInterval(-365 * 24 * 3600))
+    }
+
     func loadSparkline() async {
         let now = Date()
         sparkline = await history.chargeSeries(
@@ -192,7 +200,7 @@ final class AppModel {
             // Piggyback retention on the daily snapshot so long-running
             // sessions keep compacting without a relaunch.
             await self.history.runRetention()
-            let previous = await self.history.recordHealthSnapshot(
+            let baseline = await self.history.recordHealthSnapshot(
                 date: snapshot.timestamp,
                 healthPercent: snapshot.healthPercent,
                 rawMaxCapacity: snapshot.rawMaxCapacity,
@@ -202,7 +210,7 @@ final class AppModel {
             )
             let enabled = UserDefaults.standard.bool(forKey: Prefs.alertHealthDropEnabled)
             if let alert = AlertRules.healthDropAlert(
-                previous: previous, current: snapshot.healthPercent, enabled: enabled) {
+                baseline: baseline, current: snapshot.healthPercent, enabled: enabled) {
                 self.alertDispatcher.deliver(alert)
             }
         }

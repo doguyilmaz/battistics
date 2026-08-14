@@ -20,6 +20,10 @@ public struct HealthPoint: Sendable, Equatable, Identifiable {
 
     public var id: Date { date }
 
+    public var displayHealthPercent: Double {
+        BatteryHealth.display(healthPercent)
+    }
+
     public init(date: Date, healthPercent: Double, rawMaxCapacity: Int, cycleCount: Int) {
         self.date = date
         self.healthPercent = healthPercent

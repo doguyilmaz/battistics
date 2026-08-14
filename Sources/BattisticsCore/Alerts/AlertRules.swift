@@ -150,8 +150,18 @@ public enum AlertRules {
 
     /// Health drop detection runs at the daily snapshot cadence, not per
     /// power event, so it lives outside `evaluate`.
-    public static func healthDropAlert(previous: Double?, current: Double, enabled: Bool) -> BatteryAlert? {
-        guard enabled, let previous, current < previous - 0.5 else { return nil }
-        return .healthDropped(from: previous, to: current)
+    /// Real degradation is a few points a year, while the daily reading
+    /// swings that much on its own. So the comparison is against the median
+    /// of the recorded history, not yesterday, and the margin is wide enough
+    /// to clear the observed swing. A health notification should be rare and
+    /// mean something; day-over-day comparison made it noise.
+    public static let healthDeclineMargin = 3.0
+
+    public static func healthDropAlert(baseline: [Double], current: Double, enabled: Bool) -> BatteryAlert? {
+        guard enabled, let rawBaseline = BatteryHealth.median(baseline) else { return nil }
+        let from = BatteryHealth.display(rawBaseline)
+        let to = BatteryHealth.display(current)
+        guard to < from - healthDeclineMargin else { return nil }
+        return .healthDropped(from: from, to: to)
     }
 }

@@ -132,9 +132,43 @@ struct AlertRulesTests {
     }
 
     @Test func healthDropDetection() {
-        #expect(AlertRules.healthDropAlert(previous: 90, current: 89, enabled: true) == .healthDropped(from: 90, to: 89))
-        #expect(AlertRules.healthDropAlert(previous: 90, current: 89.8, enabled: true) == nil)
-        #expect(AlertRules.healthDropAlert(previous: nil, current: 89, enabled: true) == nil)
-        #expect(AlertRules.healthDropAlert(previous: 90, current: 80, enabled: false) == nil)
+        #expect(
+            AlertRules.healthDropAlert(baseline: [90, 90, 90], current: 85, enabled: true)
+                == .healthDropped(from: 90, to: 85))
+        #expect(AlertRules.healthDropAlert(baseline: [90, 90, 90], current: 89.8, enabled: true) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: [], current: 89, enabled: true) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: [90, 90, 90], current: 80, enabled: false) == nil)
+    }
+
+    @Test func healthDropStaysSilentWhileTheGaugeRelearnsAboveDesign() {
+        // A new pack settles 104 -> 101 as the gauge relearns Qmax. Both
+        // readings clamp to 100, so this is not a decline and must not alert.
+        #expect(AlertRules.healthDropAlert(baseline: [104], current: 101, enabled: true) == nil)
+        // Crossing below 100 reports the clamped figure, never a fictional 104.
+        #expect(
+            AlertRules.healthDropAlert(baseline: [102, 103, 102], current: 96, enabled: true)
+                == .healthDropped(from: 100, to: 96))
+    }
+
+    @Test func healthDropIgnoresTheDailyGaugeSwing() {
+        // Five real consecutive days off an M-series Mac. Day-over-day this
+        // fired three spurious "health declined" notifications.
+        let observed = [89.37, 87.97, 87.11, 86.12]
+        #expect(AlertRules.healthDropAlert(baseline: observed, current: 89.73, enabled: true) == nil)
+        // A low day inside the normal swing is still noise, not decline.
+        #expect(AlertRules.healthDropAlert(baseline: observed, current: 85.5, enabled: true) == nil)
+    }
+
+    @Test func healthDropFiresOnADeclineBeyondTheSwing() {
+        let observed = [89.37, 87.97, 87.11, 86.12]
+        let alert = AlertRules.healthDropAlert(baseline: observed, current: 83.5, enabled: true)
+        guard case .healthDropped(let from, let to) = alert else {
+            Issue.record("Expected healthDropped, got \(String(describing: alert))")
+            return
+        }
+        // Median of an even-length window is a computed mean, so compare
+        // with a tolerance rather than for exact equality.
+        #expect(abs(from - 87.54) < 0.001)
+        #expect(to == 83.5)
     }
 }

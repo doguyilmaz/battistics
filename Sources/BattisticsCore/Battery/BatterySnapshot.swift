@@ -14,6 +14,43 @@ public struct AdapterInfo: Sendable, Equatable {
     }
 }
 
+public enum BatteryHealth {
+    /// DesignCapacity is a nameplate minimum, not a measurement, so a young
+    /// pack genuinely gauges above it and the reading drifts down while the
+    /// controller relearns Qmax. macOS clamps its Maximum Capacity at 100%,
+    /// and so does every Battistics surface, so the app never reports a
+    /// figure System Settings will not show. The unclamped ratio survives in
+    /// `measuredHealthPercent` and in the stored history.
+    public static func display(_ rawPercent: Double) -> Double {
+        min(rawPercent, 100)
+    }
+
+    /// The controller re-estimates NominalChargeCapacity continuously, so
+    /// consecutive daily snapshots swing several points with no degradation
+    /// behind them. Median rather than mean: a single re-learning spike
+    /// should not drag the result at all.
+    public static func median(_ values: [Double]) -> Double? {
+        guard !values.isEmpty else { return nil }
+        let sorted = values.sorted()
+        let middle = sorted.count / 2
+        if sorted.count.isMultiple(of: 2) {
+            return (sorted[middle - 1] + sorted[middle]) / 2
+        }
+        return sorted[middle]
+    }
+
+    /// Trailing rolling median, same length as the input. The first entries
+    /// average fewer than `window` samples, which is the honest thing to do
+    /// at the start of a series rather than dropping or padding them.
+    public static func rollingMedian(_ values: [Double], window: Int) -> [Double] {
+        guard window > 1 else { return values }
+        return values.indices.map { index in
+            let start = max(0, index - window + 1)
+            return median(Array(values[start...index])) ?? values[index]
+        }
+    }
+}
+
 public enum HealthStatus: String, Sendable {
     case good
     case fair
@@ -130,8 +167,12 @@ public struct BatterySnapshot: Sendable, Equatable {
         return Double(rawMaxCapacity) / Double(designCapacity) * 100
     }
 
+    public var displayHealthPercent: Double {
+        BatteryHealth.display(healthPercent)
+    }
+
     public var healthStatus: HealthStatus {
-        HealthStatus(healthPercent: healthPercent)
+        HealthStatus(healthPercent: displayHealthPercent)
     }
 
     /// Signed instantaneous power. Negative while discharging, positive while charging.

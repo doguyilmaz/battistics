@@ -8,6 +8,7 @@ struct BatteryMathTests {
     private func makeSnapshot(
         percent: Int = 80,
         rawMax: Int = 5941,
+        nominal: Int? = 5900,
         design: Int = 6075,
         voltageMV: Int? = 12070,
         amperageMA: Int? = -650,
@@ -23,7 +24,7 @@ struct BatteryMathTests {
             percent: percent,
             rawCurrentCapacity: 4387,
             rawMaxCapacity: rawMax,
-            nominalCapacity: 5900,
+            nominalCapacity: nominal,
             designCapacity: design,
             cycleCount: 47,
             designCycleCount: 1000,
@@ -52,6 +53,53 @@ struct BatteryMathTests {
         // measured uses rawMax 5941 / design 6075
         #expect(abs(snapshot.measuredHealthPercent - 97.79) < 0.01)
         #expect(snapshot.healthStatus == .good)
+    }
+
+    @Test func youngPackGaugesAboveDesignButNeverDisplaysAboveHundred() {
+        // DesignCapacity is a nameplate minimum, so a young pack really does
+        // measure above it. macOS clamps; Battistics must not contradict it.
+        let young = makeSnapshot(nominal: 6200, design: 6075)
+        #expect(abs(young.healthPercent - 102.06) < 0.01)
+        #expect(young.displayHealthPercent == 100)
+    }
+
+    @Test func displayHealthLeavesAnAgedPackUntouched() {
+        let aged = makeSnapshot(nominal: 5371, design: 6075)
+        #expect(abs(aged.displayHealthPercent - 88.41) < 0.01)
+    }
+
+    @Test func healthPointClampsForDisplayAndKeepsWhatWasRecorded() {
+        let point = HealthPoint(
+            date: Date(timeIntervalSince1970: 1_700_000_000),
+            healthPercent: 103.4, rawMaxCapacity: 6280, cycleCount: 12)
+        #expect(point.healthPercent == 103.4)
+        #expect(point.displayHealthPercent == 100)
+    }
+
+    /// Five consecutive days recorded on a real M-series Mac. The controller
+    /// re-estimates NominalChargeCapacity daily, so the reading swings 3.6
+    /// points with no actual degradation behind it.
+    private static let observedDailyHealth = [89.37, 87.97, 87.11, 86.12, 89.73]
+
+    @Test func medianIsUnmovedByASingleOutlier() {
+        #expect(BatteryHealth.median([88, 88.5, 89]) == 88.5)
+        #expect(BatteryHealth.median([88, 89]) == 88.5)
+        #expect(BatteryHealth.median([]) == nil)
+        let withOutlier = BatteryHealth.median(Self.observedDailyHealth)
+        #expect(withOutlier == 87.97)
+    }
+
+    @Test func rollingMedianFlattensTheDailyGaugeSwing() {
+        let smoothed = BatteryHealth.rollingMedian(Self.observedDailyHealth, window: 3)
+        #expect(smoothed.count == Self.observedDailyHealth.count)
+
+        let rawSpread = Self.observedDailyHealth.max()! - Self.observedDailyHealth.min()!
+        #expect(abs(rawSpread - 3.61) < 0.01)
+
+        // The first entries average fewer than `window` samples, so judge the
+        // warmed-up tail: that is what the chart line actually looks like.
+        let steady = smoothed.dropFirst(2)
+        #expect(steady.max()! - steady.min()! < 1.0)
     }
 
     @Test func healthStatusBoundaries() {
