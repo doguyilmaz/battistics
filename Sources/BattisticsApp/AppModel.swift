@@ -18,6 +18,11 @@ final class AppModel {
     /// Which dashboard pane is showing; settable from the popover and the
     /// Settings menu command so they can deep-link into the window.
     var dashboardPane: DashboardPane = .overview
+    /// Bumped when the system flips light/dark. A tinted menu bar image is
+    /// rasterized for one backdrop, and SwiftUI has no reason to re-evaluate
+    /// the label on a system appearance change unless something observed
+    /// changes with it.
+    private(set) var appearanceGeneration = 0
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?
     @ObservationIgnored private var appleHealthTask: Task<Void, Never>?
@@ -31,6 +36,7 @@ final class AppModel {
     @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     @ObservationIgnored private var defaultsObserver: NSObjectProtocol?
+    @ObservationIgnored private var themeObserver: NSObjectProtocol?
     /// Baseline for transition detection, updated only when a transition is
     /// handled so no read path can mask another's changes.
     @ObservationIgnored private var lastTransitionSnapshot: BatterySnapshot?
@@ -54,6 +60,7 @@ final class AppModel {
         restartPowerSampling()
         observeWake()
         observeDefaults()
+        observeSystemTheme()
         observePaneLinks()
         // Deferred: NSApplication does not exist yet during App.init.
         Task { @MainActor [weak self] in
@@ -227,6 +234,20 @@ final class AppModel {
                 if let raw, let pane = DashboardPane(rawValue: raw) {
                     self?.dashboardPane = pane
                 }
+            }
+        }
+    }
+
+    /// Distributed, not local: the light/dark switch is a system-wide event
+    /// and never posts on this app's own notification center.
+    private func observeSystemTheme() {
+        themeObserver = DistributedNotificationCenter.default().addObserver(
+            forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                MenuBarIconRenderer.invalidateCache()
+                self?.appearanceGeneration += 1
             }
         }
     }

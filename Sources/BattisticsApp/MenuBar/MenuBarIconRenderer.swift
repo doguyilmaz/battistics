@@ -11,6 +11,12 @@ struct MenuBarConfig: Equatable {
     var colorHigh = false
     var colorCharging = false
     var temperatureUnit = TemperatureUnit.both
+
+    var colorRules: StatusColorRules {
+        StatusColorRules(
+            colorLow: colorLow, lowThreshold: lowThreshold,
+            colorHigh: colorHigh, colorCharging: colorCharging)
+    }
 }
 
 /// MenuBarExtra labels ignore SwiftUI foreground styles (the system renders
@@ -24,52 +30,58 @@ enum MenuBarIconRenderer {
     private static let glyphSize = NSSize(width: 27, height: 17)
     private static let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
 
+    /// The menu bar follows the *system* appearance, which the app's own
+    /// theme preference does not change. `NSApp.effectiveAppearance` reflects
+    /// `preferredColorScheme` and would report the wrong backdrop whenever
+    /// the two differ, so read NSGlobalDomain instead.
+    static var menuBarIsDark: Bool {
+        UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark"
+    }
+
+    /// Called when the system flips light/dark: every tinted image was
+    /// rasterized for the old backdrop.
+    static func invalidateCache() {
+        cache.removeAllObjects()
+    }
+
     static func image(snapshot: BatterySnapshot?, config: MenuBarConfig) -> NSImage {
+        let dark = menuBarIsDark
         // No battery (desktop Macs, read failure): neutral empty template
         // glyph, never a red zero.
         guard let snapshot, snapshot.batteryInstalled else {
             return cachedRender(
                 key: "no-battery|\(config.iconStyle.rawValue)", percent: nil, charging: false,
-                texts: [], showGlyph: true, tint: nil, shape: config.iconStyle)
+                texts: [], showGlyph: true, level: .neutral, shape: config.iconStyle, dark: dark)
         }
         let percent = snapshot.percent
         let charging = snapshot.isCharging
-        let external = snapshot.externalConnected
         let texts = [config.primaryText, config.secondaryText]
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
-        let tint = tintColor(percent: percent, charging: charging, external: external, config: config)
+        let level = StatusPalette.level(
+            percent: percent, charging: charging, external: snapshot.externalConnected,
+            rules: config.colorRules)
 
-        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(config.iconStyle.rawValue)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")"
+        // Appearance belongs in the key: a tinted image is rasterized for one
+        // backdrop and is wrong for the other.
+        let key = """
+            \(percent)|\(charging)|\(config.showGlyph)|\(config.iconStyle.rawValue)\
+            |\(texts.joined(separator: "·"))|\(level.rawValue)|\(dark ? "dark" : "light")
+            """
         return cachedRender(
             key: key, percent: percent, charging: charging, texts: texts,
-            showGlyph: config.showGlyph, tint: tint, shape: config.iconStyle)
+            showGlyph: config.showGlyph, level: level, shape: config.iconStyle, dark: dark)
     }
 
     private static func cachedRender(
         key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
-        tint: NSColor?, shape: MenuBarIconStyle
+        level: BatteryStatusLevel, shape: MenuBarIconStyle, dark: Bool
     ) -> NSImage {
         if let cached = cache.object(forKey: key as NSString) { return cached }
         let image = render(
             percent: percent, charging: charging, texts: texts,
-            showGlyph: showGlyph, tint: tint, shape: shape)
+            showGlyph: showGlyph, level: level, shape: shape, dark: dark)
         cache.setObject(image, forKey: key as NSString)
         return image
-    }
-
-    /// Status ladder: charging blue, critical red, low orange, full green,
-    /// monochrome template otherwise. Each rung is user-toggleable.
-    /// Internal so the appearance settings can render true previews.
-    static func tintColor(
-        percent: Int, charging: Bool, external: Bool, config: MenuBarConfig
-    ) -> NSColor? {
-        if config.colorCharging, charging { return .systemBlue }
-        if config.colorLow, !external {
-            if percent <= 10 { return .systemRed }
-            if percent <= config.lowThreshold { return .systemOrange }
-        }
-        if config.colorHigh, percent >= 95 { return .systemGreen }
-        return nil
     }
 
     private static func text(for kind: MenuBarText, snapshot: BatterySnapshot?, unit: TemperatureUnit) -> String? {
@@ -80,7 +92,7 @@ enum MenuBarIconRenderer {
         case .chargePercent:
             return "\(snapshot.percent)%"
         case .healthPercent:
-            return "H\(Int(snapshot.healthPercent.rounded()))%"
+            return "H\(Int(snapshot.displayHealthPercent.rounded()))%"
         case .timeRemaining:
             guard let minutes = snapshot.timeRemainingMin else { return nil }
             return Formatting.clock(minutes: minutes)
@@ -97,12 +109,18 @@ enum MenuBarIconRenderer {
     }
 
     private static func render(
-        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
-        shape: MenuBarIconStyle
+        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
+        level: BatteryStatusLevel, shape: MenuBarIconStyle, dark: Bool
     ) -> NSImage {
-        let color = tint ?? .black
+        let tint = StatusPalette.rgb(for: level, dark: dark)?.nsColor
+        let isTemplate = tint == nil
+        // A template image carries alpha only and macOS colors it for the
+        // menu bar. Once a status tint applies we lose that, so the outline
+        // and the text have to take the menu bar's own label color by hand —
+        // tinting the text is what made it unreadable over a wallpaper.
+        let outline: NSColor = isTemplate ? .black : (dark ? .white : .black)
         let string = texts.joined(separator: " ")
-        let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
+        let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: outline]
         let textSize = string.isEmpty ? .zero : (string as NSString).size(withAttributes: attributes)
 
         var width: CGFloat = 0
@@ -121,7 +139,7 @@ enum MenuBarIconRenderer {
                 BatGlyph.draw(
                     in: glyphRect,
                     style: BatGlyph.Style(
-                        color: color, charging: charging,
+                        color: outline, fillColor: tint, charging: charging,
                         fillFraction: percent.map { CGFloat($0) / 100 },
                         shape: shape))
                 x += glyphSize.width + 4
@@ -133,7 +151,7 @@ enum MenuBarIconRenderer {
             }
             return true
         }
-        image.isTemplate = tint == nil
+        image.isTemplate = isTemplate
         return image
     }
 }

@@ -178,17 +178,17 @@ struct AppearanceSettings: View {
     }
 
     private func statusPreview(percent: Int, charging: Bool, label: String) -> some View {
-        let tint = MenuBarIconRenderer.tintColor(
-            percent: percent, charging: charging, external: charging, config: config)
+        let level = StatusPalette.level(
+            percent: percent, charging: charging, external: charging, rules: config.colorRules)
         return VStack(spacing: 6) {
-            Image(
-                nsImage: BatGlyph.image(
-                    size: NSSize(width: 44, height: 27),
-                    fillFraction: charging ? nil : CGFloat(percent) / 100,
-                    charging: charging,
-                    color: tint ?? .labelColor,
-                    shape: iconStyle)
-            )
+            // Both backdrops, because the menu bar is translucent and the
+            // same tint has to survive a white desktop and a black one.
+            // Previewing on the settings background alone flatters it.
+            VStack(spacing: 0) {
+                previewChip(level: level, percent: percent, charging: charging, dark: false)
+                previewChip(level: level, percent: percent, charging: charging, dark: true)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
             Text("\(percent)%")
                 .font(.caption2)
                 .monospacedDigit()
@@ -196,5 +196,23 @@ struct AppearanceSettings: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func previewChip(
+        level: BatteryStatusLevel, percent: Int, charging: Bool, dark: Bool
+    ) -> some View {
+        let tint = StatusPalette.rgb(for: level, dark: dark)?.nsColor
+        return Image(
+            nsImage: BatGlyph.image(
+                size: NSSize(width: 44, height: 24),
+                fillFraction: charging ? nil : CGFloat(percent) / 100,
+                charging: charging,
+                color: dark ? .white : .black,
+                fillColor: tint,
+                shape: iconStyle)
+        )
+        .padding(.horizontal, 5)
+        .padding(.vertical, 3)
+        .background(dark ? Color.black : Color.white)
     }
 }
