@@ -137,7 +137,7 @@ enum Prefs {
 
     static let keepAwakeMode = "keepAwakeMode"
     static let keepAwakeDuration = "keepAwakeDuration"
-    static let keepAwakeMenuBarDot = "keepAwakeMenuBarDot"
+    static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
 
     static let powerSamplingEnabled = "powerSamplingEnabled"
     static let powerSamplingInterval = "powerSamplingInterval"
@@ -177,7 +177,7 @@ enum Prefs {
 
             keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
             keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
-            keepAwakeMenuBarDot: true,
+            keepAwakeMenuBarIcon: true,
 
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,

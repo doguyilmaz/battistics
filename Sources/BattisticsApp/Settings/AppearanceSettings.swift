@@ -15,7 +15,7 @@ struct AppearanceSettings: View {
     @AppStorage(Prefs.menuBarLowThreshold) private var lowThreshold = 20
     @AppStorage(Prefs.menuBarColorHigh) private var colorHigh = false
     @AppStorage(Prefs.menuBarColorCharging) private var colorCharging = false
-    @AppStorage(Prefs.keepAwakeMenuBarDot) private var keepAwakeMenuBarDot = true
+    @AppStorage(Prefs.keepAwakeMenuBarIcon) private var keepAwakeMenuBarIcon = true
 
     private var iconStyle: MenuBarIconStyle {
         MenuBarIconStyle(rawValue: iconStyleRaw) ?? .bat
@@ -84,7 +84,7 @@ struct AppearanceSettings: View {
                 Text("The glyph reappears automatically when both texts are set to Nothing.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Toggle("Show a dot while Keep Awake is on", isOn: $keepAwakeMenuBarDot)
+                Toggle("Show an icon while Keep Awake is on", isOn: $keepAwakeMenuBarIcon)
             }
             Section("Color") {
                 Toggle("Orange when low, red when critical", isOn: $colorLow)

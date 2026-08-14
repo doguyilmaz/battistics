@@ -287,36 +287,36 @@
         }
       }
     },
-    "Awake for %@": {
+    "Awake": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Awake for %@"
+            "value": "Awake"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ boyunca uyanık"
+            "value": "Uyanık"
           }
         }
       }
     },
-    "Awake until turned off": {
+    "Awake · %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Awake until turned off"
+            "value": "Awake · %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kapatılana kadar uyanık"
+            "value": "Uyanık · %@"
           }
         }
       }
@@ -1115,6 +1115,23 @@
         }
       }
     },
+    "Keep Awake is on. Click to turn it off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake is on. Click to turn it off."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açık. Kapatmak için tıklayın."
+          }
+        }
+      }
+    },
     "Keep the display on": {
       "extractionState": "manual",
       "localizations": {
@@ -1800,19 +1817,19 @@
         }
       }
     },
-    "Show a dot while Keep Awake is on": {
+    "Show an icon while Keep Awake is on": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show a dot while Keep Awake is on"
+            "value": "Show an icon while Keep Awake is on"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut açıkken nokta göster"
+            "value": "Uyanık Tut açıkken simge göster"
           }
         }
       }

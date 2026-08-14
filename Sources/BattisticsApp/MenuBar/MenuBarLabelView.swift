@@ -14,7 +14,7 @@ struct MenuBarLabelView: View {
     @AppStorage(Prefs.menuBarColorHigh) private var colorHigh = false
     @AppStorage(Prefs.menuBarColorCharging) private var colorCharging = false
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
-    @AppStorage(Prefs.keepAwakeMenuBarDot) private var keepAwakeMenuBarDot = true
+    @AppStorage(Prefs.keepAwakeMenuBarIcon) private var keepAwakeMenuBarIcon = true
 
     private var config: MenuBarConfig {
         MenuBarConfig(
@@ -27,7 +27,7 @@ struct MenuBarLabelView: View {
             colorHigh: colorHigh,
             colorCharging: colorCharging,
             temperatureUnit: TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both,
-            keepAwakeDot: keepAwakeMenuBarDot && keepAwake.isActive
+            keepAwakeIcon: keepAwakeMenuBarIcon && keepAwake.isActive
         )
     }
 

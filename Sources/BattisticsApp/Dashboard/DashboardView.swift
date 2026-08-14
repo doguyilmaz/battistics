@@ -1,3 +1,4 @@
+import BattisticsCore
 import SwiftUI
 
 enum DashboardPane: String, CaseIterable, Identifiable {
@@ -57,8 +58,17 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 /// interpolate the real frames, so opening reflows as smoothly as closing.
 struct DashboardView: View {
     @Environment(AppModel.self) private var model
+    @Environment(KeepAwakeModel.self) private var keepAwake
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
     @State private var sidebarVisible = true
+
+    /// Advanced by the dashboard's existing 3s refresh loop.
+    private var keepAwakeTitle: String {
+        guard let seconds = keepAwake.remaining() else {
+            return String(localized: "Awake")
+        }
+        return Formatting.duration(minutes: Int(seconds / 60))
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -81,6 +91,21 @@ struct DashboardView: View {
                 }
                 .help("Toggle sidebar")
                 .keyboardShortcut("s", modifiers: [.command, .control])
+            }
+            // Top right of the window, not inside a pane: Keep Awake applies
+            // to the whole Mac, not to whatever pane happens to be showing,
+            // and the toolbar costs the content no vertical space.
+            if keepAwake.isActive {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        keepAwake.stop()
+                    } label: {
+                        Label(keepAwakeTitle, systemImage: "cup.and.saucer.fill")
+                            .labelStyle(.titleAndIcon)
+                            .monospacedDigit()
+                    }
+                    .help("Keep Awake is on. Click to turn it off.")
+                }
             }
         }
         .navigationTitle(model.dashboardPane.title)

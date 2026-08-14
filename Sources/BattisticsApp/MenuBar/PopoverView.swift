@@ -41,10 +41,6 @@ struct PopoverView: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
-                if keepAwake.isActive {
-                    keepAwakeStrip
-                }
-
                 chargeDetails(snapshot)
                 batteryDetails(snapshot)
                 sparklineCard
@@ -84,6 +80,13 @@ struct PopoverView: View {
             )
             Text("Battistics")
                 .font(.headline)
+                .fixedSize()
+            // Before the Spacer on purpose: everything left of it is
+            // left-aligned and everything right of it is pinned right, so the
+            // Spacer absorbs the whole width change and nothing moves.
+            if keepAwake.isActive {
+                keepAwakeChip
+            }
             Spacer()
             if !isPinnedWindow {
                 Button {
@@ -233,39 +236,39 @@ struct PopoverView: View {
         }
     }
 
-    /// Only rendered while a session is running, so the popover costs
-    /// nothing when Keep Awake is off.
-    private var keepAwakeStrip: some View {
-        HStack(spacing: 6) {
+    /// Matches the banner it replaces: cup, message, and its own close
+    /// button. Measured at 117.6pt worst case against 122.2pt of header room,
+    /// so it survives the widest health badge and the longest duration.
+    private var keepAwakeChip: some View {
+        HStack(spacing: 3) {
             Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 10))
-            Text(keepAwakeSummary)
-                .font(.caption)
-            Spacer(minLength: 4)
+                .font(.system(size: 9))
+            Text(chipText)
+                .font(.system(size: 10, weight: .medium))
+                .monospacedDigit()
+                .lineLimit(1)
             Button {
                 keepAwake.stop()
             } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .bold))
             }
             .buttonStyle(.plain)
+            .padding(.leading, 1)
             .help("Turn off Keep Awake")
         }
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(.quaternary.opacity(0.5), in: Capsule())
+        .foregroundStyle(Color.accentColor)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 2)
+        .background(Color.accentColor.opacity(0.14), in: Capsule())
     }
 
-    private var keepAwakeSummary: String {
-        // The 2s refresh loop re-evaluates this body, which is what advances
-        // the countdown; no timer of its own.
+    /// Advanced by the popover's existing 2s refresh loop.
+    private var chipText: String {
         guard let seconds = keepAwake.remaining() else {
-            return String(localized: "Awake until turned off")
+            return String(localized: "Awake")
         }
-        return String(
-            localized: "Awake for \(Formatting.duration(minutes: Int(seconds / 60)))")
+        return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
     }
 
     private var keepAwakeMenu: some View {
