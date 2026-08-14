@@ -15,16 +15,16 @@ enum HistoryTab: String, CaseIterable, Identifiable {
         case .charge: String(localized: "Charge")
         case .power: String(localized: "Power")
         case .temperature: String(localized: "Temperature")
-        case .health: String(localized: "Health")
+        case .health: String(localized: "Capacity")
         }
     }
 
     var color: Color {
         switch self {
-        case .charge: .green
-        case .power: .orange
+        case .charge: .statusGood
+        case .power: .statusWarn
         case .temperature: .pink
-        case .health: .blue
+        case .health: .statusInfo
         }
     }
 }
@@ -72,8 +72,16 @@ struct HistoryPane: View {
     @State private var anchor = Date()
     @State private var points: [SeriesPoint] = []
     @State private var healthPoints: [HealthPoint] = []
+    /// 7-day rolling median of the daily readings. The raw series swings
+    /// several points on gauge re-estimation alone, which reads as a sawtooth
+    /// rather than as the slow decline it is meant to show.
+    @State private var healthTrendLine: [SeriesPoint] = []
     @State private var totals: TimeTotals?
     @State private var selectedDate: Date?
+    // Computed once per load: SwiftUI re-evaluates body on every hover and
+    // selection change, and scanning the full series each time is wasted work.
+    @State private var seriesDomain: ClosedRange<Double> = 0...100
+    @State private var healthDomain: ClosedRange<Double> = 80...100
 
     private var interval: DateInterval {
         Calendar.current.dateInterval(of: range.component, for: anchor)
@@ -144,9 +152,18 @@ struct HistoryPane: View {
     @ViewBuilder private var chartContent: some View {
         if tab == .health {
             if healthPoints.count > 1 {
-                healthChart
+                VStack(spacing: 6) {
+                    healthChart
+                    // One literal, not a concatenation: `Text("a" + "b")`
+                    // resolves to the StringProtocol overload and skips
+                    // localization entirely.
+                    Text("Dots are daily readings, the line is a 7-day trend. The controller re-estimates capacity constantly, so single days swing.")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                }
             } else {
-                emptyState("Health snapshots are recorded once per day. Come back tomorrow.")
+                emptyState("Capacity snapshots are recorded once per day. Come back tomorrow.")
             }
         } else if points.count > 1 {
             seriesChart
@@ -199,28 +216,67 @@ struct HistoryPane: View {
                 }
             }
         }
-        .chartYScale(domain: yDomain)
+        .chartYScale(domain: seriesDomain)
         .chartXScale(domain: interval.start...interval.end)
         .chartXSelection(value: $selectedDate)
     }
 
     private var healthChart: some View {
-        Chart(healthPoints) { point in
-            LineMark(
-                x: .value("Date", point.date),
-                y: .value("Health", point.healthPercent)
-            )
-            .interpolationMethod(.monotone)
-            .foregroundStyle(tab.color)
-            .lineStyle(StrokeStyle(lineWidth: 2))
-            PointMark(
-                x: .value("Date", point.date),
-                y: .value("Health", point.healthPercent)
-            )
-            .foregroundStyle(tab.color)
-            .symbolSize(24)
+        Chart {
+            // Raw dailies stay visible but recede; the trend carries the line.
+            ForEach(healthPoints) { point in
+                PointMark(
+                    x: .value("Date", point.date),
+                    y: .value("Capacity", point.displayHealthPercent)
+                )
+                .foregroundStyle(tab.color.opacity(0.28))
+                .symbolSize(16)
+            }
+            ForEach(healthTrendLine) { point in
+                LineMark(
+                    x: .value("Date", point.date),
+                    y: .value("Trend", point.value)
+                )
+                .interpolationMethod(.monotone)
+                .foregroundStyle(tab.color)
+                .lineStyle(StrokeStyle(lineWidth: 2))
+            }
+            if let selected = nearestHealthPoint {
+                RuleMark(x: .value("Date", selected.date))
+                    .foregroundStyle(.secondary.opacity(0.35))
+                PointMark(
+                    x: .value("Date", selected.date),
+                    y: .value("Capacity", selected.displayHealthPercent)
+                )
+                .foregroundStyle(tab.color)
+                .symbolSize(60)
+                .annotation(
+                    position: .top,
+                    overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
+                ) {
+                    VStack(spacing: 1) {
+                        Text(Formatting.percentPrecise(selected.displayHealthPercent))
+                            .font(.caption.weight(.semibold))
+                        Text("\(selected.cycleCount) cycles")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(selected.date, format: .dateTime.day().month(.abbreviated).year())
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(6)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6))
+                }
+            }
         }
         .chartYScale(domain: healthDomain)
+        .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: 4)) {
+                AxisGridLine()
+                AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+            }
+        }
+        .chartXSelection(value: $selectedDate)
     }
 
     private func totalsRow(_ totals: TimeTotals) -> some View {
@@ -272,7 +328,27 @@ struct HistoryPane: View {
             totals = nil
         case .health:
             healthPoints = await model.history.healthSeries()
+            let smoothed = BatteryHealth.rollingMedian(
+                healthPoints.map(\.displayHealthPercent), window: 7)
+            healthTrendLine = zip(healthPoints, smoothed).map {
+                SeriesPoint(date: $0.date, value: $1)
+            }
             totals = nil
+        }
+        recomputeDomains()
+    }
+
+    /// Health never plots above 100 (see `BatteryHealth.display`), so the top
+    /// is fixed and only the floor follows the data.
+    private func recomputeDomains() {
+        if tab == .health {
+            let minValue = healthPoints.map(\.displayHealthPercent).min() ?? 80
+            healthDomain = max((minValue - 2).rounded(.down), 0)...100
+        } else if tab == .charge {
+            seriesDomain = 0...100
+        } else {
+            let maxValue = points.map(\.value).max() ?? 10
+            seriesDomain = 0...(maxValue * 1.2 + 1)
         }
     }
 
@@ -289,19 +365,11 @@ struct HistoryPane: View {
         }
     }
 
-    private var yDomain: ClosedRange<Double> {
-        switch tab {
-        case .charge: return 0...100
-        case .power, .temperature:
-            let maxValue = points.map(\.value).max() ?? 10
-            return 0...(maxValue * 1.2 + 1)
-        case .health: return healthDomain
+    private var nearestHealthPoint: HealthPoint? {
+        guard let selectedDate, !healthPoints.isEmpty else { return nil }
+        return healthPoints.min {
+            abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate))
         }
-    }
-
-    private var healthDomain: ClosedRange<Double> {
-        let minValue = healthPoints.map(\.healthPercent).min() ?? 80
-        return (max(minValue - 3, 0))...100
     }
 
     private func valueLabel(_ value: Double) -> String {

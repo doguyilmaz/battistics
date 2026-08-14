@@ -1,1164 +1,6 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Battistics": {
-      "shouldTranslate": false
-    },
-    "GitHub": {
-      "shouldTranslate": false
-    },
-    "PID %lld": {
-      "shouldTranslate": false
-    },
-    "Celsius": {
-      "shouldTranslate": false
-    },
-    "Fahrenheit": {
-      "shouldTranslate": false
-    },
-    "Charge": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj"
-          }
-        }
-      }
-    },
-    "Cell Sensor": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hücre Sensörü"
-          }
-        }
-      }
-    },
-    "Open as a floating window that stays on top": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Üstte kalan ayrı bir pencere olarak aç"
-          }
-        }
-      }
-    },
-    "Health": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık"
-          }
-        }
-      }
-    },
-    "Charging": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj oluyor"
-          }
-        }
-      }
-    },
-    "Good": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İyi"
-          }
-        }
-      }
-    },
-    "Fair": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "Service": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Servis"
-          }
-        }
-      }
-    },
-    "Current Charge": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Şarj"
-          }
-        }
-      }
-    },
-    "Current Maximum": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Maksimum"
-          }
-        }
-      }
-    },
-    "Original Maximum": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orijinal Maksimum"
-          }
-        }
-      }
-    },
-    "Measured Maximum": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ölçülen Maksimum"
-          }
-        }
-      }
-    },
-    "Time on Battery": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilde Geçen Süre"
-          }
-        }
-      }
-    },
-    "Cycles": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Döngü"
-          }
-        }
-      }
-    },
-    "Temperature": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık"
-          }
-        }
-      }
-    },
-    "Power": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç"
-          }
-        }
-      }
-    },
-    "Amperage": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akım"
-          }
-        }
-      }
-    },
-    "Voltage": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voltaj"
-          }
-        }
-      }
-    },
-    "Last 24 Hours": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son 24 Saat"
-          }
-        }
-      }
-    },
-    "Dashboard": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Panel"
-          }
-        }
-      }
-    },
-    "Settings": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar"
-          }
-        }
-      }
-    },
-    "Quit Battistics": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics'ten Çık"
-          }
-        }
-      }
-    },
-    "No battery found": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil bulunamadı"
-          }
-        }
-      }
-    },
-    "Battistics needs a Mac with a built-in battery.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics dahili pili olan bir Mac gerektirir."
-          }
-        }
-      }
-    },
-    "N/A": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yok"
-          }
-        }
-      }
-    },
-    "Overview": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genel Bakış"
-          }
-        }
-      }
-    },
-    "History": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geçmiş"
-          }
-        }
-      }
-    },
-    "Details": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayrıntılar"
-          }
-        }
-      }
-    },
-    "Peripherals": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aksesuarlar"
-          }
-        }
-      }
-    },
-    "Energy": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enerji"
-          }
-        }
-      }
-    },
-    "Capacity": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapasite"
-          }
-        }
-      }
-    },
-    "Live": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Canlı"
-          }
-        }
-      }
-    },
-    "Power Adapter": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç Adaptörü"
-          }
-        }
-      }
-    },
-    "Adapter": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör"
-          }
-        }
-      }
-    },
-    "Rated Power": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nominal Güç"
-          }
-        }
-      }
-    },
-    "Adapter Voltage": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör Voltajı"
-          }
-        }
-      }
-    },
-    "Adapter Current": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör Akımı"
-          }
-        }
-      }
-    },
-    "Metric": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Metrik"
-          }
-        }
-      }
-    },
-    "Range": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aralık"
-          }
-        }
-      }
-    },
-    "Day": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gün"
-          }
-        }
-      }
-    },
-    "Week": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hafta"
-          }
-        }
-      }
-    },
-    "Month": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ay"
-          }
-        }
-      }
-    },
-    "Year": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yıl"
-          }
-        }
-      }
-    },
-    "On Battery": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilde"
-          }
-        }
-      }
-    },
-    "Fully Charged": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tam Şarjlı"
-          }
-        }
-      }
-    },
-    "No data yet": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Henüz veri yok"
-          }
-        }
-      }
-    },
-    "Not enough data in this period yet. Battistics records as it runs.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu dönemde henüz yeterli veri yok. Battistics çalıştıkça kayıt tutar."
-          }
-        }
-      }
-    },
-    "Health snapshots are recorded once per day. Come back tomorrow.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
-          }
-        }
-      }
-    },
-    "Model": {
-      "shouldTranslate": false
-    },
-    "Serial Number": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seri Numarası"
-          }
-        }
-      }
-    },
-    "Manufacture Date": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Üretim Tarihi"
-          }
-        }
-      }
-    },
-    "Age": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yaş"
-          }
-        }
-      }
-    },
-    "Cycle Count": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Döngü Sayısı"
-          }
-        }
-      }
-    },
-    "Design Cycle Limit": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tasarım Döngü Limiti"
-          }
-        }
-      }
-    },
-    "Design Capacity": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tasarım Kapasitesi"
-          }
-        }
-      }
-    },
-    "Measured Health": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ölçülen Sağlık"
-          }
-        }
-      }
-    },
-    "Electrical": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elektrik"
-          }
-        }
-      }
-    },
-    "Copy Report": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporu Kopyala"
-          }
-        }
-      }
-    },
-    "Battery": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil"
-          }
-        }
-      }
-    },
-    "No peripheral batteries": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aksesuar pili yok"
-          }
-        }
-      }
-    },
-    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil düzeyi bildiren bağlı klavyeler, fareler, trackpad'ler ve kulaklıklar burada görünür."
-          }
-        }
-      }
-    },
-    "Nothing notable": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kayda değer bir şey yok"
-          }
-        }
-      }
-    },
-    "Measuring…": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ölçülüyor…"
-          }
-        }
-      }
-    },
-    "No process used meaningful energy in the last sample window.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son örnekleme penceresinde anlamlı enerji kullanan süreç olmadı."
-          }
-        }
-      }
-    },
-    "Watching which apps use the most energy. First results arrive in a few seconds.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hangi uygulamaların en çok enerji kullandığı izleniyor. İlk sonuçlar birkaç saniye içinde gelir."
-          }
-        }
-      }
-    },
-    "Sampling runs only while this view is open and stops the moment it closes.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnekleme yalnızca bu görünüm açıkken çalışır ve kapanır kapanmaz durur."
-          }
-        }
-      }
-    },
-    "General": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genel"
-          }
-        }
-      }
-    },
-    "Menu Bar": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Menü Çubuğu"
-          }
-        }
-      }
-    },
-    "Notifications": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bildirimler"
-          }
-        }
-      }
-    },
-    "Updates": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güncellemeler"
-          }
-        }
-      }
-    },
-    "About": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hakkında"
-          }
-        }
-      }
-    },
-    "Start at login": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oturum açılınca başlat"
-          }
-        }
-      }
-    },
-    "Open dashboard at launch": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başlangıçta paneli aç"
-          }
-        }
-      }
-    },
-    "Visibility": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görünürlük"
-          }
-        }
-      }
-    },
-    "Show menu bar icon": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Menü çubuğu simgesini göster"
-          }
-        }
-      }
-    },
-    "Show Dock icon": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock simgesini göster"
-          }
-        }
-      }
-    },
-    "At least one of the two stays on so Battistics remains reachable.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics erişilebilir kalsın diye ikisinden en az biri açık kalır."
-          }
-        }
-      }
-    },
-    "Keep dashboard window on top": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Panel penceresini üstte tut"
-          }
-        }
-      }
-    },
-    "Appearance": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görünüm"
-          }
-        }
-      }
-    },
-    "Theme": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tema"
-          }
-        }
-      }
-    },
-    "Automatic": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Otomatik"
-          }
-        }
-      }
-    },
-    "Light": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Açık"
-          }
-        }
-      }
-    },
-    "Dark": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Koyu"
-          }
-        }
-      }
-    },
-    "Temperature unit": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık birimi"
-          }
-        }
-      }
-    },
-    "Celsius and Fahrenheit": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Celsius ve Fahrenheit"
-          }
-        }
-      }
-    },
-    "Content": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İçerik"
-          }
-        }
-      }
-    },
-    "Show battery glyph": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil simgesini göster"
-          }
-        }
-      }
-    },
-    "Primary text": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birincil metin"
-          }
-        }
-      }
-    },
-    "Secondary text": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İkincil metin"
-          }
-        }
-      }
-    },
-    "Nothing": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hiçbiri"
-          }
-        }
-      }
-    },
-    "Charge %": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj %"
-          }
-        }
-      }
-    },
-    "Health %": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık %"
-          }
-        }
-      }
-    },
-    "Time remaining": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kalan süre"
-          }
-        }
-      }
-    },
-    "Power (W)": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç (W)"
-          }
-        }
-      }
-    },
-    "Charge (mAh)": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj (mAh)"
-          }
-        }
-      }
-    },
-    "The glyph reappears automatically when both texts are set to Nothing.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Her iki metin de Hiçbiri olduğunda simge otomatik olarak geri gelir."
-          }
-        }
-      }
-    },
-    "Color": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Renk"
-          }
-        }
-      }
-    },
-    "Orange when low, red when critical": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düşükte turuncu, kritikte kırmızı"
-          }
-        }
-      }
-    },
-    "Critical red kicks in at 10%.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kritik kırmızı %10'da devreye girer."
-          }
-        }
-      }
-    },
-    "Green when full": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Doluyken yeşil"
-          }
-        }
-      }
-    },
-    "Blue while charging": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj olurken mavi"
-          }
-        }
-      }
-    },
-    "With every color rule off, the icon stays monochrome and matches the menu bar.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tüm renk kuralları kapalıyken simge tek renkli kalır ve menü çubuğuna uyar."
-          }
-        }
-      }
-    },
-    "Play sound": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ses çal"
-          }
-        }
-      }
-    },
-    "Low battery": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düşük pil"
-          }
-        }
-      }
-    },
-    "Long time on battery": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilde uzun süre"
-          }
-        }
-      }
-    },
-    "Charge limit reached": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj limitine ulaşıldı"
-          }
-        }
-      }
-    },
-    "Fully charged": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tam şarj"
-          }
-        }
-      }
-    },
-    "High battery temperature": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yüksek pil sıcaklığı"
-          }
-        }
-      }
-    },
-    "Battery health declines": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil sağlığı düştüğünde"
-          }
-        }
-      }
-    },
-    "Open System Notification Settings…": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sistem Bildirim Ayarlarını Aç…"
-          }
-        }
-      }
-    },
-    "Recording": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kayıt"
-          }
-        }
-      }
-    },
-    "Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj geçmişi olay tabanlıdır ve boştayken hiçbir maliyeti yoktur. Güç ve sıcaklık geçmişi ise zamanlayıcıyla tek bir hafif okuma gerektirir."
-          }
-        }
-      }
-    },
-    "Record power and temperature": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç ve sıcaklığı kaydet"
-          }
-        }
-      }
-    },
-    "Sampling interval": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnekleme aralığı"
-          }
-        }
-      }
-    },
-    "30 seconds": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 saniye"
-          }
-        }
-      }
-    },
     "1 minute": {
       "localizations": {
         "tr": {
@@ -1179,6 +21,16 @@
         }
       }
     },
+    "30 seconds": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 saniye"
+          }
+        }
+      }
+    },
     "5 minutes": {
       "localizations": {
         "tr": {
@@ -1189,212 +41,142 @@
         }
       }
     },
-    "Data": {
+    "About": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Veri"
+            "value": "Hakkında"
           }
         }
       }
     },
-    "On disk": {
+    "Adapter": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Diskte"
+            "value": "Adaptör"
           }
         }
       }
     },
-    "Export CSV…": {
+    "Adapter Current": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "CSV Dışa Aktar…"
+            "value": "Adaptör Akımı"
           }
         }
       }
     },
-    "Import CSV…": {
+    "Adapter Voltage": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "CSV İçe Aktar…"
+            "value": "Adaptör Voltajı"
           }
         }
       }
     },
-    "Delete History…": {
+    "Age": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geçmişi Sil…"
+            "value": "Yaş"
           }
         }
       }
     },
-    "Delete all recorded history?": {
+    "Amperage": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kayıtlı tüm geçmiş silinsin mi?"
+            "value": "Akım"
           }
         }
       }
     },
-    "Delete Everything": {
+    "App Icon": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tümünü Sil"
+            "value": "Uygulama Simgesi"
           }
         }
       }
     },
-    "Charge, power and health history will be removed permanently. Export a CSV first if you want a backup.": {
+    "Appearance": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj, güç ve sağlık geçmişi kalıcı olarak silinecek. Yedek istiyorsanız önce CSV dışa aktarın."
+            "value": "Görünüm"
           }
         }
       }
     },
-    "Old samples are compacted automatically: raw power readings become hourly averages after 30 days. Daily health snapshots are kept forever.": {
+    "Applies to the Dock and the app switcher while Battistics runs.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eski örnekler otomatik olarak sıkıştırılır: ham güç okumaları 30 gün sonra saatlik ortalamalara dönüşür. Günlük sağlık anlık görüntüleri kalıcı olarak saklanır."
+            "value": "Battistics çalışırken Dock ve uygulama değiştiricide geçerlidir."
           }
         }
       }
     },
-    "Check for updates automatically": {
+    "At least one of the two stays on so Battistics remains reachable.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güncellemeleri otomatik denetle"
+            "value": "Battistics erişilebilir kalsın diye ikisinden en az biri açık kalır."
           }
         }
       }
     },
-    "Download updates automatically": {
+    "Automatic": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güncellemeleri otomatik indir"
+            "value": "Otomatik"
           }
         }
       }
     },
-    "Version": {
+    "Bat": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sürüm"
+            "value": "Yarasa"
           }
         }
       }
     },
-    "Version %@": {
+    "Bat Battery": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sürüm %@"
+            "value": "Yarasa Pil"
           }
         }
       }
     },
-    "Check Now": {
+    "Battery": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şimdi Denetle"
-          }
-        }
-      }
-    },
-    "Check for Updates…": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güncellemeleri Denetle…"
-          }
-        }
-      }
-    },
-    "Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güncellemeler Battistics'in yaptığı tek ağ trafiğidir. Analitik yok, izleme yok, bu Mac'ten başka hiçbir şey çıkmaz."
-          }
-        }
-      }
-    },
-    "Battery statistics for the Mac. Free and open source.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac için pil istatistikleri. Ücretsiz ve açık kaynak."
-          }
-        }
-      }
-    },
-    "MIT License": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MIT Lisansı"
-          }
-        }
-      }
-    },
-    "Runs entirely on this Mac. The only network request is the optional update check.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tamamen bu Mac'te çalışır. Tek ağ isteği isteğe bağlı güncelleme denetimidir."
-          }
-        }
-      }
-    },
-    "Charge history appears here as Battistics runs.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics çalıştıkça şarj geçmişi burada görünür."
-          }
-        }
-      }
-    },
-    "Battery Low": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Düşük"
+            "value": "Pil"
           }
         }
       }
@@ -1409,12 +191,22 @@
         }
       }
     },
-    "Charge Limit Reached": {
+    "Battery Health Declined": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj Limitine Ulaşıldı"
+            "value": "Pil Sağlığı Düştü"
+          }
+        }
+      }
+    },
+    "Battery Low": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil Düşük"
           }
         }
       }
@@ -1429,42 +221,12 @@
         }
       }
     },
-    "Still on Battery": {
+    "Battery health declines": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hâlâ Pilde"
-          }
-        }
-      }
-    },
-    "Battery Health Declined": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Sağlığı Düştü"
-          }
-        }
-      }
-    },
-    "Charge is at %lld%%. Connect power soon.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj %%%lld düzeyinde. En kısa sürede güç bağlayın."
-          }
-        }
-      }
-    },
-    "Charge dropped to %lld%%.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj %%%lld düzeyine düştü."
+            "value": "Pil sağlığı düştüğünde"
           }
         }
       }
@@ -1489,6 +251,16 @@
         }
       }
     },
+    "Battery statistics for the Mac. Free and open source.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac için pil istatistikleri. Ücretsiz ve açık kaynak."
+          }
+        }
+      }
+    },
     "Battery temperature is %@.": {
       "localizations": {
         "tr": {
@@ -1499,32 +271,256 @@
         }
       }
     },
-    "The Mac has been on battery power for %@.": {
+    "Battistics": {
+      "shouldTranslate": false
+    },
+    "Battistics needs a Mac with a built-in battery.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac %@ süredir pil gücünde çalışıyor."
+            "value": "Battistics dahili pili olan bir Mac gerektirir."
           }
         }
       }
     },
-    "Maximum capacity dropped from %@ to %@.": {
+    "Blue while charging": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Maksimum kapasite %@ değerinden %@ değerine düştü."
+            "value": "Şarj olurken mavi"
           }
         }
       }
     },
-    "Bat": {
+    "Capacity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite"
+          }
+        }
+      }
+    },
+    "Capacity %": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity %"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite %"
+          }
+        }
+      }
+    },
+    "Capacity snapshots are recorded once per day. Come back tomorrow.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity snapshots are recorded once per day. Come back tomorrow."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
+          }
+        }
+      }
+    },
+    "Capacity, last 12 months": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity, last 12 months"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite, son 12 ay"
+          }
+        }
+      }
+    },
+    "Cell Sensor": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yarasa"
+            "value": "Hücre Sensörü"
+          }
+        }
+      }
+    },
+    "Celsius": {
+      "shouldTranslate": false
+    },
+    "Celsius and Fahrenheit": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Celsius ve Fahrenheit"
+          }
+        }
+      }
+    },
+    "Charge": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj"
+          }
+        }
+      }
+    },
+    "Charge %": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj %"
+          }
+        }
+      }
+    },
+    "Charge (mAh)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj (mAh)"
+          }
+        }
+      }
+    },
+    "Charge Limit Reached": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj Limitine Ulaşıldı"
+          }
+        }
+      }
+    },
+    "Charge dropped to %lld%%.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj %%%lld düzeyine düştü."
+          }
+        }
+      }
+    },
+    "Charge history appears here as Battistics runs.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics çalıştıkça şarj geçmişi burada görünür."
+          }
+        }
+      }
+    },
+    "Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj geçmişi olay tabanlıdır ve boştayken hiçbir maliyeti yoktur. Güç ve sıcaklık geçmişi ise zamanlayıcıyla tek bir hafif okuma gerektirir."
+          }
+        }
+      }
+    },
+    "Charge is at %lld%%. Connect power soon.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj %%%lld düzeyinde. En kısa sürede güç bağlayın."
+          }
+        }
+      }
+    },
+    "Charge limit reached": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj limitine ulaşıldı"
+          }
+        }
+      }
+    },
+    "Charge, power and health history will be removed permanently. Export a CSV first if you want a backup.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj, güç ve sağlık geçmişi kalıcı olarak silinecek. Yedek istiyorsanız önce CSV dışa aktarın."
+          }
+        }
+      }
+    },
+    "Charging": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj oluyor"
+          }
+        }
+      }
+    },
+    "Check Now": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdi Denetle"
+          }
+        }
+      }
+    },
+    "Check for Updates…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeleri Denetle…"
+          }
+        }
+      }
+    },
+    "Check for updates automatically": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeleri otomatik denetle"
           }
         }
       }
@@ -1539,45 +535,52 @@
         }
       }
     },
-    "Icon Style": {
+    "Color": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Simge Stili"
+            "value": "Renk"
           }
         }
       }
     },
-    "Preview": {
+    "Condition": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Önizleme"
+            "value": "Durum"
           }
         }
       }
     },
-    "Full": {
+    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dolu"
+            "value": "Pil düzeyi bildiren bağlı klavyeler, fareler, trackpad'ler ve kulaklıklar burada görünür."
           }
         }
       }
     },
-    "Normal": {
-      "shouldTranslate": false
-    },
-    "Low": {
+    "Content": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Düşük"
+            "value": "İçerik"
+          }
+        }
+      }
+    },
+    "Copy Report": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raporu Kopyala"
           }
         }
       }
@@ -1592,42 +595,242 @@
         }
       }
     },
-    "Monitor": {
+    "Critical red kicks in at 10%.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "İzleme"
+            "value": "Kritik kırmızı %10'da devreye girer."
           }
         }
       }
     },
-    "Units": {
+    "Current Charge": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Birimler"
+            "value": "Mevcut Şarj"
           }
         }
       }
     },
-    "Settings…": {
+    "Current Maximum": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ayarlar…"
+            "value": "Mevcut Maksimum"
           }
         }
       }
     },
-    "Toggle sidebar": {
+    "Cycle Count": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kenar çubuğunu aç/kapat"
+            "value": "Döngü Sayısı"
+          }
+        }
+      }
+    },
+    "Cycles": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Döngü"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koyu"
+          }
+        }
+      }
+    },
+    "Data": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veri"
+          }
+        }
+      }
+    },
+    "Day": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gün"
+          }
+        }
+      }
+    },
+    "Delete Everything": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Sil"
+          }
+        }
+      }
+    },
+    "Delete History…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçmişi Sil…"
+          }
+        }
+      }
+    },
+    "Delete all recorded history?": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıtlı tüm geçmiş silinsin mi?"
+          }
+        }
+      }
+    },
+    "Design Capacity": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasarım Kapasitesi"
+          }
+        }
+      }
+    },
+    "Design Cycle Limit": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasarım Döngü Limiti"
+          }
+        }
+      }
+    },
+    "Details": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayrıntılar"
+          }
+        }
+      }
+    },
+    "Dots are daily readings, the line is a 7-day trend. The controller re-estimates capacity constantly, so single days swing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dots are daily readings, the line is a 7-day trend. The controller re-estimates capacity constantly, so single days swing."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noktalar günlük okumaları, çizgi 7 günlük eğilimi gösterir. Denetleyici kapasiteyi sürekli yeniden hesapladığı için tek günler dalgalanır."
+          }
+        }
+      }
+    },
+    "Download updates automatically": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeleri otomatik indir"
+          }
+        }
+      }
+    },
+    "Electrical": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elektrik"
+          }
+        }
+      }
+    },
+    "Energy": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji"
+          }
+        }
+      }
+    },
+    "Export CSV…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV Dışa Aktar…"
+          }
+        }
+      }
+    },
+    "Fahrenheit": {
+      "shouldTranslate": false
+    },
+    "Fair": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "Full": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dolu"
+          }
+        }
+      }
+    },
+    "Fully Charged": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam Şarjlı"
+          }
+        }
+      }
+    },
+    "Fully charged": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam şarj"
           }
         }
       }
@@ -1642,32 +845,459 @@
         }
       }
     },
-    "Stats": {
+    "General": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "İstatistik"
+            "value": "Genel"
           }
         }
       }
     },
-    "Wings": {
+    "GitHub": {
+      "shouldTranslate": false
+    },
+    "Good": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kanat"
+            "value": "İyi"
           }
         }
       }
     },
-    "App Icon": {
+    "Green when full": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uygulama Simgesi"
+            "value": "Doluyken yeşil"
+          }
+        }
+      }
+    },
+    "Health": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık"
+          }
+        }
+      }
+    },
+    "High battery temperature": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek pil sıcaklığı"
+          }
+        }
+      }
+    },
+    "History": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçmiş"
+          }
+        }
+      }
+    },
+    "Icon Style": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simge Stili"
+          }
+        }
+      }
+    },
+    "Import CSV…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV İçe Aktar…"
+          }
+        }
+      }
+    },
+    "Keep the main window on top": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep the main window on top"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana pencereyi üstte tut"
+          }
+        }
+      }
+    },
+    "Last 24 Hours": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son 24 Saat"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık"
+          }
+        }
+      }
+    },
+    "Live": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canlı"
+          }
+        }
+      }
+    },
+    "Long time on battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilde uzun süre"
+          }
+        }
+      }
+    },
+    "Low": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük"
+          }
+        }
+      }
+    },
+    "Low battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük pil"
+          }
+        }
+      }
+    },
+    "MIT License": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MIT Lisansı"
+          }
+        }
+      }
+    },
+    "Manufacture Date": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Üretim Tarihi"
+          }
+        }
+      }
+    },
+    "Maximum capacity dropped from %@ to %@.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maksimum kapasite %@ değerinden %@ değerine düştü."
+          }
+        }
+      }
+    },
+    "Measured Capacity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Measured Capacity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçülen Kapasite"
+          }
+        }
+      }
+    },
+    "Measured Capacity is the controller's live reading and can exceed 100%.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Measured Capacity is the controller's live reading and can exceed 100%."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçülen Kapasite, denetleyicinin anlık okumasıdır ve %100'ü aşabilir."
+          }
+        }
+      }
+    },
+    "Measured Maximum": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçülen Maksimum"
+          }
+        }
+      }
+    },
+    "Measuring…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçülüyor…"
+          }
+        }
+      }
+    },
+    "Menu Bar": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menü Çubuğu"
+          }
+        }
+      }
+    },
+    "Metric": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metrik"
+          }
+        }
+      }
+    },
+    "Model": {
+      "shouldTranslate": false
+    },
+    "Monitor": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzleme"
+          }
+        }
+      }
+    },
+    "Month": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ay"
+          }
+        }
+      }
+    },
+    "N/A": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yok"
+          }
+        }
+      }
+    },
+    "No battery found": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil bulunamadı"
+          }
+        }
+      }
+    },
+    "No data yet": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz veri yok"
+          }
+        }
+      }
+    },
+    "No peripheral batteries": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aksesuar pili yok"
+          }
+        }
+      }
+    },
+    "No process used meaningful energy in the last sample window.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son örnekleme penceresinde anlamlı enerji kullanan süreç olmadı."
+          }
+        }
+      }
+    },
+    "Normal": {
+      "shouldTranslate": false
+    },
+    "Not enough data in this period yet. Battistics records as it runs.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu dönemde henüz yeterli veri yok. Battistics çalıştıkça kayıt tutar."
+          }
+        }
+      }
+    },
+    "Nothing": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiçbiri"
+          }
+        }
+      }
+    },
+    "Nothing notable": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayda değer bir şey yok"
+          }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirimler"
+          }
+        }
+      }
+    },
+    "Old samples are compacted automatically: raw power readings become hourly averages after 30 days. Daily health snapshots are kept forever.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eski örnekler otomatik olarak sıkıştırılır: ham güç okumaları 30 gün sonra saatlik ortalamalara dönüşür. Günlük sağlık anlık görüntüleri kalıcı olarak saklanır."
+          }
+        }
+      }
+    },
+    "On Battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilde"
+          }
+        }
+      }
+    },
+    "On disk": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diskte"
+          }
+        }
+      }
+    },
+    "Open System Notification Settings…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Bildirim Ayarlarını Aç…"
+          }
+        }
+      }
+    },
+    "Open as a floating window that stays on top": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Üstte kalan ayrı bir pencere olarak aç"
+          }
+        }
+      }
+    },
+    "Open the main window at launch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the main window at launch"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlangıçta ana pencereyi aç"
+          }
+        }
+      }
+    },
+    "Orange when low, red when critical": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşükte turuncu, kritikte kırmızı"
           }
         }
       }
@@ -1682,42 +1312,502 @@
         }
       }
     },
-    "Bat Battery": {
+    "Original Maximum": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yarasa Pil"
+            "value": "Orijinal Maksimum"
           }
         }
       }
     },
-    "Applies to the Dock and the app switcher while Battistics runs.": {
+    "Overview": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics çalışırken Dock ve uygulama değiştiricide geçerlidir."
+            "value": "Genel Bakış"
           }
         }
       }
     },
-    "Apple Rated Health": {
+    "PID %lld": {
+      "shouldTranslate": false
+    },
+    "Peripherals": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Sağlık Değeri"
+            "value": "Aksesuarlar"
           }
         }
       }
     },
-    "Condition": {
+    "Play sound": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Durum"
+            "value": "Ses çal"
+          }
+        }
+      }
+    },
+    "Power": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç"
+          }
+        }
+      }
+    },
+    "Power (W)": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç (W)"
+          }
+        }
+      }
+    },
+    "Power Adapter": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Adaptörü"
+          }
+        }
+      }
+    },
+    "Preview": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önizleme"
+          }
+        }
+      }
+    },
+    "Primary text": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birincil metin"
+          }
+        }
+      }
+    },
+    "Quit Battistics": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics'ten Çık"
+          }
+        }
+      }
+    },
+    "Range": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aralık"
+          }
+        }
+      }
+    },
+    "Rated Power": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nominal Güç"
+          }
+        }
+      }
+    },
+    "Record power and temperature": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç ve sıcaklığı kaydet"
+          }
+        }
+      }
+    },
+    "Recording": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıt"
+          }
+        }
+      }
+    },
+    "Runs entirely on this Mac. The only network request is the optional update check.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamamen bu Mac'te çalışır. Tek ağ isteği isteğe bağlı güncelleme denetimidir."
+          }
+        }
+      }
+    },
+    "Sampling interval": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnekleme aralığı"
+          }
+        }
+      }
+    },
+    "Sampling runs only while this view is open and stops the moment it closes.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnekleme yalnızca bu görünüm açıkken çalışır ve kapanır kapanmaz durur."
+          }
+        }
+      }
+    },
+    "Secondary text": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkincil metin"
+          }
+        }
+      }
+    },
+    "Serial Number": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seri Numarası"
+          }
+        }
+      }
+    },
+    "Service": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Servis"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar…"
+          }
+        }
+      }
+    },
+    "Show Dock icon": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock simgesini göster"
+          }
+        }
+      }
+    },
+    "Show battery glyph": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil simgesini göster"
+          }
+        }
+      }
+    },
+    "Show menu bar icon": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menü çubuğu simgesini göster"
+          }
+        }
+      }
+    },
+    "Start at login": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açılınca başlat"
+          }
+        }
+      }
+    },
+    "Stats": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İstatistik"
+          }
+        }
+      }
+    },
+    "Still on Battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hâlâ Pilde"
+          }
+        }
+      }
+    },
+    "System Settings Reports": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Settings Reports"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Ayarları'nda"
+          }
+        }
+      }
+    },
+    "Temperature": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıcaklık"
+          }
+        }
+      }
+    },
+    "Temperature unit": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıcaklık birimi"
+          }
+        }
+      }
+    },
+    "The Mac has been on battery power for %@.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac %@ süredir pil gücünde çalışıyor."
+          }
+        }
+      }
+    },
+    "The glyph reappears automatically when both texts are set to Nothing.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her iki metin de Hiçbiri olduğunda simge otomatik olarak geri gelir."
+          }
+        }
+      }
+    },
+    "Theme": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
+          }
+        }
+      }
+    },
+    "Time on Battery": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilde Geçen Süre"
+          }
+        }
+      }
+    },
+    "Time remaining": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan süre"
+          }
+        }
+      }
+    },
+    "Toggle sidebar": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kenar çubuğunu aç/kapat"
+          }
+        }
+      }
+    },
+    "Units": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birimler"
+          }
+        }
+      }
+    },
+    "Updates": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeler"
+          }
+        }
+      }
+    },
+    "Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeler Battistics'in yaptığı tek ağ trafiğidir. Analitik yok, izleme yok, bu Mac'ten başka hiçbir şey çıkmaz."
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürüm"
+          }
+        }
+      }
+    },
+    "Version %@": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürüm %@"
+          }
+        }
+      }
+    },
+    "Visibility": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görünürlük"
+          }
+        }
+      }
+    },
+    "Voltage": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voltaj"
+          }
+        }
+      }
+    },
+    "Watching which apps use the most energy. First results arrive in a few seconds.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangi uygulamaların en çok enerji kullandığı izleniyor. İlk sonuçlar birkaç saniye içinde gelir."
+          }
+        }
+      }
+    },
+    "Week": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta"
+          }
+        }
+      }
+    },
+    "Wings": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanat"
+          }
+        }
+      }
+    },
+    "With every color rule off, the icon stays monochrome and matches the menu bar.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm renk kuralları kapalıyken simge tek renkli kalır ve menü çubuğuna uyar."
+          }
+        }
+      }
+    },
+    "Year": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yıl"
           }
         }
       }

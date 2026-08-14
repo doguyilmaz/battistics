@@ -25,7 +25,7 @@ struct GeneralSettings: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 }
-                Toggle("Open dashboard at launch", isOn: $openDashboardAtLaunch)
+                Toggle("Open the main window at launch", isOn: $openDashboardAtLaunch)
             }
             Section("Visibility") {
                 Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
@@ -38,7 +38,7 @@ struct GeneralSettings: View {
                 Text("At least one of the two stays on so Battistics remains reachable.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Toggle("Keep dashboard window on top", isOn: $keepDashboardOnTop)
+                Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
             }
             Section("Units") {
                 Picker("Temperature unit", selection: $temperatureUnitRaw) {

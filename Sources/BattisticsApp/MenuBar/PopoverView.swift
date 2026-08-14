@@ -21,18 +21,32 @@ struct PopoverView: View {
         VStack(spacing: 12) {
             header
             if let snapshot = model.snapshot, snapshot.batteryInstalled {
-                HStack(spacing: 28) {
+                // Three rings inside 340pt: 3 x 86 + 2 x 16 = 290, which
+                // clears the 312pt of content width the padding leaves.
+                HStack(spacing: 16) {
                     GaugeRing(
                         value: Double(snapshot.percent),
                         title: "Charge",
                         color: .charge(percent: Double(snapshot.percent)),
-                        symbol: snapshot.isCharging ? "bolt.fill" : nil
+                        symbol: snapshot.isCharging ? "bolt.fill" : nil,
+                        diameter: 86
                     )
                     GaugeRing(
-                        value: snapshot.healthPercent,
-                        title: "Health",
-                        color: .health(percent: snapshot.healthPercent)
+                        value: snapshot.displayHealthPercent,
+                        title: "Capacity",
+                        color: .capacity(percent: snapshot.displayHealthPercent),
+                        diameter: 86
                     )
+                    if let limit = snapshot.designCycleCount, limit > 0 {
+                        GaugeRing(
+                            value: Double(snapshot.cycleCount) / Double(limit) * 100,
+                            title: "Cycles",
+                            color: .cycles(fraction: Double(snapshot.cycleCount) / Double(limit)),
+                            valueText: "\(snapshot.cycleCount)",
+                            subvalue: "/ \(limit.formatted(.number.grouping(.automatic)))",
+                            diameter: 86
+                        )
+                    }
                 }
                 .frame(maxWidth: .infinity)
 
@@ -143,7 +157,7 @@ struct PopoverView: View {
                     StatRow(
                         label: "Power",
                         value: String(format: "%+.1f W", watts),
-                        valueColor: watts < 0 ? .orange : nil)
+                        valueColor: watts < 0 ? .statusWarn : nil)
                 }
                 if let amperage = snapshot.amperageMA {
                     StatRow(label: "Amperage", value: Formatting.milliamps(amperage))
@@ -178,14 +192,14 @@ struct PopoverView: View {
                             .interpolationMethod(.monotone)
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
+                                    colors: [Color.statusGood.opacity(0.35), Color.statusGood.opacity(0.03)],
                                     startPoint: .top, endPoint: .bottom))
                             LineMark(
                                 x: .value("Time", point.date),
                                 y: .value("Charge", point.value)
                             )
                             .interpolationMethod(.monotone)
-                            .foregroundStyle(Color.green)
+                            .foregroundStyle(Color.statusGood)
                             .lineStyle(StrokeStyle(lineWidth: 1.5))
                         }
                         if let selected = nearestSparklinePoint {
@@ -195,7 +209,7 @@ struct PopoverView: View {
                                 x: .value("Time", selected.date),
                                 y: .value("Charge", selected.value)
                             )
-                            .foregroundStyle(Color.green)
+                            .foregroundStyle(Color.statusGood)
                             .symbolSize(28)
                             .annotation(
                                 position: .top,
@@ -236,7 +250,10 @@ struct PopoverView: View {
                     openWindow(id: "dashboard")
                     NSApp.activate()
                 } label: {
-                    Label("Dashboard", systemImage: "chart.xyaxis.line")
+                    // Names the pane it actually opens, and reuses that
+                    // pane's own icon. "Dashboard" survives only as an
+                    // internal type name.
+                    Label("Overview", systemImage: DashboardPane.overview.icon)
                 }
                 Spacer()
                 Button {
@@ -355,9 +372,9 @@ struct PopoverView: View {
 
     private func statusColor(_ status: HealthStatus) -> Color {
         switch status {
-        case .good: .green
-        case .fair: .orange
-        case .poor: .red
+        case .good: .statusGood
+        case .fair: .statusWarn
+        case .poor: .statusBad
         }
     }
 }

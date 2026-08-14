@@ -32,12 +32,18 @@ struct GlassBackground: View {
     }
 }
 
-/// Ring gauge used for the Charge / Health hero pair.
+/// Ring gauge used for the Charge / Capacity / Cycles hero trio.
 struct GaugeRing: View {
+    /// 0...100, drives the arc.
     let value: Double
     let title: String
     let color: Color
     var symbol: String?
+    /// Overrides the centred number when the arc's fraction is not what the
+    /// user cares about — cycles show a count, not a percentage.
+    var valueText: String?
+    /// Small line under the number, e.g. the cycle limit.
+    var subvalue: String?
     var diameter: CGFloat = 92
 
     var body: some View {
@@ -63,9 +69,16 @@ struct GaugeRing: View {
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(color)
                     }
-                    Text("\(Int(value.rounded()))%")
+                    Text(valueText ?? "\(Int(value.rounded()))%")
                         .font(.system(size: 21, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
                         .contentTransition(.numericText())
+                    if let subvalue {
+                        Text(subvalue)
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -165,17 +178,26 @@ extension Color {
     /// Charge level color ramp shared by gauges and charts.
     static func charge(percent: Double) -> Color {
         switch percent {
-        case ..<10: .red
-        case ..<20: .orange
-        default: .green
+        case ..<10: .statusBad
+        case ..<20: .statusWarn
+        default: .statusGood
         }
     }
 
-    static func health(percent: Double) -> Color {
+    static func capacity(percent: Double) -> Color {
         switch percent {
-        case 80...: .green
-        case 60..<80: .orange
-        default: .red
+        case 80...: .statusGood
+        case 60..<80: .statusWarn
+        default: .statusBad
+        }
+    }
+
+    /// Cycles consumed against the pack's design limit.
+    static func cycles(fraction: Double) -> Color {
+        switch fraction {
+        case ..<0.6: .statusGood
+        case ..<0.85: .statusWarn
+        default: .statusBad
         }
     }
 }
