@@ -21,32 +21,18 @@ struct PopoverView: View {
         VStack(spacing: 12) {
             header
             if let snapshot = model.snapshot, snapshot.batteryInstalled {
-                // Three rings inside 340pt: 3 x 86 + 2 x 16 = 290, which
-                // clears the 312pt of content width the padding leaves.
-                HStack(spacing: 16) {
+                HStack(spacing: 28) {
                     GaugeRing(
                         value: Double(snapshot.percent),
                         title: "Charge",
                         color: .charge(percent: Double(snapshot.percent)),
-                        symbol: snapshot.isCharging ? "bolt.fill" : nil,
-                        diameter: 86
+                        symbol: snapshot.isCharging ? "bolt.fill" : nil
                     )
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
                         title: "Capacity",
-                        color: .capacity(percent: snapshot.displayHealthPercent),
-                        diameter: 86
+                        color: .capacity(percent: snapshot.displayHealthPercent)
                     )
-                    if let limit = snapshot.designCycleCount, limit > 0 {
-                        GaugeRing(
-                            value: Double(snapshot.cycleCount) / Double(limit) * 100,
-                            title: "Cycles",
-                            color: .cycles(fraction: Double(snapshot.cycleCount) / Double(limit)),
-                            valueText: "\(snapshot.cycleCount)",
-                            subvalue: "/ \(limit.formatted(.number.grouping(.automatic)))",
-                            diameter: 86
-                        )
-                    }
                 }
                 .frame(maxWidth: .infinity)
 

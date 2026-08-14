@@ -30,58 +30,52 @@ enum MenuBarIconRenderer {
     private static let glyphSize = NSSize(width: 27, height: 17)
     private static let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
 
-    /// The menu bar follows the *system* appearance, which the app's own
-    /// theme preference does not change. `NSApp.effectiveAppearance` reflects
-    /// `preferredColorScheme` and would report the wrong backdrop whenever
-    /// the two differ, so read NSGlobalDomain instead.
-    static var menuBarIsDark: Bool {
-        UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark"
-    }
-
-    /// Called when the system flips light/dark: every tinted image was
-    /// rasterized for the old backdrop.
-    static func invalidateCache() {
-        cache.removeAllObjects()
-    }
-
     static func image(snapshot: BatterySnapshot?, config: MenuBarConfig) -> NSImage {
-        let dark = menuBarIsDark
         // No battery (desktop Macs, read failure): neutral empty template
         // glyph, never a red zero.
         guard let snapshot, snapshot.batteryInstalled else {
             return cachedRender(
                 key: "no-battery|\(config.iconStyle.rawValue)", percent: nil, charging: false,
-                texts: [], showGlyph: true, level: .neutral, shape: config.iconStyle, dark: dark)
+                texts: [], showGlyph: true, tint: nil, shape: config.iconStyle)
         }
         let percent = snapshot.percent
         let charging = snapshot.isCharging
+        let external = snapshot.externalConnected
         let texts = [config.primaryText, config.secondaryText]
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
-        let level = StatusPalette.level(
-            percent: percent, charging: charging, external: snapshot.externalConnected,
-            rules: config.colorRules)
+        let tint = tintColor(percent: percent, charging: charging, external: external, config: config)
 
-        // Appearance belongs in the key: a tinted image is rasterized for one
-        // backdrop and is wrong for the other.
-        let key = """
-            \(percent)|\(charging)|\(config.showGlyph)|\(config.iconStyle.rawValue)\
-            |\(texts.joined(separator: "·"))|\(level.rawValue)|\(dark ? "dark" : "light")
-            """
+        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(config.iconStyle.rawValue)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")"
         return cachedRender(
             key: key, percent: percent, charging: charging, texts: texts,
-            showGlyph: config.showGlyph, level: level, shape: config.iconStyle, dark: dark)
+            showGlyph: config.showGlyph, tint: tint, shape: config.iconStyle)
     }
 
     private static func cachedRender(
         key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
-        level: BatteryStatusLevel, shape: MenuBarIconStyle, dark: Bool
+        tint: NSColor?, shape: MenuBarIconStyle
     ) -> NSImage {
         if let cached = cache.object(forKey: key as NSString) { return cached }
         let image = render(
             percent: percent, charging: charging, texts: texts,
-            showGlyph: showGlyph, level: level, shape: shape, dark: dark)
+            showGlyph: showGlyph, tint: tint, shape: shape)
         cache.setObject(image, forKey: key as NSString)
         return image
+    }
+
+    /// Status ladder: charging blue, critical red, low orange, full green,
+    /// monochrome template otherwise. Each rung is user-toggleable.
+    /// Internal so the appearance settings can render true previews.
+    ///
+    /// The ladder itself lives in `StatusPalette` so it is unit-tested and
+    /// so the app's own gauges draw from the same colors.
+    static func tintColor(
+        percent: Int, charging: Bool, external: Bool, config: MenuBarConfig
+    ) -> NSColor? {
+        NSColor.status(
+            StatusPalette.level(
+                percent: percent, charging: charging, external: external,
+                rules: config.colorRules))
     }
 
     private static func text(for kind: MenuBarText, snapshot: BatterySnapshot?, unit: TemperatureUnit) -> String? {
@@ -109,18 +103,12 @@ enum MenuBarIconRenderer {
     }
 
     private static func render(
-        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
-        level: BatteryStatusLevel, shape: MenuBarIconStyle, dark: Bool
+        percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
+        shape: MenuBarIconStyle
     ) -> NSImage {
-        let tint = StatusPalette.rgb(for: level, dark: dark)?.nsColor
-        let isTemplate = tint == nil
-        // A template image carries alpha only and macOS colors it for the
-        // menu bar. Once a status tint applies we lose that, so the outline
-        // and the text have to take the menu bar's own label color by hand —
-        // tinting the text is what made it unreadable over a wallpaper.
-        let outline: NSColor = isTemplate ? .black : (dark ? .white : .black)
+        let color = tint ?? .black
         let string = texts.joined(separator: " ")
-        let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: outline]
+        let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
         let textSize = string.isEmpty ? .zero : (string as NSString).size(withAttributes: attributes)
 
         var width: CGFloat = 0
@@ -139,7 +127,7 @@ enum MenuBarIconRenderer {
                 BatGlyph.draw(
                     in: glyphRect,
                     style: BatGlyph.Style(
-                        color: outline, fillColor: tint, charging: charging,
+                        color: color, charging: charging,
                         fillFraction: percent.map { CGFloat($0) / 100 },
                         shape: shape))
                 x += glyphSize.width + 4
@@ -151,7 +139,7 @@ enum MenuBarIconRenderer {
             }
             return true
         }
-        image.isTemplate = isTemplate
+        image.isTemplate = tint == nil
         return image
     }
 }

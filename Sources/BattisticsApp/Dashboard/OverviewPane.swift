@@ -1,13 +1,9 @@
 import BattisticsCore
-import Charts
 import SwiftUI
 
 struct OverviewPane: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
-    /// Both computed once when the trend loads, not on every body evaluation.
-    @State private var healthTrendDomain: ClosedRange<Double> = 80...100
-    @State private var healthTrendLine: [SeriesPoint] = []
 
     private var temperatureUnit: TemperatureUnit {
         TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
@@ -30,15 +26,6 @@ struct OverviewPane: View {
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .navigationTitle("Overview")
-            .task {
-                await model.loadHealthTrend()
-                let readings = model.healthTrend.map(\.displayHealthPercent)
-                let smoothed = BatteryHealth.rollingMedian(readings, window: 7)
-                healthTrendLine = zip(model.healthTrend, smoothed).map {
-                    SeriesPoint(date: $0.date, value: $1)
-                }
-                healthTrendDomain = max(((readings.min() ?? 80) - 2).rounded(.down), 0)...100
-            }
         } else {
             ContentUnavailableView(
                 "No battery found",
@@ -96,44 +83,8 @@ struct OverviewPane: View {
                     label: "Capacity",
                     value: Formatting.percentPrecise(snapshot.displayHealthPercent),
                     valueColor: .capacity(percent: snapshot.displayHealthPercent))
-                // Absent until there are two daily snapshots, so the card is
-                // never padded with an empty box on a fresh install.
-                if healthTrendLine.count > 1 {
-                    healthTrendChart
-                }
             }
         }
-    }
-
-    private var healthTrendChart: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Chart(healthTrendLine) { point in
-                AreaMark(
-                    x: .value("Date", point.date),
-                    y: .value("Capacity", point.value)
-                )
-                .interpolationMethod(.monotone)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.statusInfo.opacity(0.28), Color.statusInfo.opacity(0.02)],
-                        startPoint: .top, endPoint: .bottom))
-                LineMark(
-                    x: .value("Date", point.date),
-                    y: .value("Capacity", point.value)
-                )
-                .interpolationMethod(.monotone)
-                .foregroundStyle(Color.statusInfo)
-                .lineStyle(StrokeStyle(lineWidth: 1.5))
-            }
-            .chartYScale(domain: healthTrendDomain)
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-            .frame(height: 34)
-            Text("Capacity, last 12 months")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-        }
-        .padding(.top, 2)
     }
 
 

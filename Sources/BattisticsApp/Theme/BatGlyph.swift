@@ -10,20 +10,11 @@ import AppKit
 ///   wings    bat silhouette that fills up with charge
 enum BatGlyph {
     struct Style {
-        /// Outline, nub and hub. Kept on the menu bar's own label color so
-        /// the silhouette always has a maximum-contrast edge, whatever the
-        /// wallpaper behind the translucent menu bar happens to be.
         var color: NSColor = .black
-        /// Interior fill: the charge level, the bars, the bolt. Defaults to
-        /// `color`. Separating the two is what lets a status tint stay
-        /// legible — the shape is carried by the outline, not the tint.
-        var fillColor: NSColor?
         var charging = false
         /// 0...1 fill level, nil hides the level indication.
         var fillFraction: CGFloat?
         var shape: MenuBarIconStyle = .bat
-
-        var interior: NSColor { fillColor ?? color }
     }
 
     /// Draws the glyph into `rect` (non-flipped coordinates).
@@ -45,17 +36,17 @@ enum BatGlyph {
     /// Standalone glyph image, template unless a color is given.
     static func image(
         size: NSSize, fillFraction: CGFloat?, charging: Bool, color: NSColor? = nil,
-        fillColor: NSColor? = nil, shape: MenuBarIconStyle = .bat
+        shape: MenuBarIconStyle = .bat
     ) -> NSImage {
         let image = NSImage(size: size, flipped: false) { rect in
             draw(
                 in: rect,
                 style: Style(
-                    color: color ?? .black, fillColor: fillColor, charging: charging,
-                    fillFraction: fillFraction, shape: shape))
+                    color: color ?? .black, charging: charging, fillFraction: fillFraction,
+                    shape: shape))
             return true
         }
-        image.isTemplate = color == nil && fillColor == nil
+        image.isTemplate = color == nil
         return image
     }
 
@@ -176,12 +167,10 @@ enum BatGlyph {
 
     private static func drawBatteryInterior(in rect: NSRect, style: Style, metrics m: BodyMetrics) {
         if style.charging {
-            style.interior.setFill()
             boltPath(
                 centerX: m.midX, centerY: (m.top + m.bottom) / 2,
                 size: (m.top - m.bottom) * 0.60
             ).fill()
-            style.color.setFill()
         } else if let fraction = style.fillFraction {
             let inset = m.stroke * 1.9
             let inner = NSRect(
@@ -191,7 +180,7 @@ enum BatGlyph {
                 x: inner.minX, y: inner.minY,
                 width: inner.width * min(max(fraction, 0), 1), height: inner.height)
             if filled.width > 1 {
-                style.interior.withAlphaComponent(0.55).setFill()
+                style.color.withAlphaComponent(0.55).setFill()
                 NSBezierPath(
                     roundedRect: filled,
                     xRadius: inner.height * 0.22, yRadius: inner.height * 0.22
@@ -218,9 +207,7 @@ enum BatGlyph {
         arc.stroke()
 
         if style.charging {
-            style.interior.setFill()
             boltPath(centerX: cx, centerY: cy + radius * 0.42, size: radius * 0.75).fill()
-            style.color.setFill()
             return
         }
 
@@ -233,9 +220,7 @@ enum BatGlyph {
             to: NSPoint(x: cx + cos(angle) * needleLength, y: cy + sin(angle) * needleLength))
         needle.lineWidth = stroke
         needle.lineCapStyle = .round
-        style.interior.setStroke()
         needle.stroke()
-        style.color.setStroke()
 
         let hubRadius = stroke * 0.9
         NSBezierPath(
@@ -258,12 +243,10 @@ enum BatGlyph {
         drawNub(in: rect, metrics: metrics)
 
         if style.charging {
-            style.interior.setFill()
             boltPath(
                 centerX: metrics.midX, centerY: (metrics.top + metrics.bottom) / 2,
                 size: (metrics.top - metrics.bottom) * 0.60
             ).fill()
-            style.color.setFill()
             return
         }
 
@@ -284,7 +267,7 @@ enum BatGlyph {
                 y: inner.minY,
                 width: barWidth,
                 height: inner.height * heights[index])
-            style.interior.withAlphaComponent(index < litBars ? 1.0 : 0.25).setFill()
+            style.color.withAlphaComponent(index < litBars ? 1.0 : 0.25).setFill()
             NSBezierPath(roundedRect: bar, xRadius: barWidth * 0.3, yRadius: barWidth * 0.3).fill()
         }
         style.color.setFill()
@@ -300,7 +283,7 @@ enum BatGlyph {
             NSGraphicsContext.current?.saveGraphicsState()
             path.addClip()
             let fillHeight = style.charging ? rect.height : rect.height * fraction
-            style.interior.withAlphaComponent(style.charging ? 0.9 : 0.6).setFill()
+            style.color.withAlphaComponent(style.charging ? 0.9 : 0.6).setFill()
             NSRect(x: rect.minX, y: rect.minY, width: rect.width, height: fillHeight).fill()
             NSGraphicsContext.current?.restoreGraphicsState()
             style.color.setFill()

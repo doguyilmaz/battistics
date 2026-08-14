@@ -32,15 +32,16 @@ struct GlassBackground: View {
     }
 }
 
-/// Ring gauge used for the Charge / Capacity / Cycles hero trio.
+/// Ring gauge used for the Charge / Capacity hero pair, and for the Cycles
+/// ring on Overview.
 struct GaugeRing: View {
     /// 0...100, drives the arc.
     let value: Double
     let title: String
     let color: Color
     var symbol: String?
-    /// Overrides the centred number when the arc's fraction is not what the
-    /// user cares about — cycles show a count, not a percentage.
+    /// Overrides the centred number where the arc's fraction is not the
+    /// figure the user wants: cycles show a count, not a percentage.
     var valueText: String?
     /// Small line under the number, e.g. the cycle limit.
     var subvalue: String?

@@ -29,9 +29,6 @@ struct MenuBarLabelView: View {
     }
 
     var body: some View {
-        // Reading the generation is what subscribes this view to system
-        // light/dark changes; the value itself is not used.
-        let _ = model.appearanceGeneration
         Image(nsImage: MenuBarIconRenderer.image(snapshot: model.snapshot, config: config))
     }
 }

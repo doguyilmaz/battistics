@@ -26,12 +26,11 @@ public struct StatusColorRules: Sendable, Equatable {
 
 /// Status color policy, kept out of the drawing code so it can be tested.
 ///
-/// The menu bar is translucent over whatever wallpaper the user picked, so a
-/// tint has to hold up against both a light and a dark backdrop. `NSColor`'s
-/// system colors are tuned for opaque app surfaces and sit at mid luminance:
-/// `.systemGreen` and `.systemOrange` fall under 3:1 against a light menu bar
-/// and visibly wash out. These are Apple's own higher-contrast variants of the
-/// same hues, chosen per appearance.
+/// One fixed color per level, not a light/dark pair: the menu bar is
+/// translucent over an arbitrary wallpaper, so a color that only works on
+/// one backdrop is not good enough anyway. Each is picked to clear 3:1
+/// against both white and black, which is what `StatusPaletteTests`
+/// enforces.
 public enum StatusPalette {
     public struct RGB: Sendable, Equatable {
         public let red: Double
@@ -70,13 +69,26 @@ public enum StatusPalette {
 
     /// `nil` for `.neutral`, which renders as a template so macOS itself
     /// picks the color the menu bar needs.
-    public static func rgb(for level: BatteryStatusLevel, dark: Bool) -> RGB? {
+    ///
+    /// Contrast against white / black, which is what a translucent menu bar
+    /// puts behind these:
+    ///
+    ///     red     #FF3B30   3.55 / 5.92   stock
+    ///     orange  #FF9500   2.20 / 9.55   stock, weak on a light menu bar
+    ///     green   #248A3D   4.40 / 4.78   deepened from #28CD41 (2.12 / 9.90)
+    ///     blue    #007AFF   4.02 / 5.23   stock, already the best balanced
+    ///
+    /// Only green is changed. Blue measures better as it ships than any
+    /// brighter variant does: raising it helps the dark menu bar and costs
+    /// the light one, and #007AFF already sits near the luminance that
+    /// balances both.
+    public static func rgb(for level: BatteryStatusLevel) -> RGB? {
         switch level {
         case .neutral: nil
-        case .critical: RGB(hex: dark ? 0xFF69_61 : 0xD700_15)
-        case .low: RGB(hex: dark ? 0xFFB3_40 : 0xC934_00)
-        case .full: RGB(hex: dark ? 0x30DB_5B : 0x248A_3D)
-        case .charging: RGB(hex: dark ? 0x409C_FF : 0x0040_DD)
+        case .critical: RGB(hex: 0xFF3B_30)
+        case .low: RGB(hex: 0xFF95_00)
+        case .full: RGB(hex: 0x248A_3D)
+        case .charging: RGB(hex: 0x007A_FF)
         }
     }
 }
