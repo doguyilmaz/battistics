@@ -51,6 +51,7 @@ struct BattisticsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = AppModel()
     @State private var updater = UpdaterModel()
+    @State private var keepAwake = KeepAwakeModel()
 
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
@@ -64,9 +65,10 @@ struct BattisticsApp: App {
             PopoverView()
                 .environment(model)
                 .environment(updater)
+                .environment(keepAwake)
                 .preferredColorScheme(colorScheme)
         } label: {
-            MenuBarLabelView(model: model)
+            MenuBarLabelView(model: model, keepAwake: keepAwake)
         }
         .menuBarExtraStyle(.window)
 
@@ -74,6 +76,7 @@ struct BattisticsApp: App {
             DashboardView()
                 .environment(model)
                 .environment(updater)
+                .environment(keepAwake)
                 .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
@@ -84,6 +87,7 @@ struct BattisticsApp: App {
             PopoverView(isPinnedWindow: true)
                 .environment(model)
                 .environment(updater)
+                .environment(keepAwake)
                 .preferredColorScheme(colorScheme)
                 .background(WindowLevelConfigurator(keepOnTop: true))
         }

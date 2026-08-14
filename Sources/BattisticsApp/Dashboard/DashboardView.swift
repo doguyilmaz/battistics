@@ -6,6 +6,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     case details
     case peripherals
     case energy
+    case system
     case general
     case appearance
     case notifications
@@ -14,7 +15,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    static let monitorPanes: [DashboardPane] = [.overview, .history, .details, .peripherals, .energy]
+    static let monitorPanes: [DashboardPane] = [.overview, .history, .details, .peripherals, .energy, .system]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data, .about]
 
     var title: String {
@@ -24,6 +25,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: String(localized: "Details")
         case .peripherals: String(localized: "Peripherals")
         case .energy: String(localized: "Energy")
+        case .system: String(localized: "System")
         case .general: String(localized: "General")
         case .appearance: String(localized: "Appearance")
         case .notifications: String(localized: "Notifications")
@@ -39,6 +41,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: "list.bullet.rectangle"
         case .peripherals: "keyboard"
         case .energy: "bolt.circle"
+        case .system: "switch.2"
         case .general: "gearshape"
         case .appearance: "paintbrush"
         case .notifications: "bell.badge"
@@ -125,6 +128,7 @@ struct DashboardView: View {
         case .details: DetailsPane()
         case .peripherals: PeripheralsPane()
         case .energy: EnergyPane()
+        case .system: SystemPane()
         case .general: GeneralSettings()
         case .appearance: AppearanceSettings()
         case .notifications: NotificationSettings()

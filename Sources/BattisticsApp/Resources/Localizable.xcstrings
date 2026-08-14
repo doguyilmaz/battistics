@@ -1,12 +1,80 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "1 hour": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 saat"
+          }
+        }
+      }
+    },
     "1 minute": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "1 dakika"
+          }
+        }
+      }
+    },
+    "12 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "12 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "12 saat"
+          }
+        }
+      }
+    },
+    "15 minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 minutes"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 dakika"
+          }
+        }
+      }
+    },
+    "2 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 saat"
           }
         }
       }
@@ -21,6 +89,23 @@
         }
       }
     },
+    "30 minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 minutes"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 dakika"
+          }
+        }
+      }
+    },
     "30 seconds": {
       "localizations": {
         "tr": {
@@ -31,12 +116,46 @@
         }
       }
     },
+    "4 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 saat"
+          }
+        }
+      }
+    },
     "5 minutes": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "5 dakika"
+          }
+        }
+      }
+    },
+    "6 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 saat"
           }
         }
       }
@@ -168,6 +287,40 @@
         }
       }
     },
+    "Awake for %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awake for %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ boyunca uyanık"
+          }
+        }
+      }
+    },
+    "Awake until turned off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awake until turned off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapatılana kadar uyanık"
+          }
+        }
+      }
+    },
     "Bat": {
       "localizations": {
         "tr": {
@@ -290,6 +443,23 @@
     },
     "Battistics": {
       "shouldTranslate": false
+    },
+    "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu açıkken Battistics bir güç bildirimi tutar; yerleşik caffeinate aracının kullandığı mekanizmanın aynısı. Kapattığınızda, süre dolduğunda veya Battistics'ten çıktığınızda bırakılır."
+          }
+        }
+      }
     },
     "Battistics needs a Mac with a built-in battery.": {
       "localizations": {
@@ -711,6 +881,23 @@
         }
       }
     },
+    "Duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Süre"
+          }
+        }
+      }
+    },
     "Electrical": {
       "localizations": {
         "tr": {
@@ -911,6 +1098,40 @@
         }
       }
     },
+    "Keep Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut"
+          }
+        }
+      }
+    },
+    "Keep the display on": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep the display on"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekranı açık tut"
+          }
+        }
+      }
+    },
     "Keep the main window on top": {
       "extractionState": "manual",
       "localizations": {
@@ -934,6 +1155,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Son 24 Saat"
+          }
+        }
+      }
+    },
+    "Let the display sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let the display sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran uyuyabilsin"
           }
         }
       }
@@ -1071,6 +1309,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Metrik"
+          }
+        }
+      }
+    },
+    "Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mod"
           }
         }
       }
@@ -1221,6 +1476,23 @@
         }
       }
     },
+    "Only works on power adapter; macOS ignores it on battery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only works on power adapter; macOS ignores it on battery."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca güç adaptöründe çalışır; macOS pil modunda yok sayar."
+          }
+        }
+      }
+    },
     "Open System Notification Settings…": {
       "localizations": {
         "tr": {
@@ -1347,6 +1619,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç Adaptörü"
+          }
+        }
+      }
+    },
+    "Prevent this Mac from sleeping": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prevent this Mac from sleeping"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac'in uykuya geçmesini engelle"
           }
         }
       }
@@ -1511,6 +1800,23 @@
         }
       }
     },
+    "Show a dot while Keep Awake is on": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show a dot while Keep Awake is on"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açıkken nokta göster"
+          }
+        }
+      }
+    },
     "Show battery glyph": {
       "localizations": {
         "tr": {
@@ -1551,12 +1857,46 @@
         }
       }
     },
+    "Stay awake with the lid closed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay awake with the lid closed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalıyken uyanık kal"
+          }
+        }
+      }
+    },
     "Still on Battery": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Hâlâ Pilde"
+          }
+        }
+      }
+    },
+    "System": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem"
           }
         }
       }
@@ -1601,6 +1941,23 @@
         }
       }
     },
+    "The screen turns off, the Mac keeps running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The screen turns off, the Mac keeps running."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran kapanır, Mac çalışmaya devam eder."
+          }
+        }
+      }
+    },
     "Theme": {
       "localizations": {
         "tr": {
@@ -1622,7 +1979,14 @@
       }
     },
     "Time remaining": {
+      "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time remaining"
+          }
+        },
         "tr": {
           "stringUnit": {
             "state": "translated",
@@ -1641,12 +2005,80 @@
         }
       }
     },
+    "Turn Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn Off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapat"
+          }
+        }
+      }
+    },
+    "Turn off Keep Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off Keep Awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut'u kapat"
+          }
+        }
+      }
+    },
     "Units": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Birimler"
+          }
+        }
+      }
+    },
+    "Until I turn it off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Until I turn it off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapatana kadar"
+          }
+        }
+      }
+    },
+    "Until turned off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Until turned off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapatılana kadar"
           }
         }
       }

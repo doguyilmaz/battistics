@@ -135,6 +135,10 @@ enum Prefs {
     static let menuBarColorHigh = "menuBarColorHigh"
     static let menuBarColorCharging = "menuBarColorCharging"
 
+    static let keepAwakeMode = "keepAwakeMode"
+    static let keepAwakeDuration = "keepAwakeDuration"
+    static let keepAwakeMenuBarDot = "keepAwakeMenuBarDot"
+
     static let powerSamplingEnabled = "powerSamplingEnabled"
     static let powerSamplingInterval = "powerSamplingInterval"
 
@@ -170,6 +174,10 @@ enum Prefs {
             menuBarLowThreshold: 20,
             menuBarColorHigh: false,
             menuBarColorCharging: false,
+
+            keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
+            keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
+            keepAwakeMenuBarDot: true,
 
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,

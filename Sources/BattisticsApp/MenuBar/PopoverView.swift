@@ -8,6 +8,7 @@ struct PopoverView: View {
     var isPinnedWindow = false
 
     @Environment(AppModel.self) private var model
+    @Environment(KeepAwakeModel.self) private var keepAwake
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
     @State private var windowVisible = true
@@ -39,6 +40,10 @@ struct PopoverView: View {
                 Text(statusText(snapshot))
                     .font(.callout)
                     .foregroundStyle(.secondary)
+
+                if keepAwake.isActive {
+                    keepAwakeStrip
+                }
 
                 chargeDetails(snapshot)
                 batteryDetails(snapshot)
@@ -228,6 +233,70 @@ struct PopoverView: View {
         }
     }
 
+    /// Only rendered while a session is running, so the popover costs
+    /// nothing when Keep Awake is off.
+    private var keepAwakeStrip: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "cup.and.saucer.fill")
+                .font(.system(size: 10))
+            Text(keepAwakeSummary)
+                .font(.caption)
+            Spacer(minLength: 4)
+            Button {
+                keepAwake.stop()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Turn off Keep Awake")
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(.quaternary.opacity(0.5), in: Capsule())
+    }
+
+    private var keepAwakeSummary: String {
+        // The 2s refresh loop re-evaluates this body, which is what advances
+        // the countdown; no timer of its own.
+        guard let seconds = keepAwake.remaining() else {
+            return String(localized: "Awake until turned off")
+        }
+        return String(
+            localized: "Awake for \(Formatting.duration(minutes: Int(seconds / 60)))")
+    }
+
+    private var keepAwakeMenu: some View {
+        @Bindable var keepAwake = keepAwake
+        return Menu {
+            if keepAwake.isActive {
+                Button("Turn Off") { keepAwake.stop() }
+                Divider()
+            }
+            Picker("Duration", selection: $keepAwake.duration) {
+                ForEach(KeepAwakeDuration.allCases) { duration in
+                    Text(duration.label).tag(duration)
+                }
+            }
+            .pickerStyle(.inline)
+            Divider()
+            Picker("Mode", selection: $keepAwake.mode) {
+                ForEach(KeepAwakeMode.allCases) { mode in
+                    Text(mode.label).tag(mode)
+                }
+            }
+            .pickerStyle(.inline)
+        } label: {
+            Image(systemName: keepAwake.isActive ? "cup.and.saucer.fill" : "cup.and.saucer")
+        } primaryAction: {
+            keepAwake.toggle()
+        }
+        .menuStyle(.button)
+        .help("Keep Awake")
+    }
+
     @ViewBuilder private var footer: some View {
         if !isPinnedWindow {
             HStack {
@@ -242,6 +311,7 @@ struct PopoverView: View {
                     Label("Overview", systemImage: DashboardPane.overview.icon)
                 }
                 Spacer()
+                keepAwakeMenu
                 Button {
                     model.dashboardPane = .general
                     openWindow(id: "dashboard")

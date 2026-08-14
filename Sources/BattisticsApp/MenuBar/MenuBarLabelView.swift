@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MenuBarLabelView: View {
     var model: AppModel
+    var keepAwake: KeepAwakeModel
 
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
@@ -13,6 +14,7 @@ struct MenuBarLabelView: View {
     @AppStorage(Prefs.menuBarColorHigh) private var colorHigh = false
     @AppStorage(Prefs.menuBarColorCharging) private var colorCharging = false
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
+    @AppStorage(Prefs.keepAwakeMenuBarDot) private var keepAwakeMenuBarDot = true
 
     private var config: MenuBarConfig {
         MenuBarConfig(
@@ -24,7 +26,8 @@ struct MenuBarLabelView: View {
             lowThreshold: lowThreshold,
             colorHigh: colorHigh,
             colorCharging: colorCharging,
-            temperatureUnit: TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
+            temperatureUnit: TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both,
+            keepAwakeDot: keepAwakeMenuBarDot && keepAwake.isActive
         )
     }
 
