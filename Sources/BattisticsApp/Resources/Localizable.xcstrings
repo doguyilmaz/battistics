@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%lld min": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld dk"
+          }
+        }
+      }
+    },
     "1 hour": {
       "extractionState": "manual",
       "localizations": {
@@ -210,6 +227,23 @@
         }
       }
     },
+    "Always": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Always"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her zaman"
+          }
+        }
+      }
+    },
     "Amperage": {
       "localizations": {
         "tr": {
@@ -278,7 +312,14 @@
       }
     },
     "Automatic": {
+      "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
         "tr": {
           "stringUnit": {
             "state": "translated",
@@ -477,6 +518,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Şarj olurken mavi"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İptal"
           }
         }
       }
@@ -854,6 +912,40 @@
         }
       }
     },
+    "Disk Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk Uykusu"
+          }
+        }
+      }
+    },
+    "Display Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran Uykusu"
+          }
+        }
+      }
+    },
     "Dots are daily readings, the line is a 7-day trend. The controller re-estimates capacity constantly, so single days swing.": {
       "extractionState": "manual",
       "localizations": {
@@ -914,6 +1006,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enerji"
+          }
+        }
+      }
+    },
+    "Energy Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energy Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji Modu"
           }
         }
       }
@@ -1054,6 +1163,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sağlık anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
+          }
+        }
+      }
+    },
+    "High Power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek Güç"
           }
         }
       }
@@ -1233,6 +1359,40 @@
         }
       }
     },
+    "Low Power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Güç"
+          }
+        }
+      }
+    },
+    "Low Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Güç Modu"
+          }
+        }
+      }
+    },
     "Low battery": {
       "localizations": {
         "tr": {
@@ -1380,6 +1540,23 @@
         }
       }
     },
+    "Never": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asla"
+          }
+        }
+      }
+    },
     "No battery found": {
       "localizations": {
         "tr": {
@@ -1493,6 +1670,40 @@
         }
       }
     },
+    "Only on battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca pilde"
+          }
+        }
+      }
+    },
+    "Only on power adapter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on power adapter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca güç adaptöründe"
+          }
+        }
+      }
+    },
     "Only works on power adapter; macOS ignores it on battery.": {
       "extractionState": "manual",
       "localizations": {
@@ -1506,6 +1717,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yalnızca güç adaptöründe çalışır; macOS pil modunda yok sayar."
+          }
+        }
+      }
+    },
+    "Open Battery Settings…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Battery Settings…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil Ayarlarını Aç…"
           }
         }
       }
@@ -1611,7 +1839,14 @@
       }
     },
     "Power": {
+      "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power"
+          }
+        },
         "tr": {
           "stringUnit": {
             "state": "translated",
@@ -1677,12 +1912,63 @@
         }
       }
     },
+    "Quit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çık"
+          }
+        }
+      }
+    },
+    "Quit %@?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit %@?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uygulamasından çıkılsın mı?"
+          }
+        }
+      }
+    },
     "Quit Battistics": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Battistics'ten Çık"
+          }
+        }
+      }
+    },
+    "Quit this app": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit this app"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uygulamadan çık"
           }
         }
       }
@@ -1918,6 +2204,23 @@
         }
       }
     },
+    "System Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Uykusu"
+          }
+        }
+      }
+    },
     "Temperature": {
       "localizations": {
         "tr": {
@@ -1981,6 +2284,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tema"
+          }
+        }
+      }
+    },
+    "These are macOS's own settings, shown for the power source in use. Battistics reads them and does not change them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These are macOS's own settings, shown for the power source in use. Battistics reads them and does not change them."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunlar macOS'un kendi ayarlarıdır ve kullanımdaki güç kaynağı için gösterilir. Battistics bunları okur, değiştirmez."
           }
         }
       }
@@ -2062,6 +2382,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Birimler"
+          }
+        }
+      }
+    },
+    "Unsaved work in this app will be lost.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsaved work in this app will be lost."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uygulamadaki kaydedilmemiş çalışmalar kaybolur."
           }
         }
       }

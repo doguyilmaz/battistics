@@ -8,6 +8,7 @@ struct SystemPane: View {
     /// Ticks with the dashboard's existing refresh loop so the countdown
     /// moves without a timer of its own.
     @Environment(AppModel.self) private var model
+    @State private var power: PowerSettings?
 
     var body: some View {
         @Bindable var keepAwake = keepAwake
@@ -48,9 +49,72 @@ struct SystemPane: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
+
+            Section("Power") {
+                if let power {
+                    if let mode = power.lowPowerMode {
+                        LabeledContent("Low Power Mode", value: label(for: mode))
+                    }
+                    // Absent on every Mac without a Pro or Max chip, so the
+                    // row is skipped rather than shown claiming a default.
+                    if let energy = power.energyMode {
+                        LabeledContent("Energy Mode", value: label(for: energy))
+                    }
+                    if let source = currentSource(power) {
+                        LabeledContent("Display Sleep", value: sleepText(source.displaySleepMinutes))
+                        LabeledContent("System Sleep", value: sleepText(source.systemSleepMinutes))
+                        LabeledContent("Disk Sleep", value: sleepText(source.diskSleepMinutes))
+                    }
+                }
+                Button("Open Battery Settings…") {
+                    if let url = URL(
+                        string: "x-apple.systempreferences:com.apple.Battery-Settings.extension") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+            }
+
+            Section {
+                Text(
+                    "These are macOS's own settings, shown for the power source in use. Battistics reads them and does not change them."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .navigationTitle("System")
+        // Read once when the pane appears. Power settings change rarely and
+        // only from System Settings, so there is nothing here to poll.
+        .task { power = await PowerSettingsReader.fetch() }
+    }
+
+    /// Whichever source is actually in effect right now.
+    private func currentSource(_ power: PowerSettings) -> PowerSettings.Source? {
+        let onBattery = model.snapshot?.externalConnected == false
+        return onBattery ? (power.battery ?? power.ac) : (power.ac ?? power.battery)
+    }
+
+    private func sleepText(_ minutes: Int?) -> String {
+        guard let minutes else { return "—" }
+        return minutes == 0 ? String(localized: "Never") : String(localized: "\(minutes) min")
+    }
+
+    private func label(for mode: LowPowerModeSetting) -> String {
+        switch mode {
+        case .never: String(localized: "Never")
+        case .always: String(localized: "Always")
+        case .onlyOnBattery: String(localized: "Only on battery")
+        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
+        }
+    }
+
+    private func label(for mode: EnergyMode) -> String {
+        switch mode {
+        case .automatic: String(localized: "Automatic")
+        case .low: String(localized: "Low Power")
+        case .high: String(localized: "High Power")
+        }
     }
 
     private var remainingText: String {
