@@ -48,8 +48,8 @@ struct OverviewPane: View {
                     )
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
-                        title: "Capacity",
-                        color: .capacity(percent: snapshot.displayHealthPercent),
+                        title: "Health",
+                        color: .health(percent: snapshot.displayHealthPercent),
                         diameter: 112
                     )
                     if let limit = snapshot.designCycleCount, limit > 0 {
@@ -78,15 +78,18 @@ struct OverviewPane: View {
                 SectionHeader(title: "Capacity")
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
                 StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
+                StatRow(label: "Measured Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
                 StatRow(
-                    label: "Capacity",
+                    label: "Health",
                     value: Formatting.percentPrecise(snapshot.displayHealthPercent),
-                    valueColor: .capacity(percent: snapshot.displayHealthPercent))
+                    valueColor: .health(percent: snapshot.displayHealthPercent))
+                StatRow(
+                    label: "Measured Health",
+                    value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
             }
         }
     }
-
 
     private func liveCard(_ snapshot: BatterySnapshot) -> some View {
         GlassCard {
@@ -102,7 +105,7 @@ struct OverviewPane: View {
                     StatRow(
                         label: "Power",
                         value: String(format: "%+.1f W", watts),
-                        valueColor: watts < 0 ? .statusWarn : nil)
+                        valueColor: watts < 0 ? .orange : nil)
                 }
                 if let amperage = snapshot.amperageMA {
                     StatRow(label: "Amperage", value: Formatting.milliamps(amperage))

@@ -32,7 +32,7 @@ struct GlassBackground: View {
     }
 }
 
-/// Ring gauge used for the Charge / Capacity hero pair, and for the Cycles
+/// Ring gauge used for the Charge / Health hero pair, and for the Cycles
 /// ring on Overview.
 struct GaugeRing: View {
     /// 0...100, drives the arc.
@@ -64,22 +64,27 @@ struct GaugeRing: View {
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut(duration: 0.5), value: value)
-                VStack(spacing: 0) {
-                    if let symbol {
-                        Image(systemName: symbol)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(color)
-                    }
-                    Text(valueText ?? "\(Int(value.rounded()))%")
-                        .font(.system(size: 21, weight: .semibold, design: .rounded))
+                // The number sits dead centre in every ring; the bolt and
+                // the limit float over it instead of joining a stack. In a
+                // stack they push the number off centre, so a charging ring
+                // stops lining up with the ones beside it. Offsets are fixed
+                // because the number's size is, whatever the diameter.
+                Text(valueText ?? "\(Int(value.rounded()))%")
+                    .font(.system(size: 21, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                if let symbol {
+                    Image(systemName: symbol)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(color)
+                        .offset(y: -20)
+                }
+                if let subvalue {
+                    Text(subvalue)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
                         .monospacedDigit()
-                        .contentTransition(.numericText())
-                    if let subvalue {
-                        Text(subvalue)
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
+                        .foregroundStyle(.secondary)
+                        .offset(y: 19)
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -179,26 +184,26 @@ extension Color {
     /// Charge level color ramp shared by gauges and charts.
     static func charge(percent: Double) -> Color {
         switch percent {
-        case ..<10: .statusBad
-        case ..<20: .statusWarn
-        default: .statusGood
+        case ..<10: .red
+        case ..<20: .orange
+        default: .green
         }
     }
 
-    static func capacity(percent: Double) -> Color {
+    static func health(percent: Double) -> Color {
         switch percent {
-        case 80...: .statusGood
-        case 60..<80: .statusWarn
-        default: .statusBad
+        case 80...: .green
+        case 60..<80: .orange
+        default: .red
         }
     }
 
     /// Cycles consumed against the pack's design limit.
     static func cycles(fraction: Double) -> Color {
         switch fraction {
-        case ..<0.6: .statusGood
-        case ..<0.85: .statusWarn
-        default: .statusBad
+        case ..<0.6: .green
+        case ..<0.85: .orange
+        default: .red
         }
     }
 }

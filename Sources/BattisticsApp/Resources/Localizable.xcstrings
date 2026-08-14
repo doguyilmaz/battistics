@@ -121,6 +121,23 @@
         }
       }
     },
+    "Apple Rated Health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Rated Health"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Sağlık Değeri"
+          }
+        }
+      }
+    },
     "Applies to the Dock and the app switcher while Battistics runs.": {
       "localizations": {
         "tr": {
@@ -290,74 +307,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Şarj olurken mavi"
-          }
-        }
-      }
-    },
-    "Capacity": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capacity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapasite"
-          }
-        }
-      }
-    },
-    "Capacity %": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capacity %"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapasite %"
-          }
-        }
-      }
-    },
-    "Capacity snapshots are recorded once per day. Come back tomorrow.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capacity snapshots are recorded once per day. Come back tomorrow."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapasite anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
-          }
-        }
-      }
-    },
-    "Capacity, last 12 months": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capacity, last 12 months"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapasite, son 12 ay"
           }
         }
       }
@@ -888,6 +837,40 @@
         }
       }
     },
+    "Health %": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health %"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık %"
+          }
+        }
+      }
+    },
+    "Health snapshots are recorded once per day. Come back tomorrow.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health snapshots are recorded once per day. Come back tomorrow."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
+          }
+        }
+      }
+    },
     "High battery temperature": {
       "localizations": {
         "tr": {
@@ -1035,36 +1018,19 @@
         }
       }
     },
-    "Measured Capacity": {
+    "Measured Health": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Measured Capacity"
+            "value": "Measured Health"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ölçülen Kapasite"
-          }
-        }
-      }
-    },
-    "Measured Capacity is the controller's live reading and can exceed 100%.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Measured Capacity is the controller's live reading and can exceed 100%."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ölçülen Kapasite, denetleyicinin anlık okumasıdır ve %100'ü aşabilir."
+            "value": "Ölçülen Sağlık"
           }
         }
       }
@@ -1591,23 +1557,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hâlâ Pilde"
-          }
-        }
-      }
-    },
-    "System Settings Reports": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System Settings Reports"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sistem Ayarları'nda"
           }
         }
       }

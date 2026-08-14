@@ -30,8 +30,8 @@ struct PopoverView: View {
                     )
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
-                        title: "Capacity",
-                        color: .capacity(percent: snapshot.displayHealthPercent)
+                        title: "Health",
+                        color: .health(percent: snapshot.displayHealthPercent)
                     )
                 }
                 .frame(maxWidth: .infinity)
@@ -143,7 +143,7 @@ struct PopoverView: View {
                     StatRow(
                         label: "Power",
                         value: String(format: "%+.1f W", watts),
-                        valueColor: watts < 0 ? .statusWarn : nil)
+                        valueColor: watts < 0 ? .orange : nil)
                 }
                 if let amperage = snapshot.amperageMA {
                     StatRow(label: "Amperage", value: Formatting.milliamps(amperage))
@@ -178,14 +178,14 @@ struct PopoverView: View {
                             .interpolationMethod(.monotone)
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color.statusGood.opacity(0.35), Color.statusGood.opacity(0.03)],
+                                    colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
                                     startPoint: .top, endPoint: .bottom))
                             LineMark(
                                 x: .value("Time", point.date),
                                 y: .value("Charge", point.value)
                             )
                             .interpolationMethod(.monotone)
-                            .foregroundStyle(Color.statusGood)
+                            .foregroundStyle(Color.green)
                             .lineStyle(StrokeStyle(lineWidth: 1.5))
                         }
                         if let selected = nearestSparklinePoint {
@@ -195,7 +195,7 @@ struct PopoverView: View {
                                 x: .value("Time", selected.date),
                                 y: .value("Charge", selected.value)
                             )
-                            .foregroundStyle(Color.statusGood)
+                            .foregroundStyle(Color.green)
                             .symbolSize(28)
                             .annotation(
                                 position: .top,
@@ -358,9 +358,9 @@ struct PopoverView: View {
 
     private func statusColor(_ status: HealthStatus) -> Color {
         switch status {
-        case .good: .statusGood
-        case .fair: .statusWarn
-        case .poor: .statusBad
+        case .good: .green
+        case .fair: .orange
+        case .poor: .red
         }
     }
 }

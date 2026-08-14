@@ -11,12 +11,6 @@ struct MenuBarConfig: Equatable {
     var colorHigh = false
     var colorCharging = false
     var temperatureUnit = TemperatureUnit.both
-
-    var colorRules: StatusColorRules {
-        StatusColorRules(
-            colorLow: colorLow, lowThreshold: lowThreshold,
-            colorHigh: colorHigh, colorCharging: colorCharging)
-    }
 }
 
 /// MenuBarExtra labels ignore SwiftUI foreground styles (the system renders
@@ -66,16 +60,16 @@ enum MenuBarIconRenderer {
     /// Status ladder: charging blue, critical red, low orange, full green,
     /// monochrome template otherwise. Each rung is user-toggleable.
     /// Internal so the appearance settings can render true previews.
-    ///
-    /// The ladder itself lives in `StatusPalette` so it is unit-tested and
-    /// so the app's own gauges draw from the same colors.
     static func tintColor(
         percent: Int, charging: Bool, external: Bool, config: MenuBarConfig
     ) -> NSColor? {
-        NSColor.status(
-            StatusPalette.level(
-                percent: percent, charging: charging, external: external,
-                rules: config.colorRules))
+        if config.colorCharging, charging { return .systemBlue }
+        if config.colorLow, !external {
+            if percent <= 10 { return .systemRed }
+            if percent <= config.lowThreshold { return .systemOrange }
+        }
+        if config.colorHigh, percent >= 95 { return .systemGreen }
+        return nil
     }
 
     private static func text(for kind: MenuBarText, snapshot: BatterySnapshot?, unit: TemperatureUnit) -> String? {

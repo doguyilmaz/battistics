@@ -15,16 +15,16 @@ enum HistoryTab: String, CaseIterable, Identifiable {
         case .charge: String(localized: "Charge")
         case .power: String(localized: "Power")
         case .temperature: String(localized: "Temperature")
-        case .health: String(localized: "Capacity")
+        case .health: String(localized: "Health")
         }
     }
 
     var color: Color {
         switch self {
-        case .charge: .statusGood
-        case .power: .statusWarn
+        case .charge: .green
+        case .power: .orange
         case .temperature: .pink
-        case .health: .statusInfo
+        case .health: .blue
         }
     }
 }
@@ -163,7 +163,7 @@ struct HistoryPane: View {
                         .multilineTextAlignment(.center)
                 }
             } else {
-                emptyState("Capacity snapshots are recorded once per day. Come back tomorrow.")
+                emptyState("Health snapshots are recorded once per day. Come back tomorrow.")
             }
         } else if points.count > 1 {
             seriesChart
@@ -227,7 +227,7 @@ struct HistoryPane: View {
             ForEach(healthPoints) { point in
                 PointMark(
                     x: .value("Date", point.date),
-                    y: .value("Capacity", point.displayHealthPercent)
+                    y: .value("Health", point.displayHealthPercent)
                 )
                 .foregroundStyle(tab.color.opacity(0.28))
                 .symbolSize(16)
@@ -246,7 +246,7 @@ struct HistoryPane: View {
                     .foregroundStyle(.secondary.opacity(0.35))
                 PointMark(
                     x: .value("Date", selected.date),
-                    y: .value("Capacity", selected.displayHealthPercent)
+                    y: .value("Health", selected.displayHealthPercent)
                 )
                 .foregroundStyle(tab.color)
                 .symbolSize(60)

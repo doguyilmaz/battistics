@@ -84,7 +84,7 @@ enum MenuBarText: String, CaseIterable, Identifiable {
         switch self {
         case .none: String(localized: "Nothing")
         case .chargePercent: String(localized: "Charge %")
-        case .healthPercent: String(localized: "Capacity %")
+        case .healthPercent: String(localized: "Health %")
         case .timeRemaining: String(localized: "Time remaining")
         case .temperature: String(localized: "Temperature")
         case .watts: String(localized: "Power (W)")

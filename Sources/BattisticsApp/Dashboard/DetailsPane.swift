@@ -41,21 +41,12 @@ struct DetailsPane: View {
                     LabeledContent("Measured Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
                     LabeledContent("Design Capacity", value: Formatting.mAh(snapshot.designCapacity))
                     LabeledContent(
-                        "Capacity", value: Formatting.percentPrecise(snapshot.displayHealthPercent))
+                        "Health", value: Formatting.percentPrecise(snapshot.displayHealthPercent))
                     LabeledContent(
-                        "Measured Capacity",
+                        "Measured Health",
                         value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
-                    // The controller's live full-charge estimate runs ahead of
-                    // the nameplate design capacity on a young pack, so this
-                    // one is allowed above 100% where "Capacity" never is.
-                    Text("Measured Capacity is the controller's live reading and can exceed 100%.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    // Only worth showing when it actually disagrees; otherwise
-                    // it is the same number from a slower, costlier source.
-                    if let percent = model.appleHealth?.maximumCapacityPercent,
-                        abs(Double(percent) - snapshot.displayHealthPercent) >= 2 {
-                        LabeledContent("System Settings Reports", value: "\(percent)%")
+                    if let percent = model.appleHealth?.maximumCapacityPercent {
+                        LabeledContent("Apple Rated Health", value: "\(percent)%")
                     }
                     if let condition = model.appleHealth?.condition {
                         LabeledContent("Condition", value: condition)
@@ -126,7 +117,7 @@ struct DetailsPane: View {
             lines.append("Manufactured: \(date.formatted(date: .abbreviated, time: .omitted)) (\(Formatting.age(from: date)))")
         }
         lines.append("Charge: \(snapshot.percent)% (\(Formatting.mAh(snapshot.rawCurrentCapacity)))")
-        lines.append("Capacity: \(Formatting.percentPrecise(snapshot.displayHealthPercent))")
+        lines.append("Health: \(Formatting.percentPrecise(snapshot.displayHealthPercent))")
         lines.append("Current maximum: \(Formatting.mAh(snapshot.currentMaxCapacity))")
         lines.append("Measured maximum: \(Formatting.mAh(snapshot.rawMaxCapacity))")
         lines.append("Design capacity: \(Formatting.mAh(snapshot.designCapacity))")
