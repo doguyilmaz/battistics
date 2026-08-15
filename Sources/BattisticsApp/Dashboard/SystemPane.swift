@@ -165,7 +165,7 @@ struct SystemPane: View {
         if helper.isInstalledButSilent {
             return String(
                 localized:
-                    "The helper is installed but not running, so changes still ask for a password. macOS only runs it for a notarized copy of Battistics."
+                    "The helper is installed but not running, so changes still ask for a password. Repair re-registers it."
             )
         }
         if helper.isInstalled {

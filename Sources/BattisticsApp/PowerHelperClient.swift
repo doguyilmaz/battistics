@@ -48,9 +48,14 @@ final class PowerHelperClient {
     private static let probeTimeout: Duration = .seconds(1)
 
     private(set) var status: SMAppService.Status = .notRegistered
-    /// Registered is not the same as running: launchd refuses to spawn an
-    /// unnotarized binary, leaving a service that exists and never answers.
+    /// Registered is not the same as running: a helper launchd cannot start
+    /// leaves a service that exists and never answers.
     private(set) var isReachable = false
+    /// Until a probe has actually finished, "not reachable" only means "not
+    /// asked yet". Without this the pane briefly accuses a healthy helper of
+    /// being broken every time it appears, because the probe is async and
+    /// the first render beats it.
+    private(set) var hasProbed = false
 
     @ObservationIgnored private var connection: NSXPCConnection?
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
@@ -104,7 +109,7 @@ final class PowerHelperClient {
     var isInstalled: Bool { status == .enabled }
     /// Installed *and* answering, which is what callers actually need.
     var canApply: Bool { isInstalled && isReachable }
-    var isInstalledButSilent: Bool { isInstalled && !isReachable }
+    var isInstalledButSilent: Bool { isInstalled && hasProbed && !isReachable }
     /// macOS wants the user to approve the daemon in Login Items first.
     var needsApproval: Bool { status == .requiresApproval }
 
@@ -112,6 +117,7 @@ final class PowerHelperClient {
         status = service.status
         guard status == .enabled else {
             isReachable = false
+            hasProbed = false
             return
         }
         // Probed here, off the critical path, so a change never waits on a
@@ -125,8 +131,10 @@ final class PowerHelperClient {
                 proxy.version { @Sendable _ in done(0) }
             }
             isReachable = true
+            hasProbed = true
         } catch {
             isReachable = false
+            hasProbed = true
             connection?.invalidate()
             connection = nil
         }

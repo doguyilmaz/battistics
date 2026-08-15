@@ -2482,19 +2482,19 @@
         }
       }
     },
-    "The helper is installed but not running, so changes still ask for a password. macOS only runs it for a notarized copy of Battistics.": {
+    "The helper is installed but not running, so changes still ask for a password. Repair re-registers it.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The helper is installed but not running, so changes still ask for a password. macOS only runs it for a notarized copy of Battistics."
+            "value": "The helper is installed but not running, so changes still ask for a password. Repair re-registers it."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yardımcı bileşen kurulu ancak çalışmıyor, bu yüzden değişiklikler hâlâ parola soruyor. macOS onu yalnızca noter onaylı bir Battistics kopyası için çalıştırır."
+            "value": "Yardımcı bileşen kurulu ancak çalışmıyor, bu yüzden değişiklikler hâlâ parola soruyor. Onar, yeniden kaydeder."
           }
         }
       }
