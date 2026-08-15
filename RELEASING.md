@@ -87,5 +87,8 @@ download.
   enclosure, which is what makes Sparkle treat it as an informational update:
   the notice appears with a link instead of a download.
 
-The frozen file never needs editing; its link points at whatever release is
-latest. It can be dropped once nobody is left on 1.0.x.
+The frozen file links straight at the 1.1.0 DMG so Sparkle's "Learn More"
+starts a download rather than opening a page. That pin is deliberate: it only
+has to carry someone across the identifier change once, after which ordinary
+updates take over. So do not delete the v1.1.0 release while it is live. The
+whole thing can be dropped once nobody is left on 1.0.x.

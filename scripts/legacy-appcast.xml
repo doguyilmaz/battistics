@@ -11,8 +11,14 @@
 
   Attach this file as appcast.xml on every release. Old copies poll
   releases/latest/download/appcast.xml, so it has to keep resolving. Newer
-  builds read appcast-2.xml and never see this. Nothing here needs changing
-  again — the link points at whatever the latest release is.
+  builds read appcast-2.xml and never see this.
+
+  The link points straight at the 1.1.0 DMG rather than the releases page,
+  so Sparkle's "Learn More" starts the download instead of opening a page to
+  hunt through. It is pinned to 1.1.0 on purpose: any build with the new
+  identifier can update itself the ordinary way afterwards, so this only has
+  to carry someone across the identifier change once. Do not delete the
+  v1.1.0 release while this is live.
 -->
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
@@ -22,7 +28,7 @@
     <language>en</language>
     <item>
       <title>Battistics has moved — one manual update needed</title>
-      <link>https://github.com/doguyilmaz/battistics/releases/latest</link>
+      <link>https://github.com/doguyilmaz/battistics/releases/download/v1.1.0/Battistics-1.1.0.dmg</link>
       <sparkle:version>1.1.0</sparkle:version>
       <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
@@ -31,10 +37,11 @@
         <p>A newer Battistics corrects a misspelling in the app's internal
         identifier. macOS treats the result as a different app, so it cannot
         install itself over the copy you are running.</p>
-        <p>Click <b>Download</b>, then drag the new Battistics to your
-        Applications folder, replacing the old one. Your charge and health
-        history is kept. Menu bar and notification settings reset to their
-        defaults, and macOS asks about notifications once more.</p>
+        <p>Click <b>Learn More</b> to download it, then drag the new
+        Battistics to your Applications folder, replacing the old one. Your
+        charge and health history is kept. Menu bar and notification settings
+        reset to their defaults, and macOS asks about notifications once
+        more.</p>
         <p>Automatic updates resume normally afterwards.</p>
       ]]></description>
     </item>
