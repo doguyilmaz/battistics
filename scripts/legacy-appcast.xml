@@ -21,16 +21,16 @@
     <description>Battery statistics for the Mac.</description>
     <language>en</language>
     <item>
-      <title>Battistics 1.1.0 — one manual update needed</title>
+      <title>Battistics has moved — one manual update needed</title>
       <link>https://github.com/doguyilmaz/battistics/releases/latest</link>
       <sparkle:version>1.1.0</sparkle:version>
       <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
       <description><![CDATA[
         <h2>Download this one by hand</h2>
-        <p>Battistics 1.1.0 corrects a misspelling in the app's internal
-        identifier. macOS treats the result as a different app, so this
-        version cannot install itself over the one you are running.</p>
+        <p>A newer Battistics corrects a misspelling in the app's internal
+        identifier. macOS treats the result as a different app, so it cannot
+        install itself over the copy you are running.</p>
         <p>Click <b>Download</b>, then drag the new Battistics to your
         Applications folder, replacing the old one. Your charge and health
         history is kept. Menu bar and notification settings reset to their
