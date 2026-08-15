@@ -68,6 +68,9 @@ struct PopoverView: View {
         .task(id: windowVisible) {
             guard windowVisible else { return }
             await model.loadSparkline()
+            // The popover can be the only thing a menu bar app ever shows, so
+            // it cannot rely on the dashboard having primed this.
+            helper.refreshStatus()
             await powerModel.refresh()
             while !Task.isCancelled && windowVisible {
                 model.refreshSensors()

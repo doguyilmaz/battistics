@@ -61,7 +61,12 @@ final class PowerHelperClient {
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
 
     init() {
-        status = SMAppService.daemon(plistName: Self.plistName).status
+        // refreshStatus rather than reading status directly: it also starts
+        // the reachability probe. Setting the field alone left isReachable
+        // false until something else happened to refresh, so the first change
+        // of a session fell back to asking for a password even though the
+        // helper was running.
+        refreshStatus()
         // The user approves or revokes this in System Settings, which no
         // notification reports back. Re-reading when the app is activated
         // catches it the moment they return, without polling: SMAppService
