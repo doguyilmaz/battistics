@@ -817,19 +817,19 @@
         }
       }
     },
-    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app.": {
+    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app."
+            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil düzeyini bildiren bağlı klavyeler, fareler, izleme dörtgenleri ve kulaklıklar burada görünür. Logitech MX serisi dahil birçok üçüncü taraf aygıt bu bilgiyi paylaşmaz ve hiçbir uygulama tarafından gösterilemez."
+            "value": "Pil düzeyini bildiren bağlı klavyeler, fareler, izleme dörtgenleri ve kulaklıklar burada görünür. Birçok üçüncü taraf aygıt bu bilgiyi paylaşmaz ve hiçbir uygulama tarafından gösterilemez."
           }
         }
       }

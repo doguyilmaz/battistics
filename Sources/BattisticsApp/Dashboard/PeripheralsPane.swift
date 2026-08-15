@@ -12,7 +12,7 @@ struct PeripheralsPane: View {
                     "No peripheral batteries",
                     systemImage: "keyboard",
                     description: Text(
-                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app.")
+                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app.")
                 )
             } else {
                 ScrollView {
