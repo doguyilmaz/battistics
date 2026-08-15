@@ -2,12 +2,24 @@ import BattisticsCore
 import SwiftUI
 
 struct PeripheralsPane: View {
+    @Environment(BluetoothGATTReader.self) private var bluetooth
     @State private var peripherals: [PeripheralBattery] = []
     @State private var hasLoaded = false
 
+    /// Levels read over Bluetooth join the rest rather than sitting in their
+    /// own list: to the reader they are the same fact from another source.
+    private var allBatteries: [PeripheralBattery] {
+        var merged: [String: PeripheralBattery] = [:]
+        for battery in peripherals + bluetooth.batteries {
+            merged["\(battery.name)#\(battery.detail ?? "")"] = battery
+        }
+        return merged.values.sorted { ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "") }
+    }
+
     var body: some View {
+        VStack(spacing: 0) {
         Group {
-            if peripherals.isEmpty {
+            if allBatteries.isEmpty {
                 ContentUnavailableView(
                     "No peripheral batteries",
                     systemImage: "keyboard",
@@ -17,7 +29,7 @@ struct PeripheralsPane: View {
             } else {
                 ScrollView {
                     VStack(spacing: 12) {
-                        ForEach(peripherals) { peripheral in
+                        ForEach(allBatteries) { peripheral in
                             GlassCard {
                                 HStack(spacing: 12) {
                                     Image(systemName: icon(for: peripheral.name))
@@ -49,6 +61,9 @@ struct PeripheralsPane: View {
                     .padding(20)
                 }
             }
+            }
+            .frame(maxHeight: .infinity)
+            bluetoothSection
         }
         .navigationTitle("Peripherals")
         .task {
@@ -58,9 +73,9 @@ struct PeripheralsPane: View {
                 // is only in system_profiler, which costs about a second, so
                 // it runs on the same slow tick rather than a faster one.
                 async let hid = PeripheralBatteryReader.read()
-                async let bluetooth = BluetoothBatteryReader.fetch()
+                async let systemProfiler = BluetoothBatteryReader.fetch()
                 var merged: [String: PeripheralBattery] = [:]
-                for battery in await hid + bluetooth {
+                for battery in await hid + systemProfiler {
                     // Same device and cell from both readers is one row.
                     merged["\(battery.name)#\(battery.detail ?? "")"] = battery
                 }
@@ -68,8 +83,85 @@ struct PeripheralsPane: View {
                     ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
                 }
                 hasLoaded = true
+                bluetooth.refresh()
                 try? await Task.sleep(for: .seconds(15))
             }
+        }
+        .task { bluetooth.startIfEnabled() }
+    }
+
+    /// A button, not a switch. A switch says the app owns the setting, but
+    /// turning it on hands off to macOS's prompt and turning it off does not
+    /// take the grant back — that only changes in System Settings. The
+    /// trailing ellipsis is the convention for an action that opens a dialog.
+    ///
+    /// Laid out like the System pane's permission row so the app has one way
+    /// of asking for things rather than a different one per pane.
+    @ViewBuilder private var bluetoothSection: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: bluetoothIcon)
+                .contentTransition(.symbolEffect(.replace))
+            // One line, always. Measured at 10pt against the 549pt this row
+            // leaves beside the icon and button: the longest string is 405pt
+            // in Turkish, so nothing here wraps or truncates.
+            Text(bluetoothExplanation)
+                .lineLimit(1)
+            Spacer(minLength: 12)
+            bluetoothAction
+        }
+        .font(.caption)
+        .foregroundStyle(bluetooth.state == .ready ? Color.accentColor : Color.secondary)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+    }
+
+    @ViewBuilder private var bluetoothAction: some View {
+        switch bluetooth.state {
+        case .off:
+            Button("Allow…") { bluetooth.isEnabled = true }
+                .controlSize(.small)
+        case .denied:
+            Button("Open Settings…") {
+                if let url = URL(
+                    string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth"
+                ) {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .controlSize(.small)
+        case .ready:
+            Button("Turn Off") { bluetooth.isEnabled = false }
+                .controlSize(.small)
+        case .waiting, .unavailable:
+            EmptyView()
+        }
+    }
+
+    private var bluetoothIcon: String {
+        switch bluetooth.state {
+        case .ready: "antenna.radiowaves.left.and.right"
+        case .denied: "exclamationmark.triangle.fill"
+        default: "antenna.radiowaves.left.and.right.slash"
+        }
+    }
+
+    private var bluetoothExplanation: String {
+        switch bluetooth.state {
+        case .off:
+            String(
+                localized:
+                    "Some devices publish their level only over Bluetooth. macOS asks for access once.")
+        case .waiting:
+            String(localized: "Waiting for Bluetooth…")
+        case .denied:
+            String(
+                localized: "macOS is not allowing Bluetooth access, so these levels cannot be read.")
+        case .unavailable:
+            String(localized: "Bluetooth is switched off or unavailable on this Mac.")
+        case .ready:
+            bluetooth.batteries.isEmpty
+                ? String(localized: "No connected device publishes its battery this way.")
+                : String(localized: "Reading levels over Bluetooth.")
         }
     }
 

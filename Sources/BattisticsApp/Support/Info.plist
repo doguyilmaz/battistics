@@ -38,6 +38,8 @@
 	<string>0.1.0</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Battistics reads the battery level that connected keyboards, mice and headphones publish over Bluetooth. It is only used to show those levels in the Peripherals view, and nothing leaves this Mac.</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>

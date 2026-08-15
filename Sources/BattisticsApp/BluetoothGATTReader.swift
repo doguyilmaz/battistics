@@ -1,0 +1,169 @@
+import BattisticsCore
+import CoreBluetooth
+import Foundation
+import Observation
+
+/// Reads the standard Bluetooth Battery Service from connected devices.
+///
+/// This is the path macOS itself uses for peripherals it shows a level for.
+/// Devices speaking HID over GATT are required by that profile to expose
+/// service 0x180F, so a keyboard or mouse that publishes nothing through
+/// IOKit or system_profiler may still answer here.
+///
+/// It is the app's only permission, and it is asked for exactly once, when
+/// the user turns this on. Nothing here runs otherwise: `CBCentralManager`
+/// is not even constructed until then, because constructing it is what
+/// triggers the prompt.
+@MainActor
+@Observable
+final class BluetoothGATTReader {
+    enum State: Sendable, Equatable {
+        case off
+        case waiting
+        /// macOS denied Bluetooth access, or Bluetooth is switched off.
+        case denied
+        case unavailable
+        case ready
+    }
+
+    private(set) var state: State = .off
+    private(set) var batteries: [PeripheralBattery] = []
+
+    @ObservationIgnored private var session: GATTSession?
+
+    var isEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: Prefs.readBluetoothBatteries) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Prefs.readBluetoothBatteries)
+            newValue ? start() : stop()
+        }
+    }
+
+    /// Called at launch. Does nothing unless the user already opted in, so an
+    /// install that never touches this never sees a prompt.
+    func startIfEnabled() {
+        if isEnabled { start() }
+    }
+
+    func refresh() {
+        session?.refresh()
+    }
+
+    private func start() {
+        guard session == nil else { return refresh() }
+        state = .waiting
+        batteries = []
+        session = GATTSession(
+            onState: { [weak self] state in
+                Task { @MainActor in self?.state = state }
+            },
+            onBattery: { [weak self] name, percent in
+                Task { @MainActor in self?.record(name: name, percent: percent) }
+            })
+    }
+
+    private func stop() {
+        session?.close()
+        session = nil
+        batteries = []
+        state = .off
+    }
+
+    private func record(name: String, percent: Int) {
+        let entry = PeripheralBattery(id: "gatt#\(name)", name: name, percent: percent)
+        batteries.removeAll { $0.id == entry.id }
+        batteries.append(entry)
+        batteries.sort { $0.name < $1.name }
+    }
+}
+
+/// Every CoreBluetooth interaction, kept off the main actor because the
+/// delegate protocols are not isolated and its objects are not `Sendable`.
+/// Constructed with `queue: nil`, so all callbacks land on the main queue —
+/// `@unchecked Sendable` records that contract. Only plain values cross back.
+private final class GATTSession: NSObject, @unchecked Sendable {
+    /// Built per use: CBUUID is not Sendable, so a shared static of one is a
+    /// concurrency error rather than a convenience.
+    private static var batteryService: CBUUID { CBUUID(string: "180F") }
+    private static var batteryLevel: CBUUID { CBUUID(string: "2A19") }
+
+    private var central: CBCentralManager?
+    private var connected: [UUID: CBPeripheral] = [:]
+    private let onState: @Sendable (BluetoothGATTReader.State) -> Void
+    private let onBattery: @Sendable (String, Int) -> Void
+
+    init(
+        onState: @escaping @Sendable (BluetoothGATTReader.State) -> Void,
+        onBattery: @escaping @Sendable (String, Int) -> Void
+    ) {
+        self.onState = onState
+        self.onBattery = onBattery
+        super.init()
+        // Constructing this is what raises the permission prompt.
+        central = CBCentralManager(delegate: self, queue: nil)
+    }
+
+    func refresh() {
+        guard let central, central.state == .poweredOn else { return }
+        for peripheral in central.retrieveConnectedPeripherals(withServices: [Self.batteryService]) {
+            connected[peripheral.identifier] = peripheral
+            peripheral.delegate = self
+            central.connect(peripheral, options: nil)
+        }
+        onState(.ready)
+    }
+
+    func close() {
+        for peripheral in connected.values {
+            central?.cancelPeripheralConnection(peripheral)
+        }
+        connected.removeAll()
+        central = nil
+    }
+}
+
+extension GATTSession: CBCentralManagerDelegate {
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn: refresh()
+        case .unauthorized: onState(.denied)
+        case .unsupported, .poweredOff: onState(.unavailable)
+        default: onState(.waiting)
+        }
+    }
+
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        peripheral.discoverServices([Self.batteryService])
+    }
+}
+
+extension GATTSession: CBPeripheralDelegate {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        for service in peripheral.services ?? [] {
+            peripheral.discoverCharacteristics([Self.batteryLevel], for: service)
+        }
+    }
+
+    func peripheral(
+        _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?
+    ) {
+        for characteristic in service.characteristics ?? [] {
+            peripheral.readValue(for: characteristic)
+            // Many devices push changes, which saves polling entirely.
+            if characteristic.properties.contains(.notify) {
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+        }
+    }
+
+    func peripheral(
+        _ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?
+    ) {
+        guard characteristic.uuid == Self.batteryLevel,
+            let value = characteristic.value?.first,
+            (0...100).contains(Int(value)),
+            let name = peripheral.name
+        else { return }
+        onBattery(name, Int(value))
+    }
+}

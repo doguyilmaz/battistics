@@ -139,6 +139,7 @@ enum Prefs {
     static let keepAwakeDuration = "keepAwakeDuration"
     static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
     static let helperRegisteredVersion = "helperRegisteredVersion"
+    static let readBluetoothBatteries = "readBluetoothBatteries"
 
     static let powerSamplingEnabled = "powerSamplingEnabled"
     static let powerSamplingInterval = "powerSamplingInterval"
@@ -179,6 +180,7 @@ enum Prefs {
             keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
             keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
             keepAwakeMenuBarIcon: true,
+            readBluetoothBatteries: false,
 
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,

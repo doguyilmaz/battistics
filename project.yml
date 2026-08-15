@@ -82,6 +82,10 @@ targets:
         CFBundleShortVersionString: "0.1.0"
         CFBundleVersion: "0.1.0"
         LSUIElement: true
+        NSBluetoothAlwaysUsageDescription: >-
+          Battistics reads the battery level that connected keyboards, mice and
+          headphones publish over Bluetooth. It is only used to show those levels
+          in the Peripherals view, and nothing leaves this Mac.
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "© 2026 Dogu Yilmaz · MIT License"
         CFBundleURLTypes:

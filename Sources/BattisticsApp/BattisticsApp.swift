@@ -55,6 +55,7 @@ struct BattisticsApp: App {
     @State private var powerAuth = PowerAuthorization()
     @State private var powerSettings = PowerSettingsModel()
     @State private var powerHelper = PowerHelperClient()
+    @State private var bluetooth = BluetoothGATTReader()
 
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
@@ -72,6 +73,7 @@ struct BattisticsApp: App {
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
+                .environment(bluetooth)
                 .preferredColorScheme(colorScheme)
         } label: {
             MenuBarLabelView(model: model, keepAwake: keepAwake)
@@ -86,6 +88,7 @@ struct BattisticsApp: App {
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
+                .environment(bluetooth)
                 .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
@@ -100,6 +103,7 @@ struct BattisticsApp: App {
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
+                .environment(bluetooth)
                 .preferredColorScheme(colorScheme)
                 .background(WindowLevelConfigurator(keepOnTop: true))
         }

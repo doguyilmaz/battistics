@@ -244,6 +244,23 @@
         }
       }
     },
+    "Allow…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzin ver…"
+          }
+        }
+      }
+    },
     "Always": {
       "extractionState": "manual",
       "localizations": {
@@ -552,6 +569,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Şarj olurken mavi"
+          }
+        }
+      }
+    },
+    "Bluetooth device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth device"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth aygıtı"
+          }
+        }
+      }
+    },
+    "Bluetooth is switched off or unavailable on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth is switched off or unavailable on this Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth kapalı veya bu Mac'te kullanılamıyor."
           }
         }
       }
@@ -1778,6 +1829,23 @@
         }
       }
     },
+    "No connected device publishes its battery this way.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No connected device publishes its battery this way."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı hiçbir aygıt pilini bu şekilde yayınlamıyor."
+          }
+        }
+      }
+    },
     "No data yet": {
       "localizations": {
         "tr": {
@@ -1996,6 +2064,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Giriş Öğelerini Aç…"
+          }
+        }
+      }
+    },
+    "Open Settings…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarları Aç…"
           }
         }
       }
@@ -2272,6 +2357,23 @@
         }
       }
     },
+    "Reading levels over Bluetooth.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading levels over Bluetooth."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düzeyler Bluetooth üzerinden okunuyor."
+          }
+        }
+      }
+    },
     "Record power and temperature": {
       "localizations": {
         "tr": {
@@ -2466,6 +2568,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Menü çubuğu simgesini göster"
+          }
+        }
+      }
+    },
+    "Some devices publish their level only over Bluetooth. macOS asks for access once.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some devices publish their level only over Bluetooth. macOS asks for access once."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bazı aygıtlar düzeyini yalnızca Bluetooth üzerinden yayınlar. macOS bir kez izin ister."
           }
         }
       }
@@ -2878,6 +2997,23 @@
         }
       }
     },
+    "Waiting for Bluetooth…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for Bluetooth…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth bekleniyor…"
+          }
+        }
+      }
+    },
     "Watching which apps use the most energy. First results arrive in a few seconds.": {
       "localizations": {
         "tr": {
@@ -2975,6 +3111,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS bunu engelliyor. Giriş Öğeleri'nde Battistics'e izin verip yeniden deneyin."
+          }
+        }
+      }
+    },
+    "macOS is not allowing Bluetooth access, so these levels cannot be read.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS is not allowing Bluetooth access, so these levels cannot be read."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS Bluetooth erişimine izin vermiyor, bu yüzden bu düzeyler okunamıyor."
           }
         }
       }
