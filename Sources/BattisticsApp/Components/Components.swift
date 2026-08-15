@@ -45,6 +45,9 @@ struct GaugeRing: View {
     var valueText: String?
     /// Small line under the number, e.g. the cycle limit.
     var subvalue: String?
+    /// Mirrors `symbol` on the other side. The top slot is the charging
+    /// bolt's, so a second state has to live at the bottom.
+    var bottomSymbol: String?
     var diameter: CGFloat = 92
 
     var body: some View {
@@ -84,6 +87,12 @@ struct GaugeRing: View {
                         .font(.system(size: 10, weight: .medium, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
+                        .offset(y: 19)
+                }
+                if let bottomSymbol {
+                    Image(systemName: bottomSymbol)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(color)
                         .offset(y: 19)
                 }
             }
@@ -181,12 +190,23 @@ struct WindowLevelConfigurator: NSViewRepresentable {
 }
 
 extension Color {
+    /// Low Power Mode. Yellow because that is what macOS uses for it, but a
+    /// deeper gold than `.yellow`: system yellow is near-white in luminance
+    /// (1.5:1 against a light background) and reads as a highlighter on an
+    /// 8pt ring rather than as a status.
+    static let lowPower = Color(red: 234 / 255, green: 179 / 255, blue: 8 / 255)
+
     /// Charge level color ramp shared by gauges and charts.
-    static func charge(percent: Double) -> Color {
+    ///
+    /// Low Power Mode tints the ring yellow, which is the colour macOS uses
+    /// for it — but only above the low-battery threshold. A warning outranks
+    /// a mode: at 8% the ring stays red, because "you are about to run out"
+    /// matters more than "you are in Low Power Mode".
+    static func charge(percent: Double, lowPower: Bool = false) -> Color {
         switch percent {
         case ..<10: .red
         case ..<20: .orange
-        default: .green
+        default: lowPower ? .lowPower : .green
         }
     }
 

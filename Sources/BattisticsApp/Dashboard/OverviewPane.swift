@@ -3,6 +3,7 @@ import SwiftUI
 
 struct OverviewPane: View {
     @Environment(AppModel.self) private var model
+    @Environment(PowerSettingsModel.self) private var powerModel
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
 
     private var temperatureUnit: TemperatureUnit {
@@ -35,6 +36,19 @@ struct OverviewPane: View {
         }
     }
 
+    /// Whether Low Power Mode applies to the source in use right now, not
+    /// merely whether it is configured.
+    private var lowPowerIsOn: Bool {
+        guard let mode = powerModel.settings?.lowPowerMode else { return false }
+        let onBattery = model.snapshot?.externalConnected == false
+        switch mode {
+        case .never: return false
+        case .always: return true
+        case .onlyOnBattery: return onBattery
+        case .onlyOnPowerAdapter: return !onBattery
+        }
+    }
+
     private func hero(_ snapshot: BatterySnapshot) -> some View {
         GlassCard(cornerRadius: 16) {
             VStack(spacing: 10) {
@@ -42,8 +56,10 @@ struct OverviewPane: View {
                     GaugeRing(
                         value: Double(snapshot.percent),
                         title: "Charge",
-                        color: .charge(percent: Double(snapshot.percent)),
+                        color: .charge(
+                            percent: Double(snapshot.percent), lowPower: lowPowerIsOn),
                         symbol: snapshot.isCharging ? "bolt.fill" : nil,
+                        bottomSymbol: lowPowerIsOn ? "leaf.fill" : nil,
                         diameter: 112
                     )
                     GaugeRing(

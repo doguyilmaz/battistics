@@ -9,6 +9,9 @@ struct PopoverView: View {
 
     @Environment(AppModel.self) private var model
     @Environment(KeepAwakeModel.self) private var keepAwake
+    @Environment(PowerAuthorization.self) private var auth
+    @Environment(PowerHelperClient.self) private var helper
+    @Environment(PowerSettingsModel.self) private var powerModel
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
     @State private var windowVisible = true
@@ -26,8 +29,10 @@ struct PopoverView: View {
                     GaugeRing(
                         value: Double(snapshot.percent),
                         title: "Charge",
-                        color: .charge(percent: Double(snapshot.percent)),
-                        symbol: snapshot.isCharging ? "bolt.fill" : nil
+                        color: .charge(
+                            percent: Double(snapshot.percent), lowPower: lowPowerIsOn),
+                        symbol: snapshot.isCharging ? "bolt.fill" : nil,
+                        bottomSymbol: lowPowerIsOn ? "leaf.fill" : nil
                     )
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
@@ -63,6 +68,7 @@ struct PopoverView: View {
         .task(id: windowVisible) {
             guard windowVisible else { return }
             await model.loadSparkline()
+            await powerModel.refresh()
             while !Task.isCancelled && windowVisible {
                 model.refreshSensors()
                 try? await Task.sleep(for: .seconds(2))
@@ -271,6 +277,64 @@ struct PopoverView: View {
         return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
     }
 
+    /// Low Power Mode only. The sleep timers are set-and-forget and belong
+    /// in the System pane; this is the one people actually flip.
+    ///
+    /// Options show whether or not permission is held; picking one asks for
+    /// it if needed. The popover does dismiss while the password dialog is up
+    /// — MenuBarExtra(.window) closes the moment it stops being key — but by
+    /// then the choice is already made and the change still applies, so
+    /// there is nothing left to interact with anyway.
+    private var powerMenu: some View {
+        Menu {
+            if let current = powerModel.settings?.lowPowerMode {
+                Picker("Low Power Mode", selection: lowPowerBinding(current)) {
+                    ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
+                        Text(lowPowerLabel(option)).tag(option)
+                    }
+                }
+                .pickerStyle(.inline)
+            }
+        } label: {
+            Image(systemName: lowPowerIsOn ? "leaf.fill" : "leaf")
+                .foregroundStyle(lowPowerIsOn ? Color.lowPower : Color.secondary)
+        }
+        .menuStyle(.button)
+        .help("Low Power Mode")
+    }
+
+    /// Whether the mode applies to the source in use right now, which is what
+    /// makes the icon reflect what the Mac is actually doing.
+    private var lowPowerIsOn: Bool {
+        guard let mode = powerModel.settings?.lowPowerMode else { return false }
+        let onBattery = model.snapshot?.externalConnected == false
+        switch mode {
+        case .never: return false
+        case .always: return true
+        case .onlyOnBattery: return onBattery
+        case .onlyOnPowerAdapter: return !onBattery
+        }
+    }
+
+    private func lowPowerBinding(_ current: LowPowerModeSetting) -> Binding<LowPowerModeSetting> {
+        Binding(
+            get: { current },
+            set: { option in
+                Task { @MainActor in
+                    await powerModel.apply(.lowPowerMode(option), using: auth, helper: helper)
+                }
+            })
+    }
+
+    private func lowPowerLabel(_ mode: LowPowerModeSetting) -> String {
+        switch mode {
+        case .never: String(localized: "Never")
+        case .always: String(localized: "Always")
+        case .onlyOnBattery: String(localized: "Only on battery")
+        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
+        }
+    }
+
     private var keepAwakeMenu: some View {
         @Bindable var keepAwake = keepAwake
         return Menu {
@@ -314,6 +378,7 @@ struct PopoverView: View {
                     Label("Overview", systemImage: DashboardPane.overview.icon)
                 }
                 Spacer()
+                powerMenu
                 keepAwakeMenu
                 Button {
                     model.dashboardPane = .general
