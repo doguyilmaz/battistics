@@ -67,6 +67,34 @@ final class PowerHelperClient {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.refreshStatus() }
         }
+        reregisterAfterUpdateIfNeeded()
+    }
+
+    /// Every Sparkle update replaces the helper executable, and Apple's own
+    /// note is that a service "must be re-registered or it may not launch"
+    /// when that happens. Left alone, someone who chose never to be asked
+    /// quietly starts being asked again after an update, with nothing to
+    /// explain why.
+    ///
+    /// Deliberately narrow: it only runs when the helper is already
+    /// registered and approved, so it can never be a first install, and the
+    /// version is recorded *before* the attempt, so a failure cannot retry
+    /// on every launch. If it does fail, the pane's existing repair state
+    /// takes over.
+    private func reregisterAfterUpdateIfNeeded() {
+        let current = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+        let defaults = UserDefaults.standard
+        guard status == .enabled,
+            defaults.string(forKey: Prefs.helperRegisteredVersion) != current
+        else { return }
+        defaults.set(current, forKey: Prefs.helperRegisteredVersion)
+        try? reinstall()
+    }
+
+    private func recordRegisteredVersion() {
+        UserDefaults.standard.set(
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "",
+            forKey: Prefs.helperRegisteredVersion)
     }
 
     private var service: SMAppService {
@@ -136,6 +164,7 @@ final class PowerHelperClient {
             refreshStatus()
             throw error
         }
+        recordRegisteredVersion()
         refreshStatus()
     }
 
@@ -149,6 +178,7 @@ final class PowerHelperClient {
         connection = nil
         try? service.unregister()
         try service.register()
+        recordRegisteredVersion()
         refreshStatus()
     }
 
@@ -156,6 +186,7 @@ final class PowerHelperClient {
         connection?.invalidate()
         connection = nil
         try service.unregister()
+        UserDefaults.standard.removeObject(forKey: Prefs.helperRegisteredVersion)
         refreshStatus()
     }
 

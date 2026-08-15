@@ -39,14 +39,8 @@ struct OverviewPane: View {
     /// Whether Low Power Mode applies to the source in use right now, not
     /// merely whether it is configured.
     private var lowPowerIsOn: Bool {
-        guard let mode = powerModel.settings?.lowPowerMode else { return false }
-        let onBattery = model.snapshot?.externalConnected == false
-        switch mode {
-        case .never: return false
-        case .always: return true
-        case .onlyOnBattery: return onBattery
-        case .onlyOnPowerAdapter: return !onBattery
-        }
+        powerModel.settings?.lowPowerMode?
+            .isActive(onBattery: model.snapshot?.externalConnected == false) ?? false
     }
 
     private func hero(_ snapshot: BatterySnapshot) -> some View {

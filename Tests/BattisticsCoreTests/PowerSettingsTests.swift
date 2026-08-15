@@ -113,3 +113,21 @@ struct PowerSettingsTests {
         #expect(settings.lowPowerMode == nil)
     }
 }
+
+@Suite("Low Power Mode activity")
+struct LowPowerActivityTests {
+    @Test func configuredIsNotTheSameAsActive() {
+        #expect(!LowPowerModeSetting.never.isActive(onBattery: true))
+        #expect(!LowPowerModeSetting.never.isActive(onBattery: false))
+
+        #expect(LowPowerModeSetting.always.isActive(onBattery: true))
+        #expect(LowPowerModeSetting.always.isActive(onBattery: false))
+
+        // The two that depend on where the power is coming from.
+        #expect(LowPowerModeSetting.onlyOnBattery.isActive(onBattery: true))
+        #expect(!LowPowerModeSetting.onlyOnBattery.isActive(onBattery: false))
+
+        #expect(!LowPowerModeSetting.onlyOnPowerAdapter.isActive(onBattery: true))
+        #expect(LowPowerModeSetting.onlyOnPowerAdapter.isActive(onBattery: false))
+    }
+}

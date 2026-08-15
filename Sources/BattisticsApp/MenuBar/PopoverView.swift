@@ -306,14 +306,8 @@ struct PopoverView: View {
     /// Whether the mode applies to the source in use right now, which is what
     /// makes the icon reflect what the Mac is actually doing.
     private var lowPowerIsOn: Bool {
-        guard let mode = powerModel.settings?.lowPowerMode else { return false }
-        let onBattery = model.snapshot?.externalConnected == false
-        switch mode {
-        case .never: return false
-        case .always: return true
-        case .onlyOnBattery: return onBattery
-        case .onlyOnPowerAdapter: return !onBattery
-        }
+        powerModel.settings?.lowPowerMode?
+            .isActive(onBattery: model.snapshot?.externalConnected == false) ?? false
     }
 
     private func lowPowerBinding(_ current: LowPowerModeSetting) -> Binding<LowPowerModeSetting> {

@@ -265,3 +265,18 @@ extension PowerChange {
         }
     }
 }
+
+extension LowPowerModeSetting {
+    /// Whether the mode applies to the source in use *right now*, as opposed
+    /// to merely being configured. "Only on battery" is set but inactive
+    /// while plugged in, and an indicator that ignored that would claim the
+    /// Mac is saving power when it is not.
+    public func isActive(onBattery: Bool) -> Bool {
+        switch self {
+        case .never: false
+        case .always: true
+        case .onlyOnBattery: onBattery
+        case .onlyOnPowerAdapter: !onBattery
+        }
+    }
+}
