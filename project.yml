@@ -1,6 +1,6 @@
 name: Battistics
 options:
-  bundleIdPrefix: com.dogukyilmaz
+  bundleIdPrefix: com.doguyilmaz
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
@@ -51,14 +51,14 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "© 2026 Dogu Yilmaz · MIT License"
         CFBundleURLTypes:
-          - CFBundleURLName: com.dogukyilmaz.Battistics
+          - CFBundleURLName: com.doguyilmaz.Battistics
             CFBundleURLSchemes: [battistics]
         SUFeedURL: https://github.com/doguyilmaz/battistics/releases/latest/download/appcast.xml
         SUEnableAutomaticChecks: true
         SUPublicEDKey: j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.dogukyilmaz.Battistics
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics
         PRODUCT_NAME: Battistics
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_USER_SCRIPT_SANDBOXING: YES

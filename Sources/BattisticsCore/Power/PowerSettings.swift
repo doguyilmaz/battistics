@@ -3,7 +3,7 @@ import Foundation
 /// How macOS is configured to apply Low Power Mode. The system stores two
 /// independent per-source flags; System Settings presents them as this one
 /// four-way choice, so Battistics does too.
-public enum LowPowerModeSetting: String, Sendable, Equatable {
+public enum LowPowerModeSetting: String, Sendable, Equatable, CaseIterable {
     case never
     case always
     case onlyOnBattery
@@ -11,10 +11,45 @@ public enum LowPowerModeSetting: String, Sendable, Equatable {
 }
 
 /// MacBook Pro / Max only. Absent on every other Mac.
-public enum EnergyMode: Int, Sendable, Equatable {
+public enum EnergyMode: Int, Sendable, Equatable, CaseIterable {
     case automatic = 0
     case low = 1
     case high = 2
+}
+
+/// Which idle timer. The raw value is the `pmset` key it sets.
+public enum SleepTimer: String, Sendable, Equatable, CaseIterable {
+    case display = "displaysleep"
+    case system = "sleep"
+    case disk = "disksleep"
+}
+
+/// Which power source a setting applies to, as `pmset` flags.
+public enum PowerSource: String, Sendable, Equatable, CaseIterable {
+    case battery = "-b"
+    case ac = "-c"
+    case all = "-a"
+}
+
+/// The discrete stops System Settings offers, rather than free-form minutes.
+///
+/// This is a security boundary, not a convenience. An arbitrary `Int` is not
+/// a closed set: a negative one stringifies to `-1`, which `pmset` would read
+/// as an option rather than a value. Restricting to enumerated cases keeps
+/// every argument a bare non-negative token, so nothing crossing the boundary
+/// can change the *shape* of the command.
+public enum SleepInterval: Int, Sendable, Equatable, CaseIterable {
+    case never = 0
+    case oneMinute = 1
+    case twoMinutes = 2
+    case threeMinutes = 3
+    case fiveMinutes = 5
+    case tenMinutes = 10
+    case fifteenMinutes = 15
+    case thirtyMinutes = 30
+    case oneHour = 60
+    case twoHours = 120
+    case threeHours = 180
 }
 
 public struct PowerSettings: Sendable, Equatable {
@@ -136,5 +171,42 @@ public enum PowerSettingsReader {
         case "powermode": source.energyMode = number.flatMap(EnergyMode.init(rawValue:))
         default: break
         }
+    }
+}
+
+/// Builds the `pmset` invocations that change power settings.
+///
+/// Separate from running them: every argument here comes from a fixed enum
+/// case, so the command can be assembled and tested without a shell, a
+/// password prompt, or root anywhere near it.
+public enum PowerSettingsWriter {
+    public static let executable = "/usr/bin/pmset"
+
+    /// `-b` is battery, `-c` is the power adapter. macOS stores Low Power
+    /// Mode as one flag per source, so the four-way choice sets both.
+    public static func arguments(for setting: LowPowerModeSetting) -> [String] {
+        let (battery, ac): (String, String) =
+            switch setting {
+            case .never: ("0", "0")
+            case .always: ("1", "1")
+            case .onlyOnBattery: ("1", "0")
+            case .onlyOnPowerAdapter: ("0", "1")
+            }
+        return ["-b", "lowpowermode", battery, "-c", "lowpowermode", ac]
+    }
+
+    /// Energy Mode is system-wide, so `-a`.
+    public static func arguments(for mode: EnergyMode) -> [String] {
+        ["-a", "powermode", String(mode.rawValue)]
+    }
+
+    public static func arguments(
+        for timer: SleepTimer, interval: SleepInterval, source: PowerSource
+    ) -> [String] {
+        [source.rawValue, timer.rawValue, String(interval.rawValue)]
+    }
+
+    public static func command(_ arguments: [String]) -> String {
+        ([executable] + arguments).joined(separator: " ")
     }
 }

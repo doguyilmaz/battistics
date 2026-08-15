@@ -52,6 +52,7 @@ struct BattisticsApp: App {
     @State private var model = AppModel()
     @State private var updater = UpdaterModel()
     @State private var keepAwake = KeepAwakeModel()
+    @State private var powerAuth = PowerAuthorization()
 
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
@@ -66,6 +67,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(powerAuth)
                 .preferredColorScheme(colorScheme)
         } label: {
             MenuBarLabelView(model: model, keepAwake: keepAwake)
@@ -77,6 +79,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(powerAuth)
                 .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
@@ -88,6 +91,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(powerAuth)
                 .preferredColorScheme(colorScheme)
                 .background(WindowLevelConfigurator(keepOnTop: true))
         }

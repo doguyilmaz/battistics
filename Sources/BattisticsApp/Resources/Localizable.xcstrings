@@ -106,6 +106,23 @@
         }
       }
     },
+    "3 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 saat"
+          }
+        }
+      }
+    },
     "30 minutes": {
       "extractionState": "manual",
       "localizations": {
@@ -223,6 +240,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yaş"
+          }
+        }
+      }
+    },
+    "Allow…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzin ver…"
           }
         }
       }
@@ -485,6 +519,23 @@
     "Battistics": {
       "shouldTranslate": false
     },
+    "Battistics can change these. Sleep timers apply to %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics can change these. Sleep timers apply to %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics bunları değiştirebilir. Uyku süreleri %@ için geçerlidir."
+          }
+        }
+      }
+    },
     "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits.": {
       "extractionState": "manual",
       "localizations": {
@@ -558,6 +609,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Celsius ve Fahrenheit"
+          }
+        }
+      }
+    },
+    "Changing these needs your administrator password.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changing these needs your administrator password."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunları değiştirmek için yönetici parolanız gerekir."
           }
         }
       }
@@ -758,6 +826,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Raporu Kopyala"
+          }
+        }
+      }
+    },
+    "Could not change the setting.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not change the setting."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayar değiştirilemedi."
+          }
+        }
+      }
+    },
+    "Could not get permission to change power settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not get permission to change power settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç ayarlarını değiştirme izni alınamadı."
           }
         }
       }
@@ -1640,6 +1742,23 @@
         }
       }
     },
+    "OK": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamam"
+          }
+        }
+      }
+    },
     "Old samples are compacted automatically: raw power readings become hourly averages after 30 days. Daily health snapshots are kept forever.": {
       "localizations": {
         "tr": {
@@ -2013,6 +2132,23 @@
         }
       }
     },
+    "Revoke": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzni kaldır"
+          }
+        }
+      }
+    },
     "Runs entirely on this Mac. The only network request is the optional update check.": {
       "localizations": {
         "tr": {
@@ -2305,6 +2441,23 @@
         }
       }
     },
+    "This version of macOS does not allow changing these here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This version of macOS does not allow changing these here."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu macOS sürümü bunların buradan değiştirilmesine izin vermiyor."
+          }
+        }
+      }
+    },
     "Time on Battery": {
       "localizations": {
         "tr": {
@@ -2543,6 +2696,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yıl"
+          }
+        }
+      }
+    },
+    "battery power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "battery power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pil gücü"
+          }
+        }
+      }
+    },
+    "the power adapter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the power adapter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "güç adaptörü"
           }
         }
       }
