@@ -847,6 +847,23 @@
         }
       }
     },
+    "Could not repair the helper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not repair the helper"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşen onarılamadı"
+          }
+        }
+      }
+    },
     "Critical": {
       "localizations": {
         "tr": {
@@ -2196,6 +2213,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yardımcıyı Kaldır"
+          }
+        }
+      }
+    },
+    "Repair": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repair"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onar"
           }
         }
       }

@@ -231,3 +231,37 @@ public enum PowerChange: Sendable, Equatable {
         }
     }
 }
+
+extension PowerChange {
+    /// Whether a re-read of the system shows this change actually took.
+    ///
+    /// The privileged paths cannot report the tool's exit status:
+    /// `AuthorizationExecuteWithPrivileges` reports only that it launched.
+    /// Rather than trust that, the caller re-reads and asks the system
+    /// whether it agrees, which also covers the helper path and any future
+    /// mechanism. `nil` settings never confirm — a failed read must not read
+    /// as a successful write.
+    public func isReflected(in settings: PowerSettings?) -> Bool {
+        guard let settings else { return false }
+        switch self {
+        case .lowPowerMode(let wanted):
+            return settings.lowPowerMode == wanted
+        case .energyMode(let wanted):
+            return settings.energyMode == wanted
+        case .sleepTimer(let timer, let wanted, let source):
+            let side: PowerSettings.Source? =
+                switch source {
+                case .battery: settings.battery
+                case .ac: settings.ac
+                case .all: settings.ac ?? settings.battery
+                }
+            let actual: Int? =
+                switch timer {
+                case .display: side?.displaySleepMinutes
+                case .system: side?.systemSleepMinutes
+                case .disk: side?.diskSleepMinutes
+                }
+            return actual == wanted.rawValue
+        }
+    }
+}

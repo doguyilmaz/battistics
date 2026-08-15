@@ -136,6 +136,12 @@ struct SystemPane: View {
         if helper.needsApproval {
             Button("Open Login Items…") { helper.openLoginItemsSettings() }
                 .controlSize(.small)
+        } else if helper.isInstalledButSilent {
+            // Registered but not answering has no way out otherwise: the
+            // button would offer to remove a helper that is already not
+            // working, when re-registering is what fixes it.
+            Button("Repair") { repairHelper() }
+                .controlSize(.small)
         } else if helper.isInstalled {
             Button("Remove Helper") { removeHelper() }
                 .controlSize(.small)
@@ -219,6 +225,17 @@ struct SystemPane: View {
             ) + detail
         default:
             return String(localized: "macOS refused the installation.") + detail
+        }
+    }
+
+    private func repairHelper() {
+        do {
+            try helper.reinstall()
+        } catch {
+            let underlying = error as NSError
+            failure = PaneFailure(
+                title: String(localized: "Could not repair the helper"),
+                message: installFailureMessage(underlying))
         }
     }
 

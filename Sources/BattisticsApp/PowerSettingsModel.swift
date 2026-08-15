@@ -79,6 +79,11 @@ final class PowerSettingsModel {
             }
         }
         await refresh()
+        // Neither path can report the tool's exit status, so ask the system
+        // whether it agrees rather than assuming a launch meant a change.
+        if outcome == .applied, !change.isReflected(in: settings) {
+            outcome = .failed
+        }
         return outcome
     }
 }

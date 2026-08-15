@@ -47,6 +47,11 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.PowerHelper
         ENABLE_HARDENED_RUNTIME: YES
         SKIP_INSTALL: YES
+        # A command line tool has no bundle, so its identity has to live in a
+        # __TEXT,__info_plist section. Apple's SMAppService helper samples do
+        # this; launchd has nowhere else to read the helper's identifier from.
+        INFOPLIST_FILE: Sources/PowerHelper/Support/HelperInfo.plist
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
 
   Battistics:
     type: application

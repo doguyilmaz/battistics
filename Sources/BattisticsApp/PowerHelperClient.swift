@@ -139,6 +139,19 @@ final class PowerHelperClient {
         refreshStatus()
     }
 
+    /// Apple: "If an app updates either the plist or the executable ... the
+    /// SMAppService must be re-registered or it may not launch. It is
+    /// recommended to also call unregister before re-registering." Every
+    /// Sparkle update replaces the helper, so a registration made before one
+    /// can end up pointing at a binary that no longer matches.
+    func reinstall() throws {
+        connection?.invalidate()
+        connection = nil
+        try? service.unregister()
+        try service.register()
+        refreshStatus()
+    }
+
     func remove() throws {
         connection?.invalidate()
         connection = nil
