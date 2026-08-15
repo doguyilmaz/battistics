@@ -83,7 +83,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Release notes come from the CHANGELOG section for this version,
+          # so the page reads like the changelog rather than a commit list.
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v want="## $VERSION" '
+            $0 == want { found = 1; next }
+            /^## / { if (found) exit }
+            found { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if [ -s "$RUNNER_TEMP/notes.md" ]; then
+            NOTES=(--notes-file "$RUNNER_TEMP/notes.md")
+          else
+            NOTES=(--generate-notes)
+          fi
           gh release create "$GITHUB_REF_NAME" \
             dist/release/Battistics-*.dmg \
             dist/release/appcast-2.xml dist/release/appcast.xml \
-            --title "Battistics-${GITHUB_REF_NAME#v}" --generate-notes
+            --title "Battistics-${GITHUB_REF_NAME#v}" "${NOTES[@]}"

@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0
+
+**Install this one by hand.** The app's internal identifier was misspelled.
+Correcting it means macOS treats 1.1.0 as a different app, so it cannot
+replace 1.0.2 in place. Charge and health history is kept; menu bar and
+notification settings return to their defaults. Updates are automatic again
+afterwards.
+
+- Keep Awake: stop the Mac sleeping for 15 minutes to 12 hours or until
+  turned off, with the display on, the display asleep, or the lid closed
+- New System pane: Low Power Mode, Energy Mode and the display, system and
+  disk sleep timers, readable and changeable, plus a link into Battery
+  settings
+- Optional helper that removes the password prompt from those changes
+- Low Power Mode shows inside the charge ring and switches from the popover
+- Quit a process from the Energy pane on hover
+- Capacity no longer reports above 100%: a young battery really does measure
+  above its nameplate, and macOS clamps it too
+- "Battery health declined" compares a 30-day median instead of yesterday,
+  so a reading that swings a few points a day stops triggering it
+- Capacity history draws a 7-day trend through the daily readings
+- Cycle count gets a gauge on Overview
+
 ## 1.0.2
 
 - Native macOS 26 app icon (Icon Composer format): the update dialog and

@@ -50,9 +50,11 @@ appcast:
 	cp scripts/legacy-appcast.xml dist/release/appcast.xml
 
 release: appcast
+	awk -v want="## $(VERSION)" '$$0 == want { f = 1; next } /^## / { if (f) exit } f' \
+		CHANGELOG.md > dist/release/notes.md
 	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg \
 		dist/release/appcast-2.xml dist/release/appcast.xml \
-		--title "Battistics-$(VERSION)" --generate-notes
+		--title "Battistics-$(VERSION)" --notes-file dist/release/notes.md
 
 clean:
 	rm -rf .build dist Battistics.xcodeproj
