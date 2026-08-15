@@ -9,9 +9,15 @@ VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' 
 gen:
 	xcodegen generate
 
+# SIGN_IDENTITY defaults to ad-hoc, which is fine until you need the
+# privileged helper: SMAppService will not register a daemon without a real
+# team identifier. Build with
+#   SIGN_IDENTITY="Developer ID Application: ..." make run
+# to exercise that path locally.
 build: gen
 	xcodebuild -project Battistics.xcodeproj -scheme Battistics -configuration Debug \
-		-derivedDataPath $(DERIVED) build
+		-derivedDataPath $(DERIVED) build \
+		CODE_SIGN_IDENTITY="$(SIGN_IDENTITY)" $(if $(filter -,$(SIGN_IDENTITY)),,CODE_SIGN_STYLE=Manual CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime")
 
 test:
 	swift test

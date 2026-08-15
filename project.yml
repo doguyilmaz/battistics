@@ -31,14 +31,43 @@ settings:
     DEAD_CODE_STRIPPING: YES
 
 targets:
+  # Privileged helper. A separate root process by necessity: setting power
+  # preferences needs root, and the alternative is prompting on every change.
+  BattisticsPowerHelper:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources/PowerHelper
+        excludes: [Support]
+    dependencies:
+      - package: BattisticsCore
+    settings:
+      base:
+        PRODUCT_NAME: BattisticsPowerHelper
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.PowerHelper
+        ENABLE_HARDENED_RUNTIME: YES
+        SKIP_INSTALL: YES
+
   Battistics:
     type: application
     platform: macOS
     sources:
       - path: Sources/BattisticsApp
+      # SMAppService looks for the daemon's plist here, by label.
+      - path: Sources/PowerHelper/Support/com.doguyilmaz.Battistics.PowerHelper.plist
+        buildPhase:
+          copyFiles:
+            destination: wrapper
+            subpath: Contents/Library/LaunchDaemons
     dependencies:
       - package: BattisticsCore
       - package: Sparkle
+      # Lands in Contents/MacOS, which is what the plist's BundleProgram
+      # points at. `embed: false` here would suppress the copy phase entirely.
+      - target: BattisticsPowerHelper
+        codeSign: true
+        copy:
+          destination: executables
     info:
       path: Sources/BattisticsApp/Support/Info.plist
       properties:

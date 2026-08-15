@@ -98,7 +98,8 @@ final class PowerAuthorization {
 
     // MARK: - Running
 
-    func run(_ arguments: [String]) throws {
+    func run(_ change: PowerChange) throws {
+        let arguments = change.arguments
         guard let authorization else { throw Failure.locked }
         guard let execute = Self.executeWithPrivileges else { throw Failure.unsupported }
 

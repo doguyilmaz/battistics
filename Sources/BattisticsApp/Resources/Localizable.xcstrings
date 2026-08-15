@@ -244,23 +244,6 @@
         }
       }
     },
-    "Allow…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow…"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İzin ver…"
-          }
-        }
-      }
-    },
     "Always": {
       "extractionState": "manual",
       "localizations": {
@@ -341,6 +324,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Battistics erişilebilir kalsın diye ikisinden en az biri açık kalır."
+          }
+        }
+      }
+    },
+    "Authorization was refused.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authorization was refused."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yetkilendirme reddedildi."
           }
         }
       }
@@ -519,23 +519,6 @@
     "Battistics": {
       "shouldTranslate": false
     },
-    "Battistics can change these. Sleep timers apply to %@.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics can change these. Sleep timers apply to %@."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics bunları değiştirebilir. Uyku süreleri %@ için geçerlidir."
-          }
-        }
-      }
-    },
     "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits.": {
       "extractionState": "manual",
       "localizations": {
@@ -609,23 +592,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Celsius ve Fahrenheit"
-          }
-        }
-      }
-    },
-    "Changing these needs your administrator password.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Changing these needs your administrator password."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bunları değiştirmek için yönetici parolanız gerekir."
           }
         }
       }
@@ -830,36 +796,53 @@
         }
       }
     },
-    "Could not change the setting.": {
+    "Could not change the setting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could not change the setting."
+            "value": "Could not change the setting"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ayar değiştirilemedi."
+            "value": "Ayar değiştirilemedi"
           }
         }
       }
     },
-    "Could not get permission to change power settings.": {
+    "Could not install the helper": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could not get permission to change power settings."
+            "value": "Could not install the helper"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güç ayarlarını değiştirme izni alınamadı."
+            "value": "Yardımcı bileşen kurulamadı"
+          }
+        }
+      }
+    },
+    "Could not remove the helper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not remove the helper"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşen kaldırılamadı"
           }
         }
       }
@@ -1659,6 +1642,23 @@
         }
       }
     },
+    "Never Ask Again…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never Ask Again…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir Daha Sorma…"
+          }
+        }
+      }
+    },
     "No battery found": {
       "localizations": {
         "tr": {
@@ -1675,6 +1675,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Henüz veri yok"
+          }
+        }
+      }
+    },
+    "No password needed. Sleep timers apply to %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No password needed. Sleep timers apply to %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parola gerekmez. Uyku süreleri %@ için geçerlidir."
           }
         }
       }
@@ -1857,6 +1874,23 @@
         }
       }
     },
+    "Open Login Items…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Login Items…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş Öğelerini Aç…"
+          }
+        }
+      }
+    },
     "Open System Notification Settings…": {
       "localizations": {
         "tr": {
@@ -1943,6 +1977,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aksesuarlar"
+          }
+        }
+      }
+    },
+    "Permission granted until Battistics quits.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permission granted until Battistics quits."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics kapanana kadar izin verildi."
           }
         }
       }
@@ -2132,19 +2183,19 @@
         }
       }
     },
-    "Revoke": {
+    "Remove Helper": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Revoke"
+            "value": "Remove Helper"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "İzni kaldır"
+            "value": "Yardımcıyı Kaldır"
           }
         }
       }
@@ -2397,6 +2448,57 @@
         }
       }
     },
+    "The helper is installed but not running, so changes still ask for a password. macOS only runs it for a notarized copy of Battistics.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The helper is installed but not running, so changes still ask for a password. macOS only runs it for a notarized copy of Battistics."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşen kurulu ancak çalışmıyor, bu yüzden değişiklikler hâlâ parola soruyor. macOS onu yalnızca noter onaylı bir Battistics kopyası için çalıştırır."
+          }
+        }
+      }
+    },
+    "The helper's configuration is missing or unreadable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The helper's configuration is missing or unreadable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşenin yapılandırması eksik veya okunamıyor."
+          }
+        }
+      }
+    },
+    "The helper's signature was rejected by macOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The helper's signature was rejected by macOS."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşenin imzası macOS tarafından reddedildi."
+          }
+        }
+      }
+    },
     "The screen turns off, the Mac keeps running.": {
       "extractionState": "manual",
       "localizations": {
@@ -2437,23 +2539,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bunlar macOS'un kendi ayarlarıdır ve kullanımdaki güç kaynağı için gösterilir. Battistics bunları okur, değiştirmez."
-          }
-        }
-      }
-    },
-    "This version of macOS does not allow changing these here.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This version of macOS does not allow changing these here."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu macOS sürümü bunların buradan değiştirilmesine izin vermiyor."
           }
         }
       }
@@ -2700,6 +2785,23 @@
         }
       }
     },
+    "You will be asked for your administrator password on the first change.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You will be asked for your administrator password on the first change."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İlk değişiklikte yönetici parolanız istenecek."
+          }
+        }
+      }
+    },
     "battery power": {
       "extractionState": "manual",
       "localizations": {
@@ -2713,6 +2815,91 @@
           "stringUnit": {
             "state": "translated",
             "value": "pil gücü"
+          }
+        }
+      }
+    },
+    "macOS has this blocked. Allow Battistics in Login Items and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS has this blocked. Allow Battistics in Login Items and try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS bunu engelliyor. Giriş Öğeleri'nde Battistics'e izin verip yeniden deneyin."
+          }
+        }
+      }
+    },
+    "macOS needs you to allow Battistics in Login Items first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS needs you to allow Battistics in Login Items first."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS önce Giriş Öğeleri'nde Battistics'e izin vermenizi istiyor."
+          }
+        }
+      }
+    },
+    "macOS refused the change. Nothing was altered.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS refused the change. Nothing was altered."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS değişikliği reddetti. Hiçbir şey değiştirilmedi."
+          }
+        }
+      }
+    },
+    "macOS refused the installation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS refused the installation."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS kurulumu reddetti."
+          }
+        }
+      }
+    },
+    "macOS refused. Two things cause this: Battistics must be notarized to install a helper, which a local build is not, and the helper must not be blocked in Login Items.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS refused. Two things cause this: Battistics must be notarized to install a helper, which a local build is not, and the helper must not be blocked in Login Items."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS reddetti. Bunun iki nedeni olabilir: yardımcı bileşen kurmak için Battistics noter onaylı olmalıdır (yerel derleme değildir) ve yardımcı bileşen Giriş Öğeleri'nde engellenmemiş olmalıdır."
           }
         }
       }

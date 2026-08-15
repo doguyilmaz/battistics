@@ -210,3 +210,24 @@ public enum PowerSettingsWriter {
         ([executable] + arguments).joined(separator: " ")
     }
 }
+
+/// One power setting change, as a value.
+///
+/// The unit that travels between app and helper is this, not an argument
+/// vector. Argv is built at the far end, by the component that runs it, from
+/// a case that had to decode successfully — so the privileged side never
+/// trusts a list of strings it was handed.
+public enum PowerChange: Sendable, Equatable {
+    case lowPowerMode(LowPowerModeSetting)
+    case energyMode(EnergyMode)
+    case sleepTimer(SleepTimer, SleepInterval, PowerSource)
+
+    public var arguments: [String] {
+        switch self {
+        case .lowPowerMode(let setting): PowerSettingsWriter.arguments(for: setting)
+        case .energyMode(let mode): PowerSettingsWriter.arguments(for: mode)
+        case .sleepTimer(let timer, let interval, let source):
+            PowerSettingsWriter.arguments(for: timer, interval: interval, source: source)
+        }
+    }
+}
