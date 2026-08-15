@@ -59,6 +59,25 @@ struct BluetoothBatteryTests {
         #expect(Set(ids).count == ids.count)
     }
 
+    /// A device reconnecting can be listed twice, briefly under two
+    /// addresses. Keying on the address showed the same earpiece twice until
+    /// macOS settled, so identity is the device and cell, not the address.
+    @Test func aDeviceListedTwiceIsReportedOnce() {
+        let doubled = """
+            {"SPBluetoothDataType": [{"device_connected": [
+              {"Dogu’s AirPods Pro": {
+                "device_address": "AA:BB:CC:DD:EE:FF",
+                "device_batteryLevelCase": "%100"}},
+              {"Dogu’s AirPods Pro": {
+                "device_address": "11:22:33:44:55:66",
+                "device_batteryLevelCase": "%95"}}
+            ]}]}
+            """.data(using: .utf8)!
+        let found = BluetoothBatteryReader.parse(doubled)
+        #expect(found.count == 1)
+        #expect(found.first?.detail == "Case")
+    }
+
     @Test func garbageYieldsNothing() {
         #expect(BluetoothBatteryReader.parse(Data("nonsense".utf8)).isEmpty)
     }

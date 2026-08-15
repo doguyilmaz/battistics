@@ -59,7 +59,12 @@ struct PeripheralsPane: View {
                 // it runs on the same slow tick rather than a faster one.
                 async let hid = PeripheralBatteryReader.read()
                 async let bluetooth = BluetoothBatteryReader.fetch()
-                peripherals = await (hid + bluetooth).sorted {
+                var merged: [String: PeripheralBattery] = [:]
+                for battery in await hid + bluetooth {
+                    // Same device and cell from both readers is one row.
+                    merged["\(battery.name)#\(battery.detail ?? "")"] = battery
+                }
+                peripherals = merged.values.sorted {
                     ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
                 }
                 hasLoaded = true

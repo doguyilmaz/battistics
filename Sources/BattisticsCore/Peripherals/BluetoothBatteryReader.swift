@@ -51,26 +51,27 @@ public enum BluetoothBatteryReader {
             ("device_batteryLevelCase", "Case"),
         ]
 
-        var found: [PeripheralBattery] = []
+        // Keyed on the device and cell rather than the address: a device
+        // reconnecting is briefly listed twice under two addresses, which
+        // showed the same earpiece twice until macOS settled. It also keeps
+        // a row's identity stable across a reconnect, so SwiftUI does not
+        // tear the list down and rebuild it.
+        var found: [String: PeripheralBattery] = [:]
         for entry in entries {
             guard let connected = entry["device_connected"] as? [[String: Any]] else { continue }
             for wrapper in connected {
                 for (name, value) in wrapper {
                     guard let device = value as? [String: Any] else { continue }
-                    let address = device["device_address"] as? String ?? name
                     for slot in slots {
                         guard let percent = percentage(device[slot.key]) else { continue }
-                        found.append(
-                            PeripheralBattery(
-                                id: "\(address)#\(slot.label ?? "main")",
-                                name: name,
-                                percent: percent,
-                                detail: slot.label))
+                        let id = "\(name)#\(slot.label ?? "main")"
+                        found[id] = PeripheralBattery(
+                            id: id, name: name, percent: percent, detail: slot.label)
                     }
                 }
             }
         }
-        return found.sorted {
+        return found.values.sorted {
             ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
         }
     }
