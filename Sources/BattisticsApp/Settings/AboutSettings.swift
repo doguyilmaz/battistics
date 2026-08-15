@@ -35,6 +35,10 @@ struct AboutSettings: View {
                         if let url = URL(string: "https://github.com/doguyilmaz/battistics") {
                             Link("GitHub", destination: url)
                         }
+                        if let url = URL(
+                            string: "https://github.com/doguyilmaz/battistics/blob/main/CHANGELOG.md") {
+                            Link("Changelog", destination: url)
+                        }
                         if let url = URL(string: "https://github.com/doguyilmaz/battistics/blob/main/LICENSE") {
                             Link("MIT License", destination: url)
                         }
@@ -47,10 +51,16 @@ struct AboutSettings: View {
             Section("Updates") {
                 Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
                 Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
-                Button("Check Now") {
-                    updater.checkForUpdates()
+                LabeledContent {
+                    Button("Check Now") {
+                        updater.checkForUpdates()
+                    }
+                    .disabled(!updater.canCheckForUpdates)
+                } label: {
+                    Text(lastCheckedText)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
                 }
-                .disabled(!updater.canCheckForUpdates)
             }
             Section {
                 Text("Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.")
@@ -59,5 +69,15 @@ struct AboutSettings: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    /// Sparkle checks daily, counted from the last check rather than from
+    /// launch, so "never" here means it has not run yet, not that it is off.
+    private var lastCheckedText: String {
+        guard let date = updater.lastCheckDate else {
+            return String(localized: "Checked automatically every 24 hours")
+        }
+        return String(
+            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
     }
 }

@@ -11,6 +11,10 @@ final class UpdaterModel {
     @ObservationIgnored private var cancellables = Set<AnyCancellable>()
 
     private(set) var canCheckForUpdates = false
+    /// Sparkle's own record. It checks on a 24 hour schedule measured from
+    /// this date rather than at launch, so without showing it there is no way
+    /// to tell a working updater from a broken one.
+    private(set) var lastCheckDate: Date?
 
     var automaticallyChecksForUpdates: Bool {
         get { controller.updater.automaticallyChecksForUpdates }
@@ -31,6 +35,11 @@ final class UpdaterModel {
         controller.updater.publisher(for: \.canCheckForUpdates)
             .sink { [weak self] value in
                 self?.canCheckForUpdates = value
+            }
+            .store(in: &cancellables)
+        controller.updater.publisher(for: \.lastUpdateCheckDate)
+            .sink { [weak self] value in
+                self?.lastCheckDate = value
             }
             .store(in: &cancellables)
     }

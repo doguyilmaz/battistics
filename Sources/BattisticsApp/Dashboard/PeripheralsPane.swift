@@ -12,7 +12,7 @@ struct PeripheralsPane: View {
                     "No peripheral batteries",
                     systemImage: "keyboard",
                     description: Text(
-                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here.")
+                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app.")
                 )
             } else {
                 ScrollView {
@@ -25,8 +25,17 @@ struct PeripheralsPane: View {
                                         .frame(width: 26)
                                         .foregroundStyle(.secondary)
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(peripheral.name)
-                                            .fontWeight(.medium)
+                                        HStack(spacing: 5) {
+                                            Text(peripheral.name)
+                                                .fontWeight(.medium)
+                                            // Earpieces report several cells;
+                                            // the name alone cannot say which.
+                                            if let detail = peripheral.detail {
+                                                Text(detail)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
                                         ProgressView(value: Double(peripheral.percent), total: 100)
                                             .tint(.charge(percent: Double(peripheral.percent)))
                                     }
@@ -44,7 +53,15 @@ struct PeripheralsPane: View {
         .navigationTitle("Peripherals")
         .task {
             while !Task.isCancelled {
-                peripherals = PeripheralBatteryReader.read()
+                // The IORegistry scan is instant and covers Apple's own Magic
+                // peripherals. Everything else — AirPods and other earpieces —
+                // is only in system_profiler, which costs about a second, so
+                // it runs on the same slow tick rather than a faster one.
+                async let hid = PeripheralBatteryReader.read()
+                async let bluetooth = BluetoothBatteryReader.fetch()
+                peripherals = await (hid + bluetooth).sorted {
+                    ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
+                }
                 hasLoaded = true
                 try? await Task.sleep(for: .seconds(15))
             }

@@ -573,6 +573,23 @@
         }
       }
     },
+    "Case": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kutu"
+          }
+        }
+      }
+    },
     "Cell Sensor": {
       "localizations": {
         "tr": {
@@ -592,6 +609,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Celsius ve Fahrenheit"
+          }
+        }
+      }
+    },
+    "Changelog": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changelog"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Değişiklikler"
           }
         }
       }
@@ -736,6 +770,23 @@
         }
       }
     },
+    "Checked automatically every 24 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checked automatically every 24 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her 24 saatte bir otomatik denetlenir"
+          }
+        }
+      }
+    },
     "Classic": {
       "localizations": {
         "tr": {
@@ -766,12 +817,19 @@
         }
       }
     },
-    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here.": {
+    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app.": {
+      "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices, including Logitech's MX range, keep their level to themselves and cannot be shown by any app."
+          }
+        },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil düzeyi bildiren bağlı klavyeler, fareler, trackpad'ler ve kulaklıklar burada görünür."
+            "value": "Pil düzeyini bildiren bağlı klavyeler, fareler, izleme dörtgenleri ve kulaklıklar burada görünür. Logitech MX serisi dahil birçok üçüncü taraf aygıt bu bilgiyi paylaşmaz ve hiçbir uygulama tarafından gösterilemez."
           }
         }
       }
@@ -1400,6 +1458,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Son 24 Saat"
+          }
+        }
+      }
+    },
+    "Last checked %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last checked %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son denetleme %@"
+          }
+        }
+      }
+    },
+    "Left": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sol"
           }
         }
       }
@@ -2230,6 +2322,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Onar"
+          }
+        }
+      }
+    },
+    "Right": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağ"
           }
         }
       }

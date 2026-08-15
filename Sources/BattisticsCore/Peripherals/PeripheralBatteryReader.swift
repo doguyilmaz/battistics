@@ -5,11 +5,15 @@ public struct PeripheralBattery: Sendable, Equatable, Identifiable {
     public let id: String
     public let name: String
     public let percent: Int
+    /// Which cell, for devices that report more than one: Left, Right, Case.
+    /// nil when the device has a single battery and the name says it all.
+    public let detail: String?
 
-    public init(id: String, name: String, percent: Int) {
+    public init(id: String, name: String, percent: Int, detail: String? = nil) {
         self.id = id
         self.name = name
         self.percent = percent
+        self.detail = detail
     }
 }
 
