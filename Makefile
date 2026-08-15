@@ -46,7 +46,10 @@ appcast:
 	cp dist/Battistics-$(VERSION).dmg dist/release/
 	$(SPARKLE_BIN)/generate_appcast dist/release \
 		--download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/v$(VERSION)/"
-	mv dist/release/appcast.xml dist/release/appcast-2.xml
+	# generate_appcast names its output after SUFeedURL in the app's
+	# Info.plist, so it already writes appcast-2.xml. The mv is only a guard
+	# in case that ever stops being true.
+	[ -f dist/release/appcast-2.xml ] || mv dist/release/appcast.xml dist/release/appcast-2.xml
 	cp scripts/legacy-appcast.xml dist/release/appcast.xml
 
 release: appcast

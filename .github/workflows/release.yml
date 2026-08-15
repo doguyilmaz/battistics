@@ -73,10 +73,12 @@ jobs:
             --ed-key-file "$KEY_FILE" \
             --download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/${GITHUB_REF_NAME}/"
           rm "$KEY_FILE"
-          # appcast-2.xml is the live feed. appcast.xml stays the frozen
-          # informational one for pre-1.1.0 builds, whose bundle identifier
-          # Sparkle will not update across.
-          mv dist/release/appcast.xml dist/release/appcast-2.xml
+          # appcast-2.xml is the live feed. generate_appcast already names it
+          # that, because it derives the filename from SUFeedURL in the app's
+          # Info.plist; the mv is only a guard in case that stops being true.
+          # appcast.xml stays the frozen informational feed for pre-1.1.0
+          # builds, whose bundle identifier Sparkle will not update across.
+          [ -f dist/release/appcast-2.xml ] || mv dist/release/appcast.xml dist/release/appcast-2.xml
           cp scripts/legacy-appcast.xml dist/release/appcast.xml
 
       - name: Create GitHub release
