@@ -46,9 +46,12 @@ appcast:
 	cp dist/Battistics-$(VERSION).dmg dist/release/
 	$(SPARKLE_BIN)/generate_appcast dist/release \
 		--download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/v$(VERSION)/"
+	mv dist/release/appcast.xml dist/release/appcast-2.xml
+	cp scripts/legacy-appcast.xml dist/release/appcast.xml
 
 release: appcast
-	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg dist/release/appcast.xml \
+	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg \
+		dist/release/appcast-2.xml dist/release/appcast.xml \
 		--title "Battistics-$(VERSION)" --generate-notes
 
 clean:

@@ -45,7 +45,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://github.com/doguyilmaz/battistics/releases/latest/download/appcast.xml</string>
+	<string>https://github.com/doguyilmaz/battistics/releases/latest/download/appcast-2.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=</string>
 </dict>
