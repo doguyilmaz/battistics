@@ -128,6 +128,9 @@ struct StatRow: View {
 /// plain language.
 struct SectionHeader: View {
     let title: String
+    /// Goes in the gap the header already leaves, so a section can say it has
+    /// nothing to show without becoming a row and changing its own height.
+    var badge: String?
     var help: [(term: String, explanation: String)] = []
 
     @State private var showingHelp = false
@@ -139,6 +142,14 @@ struct SectionHeader: View {
                 .foregroundStyle(.secondary)
                 .kerning(0.6)
             Spacer()
+            if let badge {
+                Text(badge)
+                    .font(.system(size: 9, weight: .semibold))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.secondary.opacity(0.15), in: Capsule())
+                    .foregroundStyle(.secondary)
+            }
             if !help.isEmpty {
                 Button {
                     showingHelp.toggle()

@@ -20,9 +20,7 @@ struct OverviewPane: View {
                     capacityCard(snapshot)
                     liveCard(snapshot)
                 }
-                if let adapter = snapshot.adapter, snapshot.externalConnected {
-                    adapterCard(adapter)
-                }
+                adapterCard(snapshot)
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -133,22 +131,33 @@ struct OverviewPane: View {
         return Formatting.duration(minutes: max(Int(Date().timeIntervalSince(unplugged) / 60), 0))
     }
 
-    private func adapterCard(_ adapter: AdapterInfo) -> some View {
-        GlassCard {
+    /// Always four rows, present whether or not anything is plugged in.
+    ///
+    /// The card used to come and go with the adapter, and each row used to
+    /// come and go with its own field — so plugging in grew the pane once for
+    /// the card and again for every value IOKit filled in afterwards, which is
+    /// why the adapter's name arrived late and moved everything under it.
+    /// A dash is a value; an absent row is a layout change.
+    private func adapterCard(_ snapshot: BatterySnapshot) -> some View {
+        let adapter = snapshot.externalConnected ? snapshot.adapter : nil
+        let dash = "—"
+        return GlassCard {
             VStack(spacing: 7) {
-                SectionHeader(title: "Power Adapter")
-                if let name = adapter.name {
-                    StatRow(label: "Adapter", value: name)
-                }
-                if let watts = adapter.watts {
-                    StatRow(label: "Rated Power", value: "\(watts) W")
-                }
-                if let voltage = adapter.voltageMV {
-                    StatRow(label: "Adapter Voltage", value: Formatting.volts(millivolts: voltage))
-                }
-                if let current = adapter.amperageMA {
-                    StatRow(label: "Adapter Current", value: Formatting.milliamps(current))
-                }
+                SectionHeader(
+                    title: "Power Adapter",
+                    badge: snapshot.externalConnected ? nil : String(localized: "Not connected"))
+                StatRow(label: "Adapter", value: adapter.flatMap(\.name) ?? dash)
+                StatRow(
+                    label: "Rated Power",
+                    value: adapter.flatMap(\.watts).map { "\($0) W" } ?? dash)
+                StatRow(
+                    label: "Adapter Voltage",
+                    value: adapter.flatMap(\.voltageMV)
+                        .map { Formatting.volts(millivolts: $0) } ?? dash)
+                StatRow(
+                    label: "Adapter Current",
+                    value: adapter.flatMap(\.amperageMA)
+                        .map { Formatting.milliamps($0) } ?? dash)
             }
         }
     }

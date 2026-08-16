@@ -1992,6 +1992,22 @@
     "Normal": {
       "shouldTranslate": false
     },
+    "Not connected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not connected"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı değil"
+          }
+        }
+      }
+    },
     "Not enough data in this period yet. Battistics records as it runs.": {
       "localizations": {
         "tr": {

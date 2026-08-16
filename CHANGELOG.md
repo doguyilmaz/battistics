@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- The Power Adapter section on Overview stays where it is. It used to
+  appear and disappear with the cable, and each of its rows with whichever
+  values macOS had filled in yet, so plugging in moved the page more than
+  once. Unplugged it now reads as dashes, with a "Not connected" tag
+
 ## 1.2.0
 
 - Install with `brew install --cask doguyilmaz/tap/battistics`; the DMG is
