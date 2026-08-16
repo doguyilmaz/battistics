@@ -44,7 +44,10 @@ echo
 bold "Update checks (each install polls once a day)"
 rule
 latest_date=$(jq -r '[.[] | select(.prerelease == false)] | first | .published_at' <<<"$releases")
-days=$(((($(date +%s) - $(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$latest_date" +%s)) / 86400) + 1))
+# -u because GitHub's timestamp is UTC and `date -j -f` would otherwise read it
+# as local, which is a whole day out whenever the offset crosses midnight.
+published=$(date -u -j -f "%Y-%m-%dT%H:%M:%SZ" "$latest_date" +%s)
+days=$((((($(date +%s) - published)) / 86400) + 1))
 
 for feed in appcast-2.xml appcast.xml; do
     hits=$(jq --arg f "$feed" '[.[] | select(.prerelease == false)] | first
@@ -53,8 +56,11 @@ for feed in appcast-2.xml appcast.xml; do
     appcast-2.xml) label="current  (com.doguyilmaz)" ;;
     appcast.xml) label="legacy   (com.dogukyilmaz)" ;;
     esac
-    printf '%-26s %5s fetches / %s days  ≈ %s active\n' \
-        "$label" "$hits" "$days" "$((hits / days))"
+    # Decimal, because integer division reported a feed still being polled
+    # as zero for any rate below one a day.
+    rate=$(awk -v h="$hits" -v d="$days" 'BEGIN { printf "%.1f", h / d }')
+    printf '%-26s %5s fetches / %s days  ≈ %s a day\n' \
+        "$label" "$hits" "$days" "$rate"
 done
 echo "  Legacy reaching zero is when the 1.0.2 migration can be dropped."
 
