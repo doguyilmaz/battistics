@@ -60,9 +60,11 @@ release: appcast
 		--title "Battistics-$(VERSION)" --notes-file dist/release/notes.md
 	./scripts/update-tap.sh $(VERSION) dist/release/Battistics-$(VERSION).dmg
 
-# Republishes the cask for an existing release, hashing the DMG it downloads.
+# Only needed if the release job's cask step was skipped or failed.
+# VERSION is the working tree's placeholder, so ask GitHub what shipped.
+# Override with `make tap V=1.2.0`.
 tap:
-	@./scripts/update-tap.sh $(VERSION)
+	@./scripts/update-tap.sh $(if $(V),$(V),$(shell gh release view --json tagName --jq '.tagName' | sed 's/^v//'))
 
 metrics:
 	@./scripts/metrics.sh
