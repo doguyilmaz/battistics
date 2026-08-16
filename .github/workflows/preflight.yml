@@ -1,0 +1,61 @@
+name: Preflight
+
+# Checks what a release needs, before a tag makes finding out expensive.
+#
+# Run from the Actions tab, or: gh workflow run preflight.yml
+#
+# A secret's value is only visible inside a workflow, so this is the only
+# place the tap token can actually be tested rather than merely seen to
+# exist — a token pasted with a typo, or scoped to the wrong repository,
+# looks exactly like a good one from outside.
+on:
+  workflow_dispatch:
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tap token can write the cask
+        env:
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+        run: |
+          if [ -z "$HOMEBREW_TAP_GITHUB_TOKEN" ]; then
+            echo "::error::HOMEBREW_TAP_GITHUB_TOKEN is unset. Releases still succeed, but the cask will not be updated."
+            exit 1
+          fi
+          # `permissions` on this response describes what the *token* may do,
+          # so it answers the question without writing anything.
+          perms=$(GH_TOKEN="$HOMEBREW_TAP_GITHUB_TOKEN" \
+            gh api repos/doguyilmaz/homebrew-tap --jq '.permissions // {}')
+          echo "permissions on homebrew-tap: $perms"
+          if [ "$(echo "$perms" | jq -r '.push // false')" != "true" ]; then
+            echo "::error::The token cannot write to doguyilmaz/homebrew-tap. It needs Contents: read and write on that repository."
+            exit 1
+          fi
+          echo "tap token OK"
+
+      - name: Signing and notarization secrets are present
+        run: |
+          # Presence only. Whether a certificate is valid or a notary password
+          # still works is something only a real release can answer.
+          #
+          # Each expression below is evaluated before the shell sees it and
+          # collapses to the literal true or false, so no secret value is ever
+          # placed in the environment merely to ask whether it is set.
+          missing=0
+          check() {
+            if [ "$2" = "true" ]; then
+              echo "  present  $1"
+            else
+              echo "::error::missing secret: $1"
+              missing=1
+            fi
+          }
+          check MACOS_CERT_P12      "${{ secrets.MACOS_CERT_P12 != '' }}"
+          check MACOS_CERT_PASSWORD "${{ secrets.MACOS_CERT_PASSWORD != '' }}"
+          check MACOS_SIGN_IDENTITY "${{ secrets.MACOS_SIGN_IDENTITY != '' }}"
+          check APPLE_ID            "${{ secrets.APPLE_ID != '' }}"
+          check APPLE_TEAM_ID       "${{ secrets.APPLE_TEAM_ID != '' }}"
+          check NOTARY_PASSWORD     "${{ secrets.NOTARY_PASSWORD != '' }}"
+          check SPARKLE_PRIVATE_KEY "${{ secrets.SPARKLE_PRIVATE_KEY != '' }}"
+          exit $missing
