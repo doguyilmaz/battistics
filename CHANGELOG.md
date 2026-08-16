@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.0
+
+- Install with `brew install --cask doguyilmaz/tap/battistics`; the DMG is
+  still there, and updates arrive in-app whichever way you installed
+- Report a bug from About, by issue or by email, prefilled with your version
+  and Mac model. If Battistics or its helper crashed recently, the report
+  macOS wrote is offered next to those buttons rather than left where you
+  would have to know to look
+- Temperature history is drawn on a scale a battery actually lives on. It
+  shared the power chart's axis, which starts at zero, so a day between 27
+  and 35 degrees was squeezed into the top of the chart
+- Temperature history follows the unit set in Settings instead of always
+  showing Celsius
+- History charts no longer jump as a tab loads, and no longer draw over the
+  controls above them
+
 ## 1.1.0
 
 **Install this one by hand.** The app's internal identifier was misspelled.
