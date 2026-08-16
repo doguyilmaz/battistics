@@ -111,6 +111,9 @@ struct PeripheralsPane: View {
         }
         .font(.caption)
         .foregroundStyle(bluetooth.state == .ready ? Color.accentColor : Color.secondary)
+        // A small button is taller than caption text, so the row shrank while
+        // the prompt was up and the whole pane shifted with it.
+        .frame(height: 22)
         .padding(.horizontal, 20)
         .padding(.bottom, 12)
     }
@@ -132,7 +135,12 @@ struct PeripheralsPane: View {
         case .ready:
             Button("Turn Off") { bluetooth.isEnabled = false }
                 .controlSize(.small)
-        case .waiting, .unavailable:
+        case .waiting:
+            // Something in the button's place while macOS's prompt is up,
+            // rather than a gap that closes and reopens.
+            ProgressView()
+                .controlSize(.small)
+        case .unavailable:
             EmptyView()
         }
     }
