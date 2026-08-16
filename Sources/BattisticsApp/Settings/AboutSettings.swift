@@ -3,10 +3,12 @@ import SwiftUI
 struct AboutSettings: View {
     @Environment(UpdaterModel.self) private var updater
 
-    static var versionString: String {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        return version ?? "dev"
-    }
+    static var versionString: String { IssueReporter.appVersion }
+
+    /// Looked up once when the pane appears rather than per redraw: it hits
+    /// the filesystem, and a crash that happened before launch will not
+    /// appear while the window is open.
+    @State private var crashReport: URL?
 
     var body: some View {
         @Bindable var updater = updater
@@ -62,6 +64,32 @@ struct AboutSettings: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            Section("Support") {
+                if let crashReport {
+                    LabeledContent {
+                        Button("Show Report") { CrashWatch.reveal(crashReport) }
+                    } label: {
+                        Text(crashedText(CrashWatch.date(of: crashReport)))
+                            .font(.callout)
+                    }
+                }
+                LabeledContent {
+                    HStack(spacing: 8) {
+                        Button("Open an Issue") {
+                            IssueReporter.openGitHubIssue(title: issueTitle)
+                        }
+                        Button("Send an Email") {
+                            IssueReporter.openEmail(subject: issueTitle)
+                        }
+                    }
+                } label: {
+                    Text("Found a bug, or something behaving oddly?")
+                        .font(.callout)
+                }
+                Text("Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             Section {
                 Text("Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.")
                     .font(.caption)
@@ -69,6 +97,24 @@ struct AboutSettings: View {
             }
         }
         .formStyle(.grouped)
+        .onAppear { crashReport = CrashWatch.latestReport() }
+    }
+
+    private var issueTitle: String {
+        crashReport == nil
+            ? String(localized: "Battistics \(Self.versionString)")
+            : String(localized: "Crash on Battistics \(Self.versionString)")
+    }
+
+    /// macOS shows its own "quit unexpectedly" dialog, so this is not news by
+    /// the time it is read; it is here to put the file next to the buttons
+    /// that send it.
+    private func crashedText(_ date: Date?) -> String {
+        guard let date else {
+            return String(localized: "Battistics quit unexpectedly recently")
+        }
+        return String(
+            localized: "Battistics quit unexpectedly \(date.formatted(.relative(presentation: .named)))")
     }
 
     /// Sparkle checks daily, counted from the last check rather than from

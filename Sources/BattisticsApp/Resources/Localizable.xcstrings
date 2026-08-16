@@ -536,6 +536,22 @@
     "Battistics": {
       "shouldTranslate": false
     },
+    "Battistics %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@"
+          }
+        }
+      }
+    },
     "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits.": {
       "extractionState": "manual",
       "localizations": {
@@ -559,6 +575,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Battistics dahili pili olan bir Mac gerektirir."
+          }
+        }
+      }
+    },
+    "Battistics quit unexpectedly %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics quit unexpectedly %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ beklenmedik şekilde kapandı"
+          }
+        }
+      }
+    },
+    "Battistics quit unexpectedly recently": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics quit unexpectedly recently"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics yakın zamanda beklenmedik şekilde kapandı"
           }
         }
       }
@@ -603,6 +651,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bluetooth kapalı veya bu Mac'te kullanılamıyor."
+          }
+        }
+      }
+    },
+    "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkisi de sürümünüz, macOS sürümü ve Mac modeliyle hazır açılır. Siz göndermeden hiçbir şey gönderilmez."
           }
         }
       }
@@ -973,6 +1037,22 @@
         }
       }
     },
+    "Crash on Battistics %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crash on Battistics %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ sürümünde çökme"
+          }
+        }
+      }
+    },
     "Critical": {
       "localizations": {
         "tr": {
@@ -1257,6 +1337,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Orta"
+          }
+        }
+      }
+    },
+    "Found a bug, or something behaving oddly?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Found a bug, or something behaving oddly?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata mı buldunuz, bir şey tuhaf mı davranıyor?"
           }
         }
       }
@@ -2095,6 +2191,22 @@
         }
       }
     },
+    "Open an Issue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open an Issue"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konu Aç"
+          }
+        }
+      }
+    },
     "Open as a floating window that stays on top": {
       "localizations": {
         "tr": {
@@ -2485,6 +2597,22 @@
         }
       }
     },
+    "Send an Email": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send an Email"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E-posta Gönder"
+          }
+        }
+      }
+    },
     "Serial Number": {
       "localizations": {
         "tr": {
@@ -2531,6 +2659,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dock simgesini göster"
+          }
+        }
+      }
+    },
+    "Show Report": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Report"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raporu Göster"
           }
         }
       }
@@ -2632,6 +2776,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hâlâ Pilde"
+          }
+        }
+      }
+    },
+    "Support": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Destek"
           }
         }
       }
@@ -3030,6 +3190,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hafta"
+          }
+        }
+      }
+    },
+    "What did you expect instead?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What did you expect instead?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunun yerine ne olmasını bekliyordunuz?"
+          }
+        }
+      }
+    },
+    "What happened?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What happened?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne oldu?"
           }
         }
       }
