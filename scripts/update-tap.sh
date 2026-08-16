@@ -27,10 +27,10 @@ DMG="${2:-}"
 # so a release publishes the cask only when a token for it exists. Missing is
 # not a failure: the release itself is already out, and a stale cask is a
 # smaller problem than a red pipeline that stops future ones.
-if [ -n "${TAP_TOKEN:-}" ]; then
-    export GH_TOKEN="$TAP_TOKEN"
+if [ -n "${HOMEBREW_TAP_GITHUB_TOKEN:-}" ]; then
+    export GH_TOKEN="$HOMEBREW_TAP_GITHUB_TOKEN"
 elif [ -n "${CI:-}" ]; then
-    echo "note: TAP_TOKEN unset — skipping the cask update for $VERSION." >&2
+    echo "note: HOMEBREW_TAP_GITHUB_TOKEN unset — skipping the cask update for $VERSION." >&2
     echo "      The release is unaffected. Add the secret to publish to $TAP." >&2
     exit 0
 fi
@@ -117,13 +117,13 @@ CONTENT=$(printf '%s\n' "$CASK" | base64 | tr -d '\n')
 
 if [ "$exists" = 1 ]; then
     gh api "repos/$TAP/contents/$CASK_PATH" -X PUT \
-        -f "message=battistics $VERSION" \
+        -f "message=Brew cask update for battistics version v$VERSION" \
         -f "content=$CONTENT" \
         -f "sha=$(gh api "repos/$TAP/contents/$CASK_PATH" --jq .sha)" \
         --jq '.commit.html_url'
 else
     gh api "repos/$TAP/contents/$CASK_PATH" -X PUT \
-        -f "message=battistics $VERSION" \
+        -f "message=Brew cask update for battistics version v$VERSION" \
         -f "content=$CONTENT" \
         --jq '.commit.html_url'
 fi

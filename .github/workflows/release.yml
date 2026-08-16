@@ -108,10 +108,10 @@ jobs:
       # notarization ticket rewrites the image, so the two differ.
       #
       # github.token is scoped to this repository and cannot write to the tap,
-      # so this needs a TAP_TOKEN secret with contents write on it. Without
+      # so this needs a HOMEBREW_TAP_GITHUB_TOKEN secret with contents write on it. Without
       # one the step says so and succeeds — a stale cask is worth less than a
       # release pipeline that keeps working.
       - name: Update Homebrew tap
         env:
-          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
         run: ./scripts/update-tap.sh "${GITHUB_REF_NAME#v}" dist/release/Battistics-*.dmg
