@@ -31,7 +31,13 @@ Event driven, no polling. Idle CPU is 0.0%; sensors are read only while a window
 
 ## Install
 
-Download the DMG from [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications. Updates arrive in-app.
+```sh
+brew install --cask doguyilmaz/tap/battistics
+```
+
+Or download the DMG from [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications.
+
+Either way updates arrive in-app: Battistics updates itself, so Homebrew is told to leave it alone once installed.
 
 ## Build
 

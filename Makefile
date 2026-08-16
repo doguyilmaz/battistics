@@ -4,7 +4,7 @@ SPARKLE_BIN = $(DERIVED)/SourcePackages/artifacts/sparkle/Sparkle/bin
 SIGN_IDENTITY ?= -
 VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 
-.PHONY: gen build test app run install dmg appcast release metrics clean
+.PHONY: gen build test app run install dmg appcast release tap metrics clean
 
 gen:
 	xcodegen generate
@@ -58,6 +58,11 @@ release: appcast
 	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg \
 		dist/release/appcast-2.xml dist/release/appcast.xml \
 		--title "Battistics-$(VERSION)" --notes-file dist/release/notes.md
+	./scripts/update-tap.sh $(VERSION) dist/release/Battistics-$(VERSION).dmg
+
+# Republishes the cask for an existing release, hashing the DMG it downloads.
+tap:
+	@./scripts/update-tap.sh $(VERSION)
 
 metrics:
 	@./scripts/metrics.sh
