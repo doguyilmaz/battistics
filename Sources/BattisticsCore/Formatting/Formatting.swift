@@ -4,6 +4,21 @@ public enum TemperatureUnit: String, Sendable, CaseIterable {
     case both
     case celsius
     case fahrenheit
+
+    /// The unit an axis can actually draw.
+    ///
+    /// `both` is a convenience for text, where "35.0°C / 95.0°F" reads fine.
+    /// A scale has one unit, so a chart resolves through this first and shows
+    /// Fahrenheit only when that is the explicit choice.
+    public var forScale: TemperatureUnit { self == .fahrenheit ? .fahrenheit : .celsius }
+
+    /// Readings are stored in Celsius; a chart plots them converted, so its
+    /// axis labels carry the same numbers as its values.
+    public func convert(_ celsius: Double) -> Double {
+        self == .fahrenheit ? celsius * 9 / 5 + 32 : celsius
+    }
+
+    public var symbol: String { self == .fahrenheit ? "°F" : "°C" }
 }
 
 public enum Formatting {

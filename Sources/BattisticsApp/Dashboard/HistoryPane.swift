@@ -72,6 +72,11 @@ struct HistoryPane: View {
     @State private var anchor = Date()
     @State private var selectedDate: Date?
     @State private var chart = ChartData()
+    @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
+
+    private var temperatureUnit: TemperatureUnit {
+        (TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both).forScale
+    }
 
     /// Everything the chart draws, swapped in a single assignment.
     ///
@@ -97,6 +102,10 @@ struct HistoryPane: View {
         /// Computed on load, not per body: SwiftUI re-evaluates on every
         /// hover, and rescanning the series each time is wasted work.
         var domain: ClosedRange<Double> = 0...100
+        /// Carried with the points because they are already converted into
+        /// it. Reading the preference at draw time instead would label a
+        /// Celsius series in Fahrenheit for the frame between the two.
+        var temperatureUnit: TemperatureUnit = .celsius
     }
 
     private var interval: DateInterval {
@@ -148,7 +157,7 @@ struct HistoryPane: View {
     }
 
     private var loadKey: String {
-        "\(tab.rawValue)|\(range.rawValue)|\(interval.start.timeIntervalSince1970)"
+        "\(tab.rawValue)|\(range.rawValue)|\(interval.start.timeIntervalSince1970)|\(temperatureUnit.rawValue)"
     }
 
     private var navigationRow: some View {
@@ -373,20 +382,29 @@ struct HistoryPane: View {
         // this type exists to prevent, because every `await` below is a point
         // at which SwiftUI renders whatever has been committed so far.
         var next = ChartData(tab: tab, key: loadKey)
+        next.temperatureUnit = temperatureUnit
         switch tab {
         case .charge:
             next.points = await model.history.chargeSeries(
                 from: interval.start, to: interval.end, bucketSeconds: range.bucketSeconds)
             next.totals = await model.history.timeTotals(from: interval.start, to: interval.end)
             next.domain = 0...100
-        case .power, .temperature:
-            next.points =
-                tab == .power
-                ? await model.history.powerSeries(
-                    from: interval.start, to: interval.end, bucketSeconds: range.bucketSeconds)
-                : await model.history.temperatureSeries(
-                    from: interval.start, to: interval.end, bucketSeconds: range.bucketSeconds)
+        case .power:
+            next.points = await model.history.powerSeries(
+                from: interval.start, to: interval.end, bucketSeconds: range.bucketSeconds)
+            // Zero is a real reading for watts, and how near a draw comes to
+            // it is the point of the chart.
             next.domain = 0...((next.points.map(\.value).max() ?? 10) * 1.2 + 1)
+        case .temperature:
+            next.points = await model.history.temperatureSeries(
+                from: interval.start, to: interval.end, bucketSeconds: range.bucketSeconds
+            ).map { SeriesPoint(date: $0.date, value: temperatureUnit.convert($0.value)) }
+            // Zero is not. A battery sits in a narrow band well above it, so
+            // a zero-based axis squeezed a whole day into the top fifth of
+            // the chart and filled the rest with a solid block.
+            let values = next.points.map(\.value)
+            next.domain = ((values.min() ?? 20) - 2).rounded(.down)...((values.max() ?? 40) + 2)
+                .rounded(.up)
         case .health:
             next.healthPoints = await model.history.healthSeries()
             let smoothed = BatteryHealth.rollingMedian(
@@ -421,10 +439,11 @@ struct HistoryPane: View {
     }
 
     private func valueLabel(_ value: Double) -> String {
-        switch tab {
+        switch chart.tab {
         case .charge: "\(Int(value.rounded()))%"
         case .power: Formatting.watts(value)
-        case .temperature: Formatting.temperature(value, unit: .celsius)
+        // Already converted on load, so this labels rather than converts.
+        case .temperature: String(format: "%.1f%@", value, chart.temperatureUnit.symbol)
         case .health: Formatting.percentPrecise(value)
         }
     }
