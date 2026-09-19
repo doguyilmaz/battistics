@@ -15,6 +15,7 @@ enum BatGlyph {
         /// 0...1 fill level, nil hides the level indication.
         var fillFraction: CGFloat?
         var shape: MenuBarIconStyle = .bat
+        var percentage: Int?
     }
 
     /// Draws the glyph into `rect` (non-flipped coordinates).
@@ -36,14 +37,14 @@ enum BatGlyph {
     /// Standalone glyph image, template unless a color is given.
     static func image(
         size: NSSize, fillFraction: CGFloat?, charging: Bool, color: NSColor? = nil,
-        shape: MenuBarIconStyle = .bat
+        shape: MenuBarIconStyle = .bat, percentage: Int? = nil
     ) -> NSImage {
         let image = NSImage(size: size, flipped: false) { rect in
             draw(
                 in: rect,
                 style: Style(
                     color: color ?? .black, charging: charging, fillFraction: fillFraction,
-                    shape: shape))
+                    shape: shape, percentage: percentage))
             return true
         }
         image.isTemplate = color == nil
@@ -166,7 +167,16 @@ enum BatGlyph {
     }
 
     private static func drawBatteryInterior(in rect: NSRect, style: Style, metrics m: BodyMetrics) {
-        if style.charging {
+        if let percentage = style.percentage {
+            let text = String(percentage) as NSString
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.monospacedDigitSystemFont(ofSize: (m.top - m.bottom) * 0.72, weight: .bold),
+                .foregroundColor: style.color
+            ]
+            let size = text.size(withAttributes: attributes)
+            text.draw(at: NSPoint(x: m.midX - size.width / 2, y: (m.top + m.bottom - size.height) / 2),
+                      withAttributes: attributes)
+        } else if style.charging {
             boltPath(
                 centerX: m.midX, centerY: (m.top + m.bottom) / 2,
                 size: (m.top - m.bottom) * 0.60

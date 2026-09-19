@@ -127,6 +127,7 @@ enum Prefs {
 
     static let appIconStyle = "appIconStyle"
     static let menuBarIconStyle = "menuBarIconStyle"
+    static let menuBarPercentInside = "menuBarPercentInside"
     static let menuBarShowGlyph = "menuBarShowGlyph"
     static let menuBarPrimaryText = "menuBarPrimaryText"
     static let menuBarSecondaryText = "menuBarSecondaryText"
@@ -170,6 +171,7 @@ enum Prefs {
             appIconStyle: AppIconStyle.original.rawValue,
             menuBarIconStyle: MenuBarIconStyle.bat.rawValue,
             menuBarShowGlyph: true,
+            menuBarPercentInside: false,
             menuBarPrimaryText: MenuBarText.chargePercent.rawValue,
             menuBarSecondaryText: MenuBarText.none.rawValue,
             menuBarColorLow: true,

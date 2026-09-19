@@ -8,6 +8,7 @@ struct AppearanceSettings: View {
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
     @AppStorage(Prefs.appIconStyle) private var appIconRaw = AppIconStyle.original.rawValue
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
+    @AppStorage(Prefs.menuBarPercentInside) private var percentInside = false
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
     @AppStorage(Prefs.menuBarSecondaryText) private var secondaryRaw = MenuBarText.none.rawValue
@@ -24,6 +25,7 @@ struct AppearanceSettings: View {
     private var config: MenuBarConfig {
         MenuBarConfig(
             iconStyle: iconStyle,
+            percentInside: percentInside,
             colorLow: colorLow,
             lowThreshold: lowThreshold,
             colorHigh: colorHigh,
@@ -71,6 +73,8 @@ struct AppearanceSettings: View {
             }
             Section("Content") {
                 Toggle("Show battery glyph", isOn: $showGlyph)
+                Toggle("Show percentage inside battery", isOn: $percentInside)
+                    .disabled(!showGlyph || (iconStyle != .bat && iconStyle != .classic))
                 Picker("Primary text", selection: $primaryRaw) {
                     ForEach(MenuBarText.allCases) { kind in
                         Text(kind.label).tag(kind.rawValue)
@@ -189,7 +193,8 @@ struct AppearanceSettings: View {
                     fillFraction: charging ? nil : CGFloat(percent) / 100,
                     charging: charging,
                     color: tint ?? .labelColor,
-                    shape: iconStyle)
+                    shape: iconStyle,
+                    percentage: percentInside && showGlyph ? percent : nil)
             )
             Text("\(percent)%")
                 .font(.caption2)

@@ -6,6 +6,7 @@ struct MenuBarLabelView: View {
     var keepAwake: KeepAwakeModel
 
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
+    @AppStorage(Prefs.menuBarPercentInside) private var percentInside = false
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
     @AppStorage(Prefs.menuBarSecondaryText) private var secondaryRaw = MenuBarText.none.rawValue
@@ -22,6 +23,7 @@ struct MenuBarLabelView: View {
             showGlyph: showGlyph,
             primaryText: MenuBarText(rawValue: primaryRaw) ?? .chargePercent,
             secondaryText: MenuBarText(rawValue: secondaryRaw) ?? .none,
+            percentInside: percentInside,
             colorLow: colorLow,
             lowThreshold: lowThreshold,
             colorHigh: colorHigh,
