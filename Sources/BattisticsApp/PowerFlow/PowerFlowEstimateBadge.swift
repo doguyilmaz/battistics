@@ -2,7 +2,21 @@ import SwiftUI
 
 /// Native hover help, with the same explanation available by click or keyboard.
 struct PowerFlowEstimateBadge: View {
+    enum Kind {
+        case battery
+        case system
+    }
+
+    var kind: Kind = .battery
     @State private var showingExplanation = false
+
+    private var title: String {
+        kind == .battery ? String(localized: "Estimated battery power") : String(localized: "Estimated system power")
+    }
+
+    private var explanation: String {
+        kind == .battery ? PowerFlowPresentation.batteryEstimateExplanation : PowerFlowPresentation.systemEstimateExplanation
+    }
 
     var body: some View {
         Button {
@@ -12,11 +26,11 @@ struct PowerFlowEstimateBadge: View {
                 .foregroundStyle(.yellow)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Estimated battery power")
-        .accessibilityHint(PowerFlowPresentation.batteryEstimateExplanation)
-        .help(PowerFlowPresentation.batteryEstimateExplanation)
+        .accessibilityLabel(title)
+        .accessibilityHint(explanation)
+        .help(explanation)
         .popover(isPresented: $showingExplanation) {
-            Text(PowerFlowPresentation.batteryEstimateExplanation)
+            Text(explanation)
                 .font(.callout)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(14)

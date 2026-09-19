@@ -48,7 +48,7 @@ struct GeneralSettings: View {
                         .onChange(of: showPowerFlow) { model.refreshSensors() }
                     PowerFlowInfoButton()
                 }
-                Text("Try a power-flow card in Energy and a compact summary in the popover. Off by default; availability varies by Mac and macOS.")
+                Text("Show power readings in Energy and the popover. Off by default; support varies by Mac and macOS.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

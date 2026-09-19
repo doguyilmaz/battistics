@@ -21,33 +21,33 @@ struct PowerFlowInfoButton: View {
                     .font(.headline)
                 VStack(alignment: .leading, spacing: 4) {
                     if let watts = model.snapshot?.adapter?.watts {
-                        Text("Adapter capacity reported by macOS: \(watts) W")
+                        Text("Adapter capacity: \(watts) W")
                     }
                     if let updated = model.snapshot?.powerFlow?.registryUpdatedAt {
-                        Text("Registry updated: \(updated, format: .dateTime.hour().minute().second())")
+                        Text("System updated: \(updated, format: .dateTime.hour().minute().second())")
                     } else {
-                        Text("Registry update time unavailable")
+                        Text("Update time unavailable")
                     }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                if flow.batteryIsEstimated {
+                if flow.batteryIsEstimated || flow.systemIsEstimated {
                     Label {
-                        Text(PowerFlowPresentation.batteryEstimateExplanation)
+                        Text("Yellow warnings mark calculated values.")
                     } icon: {
                         Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
                     }
                     .font(.caption)
                 } else if flow.telemetry?.hasInconsistentReadings == true {
-                    Label("Conflicting source readings are hidden.", systemImage: "exclamationmark.triangle")
+                    Label("Some readings are unavailable.", systemImage: "exclamationmark.triangle")
                         .font(.caption)
                         .foregroundStyle(.orange)
                 }
                 Divider()
-                Text("Shows power reported at the Mac’s input, system and battery. Input is not the adapter’s rated capacity or power measured at the wall socket.")
-                Text("Uses AppleSmartBattery power telemetry, which is not a documented public data contract. Availability and behavior vary by Mac and macOS version.")
-                Text("Readings can update slowly and at different times. They may not add up exactly. Battery direction follows the displayed power when current does not oppose it; a separately reported zero current can lag. Negative battery watts mean discharge; positive means charging. When battery telemetry conflicts, system power is hidden and a yellow warning marks an estimate from battery voltage × current, if available. Other missing or conflicting readings appear as a dash, never an assumed zero.")
-                Text("The registry update time is not a confirmed hardware sample time. Re-reading cached values does not make them new; a reported zero does not prove zero instantaneous flow. This preview uses existing battery sampling and adds no background polling loop.")
+                Text("Input is power entering your Mac, not the adapter’s maximum wattage or power at the wall.")
+                Text("Battery: + means charging, - means discharging. Open a yellow warning for calculation details.")
+                Text("These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate.")
+                Text("The update time does not confirm when each reading was measured.")
                     .foregroundStyle(.secondary)
             }
             .font(.callout)

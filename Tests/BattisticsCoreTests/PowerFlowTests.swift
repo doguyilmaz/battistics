@@ -158,12 +158,14 @@ struct PowerFlowTests {
         }
     }
 
-    @Test func originalAdapterBatteryConflictOmitsSystemWithOrWithoutAnEstimate() throws {
+    @Test func originalAdapterBatteryConflictUsesExplicitSystemAndBatteryEstimates() throws {
         let raw = props(input: 79_157, load: 83_585, battery: -4_428,
                         charging: true, current: 4_997, voltage: 12_229)
         let flow = try #require(PowerFlowTelemetry.parse(from: raw, readAt: readAt))
         #expect(flow.inputWatts == 79.157)
-        #expect(flow.systemLoadWatts == nil)
+        let systemEstimate = try #require(flow.systemLoadWatts)
+        #expect(abs(systemEstimate - 18.048687) < 0.000000001)
+        #expect(flow.systemPowerSource == .estimatedFromInputAndBattery)
         #expect(flow.batteryPowerWatts == 61.108313)
         #expect(flow.batteryPowerSource == .estimatedFromVoltageAndCurrent)
         #expect(flow.batteryDirection == .charging)
@@ -181,13 +183,14 @@ struct PowerFlowTests {
         }
     }
 
-    @Test func negativeSystemLoadFlagsInconsistencyWithoutInventingCorrections() throws {
+    @Test func negativeSystemLoadRetainsInconsistencyWithAnExplicitEstimate() throws {
         let invalid = try #require(PowerFlowTelemetry.parse(
             from: props(load: -13_897), readAt: readAt))
         let missing = try #require(PowerFlowTelemetry.parse(
             from: props(load: nil), readAt: readAt))
         #expect(invalid.hasInconsistentReadings)
-        #expect(invalid.systemLoadWatts == nil)
+        #expect(invalid.systemLoadWatts == 14.099)
+        #expect(invalid.systemPowerSource == .estimatedFromInputAndBattery)
         #expect(invalid.batteryPowerWatts == 0)
         #expect(!missing.hasInconsistentReadings)
         #expect(!invalid.hasSameReadings(as: missing))
@@ -299,7 +302,8 @@ struct PowerFlowTests {
             #expect(flow.batteryPowerSource == .estimatedFromVoltageAndCurrent)
             #expect(flow.batteryDirection == .discharging)
             #expect(flow.hasInconsistentReadings)
-            #expect(flow.systemLoadWatts == nil)
+            #expect(flow.systemLoadWatts == Double(sample.input) / 1_000 - Double(sample.voltage) * Double(sample.current) / 1_000_000)
+            #expect(flow.systemPowerSource == .estimatedFromInputAndBattery)
             #expect(flow.inputWatts == Double(sample.input) / 1_000)
         }
     }
@@ -369,6 +373,59 @@ struct PowerFlowTests {
         #expect(direct.batteryPowerWatts == estimated.batteryPowerWatts)
         #expect(direct.batteryDirection == estimated.batteryDirection)
         #expect(direct.hasInconsistentReadings == estimated.hasInconsistentReadings)
+        #expect(!direct.hasSameReadings(as: estimated))
+    }
+
+    @Test func systemEstimateSubtractsSignedBatteryPower() throws {
+        let samples = [
+            (input: 0, battery: -35_740, expected: 35.74),
+            (input: 18_000, battery: -44_000, expected: 62.0),
+            (input: 18_000, battery: 4_000, expected: 14.0),
+            (input: 18_000, battery: 18_000, expected: 0.0)
+        ]
+        for sample in samples {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(input: sample.input, load: nil, battery: sample.battery), readAt: readAt))
+            #expect(flow.systemLoadWatts == sample.expected)
+            #expect(flow.systemPowerSource == .estimatedFromInputAndBattery)
+            #expect(flow.batteryPowerSource == .reported)
+            #expect(!flow.hasInconsistentReadings)
+        }
+    }
+
+    @Test func systemEstimateRequiresAvailableOperandsAndPlausibleResidual() throws {
+        for raw in [
+            props(input: nil, load: nil, battery: -12_000),
+            props(input: 18_000, load: nil, battery: nil),
+            props(input: 18_000, load: nil, battery: 20_000),
+            props(input: 1_000_000, load: nil, battery: -1_000),
+            props(input: Double.infinity, load: nil, battery: -12_000),
+            props(input: 18_000, load: nil, battery: Double.nan)
+        ] {
+            var withRating = raw
+            withRating["AdapterDetails"] = ["Watts": 94]
+            let flow = try #require(PowerFlowTelemetry.parse(from: withRating, readAt: readAt))
+            #expect(flow.systemLoadWatts == nil)
+            #expect(flow.systemPowerSource == nil)
+        }
+    }
+
+    @Test func validReportedSystemPowerTakesPrecedenceOverAResidual() throws {
+        for input: Any? in [nil, 18_000] {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(input: input, load: 30_000, battery: -44_000), readAt: readAt))
+            #expect(flow.systemLoadWatts == 30)
+            #expect(flow.systemPowerSource == .reported)
+        }
+    }
+
+    @Test func equalSystemValuesWithDifferentSourcesRemainObservable() throws {
+        let direct = try #require(PowerFlowTelemetry.parse(from: props(), readAt: readAt))
+        let estimated = try #require(PowerFlowTelemetry.parse(from: props(load: nil), readAt: readAt))
+        #expect(direct.systemLoadWatts == estimated.systemLoadWatts)
+        #expect(direct.hasInconsistentReadings == estimated.hasInconsistentReadings)
+        #expect(direct.systemPowerSource == .reported)
+        #expect(estimated.systemPowerSource == .estimatedFromInputAndBattery)
         #expect(!direct.hasSameReadings(as: estimated))
     }
 

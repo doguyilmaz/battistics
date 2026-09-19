@@ -106,9 +106,9 @@ struct EnergyPane: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Energy sampling")
                 .font(.headline)
-            Text("Shows up to 20 active processes, ranked by reported energy use when available, otherwise by CPU use.")
-            Text("100% CPU represents one logical core. A process using multiple cores can exceed 100%.")
-            Text("Sampling runs only while this view is visible.")
+            Text("Up to 20 processes, ranked by energy use or, if unavailable, CPU use.")
+            Text("100% CPU equals one logical core. Using several cores can exceed 100%.")
+            Text("Updates only while this pane is visible.")
                 .foregroundStyle(.secondary)
         }
         .font(.callout)

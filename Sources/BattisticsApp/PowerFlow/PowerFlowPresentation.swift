@@ -19,6 +19,12 @@ struct PowerFlowPresentation {
     }
 
     var statusText: String {
+        if systemIsEstimated && batteryIsEstimated {
+            return String(localized: "Estimated readings")
+        }
+        if systemIsEstimated {
+            return String(localized: "System estimated")
+        }
         if batteryIsEstimated {
             return String(localized: "Battery estimated")
         }
@@ -34,8 +40,24 @@ struct PowerFlowPresentation {
         telemetry?.batteryPowerSource == .estimatedFromVoltageAndCurrent
     }
 
+    var systemIsEstimated: Bool {
+        telemetry?.systemPowerSource == .estimatedFromInputAndBattery
+    }
+
+    var systemLabel: String {
+        switch telemetry?.systemPowerSource {
+        case .reported: String(localized: "Reported load")
+        case .estimatedFromInputAndBattery: String(localized: "Estimated load")
+        case nil: String(localized: "Load unavailable")
+        }
+    }
+
     static var batteryEstimateExplanation: String {
-        String(localized: "Battery telemetry is inconsistent. This estimate uses battery voltage × current, the same calculation as the popover’s Power reading. System power is hidden during this conflict. Input and System are not estimated.")
+        String(localized: "The battery reading is inconsistent. Calculated from voltage × current, like the popover’s Power value.")
+    }
+
+    static var systemEstimateExplanation: String {
+        String(localized: "Calculated as Input - Battery. Discharging battery power is added to Input. This is an estimate.")
     }
 
     func watts(_ value: Double?, signed: Bool = false) -> String {
@@ -48,7 +70,7 @@ struct PowerFlowPresentation {
         switch telemetry?.batteryDirection {
         case .charging: String(localized: "Charging")
         case .discharging: String(localized: "Discharging")
-        case .idle: String(localized: "No reported flow")
+        case .idle: String(localized: "No flow indicated")
         default: String(localized: "Direction unknown")
         }
     }

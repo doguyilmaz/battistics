@@ -16,6 +16,11 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         case estimatedFromVoltageAndCurrent
     }
 
+    public enum SystemPowerSource: Sendable {
+        case reported
+        case estimatedFromInputAndBattery
+    }
+
     /// Time the registry dictionary was read, not a hardware sample timestamp.
     /// A recent read does not prove that the controller refreshed its values.
     public private(set) var readAt: Date
@@ -23,9 +28,10 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// not a confirmed hardware sample timestamp for PowerTelemetryData.
     public let registryUpdatedAt: Date?
     public let inputWatts: Double?
-    /// Unavailable when the battery telemetry conflicts with current/connection:
-    /// its associated system accounting cannot be treated as independently valid.
+    /// Selected system reading. When direct accounting is unavailable or conflicts,
+    /// a labeled estimate can use input minus signed selected battery power.
     public let systemLoadWatts: Double?
+    public let systemPowerSource: SystemPowerSource?
     /// Positive into the battery, negative out of it. Conflicting direct readings
     /// use a validated voltage × current estimate when available; inspect source.
     public let batteryPowerWatts: Double?
@@ -38,8 +44,8 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     public var source: String { "AppleSmartBattery.PowerTelemetryData" }
 
     /// Parses only the dictionary already obtained by BatteryReader.
-    /// Missing fields stay unknown; adapter ratings and arithmetic differences
-    /// never substitute for a measurement.
+    /// Estimates are explicitly sourced; adapter ratings never substitute for
+    /// measured input and missing operands never become assumed zeros.
     public static func parse(from props: [String: Any], readAt: Date) -> Self? {
         guard let data = props["PowerTelemetryData"] as? [String: Any] else { return nil }
         let reportedBatteryPower = watts(data["BatteryPower"], permitsNegative: true)
@@ -48,11 +54,17 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         let batterySource: BatteryPowerSource? = batteryPower == nil ? nil
             : (batteryConflict ? .estimatedFromVoltageAndCurrent : .reported)
         let negativeSystemLoad = signedTelemetryInteger(data["SystemLoad"]).map { $0 < 0 } ?? false
+        let inputPower = watts(data["SystemPowerIn"], permitsNegative: false)
+        let reportedSystemPower = batteryConflict ? nil : watts(data["SystemLoad"], permitsNegative: false)
+        let systemPower = reportedSystemPower ?? estimatedSystemPower(input: inputPower, battery: batteryPower)
+        let systemSource: SystemPowerSource? = systemPower == nil ? nil
+            : (reportedSystemPower != nil ? .reported : .estimatedFromInputAndBattery)
         return Self(
             readAt: readAt,
             registryUpdatedAt: registryUpdateDate(props["UpdateTime"], readAt: readAt),
-            inputWatts: watts(data["SystemPowerIn"], permitsNegative: false),
-            systemLoadWatts: batteryConflict ? nil : watts(data["SystemLoad"], permitsNegative: false),
+            inputWatts: inputPower,
+            systemLoadWatts: systemPower,
+            systemPowerSource: systemSource,
             batteryPowerWatts: batteryPower,
             batteryPowerSource: batterySource,
             batteryDirection: direction(from: props, batteryWatts: batteryPower),
@@ -172,6 +184,13 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             estimate.isFinite, abs(estimate) <= 1_000,
             !contradictsBatteryState(estimate, props: props)
         else { return nil }
+        return estimate
+    }
+
+    private static func estimatedSystemPower(input: Double?, battery: Double?) -> Double? {
+        guard let input, let battery else { return nil }
+        let estimate = input - battery
+        guard estimate.isFinite, (0...1_000).contains(estimate) else { return nil }
         return estimate
     }
 }

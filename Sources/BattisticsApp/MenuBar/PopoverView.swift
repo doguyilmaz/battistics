@@ -136,10 +136,10 @@ struct PopoverView: View {
                 SectionHeader(
                     title: "Charge",
                     help: [
-                        ("Current Charge", "How much energy the battery holds right now, in milliampere-hours."),
-                        ("Current Maximum", "The most the battery can hold today. It slowly declines with age and use."),
-                        ("Original Maximum", "The design capacity when the battery left the factory."),
-                        ("Time on Battery", "Active time since the power adapter was last unplugged."),
+                        ("Current Charge", "Charge stored now, in milliampere-hours (mAh)."),
+                        ("Current Maximum", "Today's full-charge capacity. It declines with age and use."),
+                        ("Original Maximum", "The battery's capacity when new."),
+                        ("Time on Battery", "Time since the adapter was unplugged."),
                     ])
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
                 StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
@@ -155,10 +155,10 @@ struct PopoverView: View {
                 SectionHeader(
                     title: "Battery",
                     help: [
-                        ("Cycles", "One cycle is a full discharge worth of use, in any number of sessions."),
-                        ("Temperature", "Internal battery temperature. Sustained heat ages a battery faster."),
-                        ("Power", "Energy flowing right now. Negative means the battery is draining."),
-                        ("Voltage", "The battery pack's current voltage."),
+                        ("Cycles", "One full battery's use, possibly across several sessions."),
+                        ("Temperature", "Battery temperature. Prolonged heat speeds up aging."),
+                        ("Power", "Battery power. Negative means draining; positive means charging."),
+                        ("Voltage", "Battery pack voltage."),
                     ])
                 StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
                 if let temperature = snapshot.temperatureC {

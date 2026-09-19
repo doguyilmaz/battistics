@@ -28,16 +28,16 @@ struct PowerFlowCard: View {
                          detail: "External power")
                     arrow((flow.telemetry?.inputWatts ?? 0) > 0 ? "arrow.right" : nil)
                     node("System", icon: "laptopcomputer", watts: flow.telemetry?.systemLoadWatts,
-                         detail: "Reported load")
+                         detail: flow.systemLabel, estimate: flow.systemIsEstimated ? .system : nil)
                     arrow(flow.batteryArrow)
                     node("Battery", icon: "battery.100", watts: flow.telemetry?.batteryPowerWatts,
-                         detail: flow.batteryLabel, signed: true, estimated: flow.batteryIsEstimated)
+                         detail: flow.batteryLabel, signed: true, estimate: flow.batteryIsEstimated ? .battery : nil)
                 }
             }
         }
     }
 
-    private func node(_ title: LocalizedStringKey, icon: String, watts: Double?, detail: String, signed: Bool = false, estimated: Bool = false) -> some View {
+    private func node(_ title: LocalizedStringKey, icon: String, watts: Double?, detail: String, signed: Bool = false, estimate: PowerFlowEstimateBadge.Kind? = nil) -> some View {
         VStack(spacing: 5) {
             Image(systemName: icon).font(.title3).foregroundStyle(.secondary)
             Text(title).font(.caption)
@@ -45,8 +45,8 @@ struct PowerFlowCard: View {
                 Text(reading.watts(watts, signed: signed))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .monospacedDigit()
-                if estimated {
-                    PowerFlowEstimateBadge().font(.caption)
+                if let estimate {
+                    PowerFlowEstimateBadge(kind: estimate).font(.caption)
                 }
             }
             Text(detail).font(.caption2).foregroundStyle(.secondary).lineLimit(1)

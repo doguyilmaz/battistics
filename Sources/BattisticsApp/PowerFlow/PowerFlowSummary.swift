@@ -9,6 +9,9 @@ struct PowerFlowSummary: View {
             Text("In \(flow.watts(flow.telemetry?.inputWatts))")
             Text("·").foregroundStyle(.tertiary)
             Text("Mac \(flow.watts(flow.telemetry?.systemLoadWatts))")
+            if flow.systemIsEstimated {
+                PowerFlowEstimateBadge(kind: .system)
+            }
             Text("·").foregroundStyle(.tertiary)
             if let arrow = flow.batteryArrow {
                 Image(systemName: arrow).accessibilityLabel(flow.batteryLabel)
