@@ -53,11 +53,11 @@ struct PowerFlowPresentation {
     }
 
     static var batteryEstimateExplanation: String {
-        String(localized: "The battery reading is inconsistent. Calculated from voltage × current, like the popover’s Power value.")
+        String(localized: "The reported battery reading is inconsistent. A valid reported reading will replace this estimate automatically.")
     }
 
     static var systemEstimateExplanation: String {
-        String(localized: "Calculated as Input - Battery. Discharging battery power is added to Input. This is an estimate.")
+        String(localized: "The reported system reading is unavailable or inconsistent. A valid reported reading will replace this estimate automatically.")
     }
 
     func watts(_ value: Double?, signed: Bool = false) -> String {
