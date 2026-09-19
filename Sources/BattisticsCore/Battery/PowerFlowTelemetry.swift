@@ -128,10 +128,11 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             let current = signedCurrent(props["Amperage"])
         else { return .unknown }
 
-        // IsCharging can remain true while a connected Mac draws additional
-        // power from its battery. Signed current corroborates the net direction.
-        if batteryWatts > 0, current > 0, external { return .charging }
-        if batteryWatts < 0, current < 0 { return .discharging }
+        // This label follows the selected power reading. A separately sampled
+        // zero current does not contradict it or independently corroborate it.
+        // IsCharging can remain true while the battery supports a connected Mac.
+        if batteryWatts > 0, current >= 0, external { return .charging }
+        if batteryWatts < 0, current <= 0 { return .discharging }
         if batteryWatts == 0, current == 0 { return .idle }
         return .unknown
     }

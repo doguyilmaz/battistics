@@ -46,7 +46,7 @@ struct PowerFlowInfoButton: View {
                 Divider()
                 Text("Shows power reported at the Mac’s input, system and battery. Input is not the adapter’s rated capacity or power measured at the wall socket.")
                 Text("Uses AppleSmartBattery power telemetry, which is not a documented public data contract. Availability and behavior vary by Mac and macOS version.")
-                Text("Readings can update slowly and at different times. They may not add up exactly. Battery arrows are hidden when direction is uncertain. Negative battery watts mean discharge; positive means charging. When battery telemetry conflicts, a yellow warning marks an estimate from battery voltage × current, if available. Other missing or conflicting readings appear as a dash, never an assumed zero.")
+                Text("Readings can update slowly and at different times. They may not add up exactly. Battery direction follows the displayed power when current does not oppose it; a separately reported zero current can lag. Negative battery watts mean discharge; positive means charging. When battery telemetry conflicts, a yellow warning marks an estimate from battery voltage × current, if available. Other missing or conflicting readings appear as a dash, never an assumed zero.")
                 Text("The registry update time is not a confirmed hardware sample time. Re-reading cached values does not make them new; a reported zero does not prove zero instantaneous flow. This preview uses existing battery sampling and adds no background polling loop.")
                     .foregroundStyle(.secondary)
             }

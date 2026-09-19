@@ -223,6 +223,43 @@ struct PowerFlowTests {
         }
     }
 
+    @Test func observedFortyFiveWattRecoveryLabelsReportedPositivePowerAsCharging() throws {
+        let flow = try #require(PowerFlowTelemetry.parse(
+            from: props(input: 43_118, load: 39_485, battery: 3_633,
+                        charging: true, external: true, current: 0), readAt: readAt))
+        #expect(flow.inputWatts == 43.118)
+        #expect(flow.systemLoadWatts == 39.485)
+        #expect(flow.batteryPowerWatts == 3.633)
+        #expect(flow.batteryPowerSource == .reported)
+        #expect(flow.batteryDirection == .charging)
+        #expect(!flow.hasInconsistentReadings)
+    }
+
+    @Test func zeroCurrentAllowsBothReportedPowerDirectionsButUnknownContextDoesNot() throws {
+        for battery in [-3_633, 3_633] {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: battery, current: 0), readAt: readAt))
+            #expect(flow.batteryDirection == (battery > 0 ? .charging : .discharging))
+            #expect(flow.batteryPowerSource == .reported)
+            for current: Any? in [nil, true, "0", Double.nan] {
+                let unknown = try #require(PowerFlowTelemetry.parse(
+                    from: props(battery: battery, current: current), readAt: readAt))
+                #expect(unknown.batteryDirection == .unknown)
+            }
+            let unknownExternal = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: battery, external: nil, current: 0), readAt: readAt))
+            #expect(unknownExternal.batteryDirection == .unknown)
+        }
+        let unplugged = try #require(PowerFlowTelemetry.parse(
+            from: props(battery: -3_633, external: false, current: 0), readAt: readAt))
+        #expect(unplugged.batteryDirection == .discharging)
+        let opposed = try #require(PowerFlowTelemetry.parse(
+            from: props(battery: 3_633, current: -1), readAt: readAt))
+        #expect(opposed.batteryPowerWatts == nil)
+        #expect(opposed.batteryDirection == .unknown)
+        #expect(opposed.hasInconsistentReadings)
+    }
+
     @Test func conflictedBatteryUsesTheSameVoltageCurrentEstimateAsThePopover() throws {
         let samples = [
             (input: 0, load: -28_617, battery: 28_617, current: -3_033, voltage: 11_784, external: false),
