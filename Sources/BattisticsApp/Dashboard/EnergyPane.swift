@@ -30,6 +30,7 @@ struct EnergyPane: View {
     @State private var hasResults = false
     @State private var hovered: Int32?
     @State private var pendingQuit: EnergyRow?
+    @State private var showingSamplingInfo = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,17 +58,27 @@ struct EnergyPane: View {
                     .padding(20)
                 }
             }
-            Text("Sampling runs only while this view is visible.")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 10)
         }
         .navigationTitle("Energy")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingSamplingInfo.toggle()
+                } label: {
+                    Label("About energy sampling", systemImage: "info.circle")
+                        .labelStyle(.iconOnly)
+                }
+                .help("About energy sampling")
+                .popover(isPresented: $showingSamplingInfo, arrowEdge: .top) {
+                    samplingInfo
+                }
+            }
+        }
         .task(id: isVisible) {
             guard isVisible else { return }
             let sampler = ProcessEnergySampler.Session()
             while !Task.isCancelled {
-                let result = await sampler.sample(over: .seconds(3))
+                let result = await sampler.sample(over: .seconds(3), limit: 20)
                 guard !Task.isCancelled else { break }
                 rows = result.map(EnergyRow.init)
                 hasResults = true
@@ -81,6 +92,21 @@ struct EnergyPane: View {
         } message: { _ in
             Text("Unsaved work in this app will be lost.")
         }
+    }
+
+    private var samplingInfo: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Energy sampling")
+                .font(.headline)
+            Text("Shows up to 20 active processes, ranked by reported energy use when available, otherwise by CPU use.")
+            Text("100% CPU represents one logical core. A process using multiple cores can exceed 100%.")
+            Text("Sampling runs only while this view is visible.")
+                .foregroundStyle(.secondary)
+        }
+        .font(.callout)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(16)
+        .frame(width: 320, alignment: .leading)
     }
 
     private var quitTitle: String {
