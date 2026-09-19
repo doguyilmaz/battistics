@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import IOKit.ps
 
 /// Event-driven power source observation. macOS invokes the run loop source
@@ -6,6 +7,7 @@ import IOKit.ps
 /// polling timer exists anywhere in the app while idle.
 @MainActor
 public final class PowerSourceMonitor {
+    private var powerSourceToken: Int32?
     private var runLoopSource: CFRunLoopSource?
     private var continuation: AsyncStream<Void>.Continuation?
 
@@ -31,10 +33,20 @@ public final class PowerSourceMonitor {
             runLoopSource = source
             CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         }
+        // The run-loop source tracks time estimates, which need not change
+        // when charging pauses/resumes on AC. Also observe all source updates.
+        var token: Int32 = 0
+        let status = notify_register_dispatch(kIOPSNotifyAnyPowerSource, &token, .main) { [weak self] _ in
+            MainActor.assumeIsolated { _ = self?.continuation?.yield() }
+        }
+        if status == NOTIFY_STATUS_OK { powerSourceToken = token }
+        continuation.yield()
         return stream
     }
 
     public func stop() {
+        if let powerSourceToken { notify_cancel(powerSourceToken) }
+        powerSourceToken = nil
         if let runLoopSource {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
         }

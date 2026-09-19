@@ -76,7 +76,7 @@ struct BattisticsApp: App {
                 .environment(bluetooth)
                 .preferredColorScheme(colorScheme)
         } label: {
-            MenuBarLabelView(model: model, keepAwake: keepAwake)
+            MenuBarLabelView(snapshot: model.snapshot, keepAwakeActive: keepAwake.isActive)
         }
         .menuBarExtraStyle(.window)
 
