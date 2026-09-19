@@ -143,7 +143,7 @@ struct PowerFlowTests {
         #expect(!missingExternal.hasInconsistentReadings)
     }
 
-    @Test func concreteOpposingSignsOrStatesSuppressOnlyTheBatteryValue() throws {
+    @Test func concreteBatteryConflictsSuppressAssociatedSystemAccounting() throws {
         for raw in [
             props(battery: 12_000, charging: nil, external: false, current: nil),
             props(battery: 12_000, charging: nil, current: -1_000),
@@ -154,7 +154,30 @@ struct PowerFlowTests {
             #expect(flow.batteryPowerWatts == nil)
             #expect(flow.batteryDirection == .unknown)
             #expect(flow.inputWatts == 14.099)
-            #expect(flow.systemLoadWatts == 14.099)
+            #expect(flow.systemLoadWatts == nil)
+        }
+    }
+
+    @Test func originalAdapterBatteryConflictOmitsSystemWithOrWithoutAnEstimate() throws {
+        let raw = props(input: 79_157, load: 83_585, battery: -4_428,
+                        charging: true, current: 4_997, voltage: 12_229)
+        let flow = try #require(PowerFlowTelemetry.parse(from: raw, readAt: readAt))
+        #expect(flow.inputWatts == 79.157)
+        #expect(flow.systemLoadWatts == nil)
+        #expect(flow.batteryPowerWatts == 61.108313)
+        #expect(flow.batteryPowerSource == .estimatedFromVoltageAndCurrent)
+        #expect(flow.batteryDirection == .charging)
+        #expect(flow.hasInconsistentReadings)
+
+        for voltage: Any? in [nil, "12229", 0, Double.nan] {
+            var invalid = raw
+            invalid["Voltage"] = voltage
+            let unavailable = try #require(PowerFlowTelemetry.parse(from: invalid, readAt: readAt))
+            #expect(unavailable.inputWatts == 79.157)
+            #expect(unavailable.systemLoadWatts == nil)
+            #expect(unavailable.batteryPowerWatts == nil)
+            #expect(unavailable.batteryPowerSource == nil)
+            #expect(unavailable.hasInconsistentReadings)
         }
     }
 

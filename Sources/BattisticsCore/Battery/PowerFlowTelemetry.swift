@@ -23,6 +23,8 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// not a confirmed hardware sample timestamp for PowerTelemetryData.
     public let registryUpdatedAt: Date?
     public let inputWatts: Double?
+    /// Unavailable when the battery telemetry conflicts with current/connection:
+    /// its associated system accounting cannot be treated as independently valid.
     public let systemLoadWatts: Double?
     /// Positive into the battery, negative out of it. Conflicting direct readings
     /// use a validated voltage × current estimate when available; inspect source.
@@ -50,7 +52,7 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             readAt: readAt,
             registryUpdatedAt: registryUpdateDate(props["UpdateTime"], readAt: readAt),
             inputWatts: watts(data["SystemPowerIn"], permitsNegative: false),
-            systemLoadWatts: watts(data["SystemLoad"], permitsNegative: false),
+            systemLoadWatts: batteryConflict ? nil : watts(data["SystemLoad"], permitsNegative: false),
             batteryPowerWatts: batteryPower,
             batteryPowerSource: batterySource,
             batteryDirection: direction(from: props, batteryWatts: batteryPower),

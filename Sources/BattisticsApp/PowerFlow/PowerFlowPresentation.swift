@@ -35,7 +35,7 @@ struct PowerFlowPresentation {
     }
 
     static var batteryEstimateExplanation: String {
-        String(localized: "Battery telemetry is inconsistent. This estimate uses battery voltage × current, the same calculation as the popover’s Power reading. Input and System are not estimated.")
+        String(localized: "Battery telemetry is inconsistent. This estimate uses battery voltage × current, the same calculation as the popover’s Power reading. System power is hidden during this conflict. Input and System are not estimated.")
     }
 
     func watts(_ value: Double?, signed: Bool = false) -> String {
