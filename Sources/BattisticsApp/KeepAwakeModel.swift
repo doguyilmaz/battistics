@@ -16,52 +16,114 @@ final class KeepAwakeModel {
 
     var isActive: Bool { session != nil }
 
-    /// Last choices, so the popover's one-click toggle repeats what the user
-    /// picked rather than a default they never asked for.
+    private(set) var isChanging = false
+    private(set) var errorMessage: String?
+    @ObservationIgnored private let helper: PowerHelperClient
+    @ObservationIgnored private var leaseTask: Task<Void, Never>?
+
     var mode: KeepAwakeMode {
-        get {
-            KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "")
-                ?? .displayOn
-        }
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: Prefs.keepAwakeMode)
-            // An assertion's type cannot change in place; retake it so a mode
-            // switch applies immediately instead of at the next start.
-            if let session {
-                start(mode: newValue, duration: session.duration)
+        didSet {
+            UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
+            if let session, oldValue != mode {
+                start(mode: mode, duration: session.duration, now: session.startedAt)
             }
         }
     }
 
     var duration: KeepAwakeDuration {
-        get {
-            KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration))
-                ?? .indefinite
-        }
-        set { UserDefaults.standard.set(newValue.rawValue, forKey: Prefs.keepAwakeDuration) }
+        didSet { UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration) }
+    }
+
+    init(helper: PowerHelperClient) {
+        self.helper = helper
+        mode = KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "") ?? .displayOn
+        duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
     }
 
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date()) {
-        let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
-        guard assertion.take(mode: mode, until: new.deadline, now: now) else {
-            stop()
-            return
+        guard !isChanging else { return }
+        isChanging = true
+        errorMessage = nil
+        let previous = session
+        Task {
+            defer { isChanging = false }
+            do {
+                if mode == .lidClosed {
+                    try await helper.setLidSleepLease(true)
+                } else if previous?.mode == .lidClosed {
+                    try await helper.setLidSleepLease(false)
+                }
+                let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
+                guard !new.hasExpired(at: Date()),
+                    assertion.take(mode: mode, until: new.deadline) else {
+                    if mode == .lidClosed { try await helper.setLidSleepLease(false) }
+                    throw CocoaError(.featureUnsupported)
+                }
+                leaseTask?.cancel()
+                session = new
+                scheduleExpiry(for: new, now: Date())
+                if mode == .lidClosed { renewLease() }
+            } catch {
+                assertion.release()
+                expiryTask?.cancel()
+                leaseTask?.cancel()
+                session = nil
+                errorMessage = String(localized: "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.")
+            }
         }
-        UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
-        UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration)
-        session = new
-        scheduleExpiry(for: new, now: now)
     }
 
     func stop() {
+        guard !isChanging else { return }
+        let wasLidClosed = session?.mode == .lidClosed
         expiryTask?.cancel()
         expiryTask = nil
+        leaseTask?.cancel()
+        leaseTask = nil
         assertion.release()
         session = nil
+        guard wasLidClosed else { return }
+        isChanging = true
+        Task {
+            defer { isChanging = false }
+            do { try await helper.setLidSleepLease(false) }
+            catch {
+                errorMessage = String(localized: "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled.")
+            }
+        }
     }
 
     func toggle() {
         isActive ? stop() : start(mode: mode, duration: duration)
+    }
+
+    func sleepDisplayNow() {
+        Task {
+            let success = await Task.detached(priority: .utility) {
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+                process.arguments = ["displaysleepnow"]
+                do { try process.run() } catch { return false }
+                process.waitUntilExit()
+                return process.terminationStatus == 0
+            }.value
+            if !success { errorMessage = String(localized: "macOS could not put the display to sleep.") }
+        }
+    }
+
+    private func renewLease() {
+        leaseTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(15))
+                guard !Task.isCancelled, let self, self.session?.mode == .lidClosed else { return }
+                do { try await self.helper.setLidSleepLease(true) }
+                catch {
+                    self.errorMessage = String(localized: "Lost the power helper connection. Keep Awake has stopped.")
+                    self.stop()
+                    return
+                }
+            }
+        }
     }
 
     /// Seconds left, or nil when the session has no deadline or none is
@@ -103,8 +165,8 @@ extension KeepAwakeMode {
     var caption: String? {
         switch self {
         case .displayOn: nil
-        case .displayMaySleep: String(localized: "The screen turns off, the Mac keeps running.")
-        case .lidClosed: String(localized: "Only works on power adapter; macOS ignores it on battery.")
+        case .displayMaySleep: String(localized: "The display follows its sleep timer while the Mac keeps running.")
+        case .lidClosed: String(localized: "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.")
         }
     }
 }

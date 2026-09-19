@@ -49,14 +49,22 @@ struct SystemPane: View {
                     }
                 }
 
+                if let error = keepAwake.errorMessage {
+                    Text(error).foregroundStyle(.red)
+                }
+                if keepAwake.isActive && keepAwake.mode != .displayOn {
+                    Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
+                }
                 if keepAwake.isActive {
                     LabeledContent("Time remaining", value: remainingText)
                 }
             }
 
+            .disabled(keepAwake.isChanging)
+
             Section {
                 Text(
-                    "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits."
+                    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)

@@ -3424,6 +3424,142 @@
           }
         }
       }
+    },
+    "The display follows its sleep timer while the Mac keeps running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The display follows its sleep timer while the Mac keeps running."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çalışmaya devam ederken ekran kendi uyku zamanlayıcısına uyar."
+          }
+        }
+      }
+    },
+    "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı gerektirir. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Sleep Display Now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep Display Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekranı Şimdi Uyut"
+          }
+        }
+      }
+    },
+    "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut başlatılamadı. Kapak kapalı modu için Sistem bölümünden güç yardımcısını kurun veya onarın."
+          }
+        }
+      }
+    },
+    "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku ayarının geri yüklendiği doğrulanamadı. Yardımcı oturum süresi dolunca yeniden deneyecek; uyku devre dışı kalırsa yardımcıyı onarın."
+          }
+        }
+      }
+    },
+    "macOS could not put the display to sleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS could not put the display to sleep."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ekranı uyutamadı."
+          }
+        }
+      }
+    },
+    "Lost the power helper connection. Keep Awake has stopped.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lost the power helper connection. Keep Awake has stopped."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısıyla bağlantı kesildi. Uyanık Tut durduruldu."
+          }
+        }
+      }
+    },
+    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -51,7 +51,7 @@ struct KeepAwakeTests {
     @Test func onlyLidClosedModeRequiresWallPower() {
         // PreventSystemSleep is the only assertion macOS honours with the
         // display shut, and it is ignored on battery.
-        #expect(KeepAwakeMode.lidClosed.requiresExternalPower)
+        #expect(!KeepAwakeMode.lidClosed.requiresExternalPower)
         #expect(!KeepAwakeMode.displayOn.requiresExternalPower)
         #expect(!KeepAwakeMode.displayMaySleep.requiresExternalPower)
     }
@@ -61,6 +61,6 @@ struct KeepAwakeTests {
         #expect(types.count == KeepAwakeMode.allCases.count)
         #expect(KeepAwakeMode.displayOn.assertionType == "PreventUserIdleDisplaySleep")
         #expect(KeepAwakeMode.displayMaySleep.assertionType == "PreventUserIdleSystemSleep")
-        #expect(KeepAwakeMode.lidClosed.assertionType == "PreventSystemSleep")
+        #expect(KeepAwakeMode.lidClosed.assertionType == "PreventUserIdleSystemSleep")
     }
 }

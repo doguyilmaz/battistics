@@ -6,6 +6,10 @@
 	<string>com.doguyilmaz.Battistics.PowerHelper</string>
 	<key>BundleProgram</key>
 	<string>Contents/MacOS/BattisticsPowerHelper</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
 	<key>MachServices</key>
 	<dict>
 		<key>com.doguyilmaz.Battistics.PowerHelper</key>

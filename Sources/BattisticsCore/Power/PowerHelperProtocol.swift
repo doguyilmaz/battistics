@@ -9,7 +9,7 @@ public let powerHelperMachServiceName = "com.doguyilmaz.Battistics.PowerHelper"
 /// enumerated case, never a command, a path, or a free-form number. The helper
 /// builds the argument vector itself from those cases, so the set of
 /// operations a caller can request is fixed at compile time and fully
-/// enumerable — 106 of them, all of which change a macOS power setting.
+/// enumerable. The closed-lid operation is a fixed-duration Boolean lease.
 ///
 /// A client that has been completely compromised gains exactly that
 /// vocabulary and nothing else. This is the whole security argument, and it
@@ -17,6 +17,8 @@ public let powerHelperMachServiceName = "com.doguyilmaz.Battistics.PowerHelper"
 /// a string or an unbounded integer would quietly turn this into a root
 /// shell.
 @objc public protocol PowerHelperProtocol {
+    /// A fixed 45-second lease, renewed by the app; never an arbitrary command.
+    func setLidSleepLease(_ enabled: Bool, reply: @escaping @Sendable (Int32) -> Void)
     func setLowPowerMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setEnergyMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setSleepTimer(_ timer: Int, minutes: Int, source: Int, reply: @escaping (Int32) -> Void)

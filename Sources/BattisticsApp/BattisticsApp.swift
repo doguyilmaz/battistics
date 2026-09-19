@@ -51,14 +51,20 @@ struct BattisticsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = AppModel()
     @State private var updater = UpdaterModel()
-    @State private var keepAwake = KeepAwakeModel()
+    @State private var keepAwake: KeepAwakeModel
     @State private var powerAuth = PowerAuthorization()
     @State private var powerSettings = PowerSettingsModel()
-    @State private var powerHelper = PowerHelperClient()
+    @State private var powerHelper: PowerHelperClient
     @State private var bluetooth = BluetoothGATTReader()
 
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
+
+    init() {
+        let helper = PowerHelperClient()
+        _powerHelper = State(initialValue: helper)
+        _keepAwake = State(initialValue: KeepAwakeModel(helper: helper))
+    }
 
     private var colorScheme: ColorScheme? {
         (ThemePreference(rawValue: themeRaw) ?? .automatic).colorScheme

@@ -8,7 +8,7 @@ public enum KeepAwakeMode: String, Sendable, CaseIterable, Identifiable {
     case displayOn
     /// Screen may go dark, the machine keeps running. (`caffeinate -i`)
     case displayMaySleep
-    /// Stays awake with the lid shut. (`caffeinate -s`)
+    /// Idle assertion paired with the privileged helper’s closed-lid lease.
     case lidClosed
 
     public var id: String { rawValue }
@@ -20,14 +20,13 @@ public enum KeepAwakeMode: String, Sendable, CaseIterable, Identifiable {
         switch self {
         case .displayOn: "PreventUserIdleDisplaySleep"
         case .displayMaySleep: "PreventUserIdleSystemSleep"
-        case .lidClosed: "PreventSystemSleep"
+        case .lidClosed: "PreventUserIdleSystemSleep"
         }
     }
 
-    /// macOS ignores `PreventSystemSleep` on battery, so the UI has to say
-    /// so rather than let the user pick a mode that silently does nothing.
+    /// Closed-lid mode uses a helper lease and works on either source.
     public var requiresExternalPower: Bool {
-        self == .lidClosed
+        false
     }
 }
 

@@ -207,6 +207,19 @@ final class PowerHelperClient {
         SMAppService.openSystemSettingsLoginItems()
     }
 
+    func setLidSleepLease(_ enabled: Bool) async throws {
+        guard canApply else { throw Failure.notConnected }
+        // Old installed helpers do not implement the lease selector.
+        let version = try await send(timeout: Self.replyTimeout) { proxy, done in
+            proxy.version { @Sendable version in done(version == "2" ? 0 : -1) }
+        }
+        guard version == 0 else { throw Failure.rejected(version) }
+        let code = try await send(timeout: Self.replyTimeout) { proxy, done in
+            proxy.setLidSleepLease(enabled, reply: done)
+        }
+        guard code == 0 else { throw Failure.rejected(code) }
+    }
+
     // MARK: - Applying
 
     /// Sends the change as enumerated codes. No argument vector crosses the

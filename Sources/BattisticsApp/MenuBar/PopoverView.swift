@@ -58,6 +58,9 @@ struct PopoverView: View {
                 )
                 .frame(height: 200)
             }
+            if let error = keepAwake.errorMessage {
+                Text(error).font(.caption).foregroundStyle(.red)
+            }
             footer
         }
         .padding(14)
@@ -377,7 +380,7 @@ struct PopoverView: View {
                 }
                 Spacer()
                 powerMenu
-                keepAwakeMenu
+                keepAwakeMenu.disabled(keepAwake.isChanging)
                 Button {
                     model.dashboardPane = .general
                     openWindow(id: "dashboard")

@@ -3,12 +3,12 @@ import Foundation
 import Security
 
 /// Battistics' privileged helper. Runs as root under launchd and does exactly
-/// one thing: apply an enumerated power setting via `pmset`.
+/// enumerated power settings and renewable closed-lid sleep leases.
 ///
 /// Kept deliberately tiny. The whole file is meant to be auditable in one
 /// sitting, because a root daemon's risk scales with how much of it there is.
-/// It opens no files, makes no network calls, loads nothing dynamically, and
-/// parses no user data.
+/// The lid-sleep controller journals its previous setting in a fixed root-owned
+/// file. No client-provided path or command is accepted.
 final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
     /// Only a copy of Battistics signed by this team may connect. Without
     /// this, every process running as the user could call the daemon and get
@@ -20,7 +20,8 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         and certificate leaf[subject.OU] = "5MYT4VYJFC"
         """
 
-    private static let build = "1"
+    private static let build = "2"
+    private let owner = UUID()
 
     /// `setCodeSigningRequirement` returns void — it cannot report that the
     /// requirement was malformed, and a daemon that quietly failed to apply
@@ -40,12 +41,20 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         guard Self.requirementIsValid else { return false }
         connection.setCodeSigningRequirement(Self.clientRequirement)
         connection.exportedInterface = NSXPCInterface(with: PowerHelperProtocol.self)
-        connection.exportedObject = self
+        let endpoint = PowerHelper()
+        let owner = endpoint.owner
+        connection.exportedObject = endpoint
+        connection.invalidationHandler = { LidSleepController.shared.disconnected(owner: owner) }
+        connection.interruptionHandler = { LidSleepController.shared.disconnected(owner: owner) }
         connection.resume()
         return true
     }
 
     // MARK: - Operations
+
+    func setLidSleepLease(_ enabled: Bool, reply: @escaping @Sendable (Int32) -> Void) {
+        LidSleepController.shared.set(enabled: enabled, owner: owner, reply: reply)
+    }
 
     func setLowPowerMode(_ code: Int, reply: @escaping (Int32) -> Void) {
         guard let setting = LowPowerModeSetting(wireCode: code) else {
@@ -100,6 +109,7 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
     }
 }
 
+let lidSleepController = LidSleepController.shared
 let helper = PowerHelper()
 let listener = NSXPCListener(machServiceName: powerHelperMachServiceName)
 listener.delegate = helper
