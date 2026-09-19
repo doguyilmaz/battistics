@@ -1,13 +1,13 @@
 import Foundation
-import Darwin
 import IOKit.ps
 
 /// Event-driven power source observation. macOS invokes the run loop source
 /// on every power state change (each percent step, plug or unplug), so no
-/// polling timer exists anywhere in the app while idle.
+/// a low-frequency fallback catches delayed controller updates.
 @MainActor
 public final class PowerSourceMonitor {
-    private var powerSourceToken: Int32?
+    private var powerSourceNotification: CFRunLoopSource?
+    private var refreshTimer: Timer?
     private var runLoopSource: CFRunLoopSource?
     private var continuation: AsyncStream<Void>.Continuation?
 
@@ -33,20 +33,35 @@ public final class PowerSourceMonitor {
             runLoopSource = source
             CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         }
-        // The run-loop source tracks time estimates, which need not change
-        // when charging pauses/resumes on AC. Also observe all source updates.
-        var token: Int32 = 0
-        let status = notify_register_dispatch(kIOPSNotifyAnyPowerSource, &token, .main) { [weak self] _ in
+        // Separate source events cover adapter transitions even when the
+        // time estimate stays unchanged. Both callbacks run on the main loop.
+        powerSourceNotification = IOPSCreateLimitedPowerNotification({ context in
+            guard let context else { return }
+            let monitor = Unmanaged<PowerSourceMonitor>.fromOpaque(context).takeUnretainedValue()
+            MainActor.assumeIsolated { _ = monitor.continuation?.yield() }
+        }, context)?.takeRetainedValue()
+        if let powerSourceNotification {
+            CFRunLoopAddSource(CFRunLoopGetMain(), powerSourceNotification, .commonModes)
+        }
+        // Controller charging flags may settle after the source notification.
+        // A cheap sensor tick keeps status fresh even when history is disabled.
+        let timer = Timer(timeInterval: 15, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { _ = self?.continuation?.yield() }
         }
-        if status == NOTIFY_STATUS_OK { powerSourceToken = token }
+        timer.tolerance = 3
+        RunLoop.main.add(timer, forMode: .common)
+        refreshTimer = timer
         continuation.yield()
         return stream
     }
 
     public func stop() {
-        if let powerSourceToken { notify_cancel(powerSourceToken) }
-        powerSourceToken = nil
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+        if let powerSourceNotification {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), powerSourceNotification, .commonModes)
+        }
+        powerSourceNotification = nil
         if let runLoopSource {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
         }
