@@ -66,7 +66,7 @@ public enum HealthStatus: String, Sendable {
 }
 
 public struct BatterySnapshot: Sendable, Equatable {
-    public let timestamp: Date
+    public private(set) var timestamp: Date
     public let batteryInstalled: Bool
     public let percent: Int
     public let rawCurrentCapacity: Int
@@ -146,6 +146,14 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.manufactureDate = manufactureDate
         self.manufactureDateIsApproximate = manufactureDateIsApproximate
         self.adapter = adapter
+    }
+
+    /// Compares every measurement while ignoring when it was read. Keep
+    /// normal equality timestamp-sensitive for history and freshness logic.
+    public func hasSameReadings(as other: BatterySnapshot) -> Bool {
+        var reading = self
+        reading.timestamp = other.timestamp
+        return reading == other
     }
 
     /// Prefers the controller’s smoothed NominalChargeCapacity. This is a

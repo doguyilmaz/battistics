@@ -22,16 +22,29 @@ final class PowerHelperClient {
     private final class ResumeOnce: @unchecked Sendable {
         private let lock = NSLock()
         private var continuation: CheckedContinuation<Int32, Error>?
+        private var timeoutTask: Task<Void, Never>?
 
         init(_ continuation: CheckedContinuation<Int32, Error>) {
             self.continuation = continuation
         }
 
+        func setTimeoutTask(_ task: Task<Void, Never>) {
+            lock.lock()
+            let completed = continuation == nil
+            if !completed { timeoutTask = task }
+            lock.unlock()
+            if completed { task.cancel() }
+        }
+
         private func take() -> CheckedContinuation<Int32, Error>? {
             lock.lock()
-            defer { lock.unlock() }
             let value = continuation
             continuation = nil
+            let timeout = timeoutTask
+            timeoutTask = nil
+            lock.unlock()
+            // An answered RPC has no remaining deadline work to wake for.
+            timeout?.cancel()
             return value
         }
 
@@ -290,7 +303,8 @@ final class PowerHelperClient {
     /// Sends the change as enumerated codes. No argument vector crosses the
     /// connection; the daemon rebuilds it from cases it validated itself.
     func apply(_ change: PowerChange) async throws {
-        let code = try await send(timeout: Self.replyTimeout) { proxy, done in
+        // The helper permits five seconds plus bounded termination cleanup.
+        let code = try await send(timeout: Self.leaseTimeout) { proxy, done in
             switch change {
             case .lowPowerMode(let setting):
                 proxy.setLowPowerMode(setting.wireCode, reply: done)
@@ -331,10 +345,12 @@ final class PowerHelperClient {
                 once.fail(Failure.notConnected)
                 return
             }
-            Task {
-                try? await Task.sleep(for: timeout)
+            let timeoutTask = Task {
+                do { try await Task.sleep(for: timeout) }
+                catch { return }
                 once.fail(Failure.unreachable)
             }
+            once.setTimeoutTask(timeoutTask)
             body(proxy) { @Sendable value in once.succeed(value) }
         }
     }

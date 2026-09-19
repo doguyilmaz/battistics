@@ -805,12 +805,12 @@
         }
       }
     },
-    "Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.": {
+    "Charge history records battery changes. Power and temperature history add periodic background readings; a longer interval reduces sampling work.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj geçmişi olay tabanlıdır ve boştayken hiçbir maliyeti yoktur. Güç ve sıcaklık geçmişi ise zamanlayıcıyla tek bir hafif okuma gerektirir."
+            "value": "Şarj geçmişi pil değişikliklerini kaydeder. Güç ve sıcaklık geçmişi arka planda düzenli ölçümler ekler; daha uzun aralık, ölçüm sıklığını azaltır."
           }
         }
       }
@@ -932,19 +932,19 @@
         }
       }
     },
-    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app.": {
+    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Some devices do not expose a level through the interfaces Battistics reads.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app."
+            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Some devices do not expose a level through the interfaces Battistics reads."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil düzeyini bildiren bağlı klavyeler, fareler, izleme dörtgenleri ve kulaklıklar burada görünür. Birçok üçüncü taraf aygıt bu bilgiyi paylaşmaz ve hiçbir uygulama tarafından gösterilemez."
+            "value": "Pil seviyesini bildiren bağlı klavye, fare, trackpad ve kulaklıklar burada görünür. Bazı cihazlar, Battistics’in kullandığı arayüzler üzerinden pil seviyesi paylaşmaz."
           }
         }
       }
@@ -2593,12 +2593,12 @@
         }
       }
     },
-    "Sampling runs only while this view is open and stops the moment it closes.": {
+    "Sampling runs only while this view is visible.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Örnekleme yalnızca bu görünüm açıkken çalışır ve kapanır kapanmaz durur."
+            "value": "Örnekleme yalnızca bu görünüm ekrandayken çalışır."
           }
         }
       }

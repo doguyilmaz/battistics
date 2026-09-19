@@ -192,14 +192,13 @@ final class KeepAwakeModel {
     func sleepDisplayNow() {
         let requestedSessionID = sessionID
         Task {
-            let success = await Task.detached(priority: .utility) {
-                let process = Process()
-                process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-                process.arguments = ["displaysleepnow"]
-                do { try process.run() } catch { return false }
-                process.waitUntilExit()
-                return process.terminationStatus == 0
-            }.value
+            let success: Bool
+            do {
+                _ = try await BoundedCommand.run(
+                    executable: "/usr/bin/pmset", arguments: ["displaysleepnow"],
+                    timeout: 5, maximumOutputBytes: 16_384)
+                success = true
+            } catch { success = false }
             // A late display command must not replace the retained reason for
             // a session that stopped while the command was running.
             guard sessionID == requestedSessionID else { return }

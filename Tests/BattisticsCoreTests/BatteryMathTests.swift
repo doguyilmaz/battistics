@@ -6,6 +6,7 @@ import Testing
 @Suite("Battery snapshot math")
 struct BatteryMathTests {
     private func makeSnapshot(
+        timestamp: Date = Date(timeIntervalSince1970: 1_700_000_000),
         percent: Int = 80,
         rawMax: Int = 5941,
         nominal: Int? = 5900,
@@ -19,7 +20,7 @@ struct BatteryMathTests {
         avgTimeToFullMin: Int? = nil
     ) -> BatterySnapshot {
         BatterySnapshot(
-            timestamp: Date(timeIntervalSince1970: 1_700_000_000),
+            timestamp: timestamp,
             batteryInstalled: true,
             percent: percent,
             rawCurrentCapacity: 4387,
@@ -43,6 +44,16 @@ struct BatteryMathTests {
             manufactureDate: nil,
             adapter: nil
         )
+    }
+
+    @Test func readingComparisonIgnoresOnlyTimestamp() {
+        let before = makeSnapshot()
+        let later = makeSnapshot(timestamp: before.timestamp.addingTimeInterval(15))
+        #expect(before != later)
+        #expect(before.hasSameReadings(as: later))
+        #expect(!before.hasSameReadings(as: makeSnapshot(isCharging: true)))
+        #expect(!before.hasSameReadings(as: makeSnapshot(externalConnected: true)))
+        #expect(!before.hasSameReadings(as: makeSnapshot(amperageMA: -800)))
     }
 
     @Test func healthPercentPrefersNominalToMatchSystemSettings() {

@@ -1,5 +1,4 @@
 import BattisticsCore
-import Darwin
 import Foundation
 import IOKit
 
@@ -34,10 +33,11 @@ final class LidSleepController: @unchecked Sendable {
                 } catch { recoveryFailed = true }
             }
             let timer = DispatchSource.makeTimerSource(queue: queue)
-            timer.schedule(deadline: .now() + 5, repeating: 5)
+            timer.schedule(deadline: .distantFuture)
             timer.setEventHandler { [weak self] in
-                // No settings polling, subprocesses, or recovery retries while idle.
-                _ = self?.lease.expire()
+                guard let self else { return }
+                _ = self.lease.expire()
+                self.scheduleExpiry()
             }
             timer.resume()
             self.timer = timer
@@ -47,20 +47,44 @@ final class LidSleepController: @unchecked Sendable {
     func acquire(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
         queue.async { [self] in
             guard !recoveryFailed else { reply(LidSleepLeaseResult.unavailable.rawValue); return }
-            reply(lease.acquire(owner: owner, session: session).rawValue)
+            let result = lease.acquire(owner: owner, session: session)
+            scheduleExpiry()
+            reply(result.rawValue)
         }
     }
 
     func renew(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
-        queue.async { [self] in reply(lease.renew(owner: owner, session: session).rawValue) }
+        queue.async { [self] in
+            let result = lease.renew(owner: owner, session: session)
+            scheduleExpiry()
+            reply(result.rawValue)
+        }
     }
 
     func release(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
-        queue.async { [self] in reply(lease.release(owner: owner, session: session).rawValue) }
+        queue.async { [self] in
+            let result = lease.release(owner: owner, session: session)
+            scheduleExpiry()
+            reply(result.rawValue)
+        }
     }
 
     func disconnected(owner: UUID) {
-        queue.async { [self] in _ = lease.disconnected(owner: owner) }
+        queue.async { [self] in
+            _ = lease.disconnected(owner: owner)
+            scheduleExpiry()
+        }
+    }
+
+    private func scheduleExpiry() {
+        guard let deadline = lease.expirationDate else {
+            timer?.schedule(deadline: .distantFuture)
+            return
+        }
+        // Lease dates use wall time; use the same clock for the one-shot so
+        // a clock correction cannot leave an already-expired lease waiting.
+        timer?.schedule(wallDeadline: .now() + max(0, deadline.timeIntervalSinceNow),
+                        leeway: .milliseconds(250))
     }
 
     /// The same root-domain property exported by pmset, without spawning a
@@ -87,37 +111,9 @@ final class LidSleepController: @unchecked Sendable {
     }
 
     private static func pmset(_ arguments: [String]) throws -> String {
-        // Capture to an unlinked private file: reading a pipe to EOF can block
-        // past the process deadline, and a full pipe can prevent process exit.
-        var path = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Battistics-pmset-XXXXXX").path.utf8CString
-        let descriptor = path.withUnsafeMutableBufferPointer { mkstemp($0.baseAddress!) }
-        guard descriptor >= 0 else {
-            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
-        }
-        _ = path.withUnsafeBufferPointer { unlink($0.baseAddress!) }
-        let output = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
-        defer { try? output.close() }
-
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-        process.arguments = arguments
-        process.standardOutput = output
-        process.standardError = FileHandle.nullDevice
-        let exited = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in exited.signal() }
-        try process.run()
-        guard exited.wait(timeout: .now() + 5) == .success else {
-            if process.isRunning { process.terminate() }
-            if exited.wait(timeout: .now() + 1) == .timedOut, process.isRunning {
-                // Never wait indefinitely on the serial lease/watchdog queue.
-                _ = kill(process.processIdentifier, SIGKILL)
-            }
-            throw POSIXError(.ETIMEDOUT)
-        }
-        guard process.terminationStatus == 0 else { throw CocoaError(.executableRuntimeMismatch) }
-        try output.seek(toOffset: 0)
-        let data = try output.readToEnd() ?? Data()
+        let data = try BoundedCommand.runSynchronously(
+            executable: "/usr/bin/pmset", arguments: arguments,
+            timeout: 5, maximumOutputBytes: 16_384)
         return String(decoding: data, as: UTF8.self)
     }
 }

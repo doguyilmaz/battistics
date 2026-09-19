@@ -31,19 +31,26 @@ final class BluetoothGATTReader {
 
     @ObservationIgnored private var session: GATTSession?
     @ObservationIgnored private var generation = UUID()
+    @ObservationIgnored private var isVisible = false
 
     var isEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: Prefs.readBluetoothBatteries) }
         set {
             UserDefaults.standard.set(newValue, forKey: Prefs.readBluetoothBatteries)
-            newValue ? start() : stop()
+            newValue && isVisible ? start() : stop()
         }
     }
 
-    /// Called at launch. Does nothing unless the user already opted in, so an
-    /// install that never touches this never sees a prompt.
+    /// Only a visible pane starts an opted-in Bluetooth session; an install
+    /// that never enables this feature never sees a permission prompt.
     func startIfEnabled() {
-        if isEnabled { start() }
+        if isEnabled && isVisible { start() }
+    }
+
+    /// Opt-in is persistent; live Bluetooth work is only needed by this pane.
+    func setVisible(_ visible: Bool) {
+        isVisible = visible
+        visible ? startIfEnabled() : stop()
     }
 
     func refresh() {
@@ -66,7 +73,7 @@ final class BluetoothGATTReader {
             onBatteries: { [weak self] batteries in
                 Task { @MainActor in
                     guard self?.generation == generation else { return }
-                    self?.batteries = batteries
+                    if self?.batteries != batteries { self?.batteries = batteries }
                 }
             })
     }
@@ -96,6 +103,7 @@ private final class GATTSession: NSObject, @unchecked Sendable {
     private var connected: [UUID: CBPeripheral] = [:]
     private let onState: @Sendable (BluetoothGATTReader.State) -> Void
     private var levels: [UUID: PeripheralBattery] = [:]
+    private var characteristics: [UUID: CBCharacteristic] = [:]
     private let onBatteries: @Sendable ([PeripheralBattery]) -> Void
 
     init(
@@ -119,6 +127,7 @@ private final class GATTSession: NSObject, @unchecked Sendable {
                 central.cancelPeripheralConnection(peripheral)
             }
             levels.removeValue(forKey: identifier)
+            characteristics.removeValue(forKey: identifier)
         }
         for peripheral in current where peripheral.state != .connected {
             levels.removeValue(forKey: peripheral.identifier)
@@ -126,13 +135,26 @@ private final class GATTSession: NSObject, @unchecked Sendable {
         publish()
         for peripheral in current {
             let isNew = connected[peripheral.identifier] == nil
+            if let previous = connected[peripheral.identifier], previous !== peripheral {
+                previous.delegate = nil
+                characteristics.removeValue(forKey: peripheral.identifier)
+                levels.removeValue(forKey: peripheral.identifier)
+            }
             connected[peripheral.identifier] = peripheral
             peripheral.delegate = self
             if isNew {
                 // A system connection is not yet this central’s connection.
                 central.connect(peripheral, options: nil)
             } else if peripheral.state == .connected {
-                peripheral.discoverServices([Self.batteryService])
+                if let characteristic = characteristics[peripheral.identifier] {
+                    // Subscribed devices push changes; only non-notifying
+                    // devices need another battery read on the visible tick.
+                    if !characteristic.isNotifying || levels[peripheral.identifier] == nil {
+                        peripheral.readValue(for: characteristic)
+                    }
+                } else {
+                    peripheral.discoverServices([Self.batteryService])
+                }
             } else if peripheral.state != .connecting {
                 central.connect(peripheral, options: nil)
             }
@@ -150,6 +172,7 @@ private final class GATTSession: NSObject, @unchecked Sendable {
         peripheral.delegate = nil
         connected.removeValue(forKey: peripheral.identifier)
         levels.removeValue(forKey: peripheral.identifier)
+        characteristics.removeValue(forKey: peripheral.identifier)
         publish()
     }
 
@@ -160,6 +183,7 @@ private final class GATTSession: NSObject, @unchecked Sendable {
         }
         connected.removeAll()
         levels.removeAll()
+        characteristics.removeAll()
         publish()
         central?.delegate = nil
         central = nil
@@ -172,6 +196,7 @@ extension GATTSession: CBCentralManagerDelegate {
             for peripheral in connected.values { peripheral.delegate = nil }
             connected.removeAll()
             levels.removeAll()
+            characteristics.removeAll()
             publish()
         }
         switch central.state {
@@ -197,6 +222,15 @@ extension GATTSession: CBCentralManagerDelegate {
 }
 
 extension GATTSession: CBPeripheralDelegate {
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        guard connected[peripheral.identifier] === peripheral,
+            invalidatedServices.contains(where: { $0.uuid == Self.batteryService }) else { return }
+        characteristics.removeValue(forKey: peripheral.identifier)
+        levels.removeValue(forKey: peripheral.identifier)
+        publish()
+        if peripheral.state == .connected { peripheral.discoverServices([Self.batteryService]) }
+    }
+
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard connected[peripheral.identifier] === peripheral else { return }
         guard error == nil else {
@@ -226,6 +260,7 @@ extension GATTSession: CBPeripheralDelegate {
             return
         }
         for characteristic in characteristics {
+            self.characteristics[peripheral.identifier] = characteristic
             peripheral.readValue(for: characteristic)
             // Many devices push changes, which saves polling entirely.
             if characteristic.properties.contains(.notify) {

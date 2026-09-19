@@ -13,26 +13,15 @@ public struct AppleHealthInfo: Sendable, Equatable {
 /// macOS's own battery health verdict, the "Maximum Capacity" shown in
 /// System Settings and the System Report. It comes from powerd's long-term
 /// smoothed model and is not derivable from the live controller values, so
-/// it is read via system_profiler. That costs about a second of background
-/// CPU; callers fetch once per launch and cache.
+/// it is read via a relatively expensive system_profiler report. Callers
+/// fetch once per launch and cache the result.
 public enum AppleHealthReader {
     public static func fetch() async -> AppleHealthInfo? {
-        await Task.detached(priority: .utility) { () -> AppleHealthInfo? in
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
-            process.arguments = ["SPPowerDataType", "-json"]
-            let output = Pipe()
-            process.standardOutput = output
-            process.standardError = Pipe()
-            do {
-                try process.run()
-            } catch {
-                return nil
-            }
-            let data = output.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
-            return parse(data)
-        }.value
+        guard let data = try? await BoundedCommand.run(
+            executable: "/usr/sbin/system_profiler", arguments: ["SPPowerDataType", "-json"],
+            timeout: 15, maximumOutputBytes: 2_097_152
+        ), !Task.isCancelled else { return nil }
+        return parse(data)
     }
 
     /// Pure and unit-testable.

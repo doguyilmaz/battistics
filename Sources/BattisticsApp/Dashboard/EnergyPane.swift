@@ -24,6 +24,8 @@ private struct EnergyRow: Identifiable {
 }
 
 struct EnergyPane: View {
+    var isVisible = true
+
     @State private var rows: [EnergyRow] = []
     @State private var hasResults = false
     @State private var hovered: Int32?
@@ -55,15 +57,17 @@ struct EnergyPane: View {
                     .padding(20)
                 }
             }
-            Text("Sampling runs only while this view is open and stops the moment it closes.")
+            Text("Sampling runs only while this view is visible.")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .padding(.bottom, 10)
         }
         .navigationTitle("Energy")
-        .task {
+        .task(id: isVisible) {
+            guard isVisible else { return }
+            let sampler = ProcessEnergySampler.Session()
             while !Task.isCancelled {
-                let result = await ProcessEnergySampler.sample(over: .seconds(3))
+                let result = await sampler.sample(over: .seconds(3))
                 guard !Task.isCancelled else { break }
                 rows = result.map(EnergyRow.init)
                 hasResults = true

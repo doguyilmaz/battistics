@@ -23,7 +23,13 @@ struct MenuBarConfig: Equatable {
 /// color rule applies. Images are cached per state.
 @MainActor
 enum MenuBarIconRenderer {
-    private static let cache = NSCache<NSString, NSImage>()
+    private static let cache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        // Configurable readings such as watts and time can otherwise retain
+        // a new image for every value seen during a long-running session.
+        cache.countLimit = 256
+        return cache
+    }()
     private static let height: CGFloat = 18
     private static let glyphSize = NSSize(width: 27, height: 17)
     private static let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)

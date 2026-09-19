@@ -32,6 +32,9 @@ public final class LidSleepLease {
         self.clear = clear
     }
 
+    /// The serial owner can arm one deadline instead of polling while idle.
+    public var expirationDate: Date? { active?.deadline }
+
     public func acquire(owner: UUID, session: UUID, now: Date = Date()) -> LidSleepLeaseResult {
         guard !blocked else { return .failed }
         guard !disconnectedOwners.contains(owner) else { return .rejected }

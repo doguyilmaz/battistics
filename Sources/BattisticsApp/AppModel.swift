@@ -30,6 +30,9 @@ final class AppModel {
     @ObservationIgnored private var alertState = AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
     @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var visibleSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var visibleSamplingInterval: Duration?
+    @ObservationIgnored private var visibleSensorConsumers: [UUID: Duration] = [:]
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     @ObservationIgnored private var defaultsObserver: NSObjectProtocol?
     /// Baseline for transition detection, updated only when a transition is
@@ -87,10 +90,50 @@ final class AppModel {
     /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
         guard let current = batteryProvider() else {
-            snapshot = nil
+            if snapshot != nil { snapshot = nil }
             return
         }
         ingest(current)
+    }
+
+    /// Registers a visible view for the lifetime of its SwiftUI task. All
+    /// windows share one poll at the fastest requested cadence; cancellation
+    /// removes the request even when SwiftUI retains the hidden view.
+    func refreshSensorsWhileVisible(every interval: Duration) async {
+        guard !Task.isCancelled, interval > .zero else { return }
+        let id = UUID()
+        let (lifetime, continuation) = AsyncStream<Void>.makeStream()
+        visibleSensorConsumers[id] = interval
+        updateVisibleSampling()
+        defer {
+            continuation.finish()
+            visibleSensorConsumers.removeValue(forKey: id)
+            updateVisibleSampling()
+        }
+        // AsyncStream suspends without a timer and ends when this consumer's
+        // task is cancelled. The model's one shared task owns all polling.
+        for await _ in lifetime {}
+    }
+
+    private func updateVisibleSampling() {
+        let interval = visibleSensorConsumers.values.min()
+        guard interval != visibleSamplingInterval else { return }
+        visibleSamplingTask?.cancel()
+        visibleSamplingTask = nil
+        visibleSamplingInterval = interval
+        guard let interval else { return }
+        refreshSensors()
+        visibleSamplingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: interval, tolerance: interval / 10)
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled else { return }
+                self?.refreshSensors()
+            }
+        }
     }
 
     /// Every snapshot from every source passes through here, so state
@@ -98,7 +141,11 @@ final class AppModel {
     /// event, UI poll, background sampler) observed them first.
     private func ingest(_ current: BatterySnapshot) {
         let previous = lastTransitionSnapshot
-        snapshot = current
+        // Timestamp-only changes do not affect battery presentation. Alerts
+        // and recording still consume every reading with its actual time.
+        if snapshot?.hasSameReadings(as: current) != true {
+            snapshot = current
+        }
         evaluateAlerts(for: current)
         maybeRecordDailyHealth(current)
 

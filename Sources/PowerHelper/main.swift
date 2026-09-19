@@ -111,18 +111,18 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
     /// No shell anywhere: an absolute executable path and an argument array,
     /// so there is no command line for anything to be spliced into.
     private func run(_ arguments: [String]) -> Int32 {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: PowerSettingsWriter.executable)
-        process.arguments = arguments
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
         do {
-            try process.run()
+            _ = try BoundedCommand.runSynchronously(
+                executable: PowerSettingsWriter.executable, arguments: arguments,
+                timeout: 5, maximumOutputBytes: 16_384)
+            return 0
+        } catch BoundedCommand.Failure.unsuccessfulExit(let status) {
+            return status
+        } catch BoundedCommand.Failure.timedOut {
+            return Int32(ETIMEDOUT)
         } catch {
             return Int32(EIO)
         }
-        process.waitUntilExit()
-        return process.terminationStatus
     }
 }
 

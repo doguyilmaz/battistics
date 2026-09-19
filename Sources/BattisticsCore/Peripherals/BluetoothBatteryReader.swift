@@ -11,25 +11,14 @@ import Foundation
 /// publishing it to macOS, which is why even the system's own Bluetooth UI
 /// cannot show it.
 public enum BluetoothBatteryReader {
-    /// `system_profiler` is slow, about a second, so callers fetch on demand
-    /// while a view is open rather than on a timer.
+    /// A relatively expensive system report, fetched only by the visible
+    /// peripherals pane. Cancellation stops an obsolete report in flight.
     public static func fetch() async -> [PeripheralBattery] {
-        await Task.detached(priority: .utility) { () -> [PeripheralBattery] in
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
-            process.arguments = ["SPBluetoothDataType", "-json"]
-            let output = Pipe()
-            process.standardOutput = output
-            process.standardError = Pipe()
-            do {
-                try process.run()
-            } catch {
-                return []
-            }
-            let data = output.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
-            return parse(data)
-        }.value
+        guard let data = try? await BoundedCommand.run(
+            executable: "/usr/sbin/system_profiler", arguments: ["SPBluetoothDataType", "-json"],
+            timeout: 15, maximumOutputBytes: 2_097_152
+        ), !Task.isCancelled else { return [] }
+        return parse(data)
     }
 
     /// Pure and unit-testable.

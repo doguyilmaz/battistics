@@ -27,7 +27,7 @@ macOS 14+ · Apple Silicon</p>
 
 ## Light by design
 
-Event driven, no polling. Idle CPU is 0.0%; sensors are read only while a window is visible.
+Uses power-change notifications with a low-frequency battery refresh fallback. Detailed views and optional power-history recording add work while enabled. Background activity is minimized, but CPU and energy use vary with settings and hardware; no fixed 0.0% CPU guarantee is made.
 
 ## Install
 

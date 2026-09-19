@@ -14,7 +14,7 @@ struct PopoverView: View {
     @Environment(PowerSettingsModel.self) private var powerModel
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
-    @State private var windowVisible = true
+    @State private var windowVisible = false
     @State private var sparklineSelection: Date?
 
     private var temperatureUnit: TemperatureUnit {
@@ -73,14 +73,15 @@ struct PopoverView: View {
         .task(id: windowVisible) {
             guard windowVisible else { return }
             await model.loadSparkline()
+            guard !Task.isCancelled else { return }
             // The popover can be the only thing a menu bar app ever shows, so
             // it cannot rely on the dashboard having primed this.
             helper.refreshStatus()
             await powerModel.refresh()
-            while !Task.isCancelled && windowVisible {
-                model.refreshSensors()
-                try? await Task.sleep(for: .seconds(2))
-            }
+        }
+        .task(id: windowVisible) {
+            guard windowVisible else { return }
+            await model.refreshSensorsWhileVisible(every: .seconds(2))
         }
     }
 
@@ -139,7 +140,7 @@ struct PopoverView: View {
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
                 StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
-                StatRow(label: "Time on Battery", value: timeOnBattery)
+                timeOnBatteryRow
             }
         }
     }
@@ -257,7 +258,15 @@ struct PopoverView: View {
         HStack(spacing: 3) {
             Image(systemName: "cup.and.saucer.fill")
                 .font(.system(size: 9))
-            Text(chipText)
+            Group {
+                if windowVisible, let session = keepAwake.session, session.deadline != nil {
+                    TimelineView(.periodic(from: session.startedAt, by: 60)) { _ in
+                        Text(chipText(at: Date()))
+                    }
+                } else {
+                    Text(chipText(at: Date()))
+                }
+            }
                 .font(.system(size: 10, weight: .medium))
                 .monospacedDigit()
                 .lineLimit(1)
@@ -277,9 +286,8 @@ struct PopoverView: View {
         .background(Color.accentColor.opacity(0.14), in: Capsule())
     }
 
-    /// Advanced by the popover's existing 2s refresh loop.
-    private var chipText: String {
-        guard let seconds = keepAwake.remaining() else {
+    private func chipText(at date: Date) -> String {
+        guard let seconds = keepAwake.remaining(at: date) else {
             return String(localized: "Awake")
         }
         return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
@@ -401,65 +409,19 @@ struct PopoverView: View {
         }
     }
 
-    /// Publishes the hosting window's visibility, driven by occlusion
-    /// state changes, so sampling is strictly event gated.
-    private struct WindowVisibilityReader: NSViewRepresentable {
-        @Binding var isVisible: Bool
-
-        func makeNSView(context: Context) -> TrackerView {
-            let view = TrackerView()
-            view.onChange = { visible in
-                Task { @MainActor in
-                    isVisible = visible
-                }
+    @ViewBuilder private var timeOnBatteryRow: some View {
+        if windowVisible, let unplugged = model.lastUnplugDate {
+            TimelineView(.periodic(from: unplugged, by: 60)) { context in
+                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
             }
-            return view
-        }
-
-        func updateNSView(_ nsView: TrackerView, context: Context) {}
-
-        final class TrackerView: NSView {
-            var onChange: ((Bool) -> Void)?
-            private var observerToken: ObserverToken?
-
-            override func viewDidMoveToWindow() {
-                super.viewDidMoveToWindow()
-                observerToken = nil
-                guard let window else { return }
-                onChange?(window.occlusionState.contains(.visible))
-                let token = NotificationCenter.default.addObserver(
-                    forName: NSWindow.didChangeOcclusionStateNotification,
-                    object: window, queue: .main
-                ) { [weak self, weak window] _ in
-                    MainActor.assumeIsolated {
-                        guard let self, let window else { return }
-                        self.onChange?(window.occlusionState.contains(.visible))
-                    }
-                }
-                observerToken = ObserverToken(token)
-            }
-        }
-
-        /// Removes the notification observer when released, so TrackerView
-        /// needs no deinit of its own (an actor-isolated class cannot touch
-        /// non-Sendable stored state from its nonisolated deinit).
-        private final class ObserverToken: @unchecked Sendable {
-            private let token: any NSObjectProtocol
-
-            init(_ token: any NSObjectProtocol) {
-                self.token = token
-            }
-
-            deinit {
-                NotificationCenter.default.removeObserver(token)
-            }
+        } else {
+            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
         }
     }
 
-    private var timeOnBattery: String {
+    private func timeOnBattery(at date: Date) -> String {
         guard let unplugged = model.lastUnplugDate else { return "N/A" }
-        let minutes = Int(Date().timeIntervalSince(unplugged) / 60)
-        return Formatting.duration(minutes: max(minutes, 0))
+        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     private var nearestSparklinePoint: SeriesPoint? {

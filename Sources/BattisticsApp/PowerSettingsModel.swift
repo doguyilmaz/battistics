@@ -16,7 +16,7 @@ final class PowerSettingsModel {
     init() {
         // Same reasoning as the helper's status: these can be changed in
         // System Settings behind our back, and coming back to Battistics is
-        // exactly the moment a stale value would be noticed. One ~9ms read
+        // exactly the moment a stale value would be noticed. One on-demand read
         // per activation, never on a timer.
         activationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
@@ -81,7 +81,7 @@ final class PowerSettingsModel {
                 }
             }
             do {
-                try auth.run(change)
+                try await auth.run(change)
             } catch {
                 outcome = .failed
             }
