@@ -122,9 +122,13 @@ private final class GATTSession: NSObject, @unchecked Sendable {
         }
         publish()
         for peripheral in current {
+            let isNew = connected[peripheral.identifier] == nil
             connected[peripheral.identifier] = peripheral
             peripheral.delegate = self
-            if peripheral.state == .connected {
+            if isNew {
+                // A system connection is not yet this central’s connection.
+                central.connect(peripheral, options: nil)
+            } else if peripheral.state == .connected {
                 peripheral.discoverServices([Self.batteryService])
             } else if peripheral.state != .connecting {
                 central.connect(peripheral, options: nil)
