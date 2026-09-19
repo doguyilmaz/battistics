@@ -20,7 +20,7 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     public let inputWatts: Double?
     public let systemLoadWatts: Double?
     /// Positive into the battery, negative out of it. A concrete contradiction
-    /// with the separately reported charging state/current suppresses this value.
+    /// with the separately reported connection/current suppresses this value.
     public let batteryPowerWatts: Double?
     public let batteryDirection: BatteryDirection
     /// At least one reported value contradicts the supported interpretation.
@@ -37,7 +37,7 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         let reportedBatteryPower = watts(data["BatteryPower"], permitsNegative: true)
         let batteryConflict = contradictsBatteryState(reportedBatteryPower, props: props)
         let batteryPower = batteryConflict ? nil : reportedBatteryPower
-        let negativeSystemLoad = integer(data["SystemLoad"]).map { $0 < 0 } ?? false
+        let negativeSystemLoad = signedTelemetryInteger(data["SystemLoad"]).map { $0 < 0 } ?? false
         return Self(
             readAt: readAt,
             registryUpdatedAt: registryUpdateDate(props["UpdateTime"], readAt: readAt),
@@ -77,23 +77,24 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     }
 
     private static func watts(_ raw: Any?, permitsNegative: Bool) -> Double? {
-        let normalized: Double?
-        if permitsNegative, let number = raw as? NSNumber,
-            String(cString: number.objCType) == "Q", number.uint64Value > UInt64(Int64.max) {
-            // IORegistry can bridge negative battery power as unsigned 64-bit.
-            // Decode before converting to Double, which loses low bits here.
-            // The all-ones sentinel is deliberately left unknown in this PoC.
-            guard number.uint64Value != UInt64.max else { return nil }
-            normalized = Double(Int64(bitPattern: number.uint64Value))
-        } else {
-            normalized = integer(raw)
-        }
-        guard let milliwatts = normalized,
+        guard let milliwatts = signedTelemetryInteger(raw),
             // A bounded PoC range rejects wrapped integers and sentinel values.
             abs(milliwatts) <= 1_000_000,
             permitsNegative || milliwatts >= 0
         else { return nil }
         return milliwatts / 1_000
+    }
+
+    private static func signedTelemetryInteger(_ raw: Any?) -> Double? {
+        if let number = raw as? NSNumber,
+            String(cString: number.objCType) == "Q", number.uint64Value > UInt64(Int64.max) {
+            // IORegistry can bridge negative telemetry as unsigned 64-bit.
+            // Decode before converting to Double, which loses low bits here.
+            // The all-ones sentinel is deliberately left unknown in this PoC.
+            guard number.uint64Value != UInt64.max else { return nil }
+            return Double(Int64(bitPattern: number.uint64Value))
+        }
+        return integer(raw)
     }
 
     private static func integer(_ raw: Any?) -> Double? {
@@ -114,27 +115,27 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
 
     private static func direction(from props: [String: Any], batteryWatts: Double?) -> BatteryDirection {
         guard let batteryWatts,
-            let charging = boolean(props["IsCharging"]),
             let external = boolean(props["ExternalConnected"]),
             let current = signedCurrent(props["Amperage"])
         else { return .unknown }
 
-        if batteryWatts > 0, current > 0, charging, external { return .charging }
-        if batteryWatts < 0, current < 0, !charging { return .discharging }
-        if batteryWatts == 0, current == 0, !charging { return .idle }
+        // IsCharging can remain true while a connected Mac draws additional
+        // power from its battery. Signed current corroborates the net direction.
+        if batteryWatts > 0, current > 0, external { return .charging }
+        if batteryWatts < 0, current < 0 { return .discharging }
+        if batteryWatts == 0, current == 0 { return .idle }
         return .unknown
     }
 
     private static func contradictsBatteryState(_ watts: Double?, props: [String: Any]) -> Bool {
         guard let watts else { return false }
-        let charging = boolean(props["IsCharging"])
         let external = boolean(props["ExternalConnected"])
         let current = signedCurrent(props["Amperage"])
         if watts > 0 {
-            return charging == false || external == false || current.map { $0 < 0 } == true
+            return external == false || current.map { $0 < 0 } == true
         }
         if watts < 0 {
-            return charging == true || current.map { $0 > 0 } == true
+            return current.map { $0 > 0 } == true
         }
         // A rounded zero and separately sampled current need not agree exactly.
         return false

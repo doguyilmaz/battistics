@@ -83,8 +83,8 @@ struct PowerFlowTests {
 
     @Test func statusMustBeExplicitAndConsistent() throws {
         for raw in [
-            props(charging: nil), props(external: nil), props(current: nil),
-            props(charging: 0), props(external: "true"), props(current: true),
+            props(external: nil), props(current: nil),
+            props(external: "true"), props(current: true),
             props(charging: true, current: -1_000),
             props(charging: true, external: false, current: 1_000),
             props(charging: false, current: 1_000), props(current: 1_000_000),
@@ -144,10 +144,8 @@ struct PowerFlowTests {
 
     @Test func concreteOpposingSignsOrStatesSuppressOnlyTheBatteryValue() throws {
         for raw in [
-            props(battery: 12_000, charging: false, current: nil),
             props(battery: 12_000, charging: nil, external: false, current: nil),
             props(battery: 12_000, charging: nil, current: -1_000),
-            props(battery: -12_000, charging: true, current: nil),
             props(battery: -12_000, charging: nil, current: 1_000)
         ] {
             let flow = try #require(PowerFlowTelemetry.parse(from: raw, readAt: readAt))
@@ -169,6 +167,59 @@ struct PowerFlowTests {
         #expect(invalid.batteryPowerWatts == 0)
         #expect(!missing.hasInconsistentReadings)
         #expect(!invalid.hasSameReadings(as: missing))
+        let wrapped = try #require(PowerFlowTelemetry.parse(
+            from: props(load: NSNumber(value: UInt64(bitPattern: Int64(-13_897)))), readAt: readAt))
+        #expect(wrapped == invalid)
+    }
+
+    @Test func observedTwentyWattAdapterSupplementationKeepsBaselineAndRecoveryReadings() throws {
+        let samples = [
+            (input: 18_025, load: 35_054, battery: -17_029, current: -1_461),
+            (input: 18_042, load: 34_243, battery: -16_201, current: -1_496)
+        ]
+        for sample in samples {
+            for charging: Any? in [true, false, nil, 0, "true"] {
+                let flow = try #require(PowerFlowTelemetry.parse(
+                    from: props(input: sample.input, load: sample.load, battery: sample.battery,
+                                charging: charging, external: true, current: sample.current), readAt: readAt))
+                #expect(flow.inputWatts == Double(sample.input) / 1_000)
+                #expect(flow.systemLoadWatts == Double(sample.load) / 1_000)
+                #expect(flow.batteryPowerWatts == Double(sample.battery) / 1_000)
+                #expect(flow.batteryDirection == .discharging)
+                #expect(!flow.hasInconsistentReadings)
+            }
+        }
+    }
+
+    @Test func chargingFlagDoesNotOverrideCorroboratedNetDirection() throws {
+        for charging: Any? in [true, false, nil, "false"] {
+            let inflow = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: 12_000, charging: charging, current: 1_000), readAt: readAt))
+            #expect(inflow.batteryPowerWatts == 12)
+            #expect(inflow.batteryDirection == .charging)
+            #expect(!inflow.hasInconsistentReadings)
+
+            let idle = try #require(PowerFlowTelemetry.parse(from: props(charging: charging), readAt: readAt))
+            #expect(idle.batteryDirection == .idle)
+            let uncorroborated = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: -12_000, charging: charging, current: nil), readAt: readAt))
+            #expect(uncorroborated.batteryPowerWatts == -12)
+            #expect(uncorroborated.batteryDirection == .unknown)
+            #expect(!uncorroborated.hasInconsistentReadings)
+        }
+    }
+
+    @Test func observedTwentyWattAdapterHighLoadContradictionStillSuppressesBattery() throws {
+        for charging: Any? in [true, false, nil, "true"] {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(input: 18_044, load: -3_156, battery: 21_200,
+                            charging: charging, external: true, current: -3_880), readAt: readAt))
+            #expect(flow.inputWatts == 18.044)
+            #expect(flow.systemLoadWatts == nil)
+            #expect(flow.batteryPowerWatts == nil)
+            #expect(flow.batteryDirection == .unknown)
+            #expect(flow.hasInconsistentReadings)
+        }
     }
 
     @Test func registryReadFreshnessCannotClaimHardwareSampleFreshness() throws {
@@ -236,7 +287,7 @@ struct PowerFlowTests {
         #expect(first != later)
         #expect(first.hasSameReadings(as: later))
         for changed in [props(input: 15_000), props(load: 13_000), props(battery: 1_000),
-                        props(input: nil), props(charging: nil)] {
+                        props(input: nil), props(current: nil)] {
             let next = BatteryReader.snapshot(from: changed, iops: nil, now: readAt, includePowerFlow: true)
             #expect(!first.hasSameReadings(as: next))
         }
