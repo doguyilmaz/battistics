@@ -148,9 +148,8 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.adapter = adapter
     }
 
-    /// The capacity the battery can currently hold. Prefers the controller's
-    /// smoothed NominalChargeCapacity, the same value macOS bases its own
-    /// health percentage on, so Battistics never contradicts System Settings.
+    /// Prefers the controller’s smoothed NominalChargeCapacity. This is a
+    /// controller estimate, distinct from Apple’s separately modeled verdict.
     public var currentMaxCapacity: Int {
         if let nominalCapacity, nominalCapacity > 0 { return nominalCapacity }
         return rawMaxCapacity
@@ -176,8 +175,9 @@ public struct BatterySnapshot: Sendable, Equatable {
         BatteryHealth.display(healthPercent)
     }
 
-    public var healthStatus: HealthStatus {
-        HealthStatus(healthPercent: displayHealthPercent)
+    public var healthStatus: HealthStatus? {
+        guard hasHealthReading else { return nil }
+        return HealthStatus(healthPercent: displayHealthPercent)
     }
 
     /// Signed instantaneous power. Negative while discharging, positive while charging.

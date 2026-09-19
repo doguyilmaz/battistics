@@ -92,7 +92,7 @@ struct OverviewPane: View {
                 StatRow(
                     label: "Health",
                     value: (snapshot.hasHealthReading ? Formatting.percentPrecise(snapshot.displayHealthPercent) : "—"),
-                    valueColor: .health(percent: snapshot.displayHealthPercent))
+                    valueColor: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary)
                 StatRow(
                     label: "Measured Health",
                     value: (snapshot.hasMeasuredHealthReading ? Formatting.percentPrecise(snapshot.measuredHealthPercent) : "—"))

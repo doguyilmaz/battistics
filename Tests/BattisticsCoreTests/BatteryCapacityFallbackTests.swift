@@ -21,6 +21,7 @@ struct BatteryCapacityFallbackTests {
             "CurrentCapacity": 80, "MaxCapacity": 100, "DesignCapacity": 6000
         ], iops: nil, now: Date())
         #expect(!snapshot.hasHealthReading)
+        #expect(snapshot.healthStatus == nil)
         #expect(!snapshot.hasMeasuredHealthReading)
         #expect(snapshot.rawMaxCapacity == 0)
     }
