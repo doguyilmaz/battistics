@@ -152,7 +152,7 @@ enum MenuBarIconRenderer {
                         color: color, charging: charging,
                         fillFraction: percent.map { CGFloat($0) / 100 },
                         shape: shape, percentage: percentInside ? percent : nil))
-                x += glyphSize.width + 4
+                x += glyphSize.width
                 if chargingWidth > 0, let bolt = NSImage(systemSymbolName: "bolt.fill", accessibilityDescription: "Charging") {
                     let box = NSRect(x: glyphSize.width + 1, y: 3, width: 8, height: 12)
                     bolt.draw(in: box)
@@ -162,6 +162,7 @@ enum MenuBarIconRenderer {
                 }
             }
             if !string.isEmpty {
+                if showGlyph { x += 4 }
                 (string as NSString).draw(
                     at: NSPoint(x: x, y: (height - textSize.height) / 2 + 0.5),
                     withAttributes: attributes)

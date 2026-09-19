@@ -3560,6 +3560,23 @@
           }
         }
       }
+    },
+    "Show percentage inside battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show percentage inside battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüzdeyi pil simgesinin içinde göster"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
