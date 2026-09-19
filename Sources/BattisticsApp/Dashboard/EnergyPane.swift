@@ -26,6 +26,8 @@ private struct EnergyRow: Identifiable {
 struct EnergyPane: View {
     var isVisible = true
 
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+
     @State private var rows: [EnergyRow] = []
     @State private var hasResults = false
     @State private var hovered: Int32?
@@ -34,6 +36,11 @@ struct EnergyPane: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if showPowerFlow {
+                PowerFlowCard()
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+            }
             if rows.isEmpty {
                 ContentUnavailableView {
                     Label(
@@ -45,6 +52,7 @@ struct EnergyPane: View {
                             ? "No process used meaningful energy in the last sample window."
                             : "Watching which apps use the most energy. First results arrive in a few seconds.")
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 10) {

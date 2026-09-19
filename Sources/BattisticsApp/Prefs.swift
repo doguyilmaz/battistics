@@ -142,6 +142,8 @@ enum Prefs {
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 
+    static let showPowerFlow = "showPowerFlow"
+
     static let powerSamplingEnabled = "powerSamplingEnabled"
     static let powerSamplingInterval = "powerSamplingInterval"
 
@@ -184,6 +186,7 @@ enum Prefs {
             keepAwakeMenuBarIcon: true,
             readBluetoothBatteries: false,
 
+            showPowerFlow: false,
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,
 

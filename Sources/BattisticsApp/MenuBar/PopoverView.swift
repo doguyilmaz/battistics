@@ -14,6 +14,7 @@ struct PopoverView: View {
     @Environment(PowerSettingsModel.self) private var powerModel
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
     @State private var windowVisible = false
     @State private var sparklineSelection: Date?
 
@@ -50,6 +51,9 @@ struct PopoverView: View {
                 chargeDetails(snapshot)
                 batteryDetails(snapshot)
                 sparklineCard
+                if showPowerFlow {
+                    PowerFlowSummary()
+                }
             } else {
                 ContentUnavailableView(
                     "No battery found",

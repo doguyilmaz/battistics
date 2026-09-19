@@ -93,6 +93,7 @@ public struct BatterySnapshot: Sendable, Equatable {
     /// only carries week precision, not a calendar day.
     public let manufactureDateIsApproximate: Bool
     public let adapter: AdapterInfo?
+    public private(set) var powerFlow: PowerFlowTelemetry?
 
     public init(
         timestamp: Date,
@@ -119,7 +120,8 @@ public struct BatterySnapshot: Sendable, Equatable {
         deviceName: String?,
         manufactureDate: Date?,
         manufactureDateIsApproximate: Bool = false,
-        adapter: AdapterInfo?
+        adapter: AdapterInfo?,
+        powerFlow: PowerFlowTelemetry? = nil
     ) {
         self.timestamp = timestamp
         self.batteryInstalled = batteryInstalled
@@ -146,13 +148,23 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.manufactureDate = manufactureDate
         self.manufactureDateIsApproximate = manufactureDateIsApproximate
         self.adapter = adapter
+        self.powerFlow = powerFlow
     }
 
     /// Compares every measurement while ignoring when it was read. Keep
     /// normal equality timestamp-sensitive for history and freshness logic.
     public func hasSameReadings(as other: BatterySnapshot) -> Bool {
+        switch (powerFlow, other.powerFlow) {
+        case let (.some(lhs), .some(rhs)):
+            guard lhs.hasSameReadings(as: rhs) else { return false }
+        case (.none, .none):
+            break
+        default:
+            return false
+        }
         var reading = self
         reading.timestamp = other.timestamp
+        reading.powerFlow = other.powerFlow
         return reading == other
     }
 

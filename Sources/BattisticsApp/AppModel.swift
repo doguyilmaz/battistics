@@ -10,6 +10,8 @@ import Observation
 @Observable
 final class AppModel {
     private(set) var snapshot: BatterySnapshot?
+    /// Latest successful registry read, separate from value-only snapshot deduplication.
+    private(set) var powerFlowReadAt: Date?
     private(set) var lastUnplugDate: Date?
     private(set) var sparkline: [SeriesPoint] = []
     /// Which dashboard pane is showing; settable from the popover and the
@@ -43,7 +45,9 @@ final class AppModel {
 
     init(
         historyDirectory: URL? = nil,
-        batteryProvider: @escaping () -> BatterySnapshot? = { BatteryReader.read() }
+        batteryProvider: @escaping () -> BatterySnapshot? = {
+            BatteryReader.read(includePowerFlow: UserDefaults.standard.bool(forKey: Prefs.showPowerFlow))
+        }
     ) {
         self.batteryProvider = batteryProvider
         Prefs.registerDefaults()
@@ -91,6 +95,7 @@ final class AppModel {
     func refreshSensors() {
         guard let current = batteryProvider() else {
             if snapshot != nil { snapshot = nil }
+            powerFlowReadAt = nil
             return
         }
         ingest(current)
@@ -140,6 +145,7 @@ final class AppModel {
     /// transitions are recorded and alerted no matter which path (power
     /// event, UI poll, background sampler) observed them first.
     private func ingest(_ current: BatterySnapshot) {
+        powerFlowReadAt = current.powerFlow?.readAt
         let previous = lastTransitionSnapshot
         // Timestamp-only changes do not affect battery presentation. Alerts
         // and recording still consume every reading with its actual time.

@@ -16,12 +16,15 @@ public enum BatteryReader {
         }
     }
 
-    public static func read(now: Date = Date()) -> BatterySnapshot? {
+    public static func read(now: Date = Date(), includePowerFlow: Bool = false) -> BatterySnapshot? {
         guard let props = smartBatteryProperties() else { return nil }
-        return snapshot(from: props, iops: systemPowerInfo(), now: now)
+        return snapshot(from: props, iops: systemPowerInfo(), now: now, includePowerFlow: includePowerFlow)
     }
 
-    public static func snapshot(from props: [String: Any], iops: SystemPowerInfo?, now: Date) -> BatterySnapshot {
+    public static func snapshot(
+        from props: [String: Any], iops: SystemPowerInfo?, now: Date,
+        includePowerFlow: Bool = false
+    ) -> BatterySnapshot {
         func int(_ key: String) -> Int? { props[key] as? Int }
         func bool(_ key: String) -> Bool? { props[key] as? Bool }
 
@@ -115,7 +118,8 @@ public enum BatteryReader {
             deviceName: props["DeviceName"] as? String,
             manufactureDate: manufactureDate,
             manufactureDateIsApproximate: manufactureDateIsApproximate,
-            adapter: adapter
+            adapter: adapter,
+            powerFlow: includePowerFlow ? PowerFlowTelemetry.parse(from: props, readAt: now) : nil
         )
     }
 

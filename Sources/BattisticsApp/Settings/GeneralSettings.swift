@@ -10,6 +10,8 @@ struct GeneralSettings: View {
     @AppStorage(Prefs.keepDashboardOnTop) private var keepDashboardOnTop = false
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
 
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginItemError: String?
 
@@ -39,6 +41,16 @@ struct GeneralSettings: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
+            }
+            Section("Experiments") {
+                HStack {
+                    Toggle("Show Power Flow", isOn: $showPowerFlow)
+                        .onChange(of: showPowerFlow) { model.refreshSensors() }
+                    PowerFlowInfoButton()
+                }
+                Text("Try a power-flow card in Energy and a compact summary in the popover. Off by default; availability varies by Mac and macOS.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             Section("Units") {
                 Picker("Temperature unit", selection: $temperatureUnitRaw) {
