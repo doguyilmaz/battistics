@@ -2,7 +2,7 @@
 
 ## 1.3.0
 
-- Battery health and capacity readings now handle newer macOS data layouts and
+- Battery health and capacity readings now handle macOS 27 data layouts and
   keep unavailable health values neutral instead of presenting a misleading
   result
 - Menu bar percentage text can be shown inside every battery icon style, with
