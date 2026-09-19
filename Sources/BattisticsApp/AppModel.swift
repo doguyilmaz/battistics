@@ -277,7 +277,24 @@ final class AppModel {
         let showDock = UserDefaults.standard.bool(forKey: Prefs.showDockIcon)
         let policy: NSApplication.ActivationPolicy = showDock ? .regular : .accessory
         if app.activationPolicy() != policy {
-            app.setActivationPolicy(policy)
+            // AppKit may hide/order out windows while changing accessory
+            // status. Preserve only our visible document windows, never the
+            // transient MenuBarExtra panel or a minimized window.
+            let windows = app.windows.filter {
+                $0.isVisible && !$0.isMiniaturized && $0.styleMask.contains(.titled)
+                    && !($0 is NSPanel)
+            }
+            let keyWindow = app.keyWindow
+            let wasActive = app.isActive
+            guard app.setActivationPolicy(policy) else { return }
+            for window in windows {
+                window.hidesOnDeactivate = false
+                window.orderFront(nil)
+            }
+            if wasActive, let keyWindow, windows.contains(keyWindow) {
+                app.activate(ignoringOtherApps: true)
+                keyWindow.makeKeyAndOrderFront(nil)
+            }
         }
     }
 }
