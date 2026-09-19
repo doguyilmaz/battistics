@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Optional Power Flow in Energy and the popover shows external input,
+  system load and battery charge or discharge separately
+- Inconsistent readings can show a marked estimate with its formula;
+  a valid reported reading replaces the estimate automatically
+- Power Flow information and estimate popovers fit narrow windows and
+  remain readable in Light appearance
+
 ## 1.2.1
 
 - The Power Adapter section on Overview stays where it is. It used to
