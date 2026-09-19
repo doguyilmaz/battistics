@@ -23,10 +23,6 @@ enum BatGlyph {
     static func draw(in rect: NSRect, style: Style) {
         style.color.setStroke()
         style.color.setFill()
-        if let percentage = style.percentage {
-            drawPercentage(percentage, in: rect, style: style)
-            return
-        }
         switch style.shape {
         case .bat, .classic:
             drawBattery(in: rect, style: style)
@@ -93,10 +89,10 @@ enum BatGlyph {
         let radius: CGFloat
         let midX: CGFloat
 
-        init(rect: NSRect, batShaped: Bool, percentage: Bool = false) {
+        init(rect: NSRect, batShaped: Bool) {
             stroke = max(rect.height * 0.075, 1.2)
-            earHeight = batShaped ? rect.height * (percentage ? 0.075 : 0.20) : 0
-            wingHeight = batShaped ? rect.height * (percentage ? 0.065 : 0.16) : 0
+            earHeight = batShaped ? rect.height * 0.20 : 0
+            wingHeight = batShaped ? rect.height * 0.16 : 0
             bodyWidth = rect.width * 0.87
             left = rect.minX + stroke / 2
             right = left + bodyWidth
@@ -172,7 +168,13 @@ enum BatGlyph {
     }
 
     private static func drawBatteryInterior(in rect: NSRect, style: Style, metrics m: BodyMetrics) {
-        if style.charging {
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: m.left, y: m.bottom, width: m.bodyWidth, height: m.top - m.bottom)
+                    .insetBy(dx: m.stroke, dy: m.stroke / 2),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+        } else if style.charging {
             boltPath(
                 centerX: m.midX, centerY: (m.top + m.bottom) / 2,
                 size: (m.top - m.bottom) * 0.60
@@ -196,90 +198,31 @@ enum BatGlyph {
         }
     }
 
-    // MARK: - Number-first glyphs
+    // MARK: - Percentage typography
 
-    /// Percentage mode reserves the whole interior for a bold reading. The
-    /// silhouettes widen instead of shrinking the type at 100; level fills,
-    /// chart bars and the gauge needle are deliberately omitted. The caller
-    /// draws charging separately so it can never replace or cover the number.
-    private static func drawPercentage(_ percentage: Int, in rect: NSRect, style: Style) {
-        let outline = NSBezierPath()
-        outline.lineWidth = max(rect.height * 0.065, 1)
-        outline.lineJoinStyle = .round
-        outline.lineCapStyle = .round
-        var textRect = rect
-
-        switch style.shape {
-        case .bat, .classic, .stats:
-            let bodyRect = rect.insetBy(dx: 0, dy: rect.height * 0.035)
-            let metrics = BodyMetrics(
-                rect: bodyRect, batShaped: style.shape == .bat, percentage: true)
-            if style.shape == .bat {
-                appendBatBatteryOutline(to: outline, rect: bodyRect, metrics: metrics)
-            } else {
-                let radius = style.shape == .stats ? metrics.radius * 0.35 : metrics.radius
-                outline.appendRoundedRect(
-                    NSRect(x: metrics.left, y: metrics.bottom,
-                           width: metrics.bodyWidth, height: metrics.top - metrics.bottom),
-                    xRadius: radius, yRadius: radius)
-            }
-            drawNub(in: bodyRect, metrics: metrics)
-            textRect = NSRect(
-                x: metrics.left, y: metrics.bottom,
-                width: metrics.bodyWidth, height: metrics.top - metrics.bottom)
-        case .gauge:
-            // A broad open-bottom dial leaves the full cap height unobstructed.
-            func point(_ x: CGFloat, _ y: CGFloat) -> NSPoint {
-                NSPoint(x: rect.minX + rect.width * x, y: rect.minY + rect.height * y)
-            }
-            outline.move(to: point(0.025, 0.09))
-            outline.line(to: point(0.025, 0.39))
-            outline.curve(to: point(0.25, 0.94),
-                          controlPoint1: point(0.025, 0.73), controlPoint2: point(0.10, 0.94))
-            outline.line(to: point(0.75, 0.94))
-            outline.curve(to: point(0.975, 0.39),
-                          controlPoint1: point(0.90, 0.94), controlPoint2: point(0.975, 0.73))
-            outline.line(to: point(0.975, 0.09))
-            textRect = rect.offsetBy(dx: 0, dy: -rect.height * 0.035)
-        case .wings:
-            // Keep the wing tips, ears and tail around a broad open body.
-            func point(_ x: CGFloat, _ y: CGFloat) -> NSPoint {
-                NSPoint(x: rect.minX + rect.width * x, y: rect.minY + rect.height * y)
-            }
-            outline.move(to: point(0.015, 0.52))
-            outline.curve(to: point(0.29, 0.87),
-                          controlPoint1: point(0.08, 0.87), controlPoint2: point(0.18, 0.87))
-            outline.line(to: point(0.35, 0.97))
-            outline.line(to: point(0.42, 0.88))
-            outline.line(to: point(0.58, 0.88))
-            outline.line(to: point(0.65, 0.97))
-            outline.line(to: point(0.71, 0.87))
-            outline.curve(to: point(0.985, 0.52),
-                          controlPoint1: point(0.82, 0.87), controlPoint2: point(0.92, 0.87))
-            outline.curve(to: point(0.71, 0.12),
-                          controlPoint1: point(0.88, 0.25), controlPoint2: point(0.80, 0.12))
-            outline.line(to: point(0.58, 0.12))
-            outline.line(to: point(0.50, 0.035))
-            outline.line(to: point(0.42, 0.12))
-            outline.line(to: point(0.29, 0.12))
-            outline.curve(to: point(0.015, 0.52),
-                          controlPoint1: point(0.20, 0.12), controlPoint2: point(0.12, 0.25))
-            outline.close()
+    /// Fit the visible digits, not the font's padded line box. Each shape
+    /// supplies its original interior; typography never changes its outline.
+    /// The menu-bar renderer keeps the charging bolt outside this reading.
+    private static func drawPercentage(
+        _ percentage: Int, in rect: NSRect, maximumFontSize: CGFloat, color: NSColor
+    ) {
+        let value = String(min(max(percentage, 0), 100))
+        func makeLine(fontSize: CGFloat) -> CTLine {
+            CTLineCreateWithAttributedString(NSAttributedString(
+                string: value,
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: fontSize, weight: .medium),
+                    .foregroundColor: color
+                ]))
         }
-        outline.stroke()
-
-        // Center the visible digits rather than the font's line box. Every
-        // style uses the same 14pt type at the actual 18pt menu-bar height.
-        let font = NSFont.monospacedDigitSystemFont(ofSize: rect.height * (14 / 18), weight: .bold)
-        let text = NSAttributedString(
-            string: String(min(max(percentage, 0), 100)),
-            attributes: [.font: font, .foregroundColor: style.color])
-        let line = CTLineCreateWithAttributedString(text)
+        let measured = CTLineGetBoundsWithOptions(makeLine(fontSize: maximumFontSize), .useGlyphPathBounds)
+        let scale = min(1, rect.width / measured.width, rect.height / measured.height)
+        let line = makeLine(fontSize: maximumFontSize * scale)
         let bounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
         guard let context = NSGraphicsContext.current?.cgContext else { return }
         context.saveGState()
         context.textMatrix = .identity
-        context.textPosition = CGPoint(x: textRect.midX - bounds.midX, y: textRect.midY - bounds.midY)
+        context.textPosition = CGPoint(x: rect.midX - bounds.midX, y: rect.midY - bounds.midY)
         CTLineDraw(line, context)
         context.restoreGState()
     }
@@ -299,6 +242,15 @@ enum BatGlyph {
         arc.lineWidth = stroke
         arc.lineCapStyle = .round
         arc.stroke()
+
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: cx - radius * 0.70, y: cy + stroke * 0.25,
+                           width: radius * 1.40, height: radius * 0.58),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+            return
+        }
 
         if style.charging {
             boltPath(centerX: cx, centerY: cy + radius * 0.42, size: radius * 0.75).fill()
@@ -335,6 +287,16 @@ enum BatGlyph {
         outline.lineWidth = metrics.stroke
         outline.stroke()
         drawNub(in: rect, metrics: metrics)
+
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: metrics.left, y: metrics.bottom,
+                           width: metrics.bodyWidth, height: metrics.top - metrics.bottom)
+                    .insetBy(dx: metrics.stroke, dy: metrics.stroke / 2),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+            return
+        }
 
         if style.charging {
             boltPath(
@@ -373,7 +335,7 @@ enum BatGlyph {
         let path = batSilhouette(in: rect)
         let fraction = min(max(style.fillFraction ?? 0, 0), 1)
 
-        if fraction > 0 || style.charging {
+        if style.percentage == nil, fraction > 0 || style.charging {
             NSGraphicsContext.current?.saveGraphicsState()
             path.addClip()
             let fillHeight = style.charging ? rect.height : rect.height * fraction
@@ -387,7 +349,15 @@ enum BatGlyph {
         path.lineJoinStyle = .round
         path.stroke()
 
-        if style.charging {
+        if let percentage = style.percentage {
+            // The original wings narrow below this band. Keep the digits
+            // between that lower scallop and the head without flattening it.
+            drawPercentage(
+                percentage,
+                in: NSRect(x: rect.minX + rect.width * 0.24, y: rect.minY + rect.height * 0.405,
+                           width: rect.width * 0.52, height: rect.height * 0.375),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+        } else if style.charging {
             NSGraphicsContext.current?.compositingOperation = .destinationOut
             boltPath(centerX: rect.midX, centerY: rect.midY * 1.05, size: rect.height * 0.42).fill()
             NSGraphicsContext.current?.compositingOperation = .sourceOver

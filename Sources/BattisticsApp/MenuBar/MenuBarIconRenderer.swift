@@ -139,7 +139,8 @@ enum MenuBarIconRenderer {
         percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
         shape: MenuBarIconStyle, keepAwakeIcon: Bool, percentInside: Bool
     ) -> NSImage {
-        let glyphSize = percentInside ? NSSize(width: 40, height: 18) : Self.glyphSize
+        // A small proportional enlargement keeps the original 27:17 silhouette.
+        let glyphSize = percentInside ? NSSize(width: 27 * 18 / 17, height: 18) : Self.glyphSize
         let chargingWidth: CGFloat = percentInside && charging ? 12 : 0
         let color = tint ?? .black
         let string = texts.joined(separator: " ")
