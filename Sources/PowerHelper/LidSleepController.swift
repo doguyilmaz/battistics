@@ -1,6 +1,7 @@
 import BattisticsCore
 import Darwin
 import Foundation
+import IOKit
 
 /// All lease state, file I/O and pmset calls belong to this serial queue.
 final class LidSleepController: @unchecked Sendable {
@@ -14,71 +15,75 @@ final class LidSleepController: @unchecked Sendable {
     private init() {
         queue.async { [self] in
             lease = LidSleepLease(
-                read: {
-                    let output = try Self.pmset(["-g"])
-                    guard output.contains("System-wide power settings:") else { throw CocoaError(.fileReadCorruptFile) }
-                    for line in output.split(separator: "\n") {
-                        let fields = line.split(whereSeparator: \.isWhitespace)
-                        if fields.first == "SleepDisabled" {
-                            guard fields.count == 2, fields[1] == "0" || fields[1] == "1" else {
-                                throw CocoaError(.fileReadCorruptFile)
-                            }
-                            return fields[1] == "1"
-                        }
-                    }
-                    return false
-                },
+                read: { try Self.readSleepDisabled() },
                 write: { _ = try Self.pmset(["-a", "disablesleep", $0 ? "1" : "0"]) },
-                save: { [journal] original in
-                    try Data((original ? "1" : "0").utf8).write(to: journal, options: .atomic)
+                save: { [journal] record in
+                    try record.encoded().write(to: journal, options: .atomic)
                 },
-                clear: { [journal] in try FileManager.default.removeItem(at: journal) })
+                clear: { [journal] in
+                    do { try FileManager.default.removeItem(at: journal) }
+                    catch CocoaError.fileNoSuchFile { }
+                })
             if FileManager.default.fileExists(atPath: journal.path) {
                 do {
-                    try recoverJournal()
+                    let record = try LidSleepLeaseJournal.decode(Data(contentsOf: journal))
+                    // The lease itself blocks new acquisition if it cannot
+                    // durably retire a record. A safely retired transient read
+                    // failure must not prohibit a later explicit user session.
+                    _ = lease.recover(journal: record)
                 } catch { recoveryFailed = true }
             }
             let timer = DispatchSource.makeTimerSource(queue: queue)
             timer.schedule(deadline: .now() + 5, repeating: 5)
             timer.setEventHandler { [weak self] in
-                guard let self else { return }
-                do {
-                    if self.recoveryFailed {
-                        try self.recoverJournal()
-                        self.recoveryFailed = false
-                    } else {
-                        try self.lease.expire()
-                    }
-                } catch {
-                    // Retain the journal and retry on the next watchdog tick.
-                }
+                // No settings polling, subprocesses, or recovery retries while idle.
+                _ = self?.lease.expire()
             }
             timer.resume()
             self.timer = timer
         }
     }
 
-    func set(enabled: Bool, owner: UUID, reply: @escaping @Sendable (Int32) -> Void) {
+    func acquire(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
         queue.async { [self] in
-            guard !recoveryFailed else { reply(EIO); return }
-            do {
-                if enabled { try lease.renew(owner: owner) }
-                else { try lease.release(owner: owner) }
-                reply(0)
-            } catch { reply(EIO) }
+            guard !recoveryFailed else { reply(LidSleepLeaseResult.unavailable.rawValue); return }
+            reply(lease.acquire(owner: owner, session: session).rawValue)
         }
     }
 
-    func disconnected(owner: UUID) {
-        queue.async { [self] in try? lease.release(owner: owner) }
+    func renew(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
+        queue.async { [self] in reply(lease.renew(owner: owner, session: session).rawValue) }
     }
 
-    private func recoverJournal() throws {
-        let saved = try String(contentsOf: journal, encoding: .utf8)
-        guard saved == "0" || saved == "1" else { throw CocoaError(.fileReadCorruptFile) }
-        // A missing/corrupt journal must not turn a no-op expiry into a
-        // successful recovery. Clear the failure latch only after restoration.
-        try lease.recover(original: saved == "1")
+    func release(owner: UUID, session: UUID, reply: @escaping @Sendable (Int32) -> Void) {
+        queue.async { [self] in reply(lease.release(owner: owner, session: session).rawValue) }
+    }
+
+    func disconnected(owner: UUID) {
+        queue.async { [self] in _ = lease.disconnected(owner: owner) }
+    }
+
+    /// The same root-domain property exported by pmset, without spawning a
+    /// process on every heartbeat. Absent or malformed values remain unknown.
+    private static func readSleepDisabled() throws -> Bool {
+        let root = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPMrootDomain"))
+        guard root != IO_OBJECT_NULL else { throw CocoaError(.fileReadUnknown) }
+        defer { IOObjectRelease(root) }
+        guard let value = IORegistryEntryCreateCFProperty(root, "SleepDisabled" as CFString,
+                                                        kCFAllocatorDefault, 0)?.takeRetainedValue() else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        if CFGetTypeID(value) == CFBooleanGetTypeID() {
+            return CFBooleanGetValue((value as! CFBoolean))
+        }
+        if CFGetTypeID(value) == CFNumberGetTypeID() {
+            let number = value as! CFNumber
+            var integer: Int64 = 0
+            guard !CFNumberIsFloatType(number), CFNumberGetValue(number, .sInt64Type, &integer),
+                  integer == 0 || integer == 1 else { throw CocoaError(.fileReadCorruptFile) }
+            return integer == 1
+        }
+        throw CocoaError(.fileReadCorruptFile)
     }
 
     private static func pmset(_ arguments: [String]) throws -> String {

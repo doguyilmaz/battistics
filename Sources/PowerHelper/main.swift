@@ -20,7 +20,7 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         and certificate leaf[subject.OU] = "5MYT4VYJFC"
         """
 
-    private static let build = "2"
+    private static let build = "3"
     private let owner = UUID()
 
     /// `setCodeSigningRequirement` returns void — it cannot report that the
@@ -52,8 +52,25 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
 
     // MARK: - Operations
 
-    func setLidSleepLease(_ enabled: Bool, reply: @escaping @Sendable (Int32) -> Void) {
-        LidSleepController.shared.set(enabled: enabled, owner: owner, reply: reply)
+    func acquireLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void) {
+        guard let session = UUID(uuidString: sessionID) else {
+            reply(LidSleepLeaseResult.rejected.rawValue); return
+        }
+        LidSleepController.shared.acquire(owner: owner, session: session, reply: reply)
+    }
+
+    func renewLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void) {
+        guard let session = UUID(uuidString: sessionID) else {
+            reply(LidSleepLeaseResult.rejected.rawValue); return
+        }
+        LidSleepController.shared.renew(owner: owner, session: session, reply: reply)
+    }
+
+    func releaseLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void) {
+        guard let session = UUID(uuidString: sessionID) else {
+            reply(LidSleepLeaseResult.rejected.rawValue); return
+        }
+        LidSleepController.shared.release(owner: owner, session: session, reply: reply)
     }
 
     func setLowPowerMode(_ code: Int, reply: @escaping (Int32) -> Void) {

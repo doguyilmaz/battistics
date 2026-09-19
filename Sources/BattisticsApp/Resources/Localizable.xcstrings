@@ -3577,6 +3577,91 @@
           }
         }
       }
+    },
+    "Keep Awake stopped": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake stopped"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut durduruldu"
+          }
+        }
+      }
+    },
+    "The system sleep setting changed elsewhere. Your current setting was kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The system sleep setting changed elsewhere. Your current setting was kept."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistemin uyku ayarı başka bir yerden değiştirildi. Mevcut ayarınız korundu."
+          }
+        }
+      }
+    },
+    "The power helper could not confirm the closed-lid session. Keep Awake has stopped.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The power helper could not confirm the closed-lid session. Keep Awake has stopped."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı, kapak kapalı oturumunu doğrulayamadı. Uyanık Tut durduruldu."
+          }
+        }
+      }
+    },
+    "Keep Awake stopped, but the system sleep setting could not be confirmed. Check your system sleep settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake stopped, but the system sleep setting could not be confirmed. Check your system sleep settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut durduruldu, ancak sistemin uyku ayarı doğrulanamadı. Sisteminizin uyku ayarlarını kontrol edin."
+          }
+        }
+      }
+    },
+    "The closed-lid Keep Awake session ended.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The closed-lid Keep Awake session ended."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı Uyanık Tut oturumu sona erdi."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -15,7 +15,7 @@ import ServiceManagement
 final class PowerHelperClient {
     private static let plistName = "com.doguyilmaz.Battistics.PowerHelper.plist"
 
-    enum Failure: Error { case notConnected, unreachable, rejected(Int32) }
+    enum Failure: Error { case notConnected, unreachable, rejected(Int32), unknownLeaseStatus(Int32) }
 
     /// A continuation can only be resumed once, but three things race to do
     /// it here: the reply, the XPC error handler, and the timeout.
@@ -46,6 +46,7 @@ final class PowerHelperClient {
     /// than a wait anyone should ever see.
     private static let replyTimeout: Duration = .seconds(2)
     private static let probeTimeout: Duration = .seconds(1)
+    private static let leaseTimeout: Duration = .seconds(8)
 
     private(set) var status: SMAppService.Status = .notRegistered
     /// Registered is not the same as running: a helper launchd cannot start
@@ -58,6 +59,10 @@ final class PowerHelperClient {
     private(set) var hasProbed = false
 
     @ObservationIgnored private var connection: NSXPCConnection?
+    @ObservationIgnored private var connectionID: UUID?
+    @ObservationIgnored private var probeID: UUID?
+    @ObservationIgnored private var leaseConnection: NSXPCConnection?
+    @ObservationIgnored private var leaseSessionID: String?
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
 
     init() {
@@ -121,27 +126,41 @@ final class PowerHelperClient {
     func refreshStatus() {
         status = service.status
         guard status == .enabled else {
+            probeID = nil
             isReachable = false
             hasProbed = false
             return
         }
         // Probed here, off the critical path, so a change never waits on a
         // timeout to discover the helper is dead.
-        Task { await probeReachability() }
+        let id = UUID()
+        probeID = id
+        Task { await probeReachability(id: id) }
     }
 
-    private func probeReachability() async {
+    private func probeReachability(id: UUID) async {
+        guard probeID == id, status == .enabled else { return }
+        let probedConnection: NSXPCConnection
+        do { probedConnection = try activeConnection() }
+        catch {
+            isReachable = false
+            hasProbed = true
+            return
+        }
         do {
-            _ = try await send(timeout: Self.probeTimeout) { proxy, done in
+            _ = try await send(timeout: Self.probeTimeout, on: probedConnection) { proxy, done in
                 proxy.version { @Sendable _ in done(0) }
             }
+            guard probeID == id, connection === probedConnection, status == .enabled else { return }
             isReachable = true
             hasProbed = true
         } catch {
+            guard probeID == id, connection === probedConnection, status == .enabled else { return }
             isReachable = false
             hasProbed = true
-            connection?.invalidate()
+            probedConnection.invalidate()
             connection = nil
+            connectionID = nil
         }
     }
 
@@ -187,6 +206,7 @@ final class PowerHelperClient {
     /// Sparkle update replaces the helper, so a registration made before one
     /// can end up pointing at a binary that no longer matches.
     func reinstall() throws {
+        probeID = nil
         connection?.invalidate()
         connection = nil
         try? service.unregister()
@@ -196,6 +216,7 @@ final class PowerHelperClient {
     }
 
     func remove() throws {
+        probeID = nil
         connection?.invalidate()
         connection = nil
         try service.unregister()
@@ -207,17 +228,61 @@ final class PowerHelperClient {
         SMAppService.openSystemSettingsLoginItems()
     }
 
-    func setLidSleepLease(_ enabled: Bool) async throws {
+    func acquireLidSleepLease(
+        _ sessionID: String, ifStillRequested: @escaping @MainActor () -> Bool
+    ) async throws -> LidSleepLeaseResult {
         guard canApply else { throw Failure.notConnected }
-        // Old installed helpers do not implement the lease selector.
-        let version = try await send(timeout: Self.replyTimeout) { proxy, done in
-            proxy.version { @Sendable version in done(version == "2" ? 0 : -1) }
+        // Pin every lease operation to the endpoint that acquired it. A new
+        // connection has a different helper-side identity and cannot renew it.
+        let connection = try activeConnection()
+        let version = try await send(timeout: Self.replyTimeout, on: connection) { proxy, done in
+            proxy.version { @Sendable version in done(version == "3" ? 0 : -1) }
         }
         guard version == 0 else { throw Failure.rejected(version) }
-        let code = try await send(timeout: Self.replyTimeout) { proxy, done in
-            proxy.setLidSleepLease(enabled, reply: done)
+        // stop() can run while the version RPC is suspended. Do not acquire
+        // after cancellation, even briefly while waiting for cleanup.
+        guard ifStillRequested() else { return .inactive }
+        leaseConnection = connection
+        leaseSessionID = sessionID
+        return try await sendLease(sessionID: sessionID) { proxy, done in
+            // Recheck at actual dispatch, after any intervening async boundary.
+            guard ifStillRequested() else { done(LidSleepLeaseResult.inactive.rawValue); return }
+            proxy.acquireLidSleepLease(sessionID, reply: done)
         }
-        guard code == 0 else { throw Failure.rejected(code) }
+    }
+
+    func hasLidSleepLeaseSession(_ sessionID: String) -> Bool {
+        leaseSessionID == sessionID && leaseConnection != nil
+    }
+
+    func renewLidSleepLease(_ sessionID: String) async throws -> LidSleepLeaseResult {
+        try await sendLease(sessionID: sessionID) { proxy, done in
+            proxy.renewLidSleepLease(sessionID, reply: done)
+        }
+    }
+
+    func releaseLidSleepLease(_ sessionID: String) async throws -> LidSleepLeaseResult {
+        defer {
+            if leaseSessionID == sessionID {
+                leaseSessionID = nil
+                leaseConnection = nil
+            }
+        }
+        return try await sendLease(sessionID: sessionID) { proxy, done in
+            proxy.releaseLidSleepLease(sessionID, reply: done)
+        }
+    }
+
+    private func sendLease(
+        sessionID: String,
+        _ body: @escaping (PowerHelperProtocol, @escaping @Sendable (Int32) -> Void) -> Void
+    ) async throws -> LidSleepLeaseResult {
+        guard leaseSessionID == sessionID, let leaseConnection else { throw Failure.notConnected }
+        let code = try await send(timeout: Self.leaseTimeout, on: leaseConnection, body)
+        guard let result = LidSleepLeaseResult(rawValue: code) else {
+            throw Failure.unknownLeaseStatus(code)
+        }
+        return result
     }
 
     // MARK: - Applying
@@ -250,9 +315,10 @@ final class PowerHelperClient {
     /// that safe, since it is the only shared state they touch.
     private func send(
         timeout: Duration,
+        on pinnedConnection: NSXPCConnection? = nil,
         _ body: @escaping (PowerHelperProtocol, @escaping @Sendable (Int32) -> Void) -> Void
     ) async throws -> Int32 {
-        let connection = try activeConnection()
+        let connection = try pinnedConnection ?? activeConnection()
         return try await withCheckedThrowingContinuation { continuation in
             let once = ResumeOnce(continuation)
             // remoteObjectProxy (no handler) drops messages silently when the
@@ -278,11 +344,21 @@ final class PowerHelperClient {
             let new = NSXPCConnection(
                 machServiceName: powerHelperMachServiceName, options: .privileged)
             new.remoteObjectInterface = NSXPCInterface(with: PowerHelperProtocol.self)
+            let id = UUID()
+            connectionID = id
             new.invalidationHandler = { [weak self] in
-                Task { @MainActor in self?.connection = nil }
+                Task { @MainActor in
+                    guard let self, self.connectionID == id else { return }
+                    self.connection = nil
+                    self.connectionID = nil
+                }
             }
             new.interruptionHandler = { [weak self] in
-                Task { @MainActor in self?.connection = nil }
+                Task { @MainActor in
+                    guard let self, self.connectionID == id else { return }
+                    self.connection = nil
+                    self.connectionID = nil
+                }
             }
             new.resume()
             connection = new

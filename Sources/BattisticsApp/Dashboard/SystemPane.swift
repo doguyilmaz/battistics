@@ -50,7 +50,8 @@ struct SystemPane: View {
                 }
 
                 if let error = keepAwake.errorMessage {
-                    Text(error).foregroundStyle(.red)
+                    Text(error)
+                        .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
                 }
                 if keepAwake.isActive && keepAwake.mode != .displayOn {
                     Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }

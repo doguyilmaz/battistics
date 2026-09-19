@@ -59,7 +59,8 @@ struct PopoverView: View {
                 .frame(height: 200)
             }
             if let error = keepAwake.errorMessage {
-                Text(error).font(.caption).foregroundStyle(.red)
+                Text(error).font(.caption)
+                    .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
             }
             footer
         }
