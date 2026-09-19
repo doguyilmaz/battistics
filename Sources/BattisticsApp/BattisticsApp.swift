@@ -26,9 +26,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    private static func openDashboard() {
+    fileprivate static func openDashboard() {
         if let url = URL(string: "battistics://dashboard") {
-            NSWorkspace.shared.open(url)
+            // Target this bundle so another installed copy cannot receive
+            // navigation initiated by the running app.
+            NSWorkspace.shared.open(
+                [url],
+                withApplicationAt: Bundle.main.bundleURL,
+                configuration: NSWorkspace.OpenConfiguration(),
+                completionHandler: nil
+            )
         }
     }
 
@@ -124,9 +131,7 @@ struct BattisticsApp: App {
             CommandGroup(replacing: .appSettings) {
                 Button("Settings…") {
                     model.dashboardPane = .general
-                    if let url = URL(string: "battistics://dashboard") {
-                        NSWorkspace.shared.open(url)
-                    }
+                    AppDelegate.openDashboard()
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
