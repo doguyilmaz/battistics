@@ -87,8 +87,9 @@ public enum CSVPort {
             switch fields.first {
             case "charge":
                 guard fields.count == 5,
-                    let ts = timestamp(fields[1]), let percent = Int(fields[2]),
-                    let external = Int(fields[3]), let charging = Int(fields[4])
+                    let ts = timestamp(fields[1]), let percent = Int(fields[2]), (0...100).contains(percent),
+                    let external = Int(fields[3]), (0...1).contains(external),
+                    let charging = Int(fields[4]), (0...1).contains(charging)
                 else { throw HistoryError.importFailed("Bad charge row: \(line)") }
                 parsed.chargeSamples.append(
                     ChargeSample(
@@ -98,25 +99,28 @@ public enum CSVPort {
                         isCharging: charging != 0
                     ))
             case "power":
-                guard fields.count == 6, let ts = timestamp(fields[1]), let watts = Double(fields[2])
+                guard fields.count == 6, let ts = timestamp(fields[1]), let watts = finiteDouble(fields[2]),
+                    fields[3...5].allSatisfy({ $0.isEmpty || finiteDouble($0) != nil })
                 else { throw HistoryError.importFailed("Bad power row: \(line)") }
                 parsed.powerRows.append(
                     PowerRow(
                         ts: ts, watts: watts,
-                        volts: Double(fields[3]), amps: Double(fields[4]), tempC: Double(fields[5])
+                        volts: finiteDouble(fields[3]), amps: finiteDouble(fields[4]), tempC: finiteDouble(fields[5])
                     ))
             case "hourly":
                 guard fields.count == 5,
-                    let ts = timestamp(fields[1]), let avg = Double(fields[2]),
-                    let max = Double(fields[3])
+                    let ts = timestamp(fields[1]), let avg = finiteDouble(fields[2]),
+                    let max = finiteDouble(fields[3]),
+                    fields[4].isEmpty || finiteDouble(fields[4]) != nil
                 else { throw HistoryError.importFailed("Bad hourly row: \(line)") }
                 parsed.hourlyRows.append(
-                    HourlyRow(hourTs: ts, avgWatts: avg, maxWatts: max, avgTemp: Double(fields[4])))
+                    HourlyRow(hourTs: ts, avgWatts: avg, maxWatts: max, avgTemp: finiteDouble(fields[4])))
             case "health":
                 guard fields.count == 8,
-                    let ts = timestamp(fields[2]), let health = Double(fields[3]),
+                    let ts = timestamp(fields[2]), let health = finiteDouble(fields[3]),
                     let rawMax = Int64(fields[4]), let design = Int64(fields[6]),
-                    let cycles = Int64(fields[7])
+                    let cycles = Int64(fields[7]),
+                    fields[5].isEmpty || Int64(fields[5]) != nil
                 else { throw HistoryError.importFailed("Bad health row: \(line)") }
                 parsed.healthRows.append(
                     HealthRow(
@@ -128,6 +132,11 @@ public enum CSVPort {
             }
         }
         return parsed
+    }
+
+    private static func finiteDouble(_ field: String) -> Double? {
+        guard let value = Double(field), value.isFinite else { return nil }
+        return value
     }
 
     private static func timestamp(_ field: String) -> Int64? {

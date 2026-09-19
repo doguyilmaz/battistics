@@ -20,29 +20,32 @@ final class PowerAuthorization {
     /// idle, so it costs no prompt anyone would otherwise have avoided.
     static let idleTimeout: Duration = .seconds(600)
 
-    private static let tool = PowerSettingsWriter.executable
-
     enum Failure: Error, Equatable {
         case cancelled
         /// The deprecated execution path is gone from this macOS.
         case unsupported
         case locked
+        case busy
         case failed(OSStatus)
     }
 
     private(set) var isUnlocked = false
 
-    @ObservationIgnored private var authorization: AuthorizationRef?
+    @ObservationIgnored private var authorization: PowerAuthorizationSession?
+    // Retain this even after relocking: an uninterruptible security call
+    // must not allow another unlock to accumulate another blocked worker.
+    @ObservationIgnored private var pendingAuthorization: PowerAuthorizationSession?
     @ObservationIgnored private var idleTask: Task<Void, Never>?
 
     /// Whether privileged changes are possible at all on this system. False
     /// means the UI should stay read-only rather than offer a lock that
     /// cannot open.
-    var isSupported: Bool { Self.executeWithPrivileges != nil }
+    var isSupported: Bool { PowerAuthorizationSession.isSupported }
 
     // MARK: - Lock state
 
     func unlock() throws {
+        guard pendingAuthorization == nil else { throw Failure.busy }
         guard authorization == nil else {
             startIdleTimer()
             return
@@ -71,7 +74,7 @@ final class PowerAuthorization {
             AuthorizationFree(reference, [])
             throw status == errAuthorizationCanceled ? Failure.cancelled : Failure.failed(status)
         }
-        authorization = reference
+        authorization = PowerAuthorizationSession(takingOwnershipOf: reference)
         isUnlocked = true
         startIdleTimer()
     }
@@ -79,10 +82,9 @@ final class PowerAuthorization {
     func relock() {
         idleTask?.cancel()
         idleTask = nil
-        if let authorization {
-            // destroyRights so the credential does not outlive the lock.
-            AuthorizationFree(authorization, [.destroyRights])
-        }
+        // Prevent further use immediately; the session defers destruction
+        // only while the worker still holds an in-flight reference.
+        authorization?.invalidate()
         authorization = nil
         isUnlocked = false
     }
@@ -98,54 +100,16 @@ final class PowerAuthorization {
 
     // MARK: - Running
 
-    func run(_ change: PowerChange) throws {
-        let arguments = change.arguments
+    func run(_ change: PowerChange) async throws {
+        guard pendingAuthorization == nil else { throw Failure.busy }
         guard let authorization else { throw Failure.locked }
-        guard let execute = Self.executeWithPrivileges else { throw Failure.unsupported }
-
-        var argv: [UnsafeMutablePointer<CChar>?] = arguments.map { strdup($0) }
-        argv.append(nil)
-        defer { for pointer in argv where pointer != nil { free(pointer) } }
-
-        var communications: UnsafeMutablePointer<FILE>?
-        let status = argv.withUnsafeMutableBufferPointer { buffer in
-            execute(authorization, Self.tool, [], buffer.baseAddress!, &communications)
+        pendingAuthorization = authorization
+        idleTask?.cancel()
+        idleTask = nil
+        defer {
+            pendingAuthorization = nil
+            if self.authorization === authorization { startIdleTimer() }
         }
-        // Draining to EOF waits for the child to exit, so the caller can
-        // re-read the settings and see the result rather than a race.
-        if let communications {
-            while fgetc(communications) != EOF {}
-            fclose(communications)
-        }
-        guard status == errAuthorizationSuccess else { throw Failure.failed(status) }
-        startIdleTimer()
+        try await authorization.run(change)
     }
-
-    /// Resolved at runtime rather than called directly.
-    ///
-    /// `AuthorizationExecuteWithPrivileges` has been deprecated since macOS
-    /// 10.7 and still ships, but looking it up through `dlsym` means the day
-    /// Apple finally removes it this returns nil and the UI degrades to
-    /// read-only, instead of the app failing to launch. It also keeps the
-    /// build free of a deprecation warning that could not otherwise be
-    /// silenced at the call site.
-    ///
-    /// Apple's stated objection is that the executed path is unvalidated.
-    /// Here it is a hardcoded `/usr/bin/pmset` and every argument comes from
-    /// a fixed enum in `PowerSettingsWriter`, so nothing a user types reaches
-    /// it.
-    private typealias ExecuteWithPrivileges = @convention(c) (
-        AuthorizationRef,
-        UnsafePointer<CChar>,
-        AuthorizationFlags,
-        UnsafePointer<UnsafeMutablePointer<CChar>?>,
-        UnsafeMutablePointer<UnsafeMutablePointer<FILE>?>?
-    ) -> OSStatus
-
-    private static let executeWithPrivileges: ExecuteWithPrivileges? = {
-        guard let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), // RTLD_DEFAULT
-            "AuthorizationExecuteWithPrivileges")
-        else { return nil }
-        return unsafeBitCast(symbol, to: ExecuteWithPrivileges.self)
-    }()
 }

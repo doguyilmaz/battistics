@@ -262,23 +262,45 @@ public actor HistoryStore {
     /// charge samples are kept 400 days. Health snapshots are kept forever.
     public func runRetention(now: Date = Date()) {
         guard ensureOpen() else { return }
-        // Hour-aligned cutoff: only complete hours are rolled up, so the
-        // ON CONFLICT guard can never discard the second half of a
-        // partially aggregated hour.
+        // Only complete hours are rolled up. Imported raw samples may overlap
+        // existing rollups; preserve those raw samples until the schema can
+        // merge aggregates using their original sample counts.
         let powerCutoff = Int64(now.timeIntervalSince1970 - 30 * 24 * 3600) / 3600 * 3600
         let chargeCutoff = Int64(now.timeIntervalSince1970 - 400 * 24 * 3600)
-        run(
-            """
-            INSERT INTO power_hourly (hour_ts, avg_watts, max_watts, avg_temp)
-            SELECT (ts / 3600) * 3600, AVG(ABS(watts)), MAX(ABS(watts)), AVG(temp_c)
-            FROM power_samples WHERE ts < ?1
-            GROUP BY (ts / 3600) * 3600
-            ON CONFLICT(hour_ts) DO NOTHING
-            """,
-            bind: [.int(powerCutoff)]
-        )
-        run("DELETE FROM power_samples WHERE ts < ?", bind: [.int(powerCutoff)])
-        run("DELETE FROM charge_samples WHERE ts < ?", bind: [.int(chargeCutoff)])
+        // Never delete source samples unless their rollup and every deletion commit.
+        try? withTransaction {
+            try execute("CREATE TEMP TABLE IF NOT EXISTS battistics_retention_hours (hour_ts INTEGER PRIMARY KEY)")
+            try execute("DELETE FROM temp.battistics_retention_hours")
+            try execute(
+                """
+                INSERT INTO temp.battistics_retention_hours (hour_ts)
+                SELECT DISTINCT (ts / 3600) * 3600 FROM power_samples
+                WHERE ts < ? AND NOT EXISTS (
+                    SELECT 1 FROM power_hourly WHERE hour_ts = (power_samples.ts / 3600) * 3600
+                )
+                """,
+                bind: [.int(powerCutoff)]
+            )
+            try execute(
+                """
+                INSERT INTO power_hourly (hour_ts, avg_watts, max_watts, avg_temp)
+                SELECT (ts / 3600) * 3600, AVG(ABS(watts)), MAX(ABS(watts)), AVG(temp_c)
+                FROM power_samples WHERE ts < ?1
+                  AND (ts / 3600) * 3600 IN (SELECT hour_ts FROM temp.battistics_retention_hours)
+                GROUP BY (ts / 3600) * 3600
+                """,
+                bind: [.int(powerCutoff)]
+            )
+            try execute(
+                """
+                DELETE FROM power_samples WHERE ts < ?
+                  AND (ts / 3600) * 3600 IN (SELECT hour_ts FROM temp.battistics_retention_hours)
+                """,
+                bind: [.int(powerCutoff)]
+            )
+            try execute("DELETE FROM charge_samples WHERE ts < ?", bind: [.int(chargeCutoff)])
+            try execute("DELETE FROM temp.battistics_retention_hours")
+        }
     }
 
     public func deleteAllHistory() {
@@ -330,50 +352,57 @@ public actor HistoryStore {
     }
 
     /// Imports a Battistics CSV export. Duplicate rows are ignored.
-    /// Returns the number of imported rows.
+    /// Returns the number of newly inserted rows, excluding duplicates.
     @discardableResult
     public func importCSV(_ text: String) throws -> Int {
         guard ensureOpen() else { throw HistoryError.cannotOpen(databaseURL.path) }
         let parsed = try CSVPort.parse(text)
-        run("BEGIN TRANSACTION")
-        defer { run("COMMIT") }
-        for sample in parsed.chargeSamples {
-            recordChargeSample(sample)
+        return try withTransaction {
+            var imported = 0
+            for sample in parsed.chargeSamples {
+                imported += try execute(
+                    "INSERT OR IGNORE INTO charge_samples (ts, percent, external, charging) VALUES (?,?,?,?)",
+                    bind: [
+                        .int(Int64(sample.date.timeIntervalSince1970)), .int(Int64(sample.percent)),
+                        .int(sample.externalConnected ? 1 : 0), .int(sample.isCharging ? 1 : 0),
+                    ]
+                )
+            }
+            for row in parsed.powerRows {
+                imported += try execute(
+                    "INSERT OR IGNORE INTO power_samples (ts, watts, volts, amps, temp_c) VALUES (?,?,?,?,?)",
+                    bind: [
+                        .int(row.ts), .real(row.watts),
+                        row.volts.map(SQLiteValue.real) ?? .null,
+                        row.amps.map(SQLiteValue.real) ?? .null,
+                        row.tempC.map(SQLiteValue.real) ?? .null,
+                    ]
+                )
+            }
+            for row in parsed.hourlyRows {
+                imported += try execute(
+                    "INSERT OR IGNORE INTO power_hourly (hour_ts, avg_watts, max_watts, avg_temp) VALUES (?,?,?,?)",
+                    bind: [
+                        .int(row.hourTs), .real(row.avgWatts), .real(row.maxWatts),
+                        row.avgTemp.map(SQLiteValue.real) ?? .null,
+                    ]
+                )
+            }
+            for row in parsed.healthRows {
+                imported += try execute(
+                    """
+                    INSERT INTO health_snapshots (day, ts, health_pct, raw_max, nominal, design, cycles)
+                    VALUES (?,?,?,?,?,?,?)
+                    ON CONFLICT(day) DO NOTHING
+                    """,
+                    bind: [
+                        .text(row.day), .int(row.ts), .real(row.healthPercent), .int(row.rawMax),
+                        row.nominal.map(SQLiteValue.int) ?? .null, .int(row.design), .int(row.cycles),
+                    ]
+                )
+            }
+            return imported
         }
-        for row in parsed.powerRows {
-            run(
-                "INSERT OR IGNORE INTO power_samples (ts, watts, volts, amps, temp_c) VALUES (?,?,?,?,?)",
-                bind: [
-                    .int(row.ts), .real(row.watts),
-                    row.volts.map(SQLiteValue.real) ?? .null,
-                    row.amps.map(SQLiteValue.real) ?? .null,
-                    row.tempC.map(SQLiteValue.real) ?? .null,
-                ]
-            )
-        }
-        for row in parsed.hourlyRows {
-            run(
-                "INSERT OR IGNORE INTO power_hourly (hour_ts, avg_watts, max_watts, avg_temp) VALUES (?,?,?,?)",
-                bind: [
-                    .int(row.hourTs), .real(row.avgWatts), .real(row.maxWatts),
-                    row.avgTemp.map(SQLiteValue.real) ?? .null,
-                ]
-            )
-        }
-        for row in parsed.healthRows {
-            run(
-                """
-                INSERT INTO health_snapshots (day, ts, health_pct, raw_max, nominal, design, cycles)
-                VALUES (?,?,?,?,?,?,?)
-                ON CONFLICT(day) DO NOTHING
-                """,
-                bind: [
-                    .text(row.day), .int(row.ts), .real(row.healthPercent), .int(row.rawMax),
-                    row.nominal.map(SQLiteValue.int) ?? .null, .int(row.design), .int(row.cycles),
-                ]
-            )
-        }
-        return parsed.rowCount
     }
 
     // MARK: - SQLite plumbing
@@ -403,20 +432,22 @@ public actor HistoryStore {
             var handle: OpaquePointer?
             let flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX
             guard sqlite3_open_v2(databaseURL.path, &handle, flags, nil) == SQLITE_OK, let handle else {
+                if let handle { sqlite3_close_v2(handle) }
                 return false
             }
             connection = Connection(handle: handle)
-            run("PRAGMA journal_mode=WAL")
-            run("PRAGMA synchronous=NORMAL")
-            createSchema()
+            try execute("PRAGMA journal_mode=WAL")
+            try execute("PRAGMA synchronous=NORMAL")
+            try createSchema()
             return true
         } catch {
+            connection = nil
             return false
         }
     }
 
-    private func createSchema() {
-        run(
+    private func createSchema() throws {
+        try execute(
             """
             CREATE TABLE IF NOT EXISTS charge_samples (
               ts INTEGER PRIMARY KEY,
@@ -425,7 +456,7 @@ public actor HistoryStore {
               charging INTEGER NOT NULL
             ) WITHOUT ROWID
             """)
-        run(
+        try execute(
             """
             CREATE TABLE IF NOT EXISTS power_samples (
               ts INTEGER PRIMARY KEY,
@@ -435,7 +466,7 @@ public actor HistoryStore {
               temp_c REAL
             ) WITHOUT ROWID
             """)
-        run(
+        try execute(
             """
             CREATE TABLE IF NOT EXISTS power_hourly (
               hour_ts INTEGER PRIMARY KEY,
@@ -444,7 +475,7 @@ public actor HistoryStore {
               avg_temp REAL
             ) WITHOUT ROWID
             """)
-        run(
+        try execute(
             """
             CREATE TABLE IF NOT EXISTS health_snapshots (
               day TEXT PRIMARY KEY,
@@ -480,12 +511,39 @@ public actor HistoryStore {
     }
 
     private func run(_ sql: String, bind values: [SQLiteValue] = []) {
-        guard let db else { return }
+        _ = try? execute(sql, bind: values)
+    }
+
+    /// Checked writes are required inside a transaction so a failed statement
+    /// cannot be mistaken for a successful mutation.
+    @discardableResult
+    private func execute(_ sql: String, bind values: [SQLiteValue] = []) throws -> Int {
+        guard let db else { throw HistoryError.cannotOpen(databaseURL.path) }
         var statement: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else { return }
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
+            throw HistoryError.statementFailed(String(cString: sqlite3_errmsg(db)))
+        }
         defer { sqlite3_finalize(statement) }
-        bindValues(values, to: statement)
-        sqlite3_step(statement)
+        try bindValues(values, to: statement)
+        var result = sqlite3_step(statement)
+        // PRAGMA statements can return rows before completing.
+        while result == SQLITE_ROW { result = sqlite3_step(statement) }
+        guard result == SQLITE_DONE else {
+            throw HistoryError.statementFailed(String(cString: sqlite3_errmsg(db)))
+        }
+        return Int(sqlite3_changes(db))
+    }
+
+    private func withTransaction<T>(_ operation: () throws -> T) throws -> T {
+        try execute("BEGIN IMMEDIATE TRANSACTION")
+        do {
+            let result = try operation()
+            try execute("COMMIT")
+            return result
+        } catch {
+            _ = try? execute("ROLLBACK")
+            throw error
+        }
     }
 
     private func query(_ sql: String, bind values: [SQLiteValue] = [], row: (OpaquePointer?) -> Void) {
@@ -493,20 +551,23 @@ public actor HistoryStore {
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else { return }
         defer { sqlite3_finalize(statement) }
-        bindValues(values, to: statement)
+        guard (try? bindValues(values, to: statement)) != nil else { return }
         while sqlite3_step(statement) == SQLITE_ROW {
             row(statement)
         }
     }
 
-    private func bindValues(_ values: [SQLiteValue], to statement: OpaquePointer?) {
+    private func bindValues(_ values: [SQLiteValue], to statement: OpaquePointer?) throws {
         for (index, value) in values.enumerated() {
             let position = Int32(index + 1)
-            switch value {
+            let result = switch value {
             case .int(let number): sqlite3_bind_int64(statement, position, number)
             case .real(let number): sqlite3_bind_double(statement, position, number)
             case .text(let string): sqlite3_bind_text(statement, position, string, -1, sqliteTransient)
             case .null: sqlite3_bind_null(statement, position)
+            }
+            guard result == SQLITE_OK else {
+                throw HistoryError.statementFailed(String(cString: sqlite3_errstr(result)))
             }
         }
     }

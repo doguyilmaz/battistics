@@ -24,13 +24,23 @@ private struct EnergyRow: Identifiable {
 }
 
 struct EnergyPane: View {
+    var isVisible = true
+
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+
     @State private var rows: [EnergyRow] = []
     @State private var hasResults = false
     @State private var hovered: Int32?
     @State private var pendingQuit: EnergyRow?
+    @State private var showingSamplingInfo = false
 
     var body: some View {
         VStack(spacing: 0) {
+            if showPowerFlow {
+                PowerFlowCard()
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+            }
             if rows.isEmpty {
                 ContentUnavailableView {
                     Label(
@@ -42,9 +52,10 @@ struct EnergyPane: View {
                             ? "No process used meaningful energy in the last sample window."
                             : "Watching which apps use the most energy. First results arrive in a few seconds.")
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
-                    VStack(spacing: 10) {
+                    LazyVStack(spacing: 10) {
                         ForEach(rows) { row in
                             GlassCard {
                                 rowContent(row)
@@ -55,15 +66,27 @@ struct EnergyPane: View {
                     .padding(20)
                 }
             }
-            Text("Sampling runs only while this view is open and stops the moment it closes.")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 10)
         }
         .navigationTitle("Energy")
-        .task {
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingSamplingInfo.toggle()
+                } label: {
+                    Label("About energy sampling", systemImage: "info.circle")
+                        .labelStyle(.iconOnly)
+                }
+                .help("About energy sampling")
+                .popover(isPresented: $showingSamplingInfo, arrowEdge: .top) {
+                    samplingInfo
+                }
+            }
+        }
+        .task(id: isVisible) {
+            guard isVisible else { return }
+            let sampler = ProcessEnergySampler.Session()
             while !Task.isCancelled {
-                let result = await ProcessEnergySampler.sample(over: .seconds(3))
+                let result = await sampler.sample(over: .seconds(3), limit: 20)
                 guard !Task.isCancelled else { break }
                 rows = result.map(EnergyRow.init)
                 hasResults = true
@@ -77,6 +100,21 @@ struct EnergyPane: View {
         } message: { _ in
             Text("Unsaved work in this app will be lost.")
         }
+    }
+
+    private var samplingInfo: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Energy sampling")
+                .font(.headline)
+            Text("Up to 20 processes, ranked by energy use or, if unavailable, CPU use.")
+            Text("100% CPU equals one logical core. Using several cores can exceed 100%.")
+            Text("Updates only while this pane is visible.")
+                .foregroundStyle(.secondary)
+        }
+        .font(.callout)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(16)
+        .frame(width: 320, alignment: .leading)
     }
 
     private var quitTitle: String {

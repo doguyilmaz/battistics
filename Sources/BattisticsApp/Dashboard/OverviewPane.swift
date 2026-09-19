@@ -2,6 +2,8 @@ import BattisticsCore
 import SwiftUI
 
 struct OverviewPane: View {
+    var isVisible = true
+
     @Environment(AppModel.self) private var model
     @Environment(PowerSettingsModel.self) private var powerModel
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
@@ -57,7 +59,8 @@ struct OverviewPane: View {
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
                         title: "Health",
-                        color: .health(percent: snapshot.displayHealthPercent),
+                        color: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary,
+                        valueText: snapshot.hasHealthReading ? nil : "—",
                         diameter: 112
                     )
                     if let limit = snapshot.designCycleCount, limit > 0 {
@@ -90,11 +93,11 @@ struct OverviewPane: View {
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
                 StatRow(
                     label: "Health",
-                    value: Formatting.percentPrecise(snapshot.displayHealthPercent),
-                    valueColor: .health(percent: snapshot.displayHealthPercent))
+                    value: (snapshot.hasHealthReading ? Formatting.percentPrecise(snapshot.displayHealthPercent) : "—"),
+                    valueColor: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary)
                 StatRow(
                     label: "Measured Health",
-                    value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
+                    value: (snapshot.hasMeasuredHealthReading ? Formatting.percentPrecise(snapshot.measuredHealthPercent) : "—"))
             }
         }
     }
@@ -121,14 +124,24 @@ struct OverviewPane: View {
                 if let voltage = snapshot.voltageMV {
                     StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
                 }
-                StatRow(label: "Time on Battery", value: timeOnBattery)
+                timeOnBatteryRow
             }
         }
     }
 
-    private var timeOnBattery: String {
+    @ViewBuilder private var timeOnBatteryRow: some View {
+        if isVisible, let unplugged = model.lastUnplugDate {
+            TimelineView(.periodic(from: unplugged, by: 60)) { context in
+                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
+            }
+        } else {
+            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
+        }
+    }
+
+    private func timeOnBattery(at date: Date) -> String {
         guard let unplugged = model.lastUnplugDate else { return "N/A" }
-        return Formatting.duration(minutes: max(Int(Date().timeIntervalSince(unplugged) / 60), 0))
+        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     /// Always four rows, present whether or not anything is plugged in.

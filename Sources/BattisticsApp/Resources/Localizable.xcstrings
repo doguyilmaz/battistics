@@ -805,12 +805,12 @@
         }
       }
     },
-    "Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.": {
+    "Charge history records battery changes. Power and temperature history add periodic background readings; a longer interval reduces sampling work.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj geçmişi olay tabanlıdır ve boştayken hiçbir maliyeti yoktur. Güç ve sıcaklık geçmişi ise zamanlayıcıyla tek bir hafif okuma gerektirir."
+            "value": "Şarj geçmişi pil değişikliklerini kaydeder. Güç ve sıcaklık geçmişi arka planda düzenli ölçümler ekler; daha uzun aralık, ölçüm sıklığını azaltır."
           }
         }
       }
@@ -932,19 +932,19 @@
         }
       }
     },
-    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app.": {
+    "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Some devices do not expose a level through the interfaces Battistics reads.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app."
+            "value": "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Some devices do not expose a level through the interfaces Battistics reads."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil düzeyini bildiren bağlı klavyeler, fareler, izleme dörtgenleri ve kulaklıklar burada görünür. Birçok üçüncü taraf aygıt bu bilgiyi paylaşmaz ve hiçbir uygulama tarafından gösterilemez."
+            "value": "Pil seviyesini bildiren bağlı klavye, fare, trackpad ve kulaklıklar burada görünür. Bazı cihazlar, Battistics’in kullandığı arayüzler üzerinden pil seviyesi paylaşmaz."
           }
         }
       }
@@ -2593,12 +2593,12 @@
         }
       }
     },
-    "Sampling runs only while this view is open and stops the moment it closes.": {
+    "Sampling runs only while this view is visible.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Örnekleme yalnızca bu görünüm açıkken çalışır ve kapanır kapanmaz durur."
+            "value": "Örnekleme yalnızca bu görünüm ekrandayken çalışır."
           }
         }
       }
@@ -3421,6 +3421,244 @@
           "stringUnit": {
             "state": "translated",
             "value": "güç adaptörü"
+          }
+        }
+      }
+    },
+    "The display follows its sleep timer while the Mac keeps running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The display follows its sleep timer while the Mac keeps running."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çalışmaya devam ederken ekran kendi uyku zamanlayıcısına uyar."
+          }
+        }
+      }
+    },
+    "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı gerektirir. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Sleep Display Now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep Display Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekranı Şimdi Uyut"
+          }
+        }
+      }
+    },
+    "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut başlatılamadı. Kapak kapalı modu için Sistem bölümünden güç yardımcısını kurun veya onarın."
+          }
+        }
+      }
+    },
+    "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku ayarının geri yüklendiği doğrulanamadı. Yardımcı oturum süresi dolunca yeniden deneyecek; uyku devre dışı kalırsa yardımcıyı onarın."
+          }
+        }
+      }
+    },
+    "macOS could not put the display to sleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS could not put the display to sleep."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ekranı uyutamadı."
+          }
+        }
+      }
+    },
+    "Lost the power helper connection. Keep Awake has stopped.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lost the power helper connection. Keep Awake has stopped."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısıyla bağlantı kesildi. Uyanık Tut durduruldu."
+          }
+        }
+      }
+    },
+    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler."
+          }
+        }
+      }
+    },
+    "Show percentage inside battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show percentage inside battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüzdeyi pil simgesinin içinde göster"
+          }
+        }
+      }
+    },
+    "Keep Awake stopped": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake stopped"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut durduruldu"
+          }
+        }
+      }
+    },
+    "The system sleep setting changed elsewhere. Your current setting was kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The system sleep setting changed elsewhere. Your current setting was kept."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistemin uyku ayarı başka bir yerden değiştirildi. Mevcut ayarınız korundu."
+          }
+        }
+      }
+    },
+    "The power helper could not confirm the closed-lid session. Keep Awake has stopped.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The power helper could not confirm the closed-lid session. Keep Awake has stopped."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı, kapak kapalı oturumunu doğrulayamadı. Uyanık Tut durduruldu."
+          }
+        }
+      }
+    },
+    "Keep Awake stopped, but the system sleep setting could not be confirmed. Check your system sleep settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake stopped, but the system sleep setting could not be confirmed. Check your system sleep settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut durduruldu, ancak sistemin uyku ayarı doğrulanamadı. Sisteminizin uyku ayarlarını kontrol edin."
+          }
+        }
+      }
+    },
+    "The closed-lid Keep Awake session ended.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The closed-lid Keep Awake session ended."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı Uyanık Tut oturumu sona erdi."
           }
         }
       }

@@ -11,11 +11,12 @@ final class PowerSettingsModel {
     private(set) var settings: PowerSettings?
 
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
+    @ObservationIgnored private var refreshGeneration: UInt = 0
 
     init() {
         // Same reasoning as the helper's status: these can be changed in
         // System Settings behind our back, and coming back to Battistics is
-        // exactly the moment a stale value would be noticed. One ~9ms read
+        // exactly the moment a stale value would be noticed. One on-demand read
         // per activation, never on a timer.
         activationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
@@ -24,8 +25,15 @@ final class PowerSettingsModel {
         }
     }
 
-    func refresh() async {
-        settings = await PowerSettingsReader.fetch()
+    @discardableResult
+    func refresh() async -> PowerSettings? {
+        refreshGeneration &+= 1
+        let generation = refreshGeneration
+        let refreshed = await PowerSettingsReader.fetch()
+        if generation == refreshGeneration {
+            settings = refreshed
+        }
+        return refreshed
     }
 
     enum Outcome {
@@ -73,15 +81,15 @@ final class PowerSettingsModel {
                 }
             }
             do {
-                try auth.run(change)
+                try await auth.run(change)
             } catch {
                 outcome = .failed
             }
         }
-        await refresh()
+        let verifiedSettings = await refresh()
         // Neither path can report the tool's exit status, so ask the system
         // whether it agrees rather than assuming a launch meant a change.
-        if outcome == .applied, !change.isReflected(in: settings) {
+        if outcome == .applied, !change.isReflected(in: verifiedSettings) {
             outcome = .failed
         }
         return outcome

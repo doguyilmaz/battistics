@@ -14,7 +14,7 @@ struct HistorySettings: View {
     var body: some View {
         Form {
             Section("Recording") {
-                Text("Charge history is event driven and costs nothing while idle. Power and temperature history need one lightweight reading on a timer.")
+                Text("Charge history records battery changes. Power and temperature history add periodic background readings; a longer interval reduces sampling work.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Record power and temperature", isOn: $samplingEnabled)
@@ -59,7 +59,7 @@ struct HistorySettings: View {
         ) {
             Button("Delete Everything", role: .destructive) {
                 Task {
-                    await model.history.deleteAllHistory()
+                    await model.deleteHistory()
                     await refreshSize()
                     statusMessage = "History deleted."
                 }

@@ -30,19 +30,27 @@ final class BluetoothGATTReader {
     private(set) var batteries: [PeripheralBattery] = []
 
     @ObservationIgnored private var session: GATTSession?
+    @ObservationIgnored private var generation = UUID()
+    @ObservationIgnored private var isVisible = false
 
     var isEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: Prefs.readBluetoothBatteries) }
         set {
             UserDefaults.standard.set(newValue, forKey: Prefs.readBluetoothBatteries)
-            newValue ? start() : stop()
+            newValue && isVisible ? start() : stop()
         }
     }
 
-    /// Called at launch. Does nothing unless the user already opted in, so an
-    /// install that never touches this never sees a prompt.
+    /// Only a visible pane starts an opted-in Bluetooth session; an install
+    /// that never enables this feature never sees a permission prompt.
     func startIfEnabled() {
-        if isEnabled { start() }
+        if isEnabled && isVisible { start() }
+    }
+
+    /// Opt-in is persistent; live Bluetooth work is only needed by this pane.
+    func setVisible(_ visible: Bool) {
+        isVisible = visible
+        visible ? startIfEnabled() : stop()
     }
 
     func refresh() {
@@ -53,28 +61,32 @@ final class BluetoothGATTReader {
         guard session == nil else { return refresh() }
         state = .waiting
         batteries = []
+        let generation = UUID()
+        self.generation = generation
         session = GATTSession(
             onState: { [weak self] state in
-                Task { @MainActor in self?.state = state }
+                Task { @MainActor in
+                    guard self?.generation == generation else { return }
+                    self?.state = state
+                }
             },
-            onBattery: { [weak self] name, percent in
-                Task { @MainActor in self?.record(name: name, percent: percent) }
+            onBatteries: { [weak self] batteries in
+                Task { @MainActor in
+                    guard self?.generation == generation else { return }
+                    if self?.batteries != batteries { self?.batteries = batteries }
+                }
             })
     }
 
     private func stop() {
+        generation = UUID()
         session?.close()
         session = nil
         batteries = []
         state = .off
     }
 
-    private func record(name: String, percent: Int) {
-        let entry = PeripheralBattery(id: "gatt#\(name)", name: name, percent: percent)
-        batteries.removeAll { $0.id == entry.id }
-        batteries.append(entry)
-        batteries.sort { $0.name < $1.name }
-    }
+
 }
 
 /// Every CoreBluetooth interaction, kept off the main actor because the
@@ -90,14 +102,16 @@ private final class GATTSession: NSObject, @unchecked Sendable {
     private var central: CBCentralManager?
     private var connected: [UUID: CBPeripheral] = [:]
     private let onState: @Sendable (BluetoothGATTReader.State) -> Void
-    private let onBattery: @Sendable (String, Int) -> Void
+    private var levels: [UUID: PeripheralBattery] = [:]
+    private var characteristics: [UUID: CBCharacteristic] = [:]
+    private let onBatteries: @Sendable ([PeripheralBattery]) -> Void
 
     init(
         onState: @escaping @Sendable (BluetoothGATTReader.State) -> Void,
-        onBattery: @escaping @Sendable (String, Int) -> Void
+        onBatteries: @escaping @Sendable ([PeripheralBattery]) -> Void
     ) {
         self.onState = onState
-        self.onBattery = onBattery
+        self.onBatteries = onBatteries
         super.init()
         // Constructing this is what raises the permission prompt.
         central = CBCentralManager(delegate: self, queue: nil)
@@ -105,25 +119,86 @@ private final class GATTSession: NSObject, @unchecked Sendable {
 
     func refresh() {
         guard let central, central.state == .poweredOn else { return }
-        for peripheral in central.retrieveConnectedPeripherals(withServices: [Self.batteryService]) {
+        let current = central.retrieveConnectedPeripherals(withServices: [Self.batteryService])
+        let identifiers = Set(current.map(\.identifier))
+        for identifier in Array(connected.keys) where !identifiers.contains(identifier) {
+            if let peripheral = connected.removeValue(forKey: identifier) {
+                peripheral.delegate = nil
+                central.cancelPeripheralConnection(peripheral)
+            }
+            levels.removeValue(forKey: identifier)
+            characteristics.removeValue(forKey: identifier)
+        }
+        for peripheral in current where peripheral.state != .connected {
+            levels.removeValue(forKey: peripheral.identifier)
+        }
+        publish()
+        for peripheral in current {
+            let isNew = connected[peripheral.identifier] == nil
+            if let previous = connected[peripheral.identifier], previous !== peripheral {
+                previous.delegate = nil
+                characteristics.removeValue(forKey: peripheral.identifier)
+                levels.removeValue(forKey: peripheral.identifier)
+            }
             connected[peripheral.identifier] = peripheral
             peripheral.delegate = self
-            central.connect(peripheral, options: nil)
+            if isNew {
+                // A system connection is not yet this central’s connection.
+                central.connect(peripheral, options: nil)
+            } else if peripheral.state == .connected {
+                if let characteristic = characteristics[peripheral.identifier] {
+                    // Subscribed devices push changes; only non-notifying
+                    // devices need another battery read on the visible tick.
+                    if !characteristic.isNotifying || levels[peripheral.identifier] == nil {
+                        peripheral.readValue(for: characteristic)
+                    }
+                } else {
+                    peripheral.discoverServices([Self.batteryService])
+                }
+            } else if peripheral.state != .connecting {
+                central.connect(peripheral, options: nil)
+            }
         }
         onState(.ready)
     }
 
+    private func publish() {
+        onBatteries(levels.values.sorted { ($0.name, $0.id) < ($1.name, $1.id) })
+    }
+
+    private func remove(_ peripheral: CBPeripheral) {
+        // A delayed callback from an older object must not evict a replacement.
+        guard connected[peripheral.identifier] === peripheral else { return }
+        peripheral.delegate = nil
+        connected.removeValue(forKey: peripheral.identifier)
+        levels.removeValue(forKey: peripheral.identifier)
+        characteristics.removeValue(forKey: peripheral.identifier)
+        publish()
+    }
+
     func close() {
         for peripheral in connected.values {
+            peripheral.delegate = nil
             central?.cancelPeripheralConnection(peripheral)
         }
         connected.removeAll()
+        levels.removeAll()
+        characteristics.removeAll()
+        publish()
+        central?.delegate = nil
         central = nil
     }
 }
 
 extension GATTSession: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        if central.state != .poweredOn {
+            for peripheral in connected.values { peripheral.delegate = nil }
+            connected.removeAll()
+            levels.removeAll()
+            characteristics.removeAll()
+            publish()
+        }
         switch central.state {
         case .poweredOn: refresh()
         case .unauthorized: onState(.denied)
@@ -132,14 +207,43 @@ extension GATTSession: CBCentralManagerDelegate {
         }
     }
 
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        remove(peripheral)
+    }
+
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        remove(peripheral)
+    }
+
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        guard connected[peripheral.identifier] === peripheral else { return }
         peripheral.discoverServices([Self.batteryService])
     }
 }
 
 extension GATTSession: CBPeripheralDelegate {
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        guard connected[peripheral.identifier] === peripheral,
+            invalidatedServices.contains(where: { $0.uuid == Self.batteryService }) else { return }
+        characteristics.removeValue(forKey: peripheral.identifier)
+        levels.removeValue(forKey: peripheral.identifier)
+        publish()
+        if peripheral.state == .connected { peripheral.discoverServices([Self.batteryService]) }
+    }
+
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        for service in peripheral.services ?? [] {
+        guard connected[peripheral.identifier] === peripheral else { return }
+        guard error == nil else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
+        let services = (peripheral.services ?? []).filter { $0.uuid == Self.batteryService }
+        if services.isEmpty {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+        }
+        for service in services {
             peripheral.discoverCharacteristics([Self.batteryLevel], for: service)
         }
     }
@@ -147,7 +251,16 @@ extension GATTSession: CBPeripheralDelegate {
     func peripheral(
         _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?
     ) {
-        for characteristic in service.characteristics ?? [] {
+        guard connected[peripheral.identifier] === peripheral,
+            service.uuid == Self.batteryService else { return }
+        let characteristics = (service.characteristics ?? []).filter { $0.uuid == Self.batteryLevel }
+        guard error == nil, !characteristics.isEmpty else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
+        for characteristic in characteristics {
+            self.characteristics[peripheral.identifier] = characteristic
             peripheral.readValue(for: characteristic)
             // Many devices push changes, which saves polling entirely.
             if characteristic.properties.contains(.notify) {
@@ -159,11 +272,21 @@ extension GATTSession: CBPeripheralDelegate {
     func peripheral(
         _ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?
     ) {
-        guard characteristic.uuid == Self.batteryLevel,
+        guard connected[peripheral.identifier] === peripheral,
+            peripheral.state == .connected, characteristic.uuid == Self.batteryLevel,
+            characteristic.service?.uuid == Self.batteryService
+        else { return }
+        guard error == nil,
             let value = characteristic.value?.first,
             (0...100).contains(Int(value)),
             let name = peripheral.name
-        else { return }
-        onBattery(name, Int(value))
+        else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
+        levels[peripheral.identifier] = PeripheralBattery(
+            id: "gatt#\(peripheral.identifier)", name: name, percent: Int(value))
+        publish()
     }
 }

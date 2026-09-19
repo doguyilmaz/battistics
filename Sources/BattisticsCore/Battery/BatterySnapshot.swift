@@ -66,7 +66,7 @@ public enum HealthStatus: String, Sendable {
 }
 
 public struct BatterySnapshot: Sendable, Equatable {
-    public let timestamp: Date
+    public private(set) var timestamp: Date
     public let batteryInstalled: Bool
     public let percent: Int
     public let rawCurrentCapacity: Int
@@ -93,6 +93,7 @@ public struct BatterySnapshot: Sendable, Equatable {
     /// only carries week precision, not a calendar day.
     public let manufactureDateIsApproximate: Bool
     public let adapter: AdapterInfo?
+    public private(set) var powerFlow: PowerFlowTelemetry?
 
     public init(
         timestamp: Date,
@@ -119,7 +120,8 @@ public struct BatterySnapshot: Sendable, Equatable {
         deviceName: String?,
         manufactureDate: Date?,
         manufactureDateIsApproximate: Bool = false,
-        adapter: AdapterInfo?
+        adapter: AdapterInfo?,
+        powerFlow: PowerFlowTelemetry? = nil
     ) {
         self.timestamp = timestamp
         self.batteryInstalled = batteryInstalled
@@ -146,14 +148,36 @@ public struct BatterySnapshot: Sendable, Equatable {
         self.manufactureDate = manufactureDate
         self.manufactureDateIsApproximate = manufactureDateIsApproximate
         self.adapter = adapter
+        self.powerFlow = powerFlow
     }
 
-    /// The capacity the battery can currently hold. Prefers the controller's
-    /// smoothed NominalChargeCapacity, the same value macOS bases its own
-    /// health percentage on, so Battistics never contradicts System Settings.
-    public var currentMaxCapacity: Int {
-        nominalCapacity ?? rawMaxCapacity
+    /// Compares every measurement while ignoring when it was read. Keep
+    /// normal equality timestamp-sensitive for history and freshness logic.
+    public func hasSameReadings(as other: BatterySnapshot) -> Bool {
+        switch (powerFlow, other.powerFlow) {
+        case let (.some(lhs), .some(rhs)):
+            guard lhs.hasSameReadings(as: rhs) else { return false }
+        case (.none, .none):
+            break
+        default:
+            return false
+        }
+        var reading = self
+        reading.timestamp = other.timestamp
+        reading.powerFlow = other.powerFlow
+        return reading == other
     }
+
+    /// Prefers the controller’s smoothed NominalChargeCapacity. This is a
+    /// controller estimate, distinct from Apple’s separately modeled verdict.
+    public var currentMaxCapacity: Int {
+        if let nominalCapacity, nominalCapacity > 0 { return nominalCapacity }
+        return rawMaxCapacity
+    }
+
+    public var hasHealthReading: Bool { designCapacity > 0 && currentMaxCapacity > 0 }
+
+    public var hasMeasuredHealthReading: Bool { designCapacity > 0 && rawMaxCapacity > 0 }
 
     public var healthPercent: Double {
         guard designCapacity > 0 else { return 0 }
@@ -171,12 +195,18 @@ public struct BatterySnapshot: Sendable, Equatable {
         BatteryHealth.display(healthPercent)
     }
 
-    public var healthStatus: HealthStatus {
-        HealthStatus(healthPercent: displayHealthPercent)
+    public var healthStatus: HealthStatus? {
+        guard hasHealthReading else { return nil }
+        return HealthStatus(healthPercent: displayHealthPercent)
     }
 
     /// Signed instantaneous power. Negative while discharging, positive while charging.
     public var watts: Double? {
+        Self.powerWatts(voltageMV: voltageMV, amperageMA: amperageMA)
+    }
+
+    /// Shared arithmetic; callers choose validation appropriate to their source.
+    static func powerWatts(voltageMV: Int?, amperageMA: Int?) -> Double? {
         guard let voltageMV, let amperageMA else { return nil }
         return Double(voltageMV) * Double(amperageMA) / 1_000_000
     }

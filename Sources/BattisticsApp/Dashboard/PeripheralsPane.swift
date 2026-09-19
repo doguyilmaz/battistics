@@ -5,15 +5,16 @@ struct PeripheralsPane: View {
     @Environment(BluetoothGATTReader.self) private var bluetooth
     @State private var peripherals: [PeripheralBattery] = []
     @State private var hasLoaded = false
+    @State private var windowVisible = false
 
-    /// Levels read over Bluetooth join the rest rather than sitting in their
-    /// own list: to the reader they are the same fact from another source.
+    /// Merge only matching physical identities. A display name can belong
+    /// to several devices, and CoreBluetooth UUIDs cannot identify MAC rows.
     private var allBatteries: [PeripheralBattery] {
         var merged: [String: PeripheralBattery] = [:]
         for battery in peripherals + bluetooth.batteries {
-            merged["\(battery.name)#\(battery.detail ?? "")"] = battery
+            merged[battery.id] = battery
         }
-        return merged.values.sorted { ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "") }
+        return merged.values.sorted { ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id) }
     }
 
     var body: some View {
@@ -24,7 +25,7 @@ struct PeripheralsPane: View {
                     "No peripheral batteries",
                     systemImage: "keyboard",
                     description: Text(
-                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Many third-party devices keep their level to themselves and cannot be shown by any app.")
+                        "Connected keyboards, mice, trackpads and headphones that report a battery level appear here. Some devices do not expose a level through the interfaces Battistics reads.")
                 )
             } else {
                 ScrollView {
@@ -66,28 +67,33 @@ struct PeripheralsPane: View {
             bluetoothSection
         }
         .navigationTitle("Peripherals")
-        .task {
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
+        .onChange(of: windowVisible) { bluetooth.setVisible(windowVisible) }
+        .onDisappear { bluetooth.setVisible(false) }
+        .task(id: windowVisible) {
+            guard windowVisible else { return }
+            bluetooth.setVisible(true)
             while !Task.isCancelled {
-                // The IORegistry scan is instant and covers Apple's own Magic
-                // peripherals. Everything else — AirPods and other earpieces —
-                // is only in system_profiler, which costs about a second, so
-                // it runs on the same slow tick rather than a faster one.
+                // Combine IORegistry readings with the more expensive system
+                // report on one tolerant tick, only while this pane is visible.
                 async let hid = PeripheralBatteryReader.read()
                 async let systemProfiler = BluetoothBatteryReader.fetch()
                 var merged: [String: PeripheralBattery] = [:]
-                for battery in await hid + systemProfiler {
+                let readings = await hid + systemProfiler
+                guard !Task.isCancelled else { return }
+                for battery in readings {
                     // Same device and cell from both readers is one row.
-                    merged["\(battery.name)#\(battery.detail ?? "")"] = battery
+                    merged[battery.id] = battery
                 }
-                peripherals = merged.values.sorted {
-                    ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
+                let refreshed = merged.values.sorted {
+                    ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id)
                 }
+                if peripherals != refreshed { peripherals = refreshed }
                 hasLoaded = true
                 bluetooth.refresh()
-                try? await Task.sleep(for: .seconds(15))
+                try? await Task.sleep(for: .seconds(15), tolerance: .seconds(3))
             }
         }
-        .task { bluetooth.startIfEnabled() }
     }
 
     /// A button, not a switch. A switch says the app owns the setting, but

@@ -6,6 +6,7 @@ struct MenuBarConfig: Equatable {
     var showGlyph = true
     var primaryText = MenuBarText.chargePercent
     var secondaryText = MenuBarText.none
+    var percentInside = false
     var colorLow = true
     var lowThreshold = 20
     var colorHigh = false
@@ -22,7 +23,13 @@ struct MenuBarConfig: Equatable {
 /// color rule applies. Images are cached per state.
 @MainActor
 enum MenuBarIconRenderer {
-    private static let cache = NSCache<NSString, NSImage>()
+    private static let cache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        // Configurable readings such as watts and time can otherwise retain
+        // a new image for every value seen during a long-running session.
+        cache.countLimit = 256
+        return cache
+    }()
     private static let height: CGFloat = 18
     private static let glyphSize = NSSize(width: 27, height: 17)
     private static let font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
@@ -39,25 +46,27 @@ enum MenuBarIconRenderer {
         let percent = snapshot.percent
         let charging = snapshot.isCharging
         let external = snapshot.externalConnected
+        let inside = config.percentInside && config.showGlyph
         let texts = [config.primaryText, config.secondaryText]
+            .filter { !inside || $0 != .chargePercent }
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
         let tint = tintColor(percent: percent, charging: charging, external: external, config: config)
 
-        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(config.iconStyle.rawValue)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")|\(config.keepAwakeIcon)"
+        let key = "\(percent)|\(charging)|\(external)|\(config.showGlyph)|\(config.iconStyle.rawValue)|\(texts.joined(separator: "·"))|\(tint?.description ?? "template")|\(config.keepAwakeIcon)|\(inside)"
         return cachedRender(
             key: key, percent: percent, charging: charging, texts: texts,
             showGlyph: config.showGlyph, tint: tint, shape: config.iconStyle,
-            keepAwakeIcon: config.keepAwakeIcon)
+            keepAwakeIcon: config.keepAwakeIcon, percentInside: inside)
     }
 
     private static func cachedRender(
         key: String, percent: Int?, charging: Bool, texts: [String], showGlyph: Bool,
-        tint: NSColor?, shape: MenuBarIconStyle, keepAwakeIcon: Bool
+        tint: NSColor?, shape: MenuBarIconStyle, keepAwakeIcon: Bool, percentInside: Bool = false
     ) -> NSImage {
         if let cached = cache.object(forKey: key as NSString) { return cached }
         let image = render(
             percent: percent, charging: charging, texts: texts,
-            showGlyph: showGlyph, tint: tint, shape: shape, keepAwakeIcon: keepAwakeIcon)
+            showGlyph: showGlyph, tint: tint, shape: shape, keepAwakeIcon: keepAwakeIcon, percentInside: percentInside)
         cache.setObject(image, forKey: key as NSString)
         return image
     }
@@ -77,6 +86,15 @@ enum MenuBarIconRenderer {
         return nil
     }
 
+    /// Uses the same dimensions and charging layout as the real status item.
+    static func previewImage(percent: Int, charging: Bool, config: MenuBarConfig) -> NSImage {
+        let tint = tintColor(percent: percent, charging: charging, external: charging, config: config)
+        return render(
+            percent: percent, charging: charging, texts: [], showGlyph: true,
+            tint: tint, shape: config.iconStyle, keepAwakeIcon: false,
+            percentInside: config.percentInside && config.showGlyph)
+    }
+
     private static func text(for kind: MenuBarText, snapshot: BatterySnapshot?, unit: TemperatureUnit) -> String? {
         guard let snapshot else { return nil }
         switch kind {
@@ -85,6 +103,7 @@ enum MenuBarIconRenderer {
         case .chargePercent:
             return "\(snapshot.percent)%"
         case .healthPercent:
+            guard snapshot.hasHealthReading else { return "H—" }
             return "H\(Int(snapshot.displayHealthPercent.rounded()))%"
         case .timeRemaining:
             guard let minutes = snapshot.timeRemainingMin else { return nil }
@@ -118,8 +137,11 @@ enum MenuBarIconRenderer {
 
     private static func render(
         percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
-        shape: MenuBarIconStyle, keepAwakeIcon: Bool
+        shape: MenuBarIconStyle, keepAwakeIcon: Bool, percentInside: Bool
     ) -> NSImage {
+        // A small proportional enlargement keeps the original 27:17 silhouette.
+        let glyphSize = percentInside ? NSSize(width: 27 * 18 / 17, height: 18) : Self.glyphSize
+        let chargingWidth: CGFloat = percentInside && charging ? 12 : 0
         let color = tint ?? .black
         let string = texts.joined(separator: " ")
         let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
@@ -132,6 +154,7 @@ enum MenuBarIconRenderer {
         if width == 0 { width = glyphSize.width }
         if keepAwakeIcon { width += awakeGap + awakeSymbolSize.width + awakeTrailingPad }
 
+        width += chargingWidth
         let size = NSSize(width: width, height: height)
         let image = NSImage(size: size, flipped: false) { _ in
             var x: CGFloat = 0
@@ -144,10 +167,18 @@ enum MenuBarIconRenderer {
                     style: BatGlyph.Style(
                         color: color, charging: charging,
                         fillFraction: percent.map { CGFloat($0) / 100 },
-                        shape: shape))
-                x += glyphSize.width + 4
+                        shape: shape, percentage: percentInside ? percent : nil))
+                x += glyphSize.width
+                if chargingWidth > 0, let bolt = NSImage(systemSymbolName: "bolt.fill", accessibilityDescription: "Charging") {
+                    let box = NSRect(x: glyphSize.width + 3, y: 3, width: 8, height: 12)
+                    bolt.draw(in: box)
+                    color.setFill()
+                    box.fill(using: .sourceAtop)
+                    x += chargingWidth
+                }
             }
             if !string.isEmpty {
+                if showGlyph { x += 4 }
                 (string as NSString).draw(
                     at: NSPoint(x: x, y: (height - textSize.height) / 2 + 0.5),
                     withAttributes: attributes)

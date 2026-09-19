@@ -127,6 +127,7 @@ enum Prefs {
 
     static let appIconStyle = "appIconStyle"
     static let menuBarIconStyle = "menuBarIconStyle"
+    static let menuBarPercentInside = "menuBarPercentInside"
     static let menuBarShowGlyph = "menuBarShowGlyph"
     static let menuBarPrimaryText = "menuBarPrimaryText"
     static let menuBarSecondaryText = "menuBarSecondaryText"
@@ -140,6 +141,8 @@ enum Prefs {
     static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
+
+    static let showPowerFlow = "showPowerFlow"
 
     static let powerSamplingEnabled = "powerSamplingEnabled"
     static let powerSamplingInterval = "powerSamplingInterval"
@@ -170,6 +173,7 @@ enum Prefs {
             appIconStyle: AppIconStyle.original.rawValue,
             menuBarIconStyle: MenuBarIconStyle.bat.rawValue,
             menuBarShowGlyph: true,
+            menuBarPercentInside: false,
             menuBarPrimaryText: MenuBarText.chargePercent.rawValue,
             menuBarSecondaryText: MenuBarText.none.rawValue,
             menuBarColorLow: true,
@@ -182,6 +186,7 @@ enum Prefs {
             keepAwakeMenuBarIcon: true,
             readBluetoothBatteries: false,
 
+            showPowerFlow: false,
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,
 

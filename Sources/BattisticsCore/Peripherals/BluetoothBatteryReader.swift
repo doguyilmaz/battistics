@@ -11,25 +11,14 @@ import Foundation
 /// publishing it to macOS, which is why even the system's own Bluetooth UI
 /// cannot show it.
 public enum BluetoothBatteryReader {
-    /// `system_profiler` is slow, about a second, so callers fetch on demand
-    /// while a view is open rather than on a timer.
+    /// A relatively expensive system report, fetched only by the visible
+    /// peripherals pane. Cancellation stops an obsolete report in flight.
     public static func fetch() async -> [PeripheralBattery] {
-        await Task.detached(priority: .utility) { () -> [PeripheralBattery] in
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
-            process.arguments = ["SPBluetoothDataType", "-json"]
-            let output = Pipe()
-            process.standardOutput = output
-            process.standardError = Pipe()
-            do {
-                try process.run()
-            } catch {
-                return []
-            }
-            let data = output.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
-            return parse(data)
-        }.value
+        guard let data = try? await BoundedCommand.run(
+            executable: "/usr/sbin/system_profiler", arguments: ["SPBluetoothDataType", "-json"],
+            timeout: 15, maximumOutputBytes: 2_097_152
+        ), !Task.isCancelled else { return [] }
+        return parse(data)
     }
 
     /// Pure and unit-testable.
@@ -51,20 +40,22 @@ public enum BluetoothBatteryReader {
             ("device_batteryLevelCase", "Case"),
         ]
 
-        // Keyed on the device and cell rather than the address: a device
-        // reconnecting is briefly listed twice under two addresses, which
-        // showed the same earpiece twice until macOS settled. It also keeps
-        // a row's identity stable across a reconnect, so SwiftUI does not
-        // tear the list down and rebuild it.
+        // Display names are not identities: two devices can have the same
+        // factory name. Keep each physical address and battery cell separate.
         var found: [String: PeripheralBattery] = [:]
         for entry in entries {
             guard let connected = entry["device_connected"] as? [[String: Any]] else { continue }
             for wrapper in connected {
                 for (name, value) in wrapper {
                     guard let device = value as? [String: Any] else { continue }
+                    let address = (device["device_address"] as? String)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        .replacingOccurrences(of: "-", with: ":")
+                        .lowercased()
+                    let identity = address.flatMap { $0.isEmpty ? nil : $0 } ?? "name:\(name)"
                     for slot in slots {
                         guard let percent = percentage(device[slot.key]) else { continue }
-                        let id = "\(name)#\(slot.label ?? "main")"
+                        let id = "\(identity)#\(slot.label ?? "main")"
                         found[id] = PeripheralBattery(
                             id: id, name: name, percent: percent, detail: slot.label)
                     }
@@ -72,14 +63,17 @@ public enum BluetoothBatteryReader {
             }
         }
         return found.values.sorted {
-            ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "")
+            ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id)
         }
     }
 
     /// Values arrive as strings with the percent sign attached, and its side
     /// depends on the user's locale — "%100" in Turkish, "100%" in English.
     private static func percentage(_ value: Any?) -> Int? {
-        guard let text = value as? String else { return value as? Int }
+        guard let text = value as? String else {
+            guard let percent = value as? Int, (0...100).contains(percent) else { return nil }
+            return percent
+        }
         let digits = text.filter(\.isNumber)
         guard let percent = Int(digits), (0...100).contains(percent) else { return nil }
         return percent

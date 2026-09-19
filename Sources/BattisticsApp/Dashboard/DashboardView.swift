@@ -61,10 +61,10 @@ struct DashboardView: View {
     @Environment(KeepAwakeModel.self) private var keepAwake
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
     @State private var sidebarVisible = true
+    @State private var windowVisible = false
 
-    /// Advanced by the dashboard's existing 3s refresh loop.
-    private var keepAwakeTitle: String {
-        guard let seconds = keepAwake.remaining() else {
+    private func keepAwakeTitle(at date: Date) -> String {
+        guard let seconds = keepAwake.remaining(at: date) else {
             return String(localized: "Awake")
         }
         return Formatting.duration(minutes: Int(seconds / 60))
@@ -100,7 +100,15 @@ struct DashboardView: View {
                     Button {
                         keepAwake.stop()
                     } label: {
-                        Label(keepAwakeTitle, systemImage: "cup.and.saucer.fill")
+                        Group {
+                            if windowVisible, let session = keepAwake.session, session.deadline != nil {
+                                TimelineView(.periodic(from: session.startedAt, by: 60)) { _ in
+                                    Label(keepAwakeTitle(at: Date()), systemImage: "cup.and.saucer.fill")
+                                }
+                            } else {
+                                Label(keepAwakeTitle(at: Date()), systemImage: "cup.and.saucer.fill")
+                            }
+                        }
                             .labelStyle(.titleAndIcon)
                             .monospacedDigit()
                     }
@@ -110,11 +118,10 @@ struct DashboardView: View {
         }
         .navigationTitle(model.dashboardPane.title)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
-        .task {
-            while !Task.isCancelled {
-                model.refreshSensors()
-                try? await Task.sleep(for: .seconds(3))
-            }
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
+        .task(id: windowVisible) {
+            guard windowVisible else { return }
+            await model.refreshSensorsWhileVisible(every: .seconds(3))
         }
     }
 
@@ -148,11 +155,11 @@ struct DashboardView: View {
 
     @ViewBuilder private var detailView: some View {
         switch model.dashboardPane {
-        case .overview: OverviewPane()
+        case .overview: OverviewPane(isVisible: windowVisible)
         case .history: HistoryPane()
         case .details: DetailsPane()
         case .peripherals: PeripheralsPane()
-        case .energy: EnergyPane()
+        case .energy: EnergyPane(isVisible: windowVisible)
         case .system: SystemPane()
         case .general: GeneralSettings()
         case .appearance: AppearanceSettings()

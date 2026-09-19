@@ -10,6 +10,8 @@ import Observation
 @Observable
 final class AppModel {
     private(set) var snapshot: BatterySnapshot?
+    /// Latest successful registry read, separate from value-only snapshot deduplication.
+    private(set) var powerFlowReadAt: Date?
     private(set) var lastUnplugDate: Date?
     private(set) var sparkline: [SeriesPoint] = []
     /// Which dashboard pane is showing; settable from the popover and the
@@ -18,6 +20,10 @@ final class AppModel {
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?
     @ObservationIgnored private var appleHealthTask: Task<Void, Never>?
+    @ObservationIgnored private var recordedHealthDay: Date?
+    @ObservationIgnored private var dailyHealthTask: Task<Void, Never>?
+    @ObservationIgnored private var sparklineGeneration: UInt = 0
+    @ObservationIgnored private var isDeletingHistory = false
 
     let history: HistoryStore
 
@@ -26,6 +32,9 @@ final class AppModel {
     @ObservationIgnored private var alertState = AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
     @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var visibleSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var visibleSamplingInterval: Duration?
+    @ObservationIgnored private var visibleSensorConsumers: [UUID: Duration] = [:]
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     @ObservationIgnored private var defaultsObserver: NSObjectProtocol?
     /// Baseline for transition detection, updated only when a transition is
@@ -36,7 +45,9 @@ final class AppModel {
 
     init(
         historyDirectory: URL? = nil,
-        batteryProvider: @escaping () -> BatterySnapshot? = { BatteryReader.read() }
+        batteryProvider: @escaping () -> BatterySnapshot? = {
+            BatteryReader.read(includePowerFlow: UserDefaults.standard.bool(forKey: Prefs.showPowerFlow))
+        }
     ) {
         self.batteryProvider = batteryProvider
         Prefs.registerDefaults()
@@ -58,13 +69,19 @@ final class AppModel {
             self?.applyAppIcon()
         }
 
+        let launchUnplugDate = lastUnplugDate
         Task { [weak self] in
             guard let self else { return }
             await self.history.runRetention()
-            if self.snapshot?.externalConnected == false,
-                let storedUnplug = await self.history.lastUnplugDate() {
+            if let launchUnplugDate,
+                self.snapshot?.externalConnected == false,
+                self.lastUnplugDate == launchUnplugDate,
+                let storedUnplug = await self.history.lastUnplugDate(),
+                self.snapshot?.externalConnected == false,
+                self.lastUnplugDate == launchUnplugDate {
                 // Restore the real unplug moment across relaunches, both for
-                // the UI and for the on-battery duration alert.
+                // the UI and for the on-battery duration alert. A live AC
+                // transition while reading history starts a different session.
                 self.lastUnplugDate = storedUnplug
                 self.alertState.unpluggedAt = storedUnplug
             }
@@ -77,19 +94,66 @@ final class AppModel {
     /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
         guard let current = batteryProvider() else {
-            snapshot = nil
+            if snapshot != nil { snapshot = nil }
+            powerFlowReadAt = nil
             return
         }
         ingest(current)
+    }
+
+    /// Registers a visible view for the lifetime of its SwiftUI task. All
+    /// windows share one poll at the fastest requested cadence; cancellation
+    /// removes the request even when SwiftUI retains the hidden view.
+    func refreshSensorsWhileVisible(every interval: Duration) async {
+        guard !Task.isCancelled, interval > .zero else { return }
+        let id = UUID()
+        let (lifetime, continuation) = AsyncStream<Void>.makeStream()
+        visibleSensorConsumers[id] = interval
+        updateVisibleSampling()
+        defer {
+            continuation.finish()
+            visibleSensorConsumers.removeValue(forKey: id)
+            updateVisibleSampling()
+        }
+        // AsyncStream suspends without a timer and ends when this consumer's
+        // task is cancelled. The model's one shared task owns all polling.
+        for await _ in lifetime {}
+    }
+
+    private func updateVisibleSampling() {
+        let interval = visibleSensorConsumers.values.min()
+        guard interval != visibleSamplingInterval else { return }
+        visibleSamplingTask?.cancel()
+        visibleSamplingTask = nil
+        visibleSamplingInterval = interval
+        guard let interval else { return }
+        refreshSensors()
+        visibleSamplingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: interval, tolerance: interval / 10)
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled else { return }
+                self?.refreshSensors()
+            }
+        }
     }
 
     /// Every snapshot from every source passes through here, so state
     /// transitions are recorded and alerted no matter which path (power
     /// event, UI poll, background sampler) observed them first.
     private func ingest(_ current: BatterySnapshot) {
+        powerFlowReadAt = current.powerFlow?.readAt
         let previous = lastTransitionSnapshot
-        snapshot = current
+        // Timestamp-only changes do not affect battery presentation. Alerts
+        // and recording still consume every reading with its actual time.
+        if snapshot?.hasSameReadings(as: current) != true {
+            snapshot = current
+        }
         evaluateAlerts(for: current)
+        maybeRecordDailyHealth(current)
 
         let changed =
             previous == nil
@@ -109,7 +173,6 @@ final class AppModel {
         Task { [weak self] in
             await self?.history.recordChargeSample(sample)
         }
-        maybeRecordDailyHealth(current)
     }
 
     func loadAppleHealthIfNeeded() {
@@ -121,9 +184,24 @@ final class AppModel {
     }
 
     func loadSparkline() async {
+        sparklineGeneration &+= 1
+        let generation = sparklineGeneration
         let now = Date()
-        sparkline = await history.chargeSeries(
+        let points = await history.chargeSeries(
             from: now.addingTimeInterval(-24 * 3600), to: now, bucketSeconds: 600)
+        guard generation == sparklineGeneration else { return }
+        sparkline = points
+    }
+
+    func deleteHistory() async {
+        guard !isDeletingHistory else { return }
+        isDeletingHistory = true
+        defer { isDeletingHistory = false }
+        await dailyHealthTask?.value
+        await history.deleteAllHistory()
+        recordedHealthDay = nil
+        sparklineGeneration &+= 1
+        sparkline = []
     }
 
     private func startMonitoring() {
@@ -185,10 +263,17 @@ final class AppModel {
     }
 
     private func maybeRecordDailyHealth(_ snapshot: BatterySnapshot) {
-        guard snapshot.batteryInstalled, snapshot.designCapacity > 0 else { return }
-        Task { [weak self] in
+        guard !isDeletingHistory else { return }
+        guard snapshot.batteryInstalled, snapshot.hasHealthReading else { return }
+        let day = Calendar.current.startOfDay(for: snapshot.timestamp)
+        guard recordedHealthDay != day, dailyHealthTask == nil else { return }
+        dailyHealthTask = Task { [weak self] in
             guard let self else { return }
-            guard !(await self.history.hasHealthSnapshot(forDay: snapshot.timestamp)) else { return }
+            defer { self.dailyHealthTask = nil }
+            if await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) {
+                self.recordedHealthDay = day
+                return
+            }
             // Piggyback retention on the daily snapshot so long-running
             // sessions keep compacting without a relaunch.
             await self.history.runRetention()
@@ -200,6 +285,10 @@ final class AppModel {
                 designCapacity: snapshot.designCapacity,
                 cycleCount: snapshot.cycleCount
             )
+            // The store may fail to persist (for example, a full disk). Do
+            // not cache success or emit a health alert for an unwritten row.
+            guard await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) else { return }
+            self.recordedHealthDay = day
             let enabled = UserDefaults.standard.bool(forKey: Prefs.alertHealthDropEnabled)
             if let alert = AlertRules.healthDropAlert(
                 baseline: baseline, current: snapshot.healthPercent, enabled: enabled) {
@@ -277,7 +366,24 @@ final class AppModel {
         let showDock = UserDefaults.standard.bool(forKey: Prefs.showDockIcon)
         let policy: NSApplication.ActivationPolicy = showDock ? .regular : .accessory
         if app.activationPolicy() != policy {
-            app.setActivationPolicy(policy)
+            // AppKit may hide/order out windows while changing accessory
+            // status. Preserve only our visible document windows, never the
+            // transient MenuBarExtra panel or a minimized window.
+            let windows = app.windows.filter {
+                $0.isVisible && !$0.isMiniaturized && $0.styleMask.contains(.titled)
+                    && !($0 is NSPanel)
+            }
+            let keyWindow = app.keyWindow
+            let wasActive = app.isActive
+            guard app.setActivationPolicy(policy) else { return }
+            for window in windows {
+                window.hidesOnDeactivate = false
+                window.orderFront(nil)
+            }
+            if wasActive, let keyWindow, windows.contains(keyWindow) {
+                app.activate(ignoringOtherApps: true)
+                keyWindow.makeKeyAndOrderFront(nil)
+            }
         }
     }
 }

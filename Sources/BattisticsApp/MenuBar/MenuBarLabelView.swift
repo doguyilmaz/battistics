@@ -2,10 +2,11 @@ import BattisticsCore
 import SwiftUI
 
 struct MenuBarLabelView: View {
-    var model: AppModel
-    var keepAwake: KeepAwakeModel
+    var snapshot: BatterySnapshot?
+    var keepAwakeActive: Bool
 
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
+    @AppStorage(Prefs.menuBarPercentInside) private var percentInside = false
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
     @AppStorage(Prefs.menuBarSecondaryText) private var secondaryRaw = MenuBarText.none.rawValue
@@ -22,16 +23,17 @@ struct MenuBarLabelView: View {
             showGlyph: showGlyph,
             primaryText: MenuBarText(rawValue: primaryRaw) ?? .chargePercent,
             secondaryText: MenuBarText(rawValue: secondaryRaw) ?? .none,
+            percentInside: percentInside,
             colorLow: colorLow,
             lowThreshold: lowThreshold,
             colorHigh: colorHigh,
             colorCharging: colorCharging,
             temperatureUnit: TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both,
-            keepAwakeIcon: keepAwakeMenuBarIcon && keepAwake.isActive
+            keepAwakeIcon: keepAwakeMenuBarIcon && keepAwakeActive
         )
     }
 
     var body: some View {
-        Image(nsImage: MenuBarIconRenderer.image(snapshot: model.snapshot, config: config))
+        Image(nsImage: MenuBarIconRenderer.image(snapshot: snapshot, config: config))
     }
 }

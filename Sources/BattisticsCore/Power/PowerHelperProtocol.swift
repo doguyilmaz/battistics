@@ -9,14 +9,17 @@ public let powerHelperMachServiceName = "com.doguyilmaz.Battistics.PowerHelper"
 /// enumerated case, never a command, a path, or a free-form number. The helper
 /// builds the argument vector itself from those cases, so the set of
 /// operations a caller can request is fixed at compile time and fully
-/// enumerable — 106 of them, all of which change a macOS power setting.
+/// enumerable. The closed-lid operation is a fixed-duration, UUID-scoped lease.
 ///
 /// A client that has been completely compromised gains exactly that
 /// vocabulary and nothing else. This is the whole security argument, and it
-/// only holds while the interface stays semantic: adding a method that takes
-/// a string or an unbounded integer would quietly turn this into a root
-/// shell.
+/// only holds while the interface stays semantic: command strings or unbounded setting values would expand privileged
+/// authority. Lease strings are validated UUIDs and never command arguments.
 @objc public protocol PowerHelperProtocol {
+    /// A fixed 45-second lease, renewed by the app; never an arbitrary command.
+    func acquireLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void)
+    func renewLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void)
+    func releaseLidSleepLease(_ sessionID: String, reply: @escaping @Sendable (Int32) -> Void)
     func setLowPowerMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setEnergyMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setSleepTimer(_ timer: Int, minutes: Int, source: Int, reply: @escaping (Int32) -> Void)

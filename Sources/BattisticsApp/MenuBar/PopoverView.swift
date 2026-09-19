@@ -14,7 +14,8 @@ struct PopoverView: View {
     @Environment(PowerSettingsModel.self) private var powerModel
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
-    @State private var windowVisible = true
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+    @State private var windowVisible = false
     @State private var sparklineSelection: Date?
 
     private var temperatureUnit: TemperatureUnit {
@@ -37,7 +38,8 @@ struct PopoverView: View {
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
                         title: "Health",
-                        color: .health(percent: snapshot.displayHealthPercent)
+                        color: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary,
+                        valueText: snapshot.hasHealthReading ? nil : "—"
                     )
                 }
                 .frame(maxWidth: .infinity)
@@ -49,6 +51,9 @@ struct PopoverView: View {
                 chargeDetails(snapshot)
                 batteryDetails(snapshot)
                 sparklineCard
+                if showPowerFlow {
+                    PowerFlowSummary()
+                }
             } else {
                 ContentUnavailableView(
                     "No battery found",
@@ -56,6 +61,10 @@ struct PopoverView: View {
                     description: Text("Battistics needs a Mac with a built-in battery.")
                 )
                 .frame(height: 200)
+            }
+            if let error = keepAwake.errorMessage {
+                Text(error).font(.caption)
+                    .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
             }
             footer
         }
@@ -68,14 +77,15 @@ struct PopoverView: View {
         .task(id: windowVisible) {
             guard windowVisible else { return }
             await model.loadSparkline()
+            guard !Task.isCancelled else { return }
             // The popover can be the only thing a menu bar app ever shows, so
             // it cannot rely on the dashboard having primed this.
             helper.refreshStatus()
             await powerModel.refresh()
-            while !Task.isCancelled && windowVisible {
-                model.refreshSensors()
-                try? await Task.sleep(for: .seconds(2))
-            }
+        }
+        .task(id: windowVisible) {
+            guard windowVisible else { return }
+            await model.refreshSensorsWhileVisible(every: .seconds(2))
         }
     }
 
@@ -126,15 +136,15 @@ struct PopoverView: View {
                 SectionHeader(
                     title: "Charge",
                     help: [
-                        ("Current Charge", "How much energy the battery holds right now, in milliampere-hours."),
-                        ("Current Maximum", "The most the battery can hold today. It slowly declines with age and use."),
-                        ("Original Maximum", "The design capacity when the battery left the factory."),
-                        ("Time on Battery", "Active time since the power adapter was last unplugged."),
+                        ("Current Charge", "Charge stored now, in milliampere-hours (mAh)."),
+                        ("Current Maximum", "Today's full-charge capacity. It declines with age and use."),
+                        ("Original Maximum", "The battery's capacity when new."),
+                        ("Time on Battery", "Time since the adapter was unplugged."),
                     ])
                 StatRow(label: "Current Charge", value: Formatting.mAh(snapshot.rawCurrentCapacity))
                 StatRow(label: "Current Maximum", value: Formatting.mAh(snapshot.currentMaxCapacity))
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
-                StatRow(label: "Time on Battery", value: timeOnBattery)
+                timeOnBatteryRow
             }
         }
     }
@@ -145,10 +155,10 @@ struct PopoverView: View {
                 SectionHeader(
                     title: "Battery",
                     help: [
-                        ("Cycles", "One cycle is a full discharge worth of use, in any number of sessions."),
-                        ("Temperature", "Internal battery temperature. Sustained heat ages a battery faster."),
-                        ("Power", "Energy flowing right now. Negative means the battery is draining."),
-                        ("Voltage", "The battery pack's current voltage."),
+                        ("Cycles", "One full battery's use, possibly across several sessions."),
+                        ("Temperature", "Battery temperature. Prolonged heat speeds up aging."),
+                        ("Power", "Battery power. Negative means draining; positive means charging."),
+                        ("Voltage", "Battery pack voltage."),
                     ])
                 StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
                 if let temperature = snapshot.temperatureC {
@@ -185,62 +195,67 @@ struct PopoverView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 6) {
                 SectionHeader(title: "Last 24 Hours")
-                if model.sparkline.count > 1 {
-                    Chart {
-                        ForEach(model.sparkline) { point in
-                            AreaMark(
-                                x: .value("Time", point.date),
-                                y: .value("Charge", point.value)
-                            )
-                            .interpolationMethod(.monotone)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
-                                    startPoint: .top, endPoint: .bottom))
-                            LineMark(
-                                x: .value("Time", point.date),
-                                y: .value("Charge", point.value)
-                            )
-                            .interpolationMethod(.monotone)
-                            .foregroundStyle(Color.green)
-                            .lineStyle(StrokeStyle(lineWidth: 1.5))
-                        }
-                        if let selected = nearestSparklinePoint {
-                            RuleMark(x: .value("Time", selected.date))
-                                .foregroundStyle(.secondary.opacity(0.35))
-                            PointMark(
-                                x: .value("Time", selected.date),
-                                y: .value("Charge", selected.value)
-                            )
-                            .foregroundStyle(Color.green)
-                            .symbolSize(28)
-                            .annotation(
-                                position: .top,
-                                overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
-                            ) {
-                                HStack(spacing: 4) {
-                                    Text("\(Int(selected.value.rounded()))%")
-                                        .font(.caption2.weight(.semibold))
-                                    Text(selected.date, format: .dateTime.hour().minute())
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                // Reserve the plot's height before the async history read finishes.
+                // Otherwise the first opening grows from a caption into a chart.
+                ZStack(alignment: .leading) {
+                    if model.sparkline.count > 1 {
+                        Chart {
+                            ForEach(model.sparkline) { point in
+                                AreaMark(
+                                    x: .value("Time", point.date),
+                                    y: .value("Charge", point.value)
+                                )
+                                .interpolationMethod(.monotone)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
+                                        startPoint: .top, endPoint: .bottom))
+                                LineMark(
+                                    x: .value("Time", point.date),
+                                    y: .value("Charge", point.value)
+                                )
+                                .interpolationMethod(.monotone)
+                                .foregroundStyle(Color.green)
+                                .lineStyle(StrokeStyle(lineWidth: 1.5))
+                            }
+                            if let selected = nearestSparklinePoint {
+                                RuleMark(x: .value("Time", selected.date))
+                                    .foregroundStyle(.secondary.opacity(0.35))
+                                PointMark(
+                                    x: .value("Time", selected.date),
+                                    y: .value("Charge", selected.value)
+                                )
+                                .foregroundStyle(Color.green)
+                                .symbolSize(28)
+                                .annotation(
+                                    position: .top,
+                                    overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
+                                ) {
+                                    HStack(spacing: 4) {
+                                        Text("\(Int(selected.value.rounded()))%")
+                                            .font(.caption2.weight(.semibold))
+                                        Text(selected.date, format: .dateTime.hour().minute())
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 5))
                                 }
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 5))
                             }
                         }
+                        .chartYScale(domain: 0...100)
+                        .chartXAxis(.hidden)
+                        .chartYAxis(.hidden)
+                        .chartXSelection(value: $sparklineSelection)
+                    } else {
+                        Text("Charge history appears here as Battistics runs.")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
                     }
-                    .chartYScale(domain: 0...100)
-                    .chartXAxis(.hidden)
-                    .chartYAxis(.hidden)
-                    .chartXSelection(value: $sparklineSelection)
-                    .frame(height: 46)
-                } else {
-                    Text("Charge history appears here as Battistics runs.")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 46)
             }
         }
     }
@@ -252,7 +267,15 @@ struct PopoverView: View {
         HStack(spacing: 3) {
             Image(systemName: "cup.and.saucer.fill")
                 .font(.system(size: 9))
-            Text(chipText)
+            Group {
+                if windowVisible, let session = keepAwake.session, session.deadline != nil {
+                    TimelineView(.periodic(from: session.startedAt, by: 60)) { _ in
+                        Text(chipText(at: Date()))
+                    }
+                } else {
+                    Text(chipText(at: Date()))
+                }
+            }
                 .font(.system(size: 10, weight: .medium))
                 .monospacedDigit()
                 .lineLimit(1)
@@ -272,9 +295,8 @@ struct PopoverView: View {
         .background(Color.accentColor.opacity(0.14), in: Capsule())
     }
 
-    /// Advanced by the popover's existing 2s refresh loop.
-    private var chipText: String {
-        guard let seconds = keepAwake.remaining() else {
+    private func chipText(at date: Date) -> String {
+        guard let seconds = keepAwake.remaining(at: date) else {
             return String(localized: "Awake")
         }
         return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
@@ -376,7 +398,7 @@ struct PopoverView: View {
                 }
                 Spacer()
                 powerMenu
-                keepAwakeMenu
+                keepAwakeMenu.disabled(keepAwake.isChanging)
                 Button {
                     model.dashboardPane = .general
                     openWindow(id: "dashboard")
@@ -396,65 +418,19 @@ struct PopoverView: View {
         }
     }
 
-    /// Publishes the hosting window's visibility, driven by occlusion
-    /// state changes, so sampling is strictly event gated.
-    private struct WindowVisibilityReader: NSViewRepresentable {
-        @Binding var isVisible: Bool
-
-        func makeNSView(context: Context) -> TrackerView {
-            let view = TrackerView()
-            view.onChange = { visible in
-                Task { @MainActor in
-                    isVisible = visible
-                }
+    @ViewBuilder private var timeOnBatteryRow: some View {
+        if windowVisible, let unplugged = model.lastUnplugDate {
+            TimelineView(.periodic(from: unplugged, by: 60)) { context in
+                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
             }
-            return view
-        }
-
-        func updateNSView(_ nsView: TrackerView, context: Context) {}
-
-        final class TrackerView: NSView {
-            var onChange: ((Bool) -> Void)?
-            private var observerToken: ObserverToken?
-
-            override func viewDidMoveToWindow() {
-                super.viewDidMoveToWindow()
-                observerToken = nil
-                guard let window else { return }
-                onChange?(window.occlusionState.contains(.visible))
-                let token = NotificationCenter.default.addObserver(
-                    forName: NSWindow.didChangeOcclusionStateNotification,
-                    object: window, queue: .main
-                ) { [weak self, weak window] _ in
-                    MainActor.assumeIsolated {
-                        guard let self, let window else { return }
-                        self.onChange?(window.occlusionState.contains(.visible))
-                    }
-                }
-                observerToken = ObserverToken(token)
-            }
-        }
-
-        /// Removes the notification observer when released, so TrackerView
-        /// needs no deinit of its own (an actor-isolated class cannot touch
-        /// non-Sendable stored state from its nonisolated deinit).
-        private final class ObserverToken: @unchecked Sendable {
-            private let token: any NSObjectProtocol
-
-            init(_ token: any NSObjectProtocol) {
-                self.token = token
-            }
-
-            deinit {
-                NotificationCenter.default.removeObserver(token)
-            }
+        } else {
+            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
         }
     }
 
-    private var timeOnBattery: String {
+    private func timeOnBattery(at date: Date) -> String {
         guard let unplugged = model.lastUnplugDate else { return "N/A" }
-        let minutes = Int(Date().timeIntervalSince(unplugged) / 60)
-        return Formatting.duration(minutes: max(minutes, 0))
+        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     private var nearestSparklinePoint: SeriesPoint? {

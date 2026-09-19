@@ -40,14 +40,23 @@ public enum PeripheralBatteryReader {
                     .takeRetainedValue()
             }
 
+            if let connected = property("Connected") as? Bool, !connected { continue }
             guard let percent = property("BatteryPercent") as? Int, (0...100).contains(percent) else {
                 continue
             }
             let name = (property("Product") as? String) ?? "Unknown device"
-            let identifier =
-                (property("SerialNumber") as? String)
-                ?? (property("DeviceAddress") as? String)
-                ?? name
+            let address = (property("DeviceAddress") as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "-", with: ":")
+                .lowercased()
+            let serial = (property("SerialNumber") as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            var registryID: UInt64 = 0
+            guard IORegistryEntryGetRegistryEntryID(service, &registryID) == KERN_SUCCESS else { continue }
+            let identity = address.flatMap { $0.isEmpty ? nil : $0 }
+                ?? serial.flatMap { $0.isEmpty ? nil : "serial:\($0)" }
+                ?? "registry:\(registryID)"
+            let identifier = "\(identity)#main"
             results.append(PeripheralBattery(id: identifier, name: name, percent: percent))
         }
         return results.sorted { $0.name < $1.name }

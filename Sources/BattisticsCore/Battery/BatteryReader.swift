@@ -16,20 +16,35 @@ public enum BatteryReader {
         }
     }
 
-    public static func read(now: Date = Date()) -> BatterySnapshot? {
+    public static func read(now: Date = Date(), includePowerFlow: Bool = false) -> BatterySnapshot? {
         guard let props = smartBatteryProperties() else { return nil }
-        return snapshot(from: props, iops: systemPowerInfo(), now: now)
+        return snapshot(from: props, iops: systemPowerInfo(), now: now, includePowerFlow: includePowerFlow)
     }
 
-    public static func snapshot(from props: [String: Any], iops: SystemPowerInfo?, now: Date) -> BatterySnapshot {
+    public static func snapshot(
+        from props: [String: Any], iops: SystemPowerInfo?, now: Date,
+        includePowerFlow: Bool = false
+    ) -> BatterySnapshot {
         func int(_ key: String) -> Int? { props[key] as? Int }
         func bool(_ key: String) -> Bool? { props[key] as? Bool }
 
         let maxCapacityKey = int("MaxCapacity") ?? 100
         let currentCapacityKey = int("CurrentCapacity") ?? 0
-        let rawCurrent = int("AppleRawCurrentCapacity") ?? currentCapacityKey
-        let rawMax = int("AppleRawMaxCapacity") ?? maxCapacityKey
-        let design = int("DesignCapacity") ?? 0
+        let batteryData = props["BatteryData"] as? [String: Any] ?? [:]
+        func positive(_ values: Int?...) -> Int? {
+            values.compactMap { $0 }.first { $0 > 0 }
+        }
+        // Recent macOS versions move mAh values into BatteryData. The
+        // normalized Current/MaxCapacity pair must never be treated as mAh.
+        let nominal = positive(int("NominalChargeCapacity"), batteryData["NominalChargeCapacity"] as? Int)
+        let rawMax = positive(int("AppleRawMaxCapacity"), batteryData["AppleRawMaxCapacity"] as? Int,
+                              batteryData["FullChargeCapacity"] as? Int,
+                              maxCapacityKey > 100 ? maxCapacityKey : nil) ?? 0
+        let rawCurrent = int("AppleRawCurrentCapacity")
+            ?? (batteryData["AppleRawCurrentCapacity"] as? Int)
+            ?? (batteryData["RemainingCapacity"] as? Int)
+            ?? (maxCapacityKey > 100 ? currentCapacityKey : 0)
+        let design = positive(int("DesignCapacity"), batteryData["DesignCapacity"] as? Int) ?? 0
 
         // Apple Silicon normalizes CurrentCapacity/MaxCapacity to a 0-100 scale.
         let percent: Int
@@ -84,7 +99,7 @@ public enum BatteryReader {
             percent: percent,
             rawCurrentCapacity: rawCurrent,
             rawMaxCapacity: rawMax,
-            nominalCapacity: int("NominalChargeCapacity"),
+            nominalCapacity: nominal,
             designCapacity: design,
             cycleCount: int("CycleCount") ?? 0,
             designCycleCount: int("DesignCycleCount9C"),
@@ -103,7 +118,8 @@ public enum BatteryReader {
             deviceName: props["DeviceName"] as? String,
             manufactureDate: manufactureDate,
             manufactureDateIsApproximate: manufactureDateIsApproximate,
-            adapter: adapter
+            adapter: adapter,
+            powerFlow: includePowerFlow ? PowerFlowTelemetry.parse(from: props, readAt: now) : nil
         )
     }
 

@@ -1,4 +1,5 @@
 import Foundation
+import SQLite3
 import Testing
 
 @testable import BattisticsCore
@@ -137,6 +138,18 @@ struct HistoryStoreTests {
         #expect(series.contains { abs($0.value - 5) < 0.001 })
     }
 
+    @Test func retentionPreservesImportedRawSamplesOverlappingAnExistingRollup() async throws {
+        let store = makeStore()
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let hour = Int64(now.timeIntervalSince1970 - 40 * 24 * 3600) / 3600 * 3600
+        let csv = "hourly,\(hour),8,8,31\npower,\(hour + 60),12,12,-1,31\n"
+        #expect(try await store.importCSV(csv) == 2)
+        let before = await store.exportCSV()
+        await store.runRetention(now: now)
+        await store.runRetention(now: now)
+        #expect(await store.exportCSV() == before)
+    }
+
     @Test func csvRoundTripIncludesHourlyRollups() async throws {
         let store = makeStore()
         let base = Date(timeIntervalSince1970: 1_700_000_000)
@@ -163,11 +176,100 @@ struct HistoryStoreTests {
         #expect(reExported == csv)
     }
 
+    @Test func csvCountsOnlyNewRows() async throws {
+        let store = makeStore()
+        let csv = "charge,1700000000,88,0,0\npower,1700000000,7.5,,,\n"
+        #expect(try await store.importCSV(csv) == 2)
+        #expect(try await store.importCSV(csv) == 0)
+        #expect(try await store.importCSV(csv + "charge,1700000060,87,0,0\n") == 1)
+    }
+
+    @Test func csvRollsBackEarlierRowsWhenInsertFails() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("battistics-transaction-tests-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = HistoryStore(directory: directory)
+        let original = "charge,1699999999,90,0,0\n"
+        try await store.importCSV(original)
+        let before = await store.exportCSV()
+        try executeSQLite(
+            "CREATE TRIGGER fail_power BEFORE INSERT ON power_samples BEGIN SELECT RAISE(ABORT, 'injected failure'); END",
+            directory: directory)
+        let csv = "charge,1700000000,88,0,0\npower,1700000000,7.5,,,\n"
+        await #expect(throws: HistoryError.self) {
+            try await store.importCSV(csv)
+        }
+        #expect(await store.exportCSV() == before)
+        try executeSQLite("DROP TRIGGER fail_power", directory: directory)
+        // A subsequent import proves the failed transaction released its lock.
+        #expect(try await store.importCSV(csv) == 2)
+    }
+
+    @Test(arguments: ["power_hourly", "charge_samples"])
+    func retentionRollsBackEveryMutationOnFailure(failingTable: String) async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("battistics-retention-tests-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = HistoryStore(directory: directory)
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        await store.recordChargeSample(
+            ChargeSample(date: now.addingTimeInterval(-401 * 24 * 3600), percent: 90,
+                         externalConnected: false, isCharging: false))
+        await store.recordPowerSample(
+            date: now.addingTimeInterval(-40 * 24 * 3600), watts: 8,
+            volts: 12, amps: -0.6, temperatureC: 31)
+        let before = await store.exportCSV()
+        let operation = failingTable == "power_hourly" ? "INSERT" : "DELETE"
+        try executeSQLite(
+            "CREATE TRIGGER fail_retention BEFORE \(operation) ON \(failingTable) BEGIN SELECT RAISE(ABORT, 'injected failure'); END",
+            directory: directory)
+        await store.runRetention(now: now)
+        #expect(await store.exportCSV() == before)
+        try executeSQLite("DROP TRIGGER fail_retention", directory: directory)
+        await store.runRetention(now: now)
+        let after = await store.exportCSV()
+        #expect(after.contains("\nhourly,"))
+        #expect(!after.contains("\npower,"))
+        #expect(!after.contains("\ncharge,"))
+    }
+
+    private func executeSQLite(_ sql: String, directory: URL) throws {
+        var database: OpaquePointer?
+        let result = sqlite3_open(directory.appendingPathComponent("history.sqlite").path, &database)
+        defer { if let database { sqlite3_close_v2(database) } }
+        guard result == SQLITE_OK, let database else {
+            throw HistoryError.cannotOpen(directory.path)
+        }
+        guard sqlite3_exec(database, sql, nil, nil, nil) == SQLITE_OK else {
+            throw HistoryError.statementFailed(String(cString: sqlite3_errmsg(database)))
+        }
+    }
+
     @Test func csvImportsCRLFLineEndings() async throws {
         let store = makeStore()
         let crlf = "# Battistics history export v1\r\ncharge,1700000000,88,0,0\r\n"
         let imported = try await store.importCSV(crlf)
         #expect(imported == 1)
+    }
+
+    @Test(arguments: [
+        "charge,1700000000,101,0,0",
+        "charge,1700000000,-1,0,0",
+        "charge,1700000000,50,2,0",
+        "charge,1700000000,50,0,-1",
+        "power,1700000000,nan,,,",
+        "power,1700000000,inf,,,",
+        "power,1700000000,8,invalid,,",
+        "power,1700000000,8,,nan,",
+        "power,1700000000,8,,,inf",
+        "hourly,1700000000,nan,10,",
+        "hourly,1700000000,8,inf,",
+        "hourly,1700000000,8,10,invalid",
+        "health,2023-11-14,1700000000,nan,5900,,6075,10",
+        "health,2023-11-14,1700000000,98,5900,invalid,6075,10",
+    ])
+    func csvRejectsInvalidNumericValues(row: String) {
+        #expect(throws: HistoryError.self) { try CSVPort.parse(row) }
     }
 
     @Test func csvRejectsGarbage() async {

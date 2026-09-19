@@ -24,29 +24,76 @@ public struct ProcessEnergySample: Sendable, Equatable, Identifiable {
 /// nothing here ever runs in the background.
 public enum ProcessEnergySampler {
     private struct Reading {
+        let startedAt: UInt64
         let cpuNanoseconds: UInt64
         let energy: UInt64
     }
 
     public static func sample(over duration: Duration = .seconds(3), limit: Int = 8) async -> [ProcessEnergySample] {
-        let before = snapshot()
-        try? await Task.sleep(for: duration)
-        let after = snapshot()
+        await Session().sample(over: duration, limit: limit)
+    }
 
-        let intervalNs = Double(duration.components.seconds) * 1e9
-            + Double(duration.components.attoseconds) / 1e9
+    /// Reuses the previous census when a visible pane requests successive
+    /// windows. After the initial baseline, only one census is needed per tick.
+    public actor Session {
+        private var previous: [Int32: Reading]?
+        private var previousInstant: ContinuousClock.Instant?
+        private var sampling = false
+
+        public init() {}
+
+        public func sample(over duration: Duration = .seconds(3), limit: Int = 8) async -> [ProcessEnergySample] {
+            guard !Task.isCancelled, duration > .zero, limit > 0, !sampling else { return [] }
+            sampling = true
+            defer { sampling = false }
+            let clock = ContinuousClock()
+            if previous == nil {
+                previous = ProcessEnergySampler.snapshot()
+                previousInstant = clock.now
+            }
+            do { try await Task.sleep(for: duration) }
+            catch {
+                previous = nil
+                previousInstant = nil
+                return []
+            }
+            guard !Task.isCancelled else {
+                previous = nil
+                previousInstant = nil
+                return []
+            }
+            let after = ProcessEnergySampler.snapshot()
+            guard !Task.isCancelled else {
+                previous = nil
+                previousInstant = nil
+                return []
+            }
+            guard let before = previous, let startedAt = previousInstant else { return [] }
+            let now = clock.now
+            previous = after
+            previousInstant = now
+            return ProcessEnergySampler.rank(before: before, after: after,
+                                             elapsed: startedAt.duration(to: now), limit: limit)
+        }
+    }
+
+    private static func rank(before: [Int32: Reading], after: [Int32: Reading],
+                             elapsed: Duration, limit: Int) -> [ProcessEnergySample] {
+        // Use the observed monotonic interval, including scheduling delays.
+        let intervalNs = Double(elapsed.components.seconds) * 1e9
+            + Double(elapsed.components.attoseconds) / 1e9
         guard intervalNs > 0 else { return [] }
 
         var deltas: [(pid: Int32, cpu: Double, energy: UInt64)] = []
-        var totalEnergyDelta: UInt64 = 0
+        var totalEnergyDelta: Double = 0
         for (pid, current) in after {
-            guard let previous = before[pid] else { continue }
+            guard let previous = before[pid], previous.startedAt == current.startedAt else { continue }
             let cpuDelta = current.cpuNanoseconds >= previous.cpuNanoseconds
                 ? current.cpuNanoseconds - previous.cpuNanoseconds : 0
             let energyDelta = current.energy >= previous.energy
                 ? current.energy - previous.energy : 0
             guard cpuDelta > 0 || energyDelta > 0 else { continue }
-            totalEnergyDelta += energyDelta
+            totalEnergyDelta += Double(energyDelta)
             deltas.append((pid, Double(cpuDelta) / intervalNs * 100, energyDelta))
         }
 
@@ -57,7 +104,7 @@ public enum ProcessEnergySampler {
 
         return ranked.prefix(limit).compactMap { delta in
             guard delta.cpu >= 0.1 || delta.energy > 0 else { return nil }
-            let share: Double? = totalEnergyDelta > 0 ? Double(delta.energy) / Double(totalEnergyDelta) : nil
+            let share: Double? = totalEnergyDelta > 0 ? Double(delta.energy) / totalEnergyDelta : nil
             return ProcessEnergySample(
                 pid: delta.pid,
                 name: processName(for: delta.pid),
@@ -68,8 +115,10 @@ public enum ProcessEnergySampler {
     }
 
     private static func snapshot() -> [Int32: Reading] {
+        guard !Task.isCancelled else { return [:] }
         var readings: [Int32: Reading] = [:]
         for pid in allPids() where pid > 0 {
+            guard !Task.isCancelled else { return [:] }
             guard let usage = usage(for: pid) else { continue }
             readings[pid] = usage
         }
@@ -96,7 +145,8 @@ public enum ProcessEnergySampler {
         }
         guard result == 0 else { return nil }
         let ticks = info.ri_user_time &+ info.ri_system_time
-        return Reading(cpuNanoseconds: machTicksToNanoseconds(ticks), energy: info.ri_billed_energy)
+        return Reading(startedAt: info.ri_proc_start_abstime,
+                       cpuNanoseconds: machTicksToNanoseconds(ticks), energy: info.ri_billed_energy)
     }
 
     private static let timebase: mach_timebase_info_data_t = {

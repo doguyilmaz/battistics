@@ -1,4 +1,5 @@
 import AppKit
+import CoreText
 
 /// Menu bar glyph renderer. Five styles, all drawn in code so every one
 /// supports live fill level, a charging bolt, template rendering and status
@@ -15,6 +16,7 @@ enum BatGlyph {
         /// 0...1 fill level, nil hides the level indication.
         var fillFraction: CGFloat?
         var shape: MenuBarIconStyle = .bat
+        var percentage: Int?
     }
 
     /// Draws the glyph into `rect` (non-flipped coordinates).
@@ -36,14 +38,14 @@ enum BatGlyph {
     /// Standalone glyph image, template unless a color is given.
     static func image(
         size: NSSize, fillFraction: CGFloat?, charging: Bool, color: NSColor? = nil,
-        shape: MenuBarIconStyle = .bat
+        shape: MenuBarIconStyle = .bat, percentage: Int? = nil
     ) -> NSImage {
         let image = NSImage(size: size, flipped: false) { rect in
             draw(
                 in: rect,
                 style: Style(
                     color: color ?? .black, charging: charging, fillFraction: fillFraction,
-                    shape: shape))
+                    shape: shape, percentage: percentage))
             return true
         }
         image.isTemplate = color == nil
@@ -166,7 +168,13 @@ enum BatGlyph {
     }
 
     private static func drawBatteryInterior(in rect: NSRect, style: Style, metrics m: BodyMetrics) {
-        if style.charging {
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: m.left, y: m.bottom, width: m.bodyWidth, height: m.top - m.bottom)
+                    .insetBy(dx: m.stroke, dy: m.stroke / 2),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+        } else if style.charging {
             boltPath(
                 centerX: m.midX, centerY: (m.top + m.bottom) / 2,
                 size: (m.top - m.bottom) * 0.60
@@ -190,6 +198,35 @@ enum BatGlyph {
         }
     }
 
+    // MARK: - Percentage typography
+
+    /// Fit the visible digits, not the font's padded line box. Each shape
+    /// supplies its original interior; typography never changes its outline.
+    /// The menu-bar renderer keeps the charging bolt outside this reading.
+    private static func drawPercentage(
+        _ percentage: Int, in rect: NSRect, maximumFontSize: CGFloat, color: NSColor
+    ) {
+        let value = String(min(max(percentage, 0), 100))
+        func makeLine(fontSize: CGFloat) -> CTLine {
+            CTLineCreateWithAttributedString(NSAttributedString(
+                string: value,
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: fontSize, weight: .medium),
+                    .foregroundColor: color
+                ]))
+        }
+        let measured = CTLineGetBoundsWithOptions(makeLine(fontSize: maximumFontSize), .useGlyphPathBounds)
+        let scale = min(1, rect.width / measured.width, rect.height / measured.height)
+        let line = makeLine(fontSize: maximumFontSize * scale)
+        let bounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
+        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        context.saveGState()
+        context.textMatrix = .identity
+        context.textPosition = CGPoint(x: rect.midX - bounds.midX, y: rect.midY - bounds.midY)
+        CTLineDraw(line, context)
+        context.restoreGState()
+    }
+
     // MARK: - Gauge
 
     private static func drawGauge(in rect: NSRect, style: Style) {
@@ -205,6 +242,15 @@ enum BatGlyph {
         arc.lineWidth = stroke
         arc.lineCapStyle = .round
         arc.stroke()
+
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: cx - radius * 0.70, y: cy + stroke * 0.25,
+                           width: radius * 1.40, height: radius * 0.58),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+            return
+        }
 
         if style.charging {
             boltPath(centerX: cx, centerY: cy + radius * 0.42, size: radius * 0.75).fill()
@@ -241,6 +287,16 @@ enum BatGlyph {
         outline.lineWidth = metrics.stroke
         outline.stroke()
         drawNub(in: rect, metrics: metrics)
+
+        if let percentage = style.percentage {
+            drawPercentage(
+                percentage,
+                in: NSRect(x: metrics.left, y: metrics.bottom,
+                           width: metrics.bodyWidth, height: metrics.top - metrics.bottom)
+                    .insetBy(dx: metrics.stroke, dy: metrics.stroke / 2),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+            return
+        }
 
         if style.charging {
             boltPath(
@@ -279,7 +335,7 @@ enum BatGlyph {
         let path = batSilhouette(in: rect)
         let fraction = min(max(style.fillFraction ?? 0, 0), 1)
 
-        if fraction > 0 || style.charging {
+        if style.percentage == nil, fraction > 0 || style.charging {
             NSGraphicsContext.current?.saveGraphicsState()
             path.addClip()
             let fillHeight = style.charging ? rect.height : rect.height * fraction
@@ -293,7 +349,15 @@ enum BatGlyph {
         path.lineJoinStyle = .round
         path.stroke()
 
-        if style.charging {
+        if let percentage = style.percentage {
+            // The original wings narrow below this band. Keep the digits
+            // between that lower scallop and the head without flattening it.
+            drawPercentage(
+                percentage,
+                in: NSRect(x: rect.minX + rect.width * 0.24, y: rect.minY + rect.height * 0.405,
+                           width: rect.width * 0.52, height: rect.height * 0.375),
+                maximumFontSize: rect.height * (11 / 17), color: style.color)
+        } else if style.charging {
             NSGraphicsContext.current?.compositingOperation = .destinationOut
             boltPath(centerX: rect.midX, centerY: rect.midY * 1.05, size: rect.height * 0.42).fill()
             NSGraphicsContext.current?.compositingOperation = .sourceOver

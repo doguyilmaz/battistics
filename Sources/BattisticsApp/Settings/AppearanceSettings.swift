@@ -8,6 +8,7 @@ struct AppearanceSettings: View {
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
     @AppStorage(Prefs.appIconStyle) private var appIconRaw = AppIconStyle.original.rawValue
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
+    @AppStorage(Prefs.menuBarPercentInside) private var percentInside = false
     @AppStorage(Prefs.menuBarShowGlyph) private var showGlyph = true
     @AppStorage(Prefs.menuBarPrimaryText) private var primaryRaw = MenuBarText.chargePercent.rawValue
     @AppStorage(Prefs.menuBarSecondaryText) private var secondaryRaw = MenuBarText.none.rawValue
@@ -24,6 +25,8 @@ struct AppearanceSettings: View {
     private var config: MenuBarConfig {
         MenuBarConfig(
             iconStyle: iconStyle,
+            showGlyph: showGlyph,
+            percentInside: percentInside,
             colorLow: colorLow,
             lowThreshold: lowThreshold,
             colorHigh: colorHigh,
@@ -71,6 +74,8 @@ struct AppearanceSettings: View {
             }
             Section("Content") {
                 Toggle("Show battery glyph", isOn: $showGlyph)
+                Toggle("Show percentage inside battery", isOn: $percentInside)
+                    .disabled(!showGlyph)
                 Picker("Primary text", selection: $primaryRaw) {
                     ForEach(MenuBarText.allCases) { kind in
                         Text(kind.label).tag(kind.rawValue)
@@ -155,7 +160,8 @@ struct AppearanceSettings: View {
                 nsImage: BatGlyph.image(
                     size: NSSize(width: 58, height: 36),
                     fillFraction: 0.8, charging: false,
-                    color: .labelColor, shape: style)
+                    color: .labelColor, shape: style,
+                    percentage: percentInside && showGlyph ? 57 : nil)
             )
             Text(style.label)
                 .font(.caption)
@@ -180,17 +186,12 @@ struct AppearanceSettings: View {
     }
 
     private func statusPreview(percent: Int, charging: Bool, label: String) -> some View {
-        let tint = MenuBarIconRenderer.tintColor(
-            percent: percent, charging: charging, external: charging, config: config)
         return VStack(spacing: 6) {
             Image(
-                nsImage: BatGlyph.image(
-                    size: NSSize(width: 44, height: 27),
-                    fillFraction: charging ? nil : CGFloat(percent) / 100,
-                    charging: charging,
-                    color: tint ?? .labelColor,
-                    shape: iconStyle)
+                nsImage: MenuBarIconRenderer.previewImage(
+                    percent: percent, charging: charging, config: config)
             )
+            .frame(height: 27)
             Text("\(percent)%")
                 .font(.caption2)
                 .monospacedDigit()

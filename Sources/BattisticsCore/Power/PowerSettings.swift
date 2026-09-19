@@ -97,27 +97,14 @@ public struct PowerSettings: Sendable, Equatable {
 ///
 /// The IOKit preferences API (`IOPMCopyPMPreferences` and friends) is not in
 /// the public SDK — only assertions are — so this shells out to `pmset -g
-/// custom`, which needs no privileges and costs about 9ms. Reading is cheap
-/// enough to do on demand; nothing here polls.
+/// custom`, which needs no privileges. Fetch on demand; nothing here polls.
 public enum PowerSettingsReader {
     public static func fetch() async -> PowerSettings? {
-        await Task.detached(priority: .utility) { () -> PowerSettings? in
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-            process.arguments = ["-g", "custom"]
-            let output = Pipe()
-            process.standardOutput = output
-            process.standardError = Pipe()
-            do {
-                try process.run()
-            } catch {
-                return nil
-            }
-            let data = output.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
-            guard process.terminationStatus == 0 else { return nil }
-            return parse(String(decoding: data, as: UTF8.self))
-        }.value
+        guard let data = try? await BoundedCommand.run(
+            executable: "/usr/bin/pmset", arguments: ["-g", "custom"],
+            timeout: 5, maximumOutputBytes: 65_536
+        ), !Task.isCancelled else { return nil }
+        return parse(String(decoding: data, as: UTF8.self))
     }
 
     /// Pure and unit-testable.
