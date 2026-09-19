@@ -47,7 +47,7 @@ struct EnergyPane: View {
                 }
             } else {
                 ScrollView {
-                    VStack(spacing: 10) {
+                    LazyVStack(spacing: 10) {
                         ForEach(rows) { row in
                             GlassCard {
                                 rowContent(row)
