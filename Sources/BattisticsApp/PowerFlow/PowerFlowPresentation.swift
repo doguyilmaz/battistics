@@ -18,6 +18,15 @@ struct PowerFlowPresentation {
             || telemetry?.batteryPowerWatts != nil
     }
 
+    var statusText: String {
+        if telemetry?.hasInconsistentReadings == true {
+            return String(localized: "Readings inconsistent")
+        }
+        return hasReadings
+            ? String(localized: "Readings may lag")
+            : String(localized: "Readings unavailable")
+    }
+
     func watts(_ value: Double?, signed: Bool = false) -> String {
         guard let value else { return "—" }
         if abs(value) < 0.05 { return "0.0 W" }

@@ -17,7 +17,7 @@ struct PowerFlowCard: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Text(flow.hasReadings ? "Readings may lag" : "Readings unavailable")
+                    Text(flow.statusText)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

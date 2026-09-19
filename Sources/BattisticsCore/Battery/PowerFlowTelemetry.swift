@@ -19,10 +19,13 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     public let registryUpdatedAt: Date?
     public let inputWatts: Double?
     public let systemLoadWatts: Double?
-    /// Positive into the battery, negative out of it. Direction remains unknown
-    /// when the separately reported charging state/current disagree.
+    /// Positive into the battery, negative out of it. A concrete contradiction
+    /// with the separately reported charging state/current suppresses this value.
     public let batteryPowerWatts: Double?
     public let batteryDirection: BatteryDirection
+    /// At least one reported value contradicts the supported interpretation.
+    /// Missing context alone does not imply inconsistent readings.
+    public let hasInconsistentReadings: Bool
 
     public var source: String { "AppleSmartBattery.PowerTelemetryData" }
 
@@ -31,14 +34,18 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// never substitute for a measurement.
     public static func parse(from props: [String: Any], readAt: Date) -> Self? {
         guard let data = props["PowerTelemetryData"] as? [String: Any] else { return nil }
-        let batteryPower = watts(data["BatteryPower"], permitsNegative: true)
+        let reportedBatteryPower = watts(data["BatteryPower"], permitsNegative: true)
+        let batteryConflict = contradictsBatteryState(reportedBatteryPower, props: props)
+        let batteryPower = batteryConflict ? nil : reportedBatteryPower
+        let negativeSystemLoad = integer(data["SystemLoad"]).map { $0 < 0 } ?? false
         return Self(
             readAt: readAt,
             registryUpdatedAt: registryUpdateDate(props["UpdateTime"], readAt: readAt),
             inputWatts: watts(data["SystemPowerIn"], permitsNegative: false),
             systemLoadWatts: watts(data["SystemLoad"], permitsNegative: false),
             batteryPowerWatts: batteryPower,
-            batteryDirection: direction(from: props, batteryWatts: batteryPower)
+            batteryDirection: direction(from: props, batteryWatts: batteryPower),
+            hasInconsistentReadings: negativeSystemLoad || batteryConflict
         )
     }
 
@@ -109,16 +116,37 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         guard let batteryWatts,
             let charging = boolean(props["IsCharging"]),
             let external = boolean(props["ExternalConnected"]),
-            let rawCurrent = integer(props["Amperage"]),
-            rawCurrent >= Double(Int32.min), rawCurrent <= Double(UInt32.max),
-            let current = BatteryReader.signedMilliamps(Int(rawCurrent)),
-            // Do not interpret unrealistic or sentinel current as a direction.
-            abs(current) <= 100_000
+            let current = signedCurrent(props["Amperage"])
         else { return .unknown }
 
         if batteryWatts > 0, current > 0, charging, external { return .charging }
         if batteryWatts < 0, current < 0, !charging { return .discharging }
         if batteryWatts == 0, current == 0, !charging { return .idle }
         return .unknown
+    }
+
+    private static func contradictsBatteryState(_ watts: Double?, props: [String: Any]) -> Bool {
+        guard let watts else { return false }
+        let charging = boolean(props["IsCharging"])
+        let external = boolean(props["ExternalConnected"])
+        let current = signedCurrent(props["Amperage"])
+        if watts > 0 {
+            return charging == false || external == false || current.map { $0 < 0 } == true
+        }
+        if watts < 0 {
+            return charging == true || current.map { $0 > 0 } == true
+        }
+        // A rounded zero and separately sampled current need not agree exactly.
+        return false
+    }
+
+    private static func signedCurrent(_ raw: Any?) -> Int? {
+        guard let rawCurrent = integer(raw),
+            rawCurrent >= Double(Int32.min), rawCurrent <= Double(UInt32.max),
+            let current = BatteryReader.signedMilliamps(Int(rawCurrent)),
+            // Do not interpret unrealistic or sentinel current as a direction.
+            abs(current) <= 100_000
+        else { return nil }
+        return current
     }
 }
