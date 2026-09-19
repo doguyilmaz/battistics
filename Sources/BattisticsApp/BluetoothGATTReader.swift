@@ -120,6 +120,9 @@ private final class GATTSession: NSObject, @unchecked Sendable {
             }
             levels.removeValue(forKey: identifier)
         }
+        for peripheral in current where peripheral.state != .connected {
+            levels.removeValue(forKey: peripheral.identifier)
+        }
         publish()
         for peripheral in current {
             let isNew = connected[peripheral.identifier] == nil
@@ -142,6 +145,9 @@ private final class GATTSession: NSObject, @unchecked Sendable {
     }
 
     private func remove(_ peripheral: CBPeripheral) {
+        // A delayed callback from an older object must not evict a replacement.
+        guard connected[peripheral.identifier] === peripheral else { return }
+        peripheral.delegate = nil
         connected.removeValue(forKey: peripheral.identifier)
         levels.removeValue(forKey: peripheral.identifier)
         publish()
@@ -149,6 +155,7 @@ private final class GATTSession: NSObject, @unchecked Sendable {
 
     func close() {
         for peripheral in connected.values {
+            peripheral.delegate = nil
             central?.cancelPeripheralConnection(peripheral)
         }
         connected.removeAll()
@@ -191,8 +198,18 @@ extension GATTSession: CBCentralManagerDelegate {
 
 extension GATTSession: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard error == nil, connected[peripheral.identifier] === peripheral else { return }
-        for service in peripheral.services ?? [] {
+        guard connected[peripheral.identifier] === peripheral else { return }
+        guard error == nil else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
+        let services = (peripheral.services ?? []).filter { $0.uuid == Self.batteryService }
+        if services.isEmpty {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+        }
+        for service in services {
             peripheral.discoverCharacteristics([Self.batteryLevel], for: service)
         }
     }
@@ -200,8 +217,15 @@ extension GATTSession: CBPeripheralDelegate {
     func peripheral(
         _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?
     ) {
-        guard error == nil, connected[peripheral.identifier] === peripheral else { return }
-        for characteristic in service.characteristics ?? [] {
+        guard connected[peripheral.identifier] === peripheral,
+            service.uuid == Self.batteryService else { return }
+        let characteristics = (service.characteristics ?? []).filter { $0.uuid == Self.batteryLevel }
+        guard error == nil, !characteristics.isEmpty else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
+        for characteristic in characteristics {
             peripheral.readValue(for: characteristic)
             // Many devices push changes, which saves polling entirely.
             if characteristic.properties.contains(.notify) {
@@ -213,12 +237,19 @@ extension GATTSession: CBPeripheralDelegate {
     func peripheral(
         _ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?
     ) {
-        guard error == nil, connected[peripheral.identifier] === peripheral,
+        guard connected[peripheral.identifier] === peripheral,
             peripheral.state == .connected, characteristic.uuid == Self.batteryLevel,
+            characteristic.service?.uuid == Self.batteryService
+        else { return }
+        guard error == nil,
             let value = characteristic.value?.first,
             (0...100).contains(Int(value)),
             let name = peripheral.name
-        else { return }
+        else {
+            levels.removeValue(forKey: peripheral.identifier)
+            publish()
+            return
+        }
         levels[peripheral.identifier] = PeripheralBattery(
             id: "gatt#\(peripheral.identifier)", name: name, percent: Int(value))
         publish()
