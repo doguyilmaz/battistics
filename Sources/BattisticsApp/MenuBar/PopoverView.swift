@@ -191,62 +191,67 @@ struct PopoverView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 6) {
                 SectionHeader(title: "Last 24 Hours")
-                if model.sparkline.count > 1 {
-                    Chart {
-                        ForEach(model.sparkline) { point in
-                            AreaMark(
-                                x: .value("Time", point.date),
-                                y: .value("Charge", point.value)
-                            )
-                            .interpolationMethod(.monotone)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
-                                    startPoint: .top, endPoint: .bottom))
-                            LineMark(
-                                x: .value("Time", point.date),
-                                y: .value("Charge", point.value)
-                            )
-                            .interpolationMethod(.monotone)
-                            .foregroundStyle(Color.green)
-                            .lineStyle(StrokeStyle(lineWidth: 1.5))
-                        }
-                        if let selected = nearestSparklinePoint {
-                            RuleMark(x: .value("Time", selected.date))
-                                .foregroundStyle(.secondary.opacity(0.35))
-                            PointMark(
-                                x: .value("Time", selected.date),
-                                y: .value("Charge", selected.value)
-                            )
-                            .foregroundStyle(Color.green)
-                            .symbolSize(28)
-                            .annotation(
-                                position: .top,
-                                overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
-                            ) {
-                                HStack(spacing: 4) {
-                                    Text("\(Int(selected.value.rounded()))%")
-                                        .font(.caption2.weight(.semibold))
-                                    Text(selected.date, format: .dateTime.hour().minute())
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                // Reserve the plot's height before the async history read finishes.
+                // Otherwise the first opening grows from a caption into a chart.
+                ZStack(alignment: .leading) {
+                    if model.sparkline.count > 1 {
+                        Chart {
+                            ForEach(model.sparkline) { point in
+                                AreaMark(
+                                    x: .value("Time", point.date),
+                                    y: .value("Charge", point.value)
+                                )
+                                .interpolationMethod(.monotone)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color.green.opacity(0.35), Color.green.opacity(0.03)],
+                                        startPoint: .top, endPoint: .bottom))
+                                LineMark(
+                                    x: .value("Time", point.date),
+                                    y: .value("Charge", point.value)
+                                )
+                                .interpolationMethod(.monotone)
+                                .foregroundStyle(Color.green)
+                                .lineStyle(StrokeStyle(lineWidth: 1.5))
+                            }
+                            if let selected = nearestSparklinePoint {
+                                RuleMark(x: .value("Time", selected.date))
+                                    .foregroundStyle(.secondary.opacity(0.35))
+                                PointMark(
+                                    x: .value("Time", selected.date),
+                                    y: .value("Charge", selected.value)
+                                )
+                                .foregroundStyle(Color.green)
+                                .symbolSize(28)
+                                .annotation(
+                                    position: .top,
+                                    overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
+                                ) {
+                                    HStack(spacing: 4) {
+                                        Text("\(Int(selected.value.rounded()))%")
+                                            .font(.caption2.weight(.semibold))
+                                        Text(selected.date, format: .dateTime.hour().minute())
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 5))
                                 }
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 5))
                             }
                         }
+                        .chartYScale(domain: 0...100)
+                        .chartXAxis(.hidden)
+                        .chartYAxis(.hidden)
+                        .chartXSelection(value: $sparklineSelection)
+                    } else {
+                        Text("Charge history appears here as Battistics runs.")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
                     }
-                    .chartYScale(domain: 0...100)
-                    .chartXAxis(.hidden)
-                    .chartYAxis(.hidden)
-                    .chartXSelection(value: $sparklineSelection)
-                    .frame(height: 46)
-                } else {
-                    Text("Charge history appears here as Battistics runs.")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 46)
             }
         }
     }
