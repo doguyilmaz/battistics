@@ -52,8 +52,8 @@ struct PowerFlowInfoButton: View {
             }
             .font(.callout)
             .fixedSize(horizontal: false, vertical: true)
-            .padding(16)
-            .frame(width: 340, alignment: .leading)
+            .padding(14)
+            .frame(width: 280, alignment: .leading)
         }
     }
 }
