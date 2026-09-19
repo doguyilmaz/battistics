@@ -14,6 +14,9 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// Time the registry dictionary was read, not a hardware sample timestamp.
     /// A recent read does not prove that the controller refreshed its values.
     public private(set) var readAt: Date
+    /// AppleSmartBattery's reported registry dictionary update time. This is
+    /// not a confirmed hardware sample timestamp for PowerTelemetryData.
+    public let registryUpdatedAt: Date?
     public let inputWatts: Double?
     public let systemLoadWatts: Double?
     /// Positive into the battery, negative out of it. Direction remains unknown
@@ -31,6 +34,7 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         let batteryPower = watts(data["BatteryPower"], permitsNegative: true)
         return Self(
             readAt: readAt,
+            registryUpdatedAt: registryUpdateDate(props["UpdateTime"], readAt: readAt),
             inputWatts: watts(data["SystemPowerIn"], permitsNegative: false),
             systemLoadWatts: watts(data["SystemLoad"], permitsNegative: false),
             batteryPowerWatts: batteryPower,
@@ -47,8 +51,22 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
 
     public func hasSameReadings(as other: Self) -> Bool {
         var reading = self
+        // Source metadata changes remain observable even if watts stay equal.
         reading.readAt = other.readAt
         return reading == other
+    }
+
+    private static func registryUpdateDate(_ raw: Any?, readAt: Date) -> Date? {
+        guard let number = raw as? NSNumber,
+            CFGetTypeID(number) != CFBooleanGetTypeID()
+        else { return nil }
+        let seconds = number.doubleValue
+        let readSeconds = readAt.timeIntervalSince1970
+        // Reject implausible epochs while allowing a small clock skew.
+        guard seconds.isFinite, readSeconds.isFinite,
+            seconds >= 946_684_800, seconds <= readSeconds + 5
+        else { return nil }
+        return Date(timeIntervalSince1970: seconds)
     }
 
     private static func watts(_ raw: Any?, permitsNegative: Bool) -> Double? {

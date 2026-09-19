@@ -17,6 +17,10 @@ struct PowerFlowCard: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     Spacer()
+                    Text(flow.hasReadings ? "Readings may lag" : "Readings unavailable")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                     PowerFlowInfoButton()
                 }
                 HStack(spacing: 12) {
@@ -27,23 +31,17 @@ struct PowerFlowCard: View {
                          detail: "Reported load")
                     arrow(flow.batteryArrow)
                     node("Battery", icon: "battery.100", watts: flow.telemetry?.batteryPowerWatts,
-                         detail: flow.batteryLabel)
+                         detail: flow.batteryLabel, signed: true)
                 }
-                Text(flow.hasReadings
-                     ? "System-reported readings · updates may be delayed"
-                     : "Power telemetry is unavailable. Existing battery readings still work.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(height: 28, alignment: .leading)
             }
         }
     }
 
-    private func node(_ title: LocalizedStringKey, icon: String, watts: Double?, detail: String) -> some View {
+    private func node(_ title: LocalizedStringKey, icon: String, watts: Double?, detail: String, signed: Bool = false) -> some View {
         VStack(spacing: 5) {
             Image(systemName: icon).font(.title3).foregroundStyle(.secondary)
             Text(title).font(.caption)
-            Text(reading.watts(watts))
+            Text(reading.watts(watts, signed: signed))
                 .font(.system(.title3, design: .rounded).weight(.medium))
                 .monospacedDigit()
             Text(detail).font(.caption2).foregroundStyle(.secondary).lineLimit(1)

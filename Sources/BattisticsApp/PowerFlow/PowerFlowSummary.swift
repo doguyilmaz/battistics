@@ -13,7 +13,7 @@ struct PowerFlowSummary: View {
             if let arrow = flow.batteryArrow {
                 Image(systemName: arrow).accessibilityLabel(flow.batteryLabel)
             }
-            Text("Bat \(flow.watts(flow.telemetry?.batteryPowerWatts))")
+            Text("Bat \(flow.watts(flow.telemetry?.batteryPowerWatts, signed: true))")
             Spacer(minLength: 0)
             PowerFlowInfoButton()
         }

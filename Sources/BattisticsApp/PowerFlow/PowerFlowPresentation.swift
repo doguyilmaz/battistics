@@ -18,9 +18,10 @@ struct PowerFlowPresentation {
             || telemetry?.batteryPowerWatts != nil
     }
 
-    func watts(_ value: Double?) -> String {
+    func watts(_ value: Double?, signed: Bool = false) -> String {
         guard let value else { return "—" }
-        return String(format: "%.1f W", abs(value))
+        if abs(value) < 0.05 { return "0.0 W" }
+        return String(format: signed ? "%+.1f W" : "%.1f W", signed ? value : abs(value))
     }
 
     var batteryLabel: String {

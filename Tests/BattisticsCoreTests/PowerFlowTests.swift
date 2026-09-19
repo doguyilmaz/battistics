@@ -9,7 +9,8 @@ struct PowerFlowTests {
 
     private func props(
         input: Any? = 14_099, load: Any? = 14_099, battery: Any? = 0,
-        charging: Any? = false, external: Any? = true, current: Any? = 0
+        charging: Any? = false, external: Any? = true, current: Any? = 0,
+        updateTime: Any? = nil
     ) -> [String: Any] {
         var telemetry: [String: Any] = [:]
         telemetry["SystemPowerIn"] = input
@@ -19,6 +20,7 @@ struct PowerFlowTests {
         result["IsCharging"] = charging
         result["ExternalConnected"] = external
         result["Amperage"] = current
+        result["UpdateTime"] = updateTime
         return result
     }
 
@@ -118,6 +120,55 @@ struct PowerFlowTests {
         #expect(flow.isStale(at: readAt.addingTimeInterval(-1)))
         #expect(flow.isStale(at: readAt, maximumAge: -1))
         #expect(flow.isStale(at: readAt, maximumAge: .nan))
+    }
+
+    @Test func repeatedReadsPreserveReportedRegistryUpdateTime() throws {
+        let updatedAt = readAt.addingTimeInterval(-37)
+        let raw = props(updateTime: updatedAt.timeIntervalSince1970)
+        let first = try #require(PowerFlowTelemetry.parse(from: raw, readAt: readAt))
+        let nextReadAt = readAt.addingTimeInterval(10)
+        let next = try #require(PowerFlowTelemetry.parse(from: raw, readAt: nextReadAt))
+        #expect(first.registryUpdatedAt == updatedAt)
+        #expect(next.registryUpdatedAt == updatedAt)
+        #expect(next.readAt == nextReadAt)
+        #expect(first.hasSameReadings(as: next))
+    }
+
+    @Test func invalidOrMissingRegistryUpdateTimeRemainsUnknown() throws {
+        let missing = try #require(PowerFlowTelemetry.parse(from: props(), readAt: readAt))
+        #expect(missing.registryUpdatedAt == nil)
+        let invalid: [Any] = [true, "1700000000", Double.nan, Double.infinity,
+                              -1, 946_684_799, readAt.timeIntervalSince1970 + 6,
+                              NSNumber(value: UInt64.max)]
+        for value in invalid {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(updateTime: value), readAt: readAt))
+            #expect(flow.registryUpdatedAt == nil)
+            #expect(flow.inputWatts == 14.099)
+        }
+    }
+
+    @Test func registryUpdateTimeAcceptsPlausibleNumericEpochs() throws {
+        for seconds in [946_684_800, readAt.timeIntervalSince1970 - 0.5,
+                        readAt.timeIntervalSince1970 + 5] {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(updateTime: seconds), readAt: readAt))
+            #expect(flow.registryUpdatedAt == Date(timeIntervalSince1970: seconds))
+        }
+    }
+
+    @Test func registryUpdateChangesAreNotDeduplicatedWithEqualWatts() throws {
+        let first = BatteryReader.snapshot(
+            from: props(updateTime: readAt.timeIntervalSince1970 - 60),
+            iops: nil, now: readAt, includePowerFlow: true)
+        let next = BatteryReader.snapshot(
+            from: props(updateTime: readAt.timeIntervalSince1970),
+            iops: nil, now: readAt, includePowerFlow: true)
+        let firstFlow = try #require(first.powerFlow)
+        let nextFlow = try #require(next.powerFlow)
+        #expect(firstFlow.inputWatts == nextFlow.inputWatts)
+        #expect(!firstFlow.hasSameReadings(as: nextFlow))
+        #expect(!first.hasSameReadings(as: next))
     }
 
     @Test func comparisonsIgnoreReadTimeButIncludeFlowChangesAndAvailability() {
