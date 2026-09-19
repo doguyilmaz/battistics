@@ -10,7 +10,7 @@ struct PowerFlowTests {
     private func props(
         input: Any? = 14_099, load: Any? = 14_099, battery: Any? = 0,
         charging: Any? = false, external: Any? = true, current: Any? = 0,
-        updateTime: Any? = nil
+        updateTime: Any? = nil, voltage: Any? = nil
     ) -> [String: Any] {
         var telemetry: [String: Any] = [:]
         telemetry["SystemPowerIn"] = input
@@ -21,6 +21,7 @@ struct PowerFlowTests {
         result["ExternalConnected"] = external
         result["Amperage"] = current
         result["UpdateTime"] = updateTime
+        result["Voltage"] = voltage
         return result
     }
 
@@ -220,6 +221,95 @@ struct PowerFlowTests {
             #expect(flow.batteryDirection == .unknown)
             #expect(flow.hasInconsistentReadings)
         }
+    }
+
+    @Test func conflictedBatteryUsesTheSameVoltageCurrentEstimateAsThePopover() throws {
+        let samples = [
+            (input: 0, load: -28_617, battery: 28_617, current: -3_033, voltage: 11_784, external: false),
+            (input: 18_044, load: -3_156, battery: 21_200, current: -3_880, voltage: 11_406, external: true)
+        ]
+        for sample in samples {
+            let raw = props(input: sample.input, load: sample.load, battery: sample.battery,
+                            charging: true, external: sample.external, current: sample.current,
+                            voltage: sample.voltage)
+            let snapshot = BatteryReader.snapshot(from: raw, iops: nil, now: readAt, includePowerFlow: true)
+            let flow = try #require(snapshot.powerFlow)
+            #expect(flow.batteryPowerWatts == snapshot.watts)
+            #expect(flow.batteryPowerWatts == Double(sample.voltage) * Double(sample.current) / 1_000_000)
+            #expect(flow.batteryPowerSource == .estimatedFromVoltageAndCurrent)
+            #expect(flow.batteryDirection == .discharging)
+            #expect(flow.hasInconsistentReadings)
+            #expect(flow.systemLoadWatts == nil)
+            #expect(flow.inputWatts == Double(sample.input) / 1_000)
+        }
+    }
+
+    @Test func invalidVoltageOrCurrentCannotProduceAFallback() throws {
+        let invalidVoltage: [Any?] = [nil, true, "12000", 0, -12_000, 999, 30_001, 65_535,
+                                      12_000.5, Double.nan, Double.infinity, NSNumber(value: UInt64.max)]
+        for voltage in invalidVoltage {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: 12_000, current: -1_000, voltage: voltage), readAt: readAt))
+            #expect(flow.batteryPowerWatts == nil)
+            #expect(flow.batteryPowerSource == nil)
+            #expect(flow.hasInconsistentReadings)
+        }
+        let invalidCurrent: [Any?] = [nil, true, "-1000", -1_000.5, Double.nan, Double.infinity,
+                                      -100_001, 100_001, NSNumber(value: UInt64.max)]
+        for current in invalidCurrent {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(battery: 12_000, external: false, current: current, voltage: 12_000), readAt: readAt))
+            #expect(flow.batteryPowerWatts == nil)
+            #expect(flow.batteryPowerSource == nil)
+            #expect(flow.batteryDirection == .unknown)
+            #expect(flow.hasInconsistentReadings)
+        }
+        for raw in [
+            props(battery: 12_000, external: false, current: 1_000, voltage: 12_000),
+            props(battery: -12_000, current: 100_000, voltage: 30_000)
+        ] {
+            let flow = try #require(PowerFlowTelemetry.parse(from: raw, readAt: readAt))
+            #expect(flow.batteryPowerWatts == nil)
+            #expect(flow.batteryPowerSource == nil)
+        }
+    }
+
+    @Test func fallbackAcceptsWrappedCurrentAndBothNetDirections() throws {
+        let discharge = try #require(PowerFlowTelemetry.parse(
+            from: props(battery: 12_000, current: 4_294_966_296, voltage: 12_000), readAt: readAt))
+        #expect(discharge.batteryPowerWatts == -12)
+        #expect(discharge.batteryDirection == .discharging)
+        #expect(discharge.batteryPowerSource == .estimatedFromVoltageAndCurrent)
+        let charge = try #require(PowerFlowTelemetry.parse(
+            from: props(battery: -12_000, charging: false, current: 1_000, voltage: 12_000), readAt: readAt))
+        #expect(charge.batteryPowerWatts == 12)
+        #expect(charge.batteryDirection == .charging)
+        #expect(charge.batteryPowerSource == .estimatedFromVoltageAndCurrent)
+    }
+
+    @Test func fallbackDoesNotReplaceDirectOrMerelyMissingBatteryReadings() throws {
+        let direct = try #require(PowerFlowTelemetry.parse(
+            from: props(load: -3_156, battery: -16_201, current: -1_496, voltage: 11_593), readAt: readAt))
+        #expect(direct.batteryPowerWatts == -16.201)
+        #expect(direct.batteryPowerSource == .reported)
+        #expect(direct.hasInconsistentReadings)
+        for battery: Any? in [nil, "invalid", Double.nan, NSNumber(value: UInt64.max)] {
+            let flow = try #require(PowerFlowTelemetry.parse(
+                from: props(load: -3_156, battery: battery, current: -1_496, voltage: 11_593), readAt: readAt))
+            #expect(flow.batteryPowerWatts == nil)
+            #expect(flow.batteryPowerSource == nil)
+        }
+    }
+
+    @Test func sourceChangesRemainObservableWhenBatteryWattsMatch() throws {
+        let direct = try #require(PowerFlowTelemetry.parse(
+            from: props(load: -1, battery: 12_000, current: 1_000, voltage: 12_000), readAt: readAt))
+        let estimated = try #require(PowerFlowTelemetry.parse(
+            from: props(load: -1, battery: -12_000, current: 1_000, voltage: 12_000), readAt: readAt))
+        #expect(direct.batteryPowerWatts == estimated.batteryPowerWatts)
+        #expect(direct.batteryDirection == estimated.batteryDirection)
+        #expect(direct.hasInconsistentReadings == estimated.hasInconsistentReadings)
+        #expect(!direct.hasSameReadings(as: estimated))
     }
 
     @Test func registryReadFreshnessCannotClaimHardwareSampleFreshness() throws {

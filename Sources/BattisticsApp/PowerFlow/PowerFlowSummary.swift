@@ -14,6 +14,9 @@ struct PowerFlowSummary: View {
                 Image(systemName: arrow).accessibilityLabel(flow.batteryLabel)
             }
             Text("Bat \(flow.watts(flow.telemetry?.batteryPowerWatts, signed: true))")
+            if flow.batteryIsEstimated {
+                PowerFlowEstimateBadge()
+            }
             Spacer(minLength: 0)
             PowerFlowInfoButton()
         }

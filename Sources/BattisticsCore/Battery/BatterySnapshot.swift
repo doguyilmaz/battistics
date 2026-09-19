@@ -202,6 +202,11 @@ public struct BatterySnapshot: Sendable, Equatable {
 
     /// Signed instantaneous power. Negative while discharging, positive while charging.
     public var watts: Double? {
+        Self.powerWatts(voltageMV: voltageMV, amperageMA: amperageMA)
+    }
+
+    /// Shared arithmetic; callers choose validation appropriate to their source.
+    static func powerWatts(voltageMV: Int?, amperageMA: Int?) -> Double? {
         guard let voltageMV, let amperageMA else { return nil }
         return Double(voltageMV) * Double(amperageMA) / 1_000_000
     }

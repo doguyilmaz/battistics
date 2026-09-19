@@ -19,12 +19,23 @@ struct PowerFlowPresentation {
     }
 
     var statusText: String {
+        if batteryIsEstimated {
+            return String(localized: "Battery estimated")
+        }
         if telemetry?.hasInconsistentReadings == true {
             return String(localized: "Readings inconsistent")
         }
         return hasReadings
             ? String(localized: "Readings may lag")
             : String(localized: "Readings unavailable")
+    }
+
+    var batteryIsEstimated: Bool {
+        telemetry?.batteryPowerSource == .estimatedFromVoltageAndCurrent
+    }
+
+    static var batteryEstimateExplanation: String {
+        String(localized: "Battery telemetry is inconsistent. This estimate uses battery voltage × current, the same calculation as the popover’s Power reading. Input and System are not estimated.")
     }
 
     func watts(_ value: Double?, signed: Bool = false) -> String {

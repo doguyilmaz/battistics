@@ -11,6 +11,11 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         case unknown
     }
 
+    public enum BatteryPowerSource: Sendable {
+        case reported
+        case estimatedFromVoltageAndCurrent
+    }
+
     /// Time the registry dictionary was read, not a hardware sample timestamp.
     /// A recent read does not prove that the controller refreshed its values.
     public private(set) var readAt: Date
@@ -19,9 +24,10 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     public let registryUpdatedAt: Date?
     public let inputWatts: Double?
     public let systemLoadWatts: Double?
-    /// Positive into the battery, negative out of it. A concrete contradiction
-    /// with the separately reported connection/current suppresses this value.
+    /// Positive into the battery, negative out of it. Conflicting direct readings
+    /// use a validated voltage × current estimate when available; inspect source.
     public let batteryPowerWatts: Double?
+    public let batteryPowerSource: BatteryPowerSource?
     public let batteryDirection: BatteryDirection
     /// At least one reported value contradicts the supported interpretation.
     /// Missing context alone does not imply inconsistent readings.
@@ -36,7 +42,9 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         guard let data = props["PowerTelemetryData"] as? [String: Any] else { return nil }
         let reportedBatteryPower = watts(data["BatteryPower"], permitsNegative: true)
         let batteryConflict = contradictsBatteryState(reportedBatteryPower, props: props)
-        let batteryPower = batteryConflict ? nil : reportedBatteryPower
+        let batteryPower = batteryConflict ? estimatedBatteryPower(from: props) : reportedBatteryPower
+        let batterySource: BatteryPowerSource? = batteryPower == nil ? nil
+            : (batteryConflict ? .estimatedFromVoltageAndCurrent : .reported)
         let negativeSystemLoad = signedTelemetryInteger(data["SystemLoad"]).map { $0 < 0 } ?? false
         return Self(
             readAt: readAt,
@@ -44,6 +52,7 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             inputWatts: watts(data["SystemPowerIn"], permitsNegative: false),
             systemLoadWatts: watts(data["SystemLoad"], permitsNegative: false),
             batteryPowerWatts: batteryPower,
+            batteryPowerSource: batterySource,
             batteryDirection: direction(from: props, batteryWatts: batteryPower),
             hasInconsistentReadings: negativeSystemLoad || batteryConflict
         )
@@ -149,5 +158,17 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             abs(current) <= 100_000
         else { return nil }
         return current
+    }
+
+    private static func estimatedBatteryPower(from props: [String: Any]) -> Double? {
+        guard let voltage = integer(props["Voltage"]),
+            // Broad laptop battery bounds exclude sentinels and implausible input.
+            (1_000...30_000).contains(voltage),
+            let current = signedCurrent(props["Amperage"]),
+            let estimate = BatterySnapshot.powerWatts(voltageMV: Int(voltage), amperageMA: current),
+            estimate.isFinite, abs(estimate) <= 1_000,
+            !contradictsBatteryState(estimate, props: props)
+        else { return nil }
+        return estimate
     }
 }
