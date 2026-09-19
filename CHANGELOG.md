@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- Battery health and capacity readings now handle newer macOS data layouts and
+  keep unavailable health values neutral instead of presenting a misleading
+  result
+- Menu bar percentage text can be shown inside every battery icon style, with
+  fitted text that preserves each icon's shape and localized settings labels
+- Dashboard windows stay visible across Dock policy changes, and dashboard
+  links route back to the running app correctly
+- Charging status updates use supported power notifications with an independent
+  sensor fallback, including more reliable menu bar refreshes
+- Keep Awake supports renewable display and closed-lid leases, notices when a
+  sleep setting was changed externally, and bounds helper command work
+- Peripheral battery entries clear on disconnect and keep the correct device
+  identity across Bluetooth reconnects
+- History retention, CSV import and asynchronous health updates are safer when
+  a storage or observation step fails
+- Energy now shows up to twenty processes, explains visible-only sampling and
+  avoids creating offscreen rows until they are needed
+- History charts reserve their space before data arrives, preventing layout
+  jumps while a view loads
 - Optional Power Flow in Energy and the popover shows external input,
   system load and battery charge or discharge separately
 - Inconsistent readings can show a marked estimate with its formula;
