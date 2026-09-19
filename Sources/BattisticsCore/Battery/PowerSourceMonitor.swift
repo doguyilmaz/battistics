@@ -16,7 +16,9 @@ public final class PowerSourceMonitor {
     /// Starts observing and returns a stream that yields on every change.
     public func start() -> AsyncStream<Void> {
         stop()
-        let (stream, continuation) = AsyncStream.makeStream(of: Void.self)
+        // Events request a fresh read; queued duplicates contain no state.
+        let (stream, continuation) = AsyncStream.makeStream(
+            of: Void.self, bufferingPolicy: .bufferingNewest(1))
         self.continuation = continuation
 
         let context = Unmanaged.passUnretained(self).toOpaque()

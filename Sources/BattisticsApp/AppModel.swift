@@ -18,6 +18,10 @@ final class AppModel {
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?
     @ObservationIgnored private var appleHealthTask: Task<Void, Never>?
+    @ObservationIgnored private var recordedHealthDay: Date?
+    @ObservationIgnored private var dailyHealthTask: Task<Void, Never>?
+    @ObservationIgnored private var sparklineGeneration: UInt = 0
+    @ObservationIgnored private var isDeletingHistory = false
 
     let history: HistoryStore
 
@@ -58,13 +62,19 @@ final class AppModel {
             self?.applyAppIcon()
         }
 
+        let launchUnplugDate = lastUnplugDate
         Task { [weak self] in
             guard let self else { return }
             await self.history.runRetention()
-            if self.snapshot?.externalConnected == false,
-                let storedUnplug = await self.history.lastUnplugDate() {
+            if let launchUnplugDate,
+                self.snapshot?.externalConnected == false,
+                self.lastUnplugDate == launchUnplugDate,
+                let storedUnplug = await self.history.lastUnplugDate(),
+                self.snapshot?.externalConnected == false,
+                self.lastUnplugDate == launchUnplugDate {
                 // Restore the real unplug moment across relaunches, both for
-                // the UI and for the on-battery duration alert.
+                // the UI and for the on-battery duration alert. A live AC
+                // transition while reading history starts a different session.
                 self.lastUnplugDate = storedUnplug
                 self.alertState.unpluggedAt = storedUnplug
             }
@@ -90,6 +100,7 @@ final class AppModel {
         let previous = lastTransitionSnapshot
         snapshot = current
         evaluateAlerts(for: current)
+        maybeRecordDailyHealth(current)
 
         let changed =
             previous == nil
@@ -109,7 +120,6 @@ final class AppModel {
         Task { [weak self] in
             await self?.history.recordChargeSample(sample)
         }
-        maybeRecordDailyHealth(current)
     }
 
     func loadAppleHealthIfNeeded() {
@@ -121,9 +131,24 @@ final class AppModel {
     }
 
     func loadSparkline() async {
+        sparklineGeneration &+= 1
+        let generation = sparklineGeneration
         let now = Date()
-        sparkline = await history.chargeSeries(
+        let points = await history.chargeSeries(
             from: now.addingTimeInterval(-24 * 3600), to: now, bucketSeconds: 600)
+        guard generation == sparklineGeneration else { return }
+        sparkline = points
+    }
+
+    func deleteHistory() async {
+        guard !isDeletingHistory else { return }
+        isDeletingHistory = true
+        defer { isDeletingHistory = false }
+        await dailyHealthTask?.value
+        await history.deleteAllHistory()
+        recordedHealthDay = nil
+        sparklineGeneration &+= 1
+        sparkline = []
     }
 
     private func startMonitoring() {
@@ -185,10 +210,17 @@ final class AppModel {
     }
 
     private func maybeRecordDailyHealth(_ snapshot: BatterySnapshot) {
+        guard !isDeletingHistory else { return }
         guard snapshot.batteryInstalled, snapshot.hasHealthReading else { return }
-        Task { [weak self] in
+        let day = Calendar.current.startOfDay(for: snapshot.timestamp)
+        guard recordedHealthDay != day, dailyHealthTask == nil else { return }
+        dailyHealthTask = Task { [weak self] in
             guard let self else { return }
-            guard !(await self.history.hasHealthSnapshot(forDay: snapshot.timestamp)) else { return }
+            defer { self.dailyHealthTask = nil }
+            if await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) {
+                self.recordedHealthDay = day
+                return
+            }
             // Piggyback retention on the daily snapshot so long-running
             // sessions keep compacting without a relaunch.
             await self.history.runRetention()
@@ -200,6 +232,10 @@ final class AppModel {
                 designCapacity: snapshot.designCapacity,
                 cycleCount: snapshot.cycleCount
             )
+            // The store may fail to persist (for example, a full disk). Do
+            // not cache success or emit a health alert for an unwritten row.
+            guard await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) else { return }
+            self.recordedHealthDay = day
             let enabled = UserDefaults.standard.bool(forKey: Prefs.alertHealthDropEnabled)
             if let alert = AlertRules.healthDropAlert(
                 baseline: baseline, current: snapshot.healthPercent, enabled: enabled) {

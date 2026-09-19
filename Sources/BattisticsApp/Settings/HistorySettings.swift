@@ -59,7 +59,7 @@ struct HistorySettings: View {
         ) {
             Button("Delete Everything", role: .destructive) {
                 Task {
-                    await model.history.deleteAllHistory()
+                    await model.deleteHistory()
                     await refreshSize()
                     statusMessage = "History deleted."
                 }

@@ -11,6 +11,7 @@ final class PowerSettingsModel {
     private(set) var settings: PowerSettings?
 
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
+    @ObservationIgnored private var refreshGeneration: UInt = 0
 
     init() {
         // Same reasoning as the helper's status: these can be changed in
@@ -24,8 +25,15 @@ final class PowerSettingsModel {
         }
     }
 
-    func refresh() async {
-        settings = await PowerSettingsReader.fetch()
+    @discardableResult
+    func refresh() async -> PowerSettings? {
+        refreshGeneration &+= 1
+        let generation = refreshGeneration
+        let refreshed = await PowerSettingsReader.fetch()
+        if generation == refreshGeneration {
+            settings = refreshed
+        }
+        return refreshed
     }
 
     enum Outcome {
@@ -78,10 +86,10 @@ final class PowerSettingsModel {
                 outcome = .failed
             }
         }
-        await refresh()
+        let verifiedSettings = await refresh()
         // Neither path can report the tool's exit status, so ask the system
         // whether it agrees rather than assuming a launch meant a change.
-        if outcome == .applied, !change.isReflected(in: settings) {
+        if outcome == .applied, !change.isReflected(in: verifiedSettings) {
             outcome = .failed
         }
         return outcome
