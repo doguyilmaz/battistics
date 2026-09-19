@@ -46,7 +46,7 @@ enum MenuBarIconRenderer {
         let percent = snapshot.percent
         let charging = snapshot.isCharging
         let external = snapshot.externalConnected
-        let inside = config.percentInside && config.showGlyph && (config.iconStyle == .bat || config.iconStyle == .classic)
+        let inside = config.percentInside && config.showGlyph
         let texts = [config.primaryText, config.secondaryText]
             .filter { !inside || $0 != .chargePercent }
             .compactMap { text(for: $0, snapshot: snapshot, unit: config.temperatureUnit) }
@@ -84,6 +84,15 @@ enum MenuBarIconRenderer {
         }
         if config.colorHigh, percent >= 95 { return .systemGreen }
         return nil
+    }
+
+    /// Uses the same dimensions and charging layout as the real status item.
+    static func previewImage(percent: Int, charging: Bool, config: MenuBarConfig) -> NSImage {
+        let tint = tintColor(percent: percent, charging: charging, external: charging, config: config)
+        return render(
+            percent: percent, charging: charging, texts: [], showGlyph: true,
+            tint: tint, shape: config.iconStyle, keepAwakeIcon: false,
+            percentInside: config.percentInside && config.showGlyph)
     }
 
     private static func text(for kind: MenuBarText, snapshot: BatterySnapshot?, unit: TemperatureUnit) -> String? {
@@ -130,8 +139,8 @@ enum MenuBarIconRenderer {
         percent: Int?, charging: Bool, texts: [String], showGlyph: Bool, tint: NSColor?,
         shape: MenuBarIconStyle, keepAwakeIcon: Bool, percentInside: Bool
     ) -> NSImage {
-        let glyphSize = percentInside ? NSSize(width: 32, height: 17) : Self.glyphSize
-        let chargingWidth: CGFloat = percentInside && charging ? 10 : 0
+        let glyphSize = percentInside ? NSSize(width: 40, height: 18) : Self.glyphSize
+        let chargingWidth: CGFloat = percentInside && charging ? 12 : 0
         let color = tint ?? .black
         let string = texts.joined(separator: " ")
         let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
@@ -160,7 +169,7 @@ enum MenuBarIconRenderer {
                         shape: shape, percentage: percentInside ? percent : nil))
                 x += glyphSize.width
                 if chargingWidth > 0, let bolt = NSImage(systemSymbolName: "bolt.fill", accessibilityDescription: "Charging") {
-                    let box = NSRect(x: glyphSize.width + 1, y: 3, width: 8, height: 12)
+                    let box = NSRect(x: glyphSize.width + 3, y: 3, width: 8, height: 12)
                     bolt.draw(in: box)
                     color.setFill()
                     box.fill(using: .sourceAtop)
