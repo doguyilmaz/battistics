@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.3.0
 
 - Battery health and capacity readings now handle newer macOS data layouts and
   keep unavailable health values neutral instead of presenting a misleading
