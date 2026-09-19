@@ -85,6 +85,7 @@ enum MenuBarIconRenderer {
         case .chargePercent:
             return "\(snapshot.percent)%"
         case .healthPercent:
+            guard snapshot.hasHealthReading else { return "H—" }
             return "H\(Int(snapshot.displayHealthPercent.rounded()))%"
         case .timeRemaining:
             guard let minutes = snapshot.timeRemainingMin else { return nil }

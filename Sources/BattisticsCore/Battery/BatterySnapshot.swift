@@ -152,8 +152,13 @@ public struct BatterySnapshot: Sendable, Equatable {
     /// smoothed NominalChargeCapacity, the same value macOS bases its own
     /// health percentage on, so Battistics never contradicts System Settings.
     public var currentMaxCapacity: Int {
-        nominalCapacity ?? rawMaxCapacity
+        if let nominalCapacity, nominalCapacity > 0 { return nominalCapacity }
+        return rawMaxCapacity
     }
+
+    public var hasHealthReading: Bool { designCapacity > 0 && currentMaxCapacity > 0 }
+
+    public var hasMeasuredHealthReading: Bool { designCapacity > 0 && rawMaxCapacity > 0 }
 
     public var healthPercent: Double {
         guard designCapacity > 0 else { return 0 }

@@ -185,7 +185,7 @@ final class AppModel {
     }
 
     private func maybeRecordDailyHealth(_ snapshot: BatterySnapshot) {
-        guard snapshot.batteryInstalled, snapshot.designCapacity > 0 else { return }
+        guard snapshot.batteryInstalled, snapshot.hasHealthReading else { return }
         Task { [weak self] in
             guard let self else { return }
             guard !(await self.history.hasHealthSnapshot(forDay: snapshot.timestamp)) else { return }

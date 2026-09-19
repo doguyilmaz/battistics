@@ -57,7 +57,8 @@ struct OverviewPane: View {
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
                         title: "Health",
-                        color: .health(percent: snapshot.displayHealthPercent),
+                        color: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary,
+                        valueText: snapshot.hasHealthReading ? nil : "—",
                         diameter: 112
                     )
                     if let limit = snapshot.designCycleCount, limit > 0 {
@@ -90,11 +91,11 @@ struct OverviewPane: View {
                 StatRow(label: "Original Maximum", value: Formatting.mAh(snapshot.designCapacity))
                 StatRow(
                     label: "Health",
-                    value: Formatting.percentPrecise(snapshot.displayHealthPercent),
+                    value: (snapshot.hasHealthReading ? Formatting.percentPrecise(snapshot.displayHealthPercent) : "—"),
                     valueColor: .health(percent: snapshot.displayHealthPercent))
                 StatRow(
                     label: "Measured Health",
-                    value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
+                    value: (snapshot.hasMeasuredHealthReading ? Formatting.percentPrecise(snapshot.measuredHealthPercent) : "—"))
             }
         }
     }

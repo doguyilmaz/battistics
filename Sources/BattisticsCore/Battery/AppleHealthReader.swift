@@ -52,7 +52,7 @@ public enum AppleHealthReader {
                 capacity = health["sppower_battery_health_maximum_capacity"] as? Int
             }
             let condition = health["sppower_battery_health"] as? String
-            return AppleHealthInfo(maximumCapacityPercent: capacity, condition: condition)
+            return AppleHealthInfo(maximumCapacityPercent: capacity.flatMap { (1...100).contains($0) ? $0 : nil }, condition: condition)
         }
         return nil
     }

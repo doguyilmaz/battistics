@@ -41,10 +41,10 @@ struct DetailsPane: View {
                     LabeledContent("Measured Maximum", value: Formatting.mAh(snapshot.rawMaxCapacity))
                     LabeledContent("Design Capacity", value: Formatting.mAh(snapshot.designCapacity))
                     LabeledContent(
-                        "Health", value: Formatting.percentPrecise(snapshot.displayHealthPercent))
+                        "Health", value: (snapshot.hasHealthReading ? Formatting.percentPrecise(snapshot.displayHealthPercent) : "—"))
                     LabeledContent(
                         "Measured Health",
-                        value: Formatting.percentPrecise(snapshot.measuredHealthPercent))
+                        value: (snapshot.hasMeasuredHealthReading ? Formatting.percentPrecise(snapshot.measuredHealthPercent) : "—"))
                     if let percent = model.appleHealth?.maximumCapacityPercent {
                         LabeledContent("Apple Rated Health", value: "\(percent)%")
                     }
@@ -117,7 +117,7 @@ struct DetailsPane: View {
             lines.append("Manufactured: \(date.formatted(date: .abbreviated, time: .omitted)) (\(Formatting.age(from: date)))")
         }
         lines.append("Charge: \(snapshot.percent)% (\(Formatting.mAh(snapshot.rawCurrentCapacity)))")
-        lines.append("Health: \(Formatting.percentPrecise(snapshot.displayHealthPercent))")
+        lines.append("Health: \((snapshot.hasHealthReading ? Formatting.percentPrecise(snapshot.displayHealthPercent) : "—"))")
         lines.append("Current maximum: \(Formatting.mAh(snapshot.currentMaxCapacity))")
         lines.append("Measured maximum: \(Formatting.mAh(snapshot.rawMaxCapacity))")
         lines.append("Design capacity: \(Formatting.mAh(snapshot.designCapacity))")

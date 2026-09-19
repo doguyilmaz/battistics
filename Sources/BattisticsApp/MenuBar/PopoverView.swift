@@ -37,7 +37,8 @@ struct PopoverView: View {
                     GaugeRing(
                         value: snapshot.displayHealthPercent,
                         title: "Health",
-                        color: .health(percent: snapshot.displayHealthPercent)
+                        color: snapshot.hasHealthReading ? .health(percent: snapshot.displayHealthPercent) : .secondary,
+                        valueText: snapshot.hasHealthReading ? nil : "—"
                     )
                 }
                 .frame(maxWidth: .infinity)
