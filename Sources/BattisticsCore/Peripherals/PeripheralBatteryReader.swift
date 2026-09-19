@@ -40,6 +40,7 @@ public enum PeripheralBatteryReader {
                     .takeRetainedValue()
             }
 
+            if let connected = property("Connected") as? Bool, !connected { continue }
             guard let percent = property("BatteryPercent") as? Int, (0...100).contains(percent) else {
                 continue
             }

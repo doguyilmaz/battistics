@@ -79,7 +79,10 @@ public enum BluetoothBatteryReader {
     /// Values arrive as strings with the percent sign attached, and its side
     /// depends on the user's locale — "%100" in Turkish, "100%" in English.
     private static func percentage(_ value: Any?) -> Int? {
-        guard let text = value as? String else { return value as? Int }
+        guard let text = value as? String else {
+            guard let percent = value as? Int, (0...100).contains(percent) else { return nil }
+            return percent
+        }
         let digits = text.filter(\.isNumber)
         guard let percent = Int(digits), (0...100).contains(percent) else { return nil }
         return percent
