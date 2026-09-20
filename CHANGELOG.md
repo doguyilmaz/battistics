@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1
+
+- Power Flow is now enabled by default for new installations and can be
+  disabled from General settings. Existing preferences are preserved.
+
 ## 1.3.0
 
 - Battery health and capacity readings now handle macOS 27 data layouts and

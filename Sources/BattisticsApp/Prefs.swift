@@ -186,7 +186,7 @@ enum Prefs {
             keepAwakeMenuBarIcon: true,
             readBluetoothBatteries: false,
 
-            showPowerFlow: false,
+            showPowerFlow: true,
             powerSamplingEnabled: true,
             powerSamplingInterval: 60,
 

@@ -10,7 +10,7 @@ struct GeneralSettings: View {
     @AppStorage(Prefs.keepDashboardOnTop) private var keepDashboardOnTop = false
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
 
-    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = true
 
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var loginItemError: String?
@@ -48,7 +48,7 @@ struct GeneralSettings: View {
                         .onChange(of: showPowerFlow) { model.refreshSensors() }
                     PowerFlowInfoButton()
                 }
-                Text("Show power readings in Energy and the popover. Off by default; support varies by Mac and macOS.")
+                Text("Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

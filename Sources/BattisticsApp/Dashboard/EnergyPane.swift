@@ -26,7 +26,7 @@ private struct EnergyRow: Identifiable {
 struct EnergyPane: View {
     var isVisible = true
 
-    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = false
+    @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = true
 
     @State private var rows: [EnergyRow] = []
     @State private var hasResults = false
