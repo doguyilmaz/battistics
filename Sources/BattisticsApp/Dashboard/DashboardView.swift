@@ -148,8 +148,10 @@ struct DashboardView: View {
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .frame(width: 180)
+        // Stops at the toolbar. The toolbar spans the whole window in this
+        // layout, so a full-height line ran through its title.
         .overlay(alignment: .trailing) {
-            Divider().ignoresSafeArea()
+            Divider()
         }
     }
 

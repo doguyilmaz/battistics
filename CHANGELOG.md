@@ -4,6 +4,18 @@
 
 - Power Flow is now enabled by default for new installations and can be
   disabled from General settings. Existing preferences are preserved.
+- Closed-lid Keep Awake sets up its power helper itself. Turning it on
+  installs the helper, starts once it is allowed in Login Items, and
+  replaces a helper left running by an earlier version. When something is
+  still missing, the message says what, not just "could not start"
+- A closed-lid session that ends with the lid still shut lets the Mac sleep,
+  as closing the lid normally would, instead of running until the battery
+  is empty. The previous sleep setting is restored as before
+- The detached window keeps the Overview, Low Power Mode, Keep Awake,
+  Settings and Quit buttons
+- The dashboard sidebar's divider no longer runs through the window title
+- On macOS 27, cards in the popover and dashboard use a plain background,
+  since Liquid Glass nested in the popover changed their colors
 
 ## 1.3.0
 

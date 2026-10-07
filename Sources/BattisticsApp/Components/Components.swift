@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Card background: Liquid Glass on macOS 26, material with a hairline
-/// border before it. The only place in the app that branches on OS version
-/// for chrome, so views stay clean.
+/// Card background: Liquid Glass on macOS 26, a quiet platter from macOS 27,
+/// material with a hairline border before 26. The only place in the app that
+/// branches on OS version for chrome, so views stay clean.
 struct GlassCard<Content: View>: View {
     var cornerRadius: CGFloat = 12
     @ViewBuilder var content: () -> Content
@@ -19,7 +19,14 @@ struct GlassBackground: View {
     var cornerRadius: CGFloat = 12
 
     var body: some View {
-        if #available(macOS 26.0, *) {
+        if #available(macOS 27.0, *) {
+            // macOS 27 retuned Liquid Glass around a system-wide transparency
+            // setting. These cards sit on the popover's own glass, and nested
+            // there they came out tinted, shifting the colors inside them.
+            // Apple's guidance keeps glass for controls, not content, so
+            // content cards get a plain platter instead.
+            PlatterBackground(cornerRadius: cornerRadius)
+        } else if #available(macOS 26.0, *) {
             Color.clear.glassEffect(.regular, in: .rect(cornerRadius: cornerRadius))
         } else {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -29,6 +36,29 @@ struct GlassBackground: View {
                         .strokeBorder(.quaternary, lineWidth: 1)
                 }
         }
+    }
+}
+
+/// Lighter than what it sits on in both appearances, like the grouped boxes
+/// in System Settings, with a hairline edge that firms up under Increase
+/// Contrast. Fixed opacities rather than a material, so it looks the same
+/// whatever the glass transparency is set to.
+private struct PlatterBackground: View {
+    var cornerRadius: CGFloat
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    var body: some View {
+        let dark = colorScheme == .dark
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        shape
+            .fill(Color.white.opacity(dark ? 0.06 : 0.55))
+            .overlay {
+                shape.strokeBorder(
+                    (dark ? Color.white : Color.black)
+                        .opacity(contrast == .increased ? 0.3 : (dark ? 0.08 : 0.07)),
+                    lineWidth: contrast == .increased ? 1 : 0.5)
+            }
     }
 }
 

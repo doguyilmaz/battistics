@@ -383,39 +383,39 @@ struct PopoverView: View {
         .help("Keep Awake")
     }
 
-    @ViewBuilder private var footer: some View {
-        if !isPinnedWindow {
-            HStack {
-                Button {
-                    model.dashboardPane = .overview
-                    openWindow(id: "dashboard")
-                    NSApp.activate()
-                } label: {
-                    // Names the pane it actually opens, and reuses that
-                    // pane's own icon. "Dashboard" survives only as an
-                    // internal type name.
-                    Label("Overview", systemImage: DashboardPane.overview.icon)
-                }
-                Spacer()
-                powerMenu
-                keepAwakeMenu.disabled(keepAwake.isChanging)
-                Button {
-                    model.dashboardPane = .general
-                    openWindow(id: "dashboard")
-                    NSApp.activate()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .help("Settings")
-                Button {
-                    NSApp.terminate(nil)
-                } label: {
-                    Image(systemName: "power")
-                }
-                .help("Quit Battistics")
+    /// Shown in the detached window too: it is the same panel, and Low Power
+    /// Mode and Keep Awake are exactly what someone keeps it pinned for.
+    private var footer: some View {
+        HStack {
+            Button {
+                model.dashboardPane = .overview
+                openWindow(id: "dashboard")
+                NSApp.activate()
+            } label: {
+                // Names the pane it actually opens, and reuses that
+                // pane's own icon. "Dashboard" survives only as an
+                // internal type name.
+                Label("Overview", systemImage: DashboardPane.overview.icon)
             }
-            .controlSize(.small)
+            Spacer()
+            powerMenu
+            keepAwakeMenu.disabled(keepAwake.isChanging)
+            Button {
+                model.dashboardPane = .general
+                openWindow(id: "dashboard")
+                NSApp.activate()
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .help("Settings")
+            Button {
+                NSApp.terminate(nil)
+            } label: {
+                Image(systemName: "power")
+            }
+            .help("Quit Battistics")
         }
+        .controlSize(.small)
     }
 
     @ViewBuilder private var timeOnBatteryRow: some View {
