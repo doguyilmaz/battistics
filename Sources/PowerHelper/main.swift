@@ -20,7 +20,6 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         and certificate leaf[subject.OU] = "5MYT4VYJFC"
         """
 
-    private static let build = "3"
     private let owner = UUID()
 
     /// `setCodeSigningRequirement` returns void — it cannot report that the
@@ -103,7 +102,7 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
     }
 
     func version(reply: @escaping (String) -> Void) {
-        reply(Self.build)
+        reply(powerHelperBuild)
     }
 
     // MARK: - Execution

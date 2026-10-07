@@ -10,6 +10,7 @@ struct SystemPane: View {
     @Environment(AppModel.self) private var model
     @Environment(PowerSettingsModel.self) private var powerModel
     @State private var failure: PaneFailure?
+    @State private var isRepairing = false
 
     /// Carries its own title: one hardcoded alert title reused for every
     /// error produced "Could not change the setting / Could not install the
@@ -65,7 +66,7 @@ struct SystemPane: View {
 
             Section {
                 Text(
-                    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
+                    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would."
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -145,12 +146,13 @@ struct SystemPane: View {
         if helper.needsApproval {
             Button("Open Login Items…") { helper.openLoginItemsSettings() }
                 .controlSize(.small)
-        } else if helper.isInstalledButSilent {
-            // Registered but not answering has no way out otherwise: the
-            // button would offer to remove a helper that is already not
-            // working, when re-registering is what fixes it.
+        } else if helper.needsRepair {
+            // Registered but not answering, or answering as an older build,
+            // has no way out otherwise: the button would offer to remove a
+            // helper, when re-registering is what fixes it.
             Button("Repair") { repairHelper() }
                 .controlSize(.small)
+                .disabled(isRepairing)
         } else if helper.isInstalled {
             Button("Remove Helper") { removeHelper() }
                 .controlSize(.small)
@@ -161,7 +163,7 @@ struct SystemPane: View {
     }
 
     private var permissionIcon: String {
-        if helper.isInstalledButSilent { return "exclamationmark.triangle.fill" }
+        if helper.needsRepair { return "exclamationmark.triangle.fill" }
         if helper.isInstalled { return "checkmark.seal.fill" }
         return auth.isUnlocked ? "lock.open.fill" : "lock.fill"
     }
@@ -175,6 +177,12 @@ struct SystemPane: View {
             return String(
                 localized:
                     "The helper is installed but not running, so changes still ask for a password. Repair re-registers it."
+            )
+        }
+        if helper.needsRepair {
+            return String(
+                localized:
+                    "An older helper is still running. Closed-lid Keep Awake needs the current one; Repair replaces it."
             )
         }
         if helper.isInstalled {
@@ -238,13 +246,26 @@ struct SystemPane: View {
     }
 
     private func repairHelper() {
-        do {
-            try helper.reinstall()
-        } catch {
-            let underlying = error as NSError
-            failure = PaneFailure(
-                title: String(localized: "Could not repair the helper"),
-                message: installFailureMessage(underlying))
+        isRepairing = true
+        Task { @MainActor in
+            defer { isRepairing = false }
+            do {
+                try await helper.repair()
+            } catch PowerHelperClient.Failure.needsApproval {
+                // The row now offers Login Items, which is the answer.
+            } catch PowerHelperClient.Failure.installFailed(let domain, let code) {
+                failure = PaneFailure(
+                    title: String(localized: "Could not repair the helper"),
+                    message: installFailureMessage(NSError(domain: domain, code: code)))
+            } catch PowerHelperClient.Failure.outdated {
+                failure = PaneFailure(
+                    title: String(localized: "Could not repair the helper"),
+                    message: String(localized: "An older power helper is still running. Restart the Mac to replace it, then try again."))
+            } catch {
+                failure = PaneFailure(
+                    title: String(localized: "Could not repair the helper"),
+                    message: String(localized: "The helper was registered again but did not start. Restarting the Mac usually fixes this."))
+            }
         }
     }
 

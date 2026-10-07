@@ -27,12 +27,22 @@ final class KeepAwakeModel {
     @ObservationIgnored private let notice = KeepAwakeNoticeController()
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
+    /// Waits, bounded, for the user to allow the helper in Login Items, then
+    /// starts the closed-lid session they asked for.
+    @ObservationIgnored private var approvalTask: Task<Void, Never>?
+    /// Keeps App Nap from stretching the renewal timer past the helper's
+    /// 45-second lease while the lid is shut and nothing of ours is visible.
+    @ObservationIgnored private var renewalActivity: NSObjectProtocol?
 
     var mode: KeepAwakeMode {
         didSet {
             UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
             if let session, oldValue != mode {
                 start(mode: mode, duration: session.duration, now: session.startedAt)
+            } else if mode != .lidClosed, approvalTask != nil {
+                // Nothing left to wait for once closed-lid is no longer wanted.
+                cancelApprovalWait()
+                errorMessage = nil
             }
         }
     }
@@ -59,6 +69,7 @@ final class KeepAwakeModel {
 
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date()) {
         guard !isChanging else { return }
+        cancelApprovalWait()
         let previousLeaseID = session?.mode == .lidClosed ? sessionID : nil
         clearLocalSession()
         let id = UUID().uuidString
@@ -86,6 +97,10 @@ final class KeepAwakeModel {
                 }
                 guard sessionID == id else { return }
                 if mode == .lidClosed {
+                    // Installs, approves or repairs the helper as needed, so
+                    // choosing the mode is enough to make it work.
+                    try await helper.prepareForLidSleep()
+                    guard sessionID == id else { return }
                     let result = try await helper.acquireLidSleepLease(id) { [weak self] in
                         self?.sessionID == id
                     }
@@ -109,7 +124,12 @@ final class KeepAwakeModel {
                 }
                 session = new
                 scheduleExpiry(for: new, now: Date())
-                if mode == .lidClosed { renewLease(sessionID: id) }
+                if mode == .lidClosed {
+                    renewalActivity = ProcessInfo.processInfo.beginActivity(
+                        options: .userInitiatedAllowingIdleSystemSleep,
+                        reason: "Renewing the closed-lid Keep Awake lease")
+                    renewLease(sessionID: id)
+                }
             } catch PowerHelperClient.Failure.unknownLeaseStatus {
                 // An unrecognized wire result does not authorize rollback.
                 if sessionID == id {
@@ -126,8 +146,9 @@ final class KeepAwakeModel {
                     }
                     return
                 }
-                // Only a v3 acquisition can have mutated the setting. An older
-                // helper or a rejected preflight never needs a release selector.
+                // Only an acquisition that reached the helper can have mutated
+                // the setting. A failed preparation or a rejected preflight
+                // never needs a release selector.
                 if helper.hasLidSleepLeaseSession(id) {
                     let confirmed = await cleanUpAcquisition(sessionID: id)
                     guard sessionID == id else { return }
@@ -137,13 +158,65 @@ final class KeepAwakeModel {
                     guard sessionID == id else { return }
                     clearLocalSession()
                 }
-                errorMessage = String(localized: "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.")
+                showStartFailure(error, duration: duration)
             }
         }
     }
 
+    /// Says what is actually missing instead of one catch-all sentence, and
+    /// turns the one step only the user can take into the next action.
+    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration) {
+        isStoppedReasonInformational = false
+        switch error {
+        case PowerHelperClient.Failure.needsApproval:
+            isStoppedReasonInformational = true
+            errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
+            helper.openLoginItemsSettings()
+            waitForHelperApproval(duration: duration)
+        case PowerHelperClient.Failure.installFailed(let domain, let code):
+            errorMessage = String(localized: "macOS did not install the power helper that closed-lid mode needs.") + " (\(domain) \(code))"
+        case PowerHelperClient.Failure.outdated:
+            errorMessage = String(localized: "An older power helper is still running. Restart the Mac to replace it, then try again.")
+        case is PowerHelperClient.Failure:
+            errorMessage = String(localized: "The power helper did not respond, even after it was registered again. Use Repair in the System pane or restart the Mac.")
+        default:
+            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+        }
+    }
+
+    /// Polls a cheap registration read for a few minutes at most: no
+    /// notification reports the approval, and returning to Battistics is not
+    /// guaranteed to activate a menu bar app.
+    private func waitForHelperApproval(duration: KeepAwakeDuration) {
+        approvalTask?.cancel()
+        approvalTask = Task { [weak self] in
+            for _ in 0..<180 {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled, let self else { return }
+                // A different choice since then wins over the old request.
+                guard self.session == nil, self.mode == .lidClosed else { break }
+                self.helper.refreshStatusIfChanged()
+                if self.helper.isInstalled {
+                    self.approvalTask = nil
+                    self.start(mode: .lidClosed, duration: duration)
+                    return
+                }
+            }
+            self?.approvalTask = nil
+        }
+    }
+
+    private func cancelApprovalWait() {
+        approvalTask?.cancel()
+        approvalTask = nil
+    }
+
     func stop() {
         let leaseID = session?.mode == .lidClosed ? sessionID : nil
+        if approvalTask != nil {
+            cancelApprovalWait()
+            errorMessage = nil
+        }
         clearLocalSession()
         // A pending start owns its cleanup and keeps changes serialized until
         // its reply arrives. Invalidating sessionID prevents it from starting.
@@ -181,6 +254,10 @@ final class KeepAwakeModel {
         expiryTask = nil
         leaseTask?.cancel()
         leaseTask = nil
+        if let renewalActivity {
+            ProcessInfo.processInfo.endActivity(renewalActivity)
+            self.renewalActivity = nil
+        }
         assertion.release()
         session = nil
     }
@@ -312,7 +389,7 @@ extension KeepAwakeMode {
         switch self {
         case .displayOn: nil
         case .displayMaySleep: String(localized: "The display follows its sleep timer while the Mac keeps running.")
-        case .lidClosed: String(localized: "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.")
+        case .lidClosed: String(localized: "Uses the power helper, set up the first time you turn this on. Keeps the Mac running with its lid closed on battery or adapter.")
         }
     }
 }

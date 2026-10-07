@@ -3442,23 +3442,6 @@
         }
       }
     },
-    "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerektirir. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
-          }
-        }
-      }
-    },
     "Sleep Display Now": {
       "extractionState": "manual",
       "localizations": {
@@ -3472,23 +3455,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ekranı Şimdi Uyut"
-          }
-        }
-      }
-    },
-    "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut başlatılamadı. Kapak kapalı modu için Sistem bölümünden güç yardımcısını kurun veya onarın."
           }
         }
       }
@@ -3540,23 +3506,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç yardımcısıyla bağlantı kesildi. Uyanık Tut durduruldu."
-          }
-        }
-      }
-    },
-    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler."
           }
         }
       }
@@ -3659,6 +3608,159 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı Uyanık Tut oturumu sona erdi."
+          }
+        }
+      }
+    },
+    "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Ayarları > Genel > Giriş Öğeleri ve Uzantılar bölümünde Battistics'e izin verin. Kapak kapalı Uyanık Tut, izin verildiği anda başlar."
+          }
+        }
+      }
+    },
+    "macOS did not install the power helper that closed-lid mode needs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS did not install the power helper that closed-lid mode needs."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS, kapak kapalı modun ihtiyaç duyduğu güç yardımcısını kurmadı."
+          }
+        }
+      }
+    },
+    "An older power helper is still running. Restart the Mac to replace it, then try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An older power helper is still running. Restart the Mac to replace it, then try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eski bir güç yardımcısı hâlâ çalışıyor. Değiştirmek için Mac'i yeniden başlatın, ardından tekrar deneyin."
+          }
+        }
+      }
+    },
+    "The power helper did not respond, even after it was registered again. Use Repair in the System pane or restart the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The power helper did not respond, even after it was registered again. Use Repair in the System pane or restart the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı yeniden kaydedildikten sonra bile yanıt vermedi. Sistem bölümündeki Onar düğmesini kullanın veya Mac'i yeniden başlatın."
+          }
+        }
+      }
+    },
+    "macOS did not accept the Keep Awake request. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS did not accept the Keep Awake request. Try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS, Uyanık Tut isteğini kabul etmedi. Tekrar deneyin."
+          }
+        }
+      }
+    },
+    "An older helper is still running. Closed-lid Keep Awake needs the current one; Repair replaces it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An older helper is still running. Closed-lid Keep Awake needs the current one; Repair replaces it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eski bir yardımcı bileşen hâlâ çalışıyor. Kapak kapalı Uyanık Tut güncel sürümü gerektirir; Onar onu değiştirir."
+          }
+        }
+      }
+    },
+    "The helper was registered again but did not start. Restarting the Mac usually fixes this.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The helper was registered again but did not start. Restarting the Mac usually fixes this."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşen yeniden kaydedildi ancak başlamadı. Mac'i yeniden başlatmak genellikle bunu düzeltir."
+          }
+        }
+      }
+    },
+    "Uses the power helper, set up the first time you turn this on. Keeps the Mac running with its lid closed on battery or adapter.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uses the power helper, set up the first time you turn this on. Keeps the Mac running with its lid closed on battery or adapter."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İlk açtığınızda kurulan güç yardımcısını kullanır. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler. O sırada kapak hâlâ kapalıysa Mac her zamanki gibi uyku moduna geçer."
           }
         }
       }
