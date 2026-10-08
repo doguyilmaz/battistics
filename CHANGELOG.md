@@ -14,6 +14,10 @@
 - The dashboard sidebar's divider no longer runs through the window title
 - On macOS 27, cards in the popover and dashboard use a plain background,
   since Liquid Glass nested in the popover changed their colors
+- An update found in the background no longer opens its window behind
+  other apps, where it could sit unnoticed for weeks. It shows in the menu
+  bar panel and, when notifications are allowed, as a notification; either
+  one opens it. Right after launch it still opens directly
 
 ## 1.3.1
 

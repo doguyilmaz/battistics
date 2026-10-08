@@ -12,6 +12,7 @@ struct PopoverView: View {
     @Environment(PowerAuthorization.self) private var auth
     @Environment(PowerHelperClient.self) private var helper
     @Environment(PowerSettingsModel.self) private var powerModel
+    @Environment(UpdaterModel.self) private var updater
     @Environment(\.openWindow) private var openWindow
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
     @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = true
@@ -65,6 +66,9 @@ struct PopoverView: View {
             if let error = keepAwake.errorMessage {
                 Text(error).font(.caption)
                     .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
+            }
+            if let version = updater.pendingUpdateVersion {
+                updateRow(version)
             }
             footer
         }
@@ -381,6 +385,23 @@ struct PopoverView: View {
         }
         .menuStyle(.button)
         .help("Keep Awake")
+    }
+
+    /// A scheduled check found an update while Battistics was in the
+    /// background. Sparkle holds the alert instead of opening it behind
+    /// other windows, so this is where it gets noticed.
+    private func updateRow(_ version: String) -> some View {
+        Button {
+            updater.checkForUpdates()
+        } label: {
+            Label("Battistics \(version) is available", systemImage: "arrow.down.circle.fill")
+                .font(.caption.weight(.medium))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.accentColor)
+        .help("Show the update")
     }
 
     /// Shown in the detached window too: it is the same panel, and Low Power

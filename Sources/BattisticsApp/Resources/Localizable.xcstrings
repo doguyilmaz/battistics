@@ -3764,6 +3764,74 @@
           }
         }
       }
+    },
+    "Update Available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme Var"
+          }
+        }
+      }
+    },
+    "Battistics %@ is ready to install. Click to see what's new.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ is ready to install. Click to see what's new."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ kurulmaya hazır. Yenilikleri görmek için tıklayın."
+          }
+        }
+      }
+    },
+    "Battistics %@ is available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ is available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ kullanılabilir"
+          }
+        }
+      }
+    },
+    "Show the update": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show the update"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeyi göster"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
