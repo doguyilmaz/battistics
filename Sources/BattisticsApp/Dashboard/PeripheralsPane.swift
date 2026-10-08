@@ -52,7 +52,7 @@ struct PeripheralsPane: View {
                                         ProgressView(value: Double(peripheral.percent), total: 100)
                                             .tint(.charge(percent: Double(peripheral.percent)))
                                     }
-                                    Text("\(peripheral.percent)%")
+                                    Text(Formatting.percent(Double(peripheral.percent)))
                                         .font(.callout.weight(.semibold))
                                         .monospacedDigit()
                                 }

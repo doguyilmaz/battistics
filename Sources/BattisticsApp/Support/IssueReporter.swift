@@ -86,21 +86,27 @@ enum IssueReporter {
 /// if one is there, it really crashed, and the file is what the user needs to
 /// attach anyway.
 enum CrashWatch {
-    /// macOS also names the privileged helper's reports after its executable,
-    /// and a helper crash is exactly the kind the user cannot see.
-    private static let prefixes = ["Battistics-", "PowerHelper-"]
+    /// Reports are named after the executable; "Battistics-" does not match
+    /// the helper's.
+    private static let prefixes = ["Battistics-", "BattisticsPowerHelper-"]
+
+    /// The app's reports land in the user's library. The helper runs as
+    /// root, so its reports go to the system-wide one instead.
+    private static let directories = [
+        FileManager.default.homeDirectoryForCurrentUser
+            .appending(path: "Library/Logs/DiagnosticReports"),
+        URL(filePath: "/Library/Logs/DiagnosticReports"),
+    ]
 
     /// Older reports are somebody else's problem by now, and surfacing one
     /// months later reads as a bug in this app rather than a record of one.
     private static let window: TimeInterval = 7 * 86400
 
     static func latestReport() -> URL? {
-        let directory = FileManager.default.homeDirectoryForCurrentUser
-            .appending(path: "Library/Logs/DiagnosticReports")
-        guard
-            let files = try? FileManager.default.contentsOfDirectory(
-                at: directory, includingPropertiesForKeys: [.contentModificationDateKey])
-        else { return nil }
+        let files = directories.flatMap { directory in
+            (try? FileManager.default.contentsOfDirectory(
+                at: directory, includingPropertiesForKeys: [.contentModificationDateKey])) ?? []
+        }
 
         let cutoff = Date().addingTimeInterval(-window)
         return
@@ -122,6 +128,16 @@ enum CrashWatch {
 
     static func reveal(_ report: URL) {
         NSWorkspace.shared.activateFileViewerSelecting([report])
+    }
+
+    /// "Battistics quit unexpectedly yesterday", for the About pane and the
+    /// report sheet.
+    static func description(of report: URL) -> String {
+        guard let date = date(of: report) else {
+            return String(localized: "Battistics quit unexpectedly recently")
+        }
+        return String(
+            localized: "Battistics quit unexpectedly \(date.formatted(.relative(presentation: .named)))")
     }
 
     static func date(of report: URL) -> Date? {

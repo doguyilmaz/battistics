@@ -2,6 +2,7 @@ import AppKit
 import BattisticsCore
 import Foundation
 import Observation
+import Security
 import ServiceManagement
 
 /// Talks to the privileged helper, when one is installed.
@@ -15,7 +16,42 @@ import ServiceManagement
 final class PowerHelperClient {
     private static let plistName = "com.doguyilmaz.Battistics.PowerHelper.plist"
 
-    enum Failure: Error { case notConnected, unreachable, rejected(Int32), unknownLeaseStatus(Int32) }
+    enum Failure: Error {
+        case notConnected, unreachable, rejected(Int32), unknownLeaseStatus(Int32)
+        /// Registered, but macOS will not run it until the user allows it in
+        /// Login Items.
+        case needsApproval
+        case installFailed(domain: String, code: Int)
+        /// An older helper still answers after re-registering it.
+        case outdated
+        /// This copy has no team signature, so launchd would refuse to run a
+        /// helper registered from it.
+        case unsignedBuild
+    }
+
+    /// A local Debug build is ad-hoc signed. Registering from one points
+    /// launchd at a helper it kills on launch, and drops the installed
+    /// copy's working registration on the way.
+    static let isTeamSigned: Bool = {
+        var code: SecCode?
+        var staticCode: SecStaticCode?
+        var info: CFDictionary?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
+            SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
+            SecCodeCopySigningInformation(
+                staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &info) == errSecSuccess,
+            let info = info as? [String: Any]
+        else { return false }
+        return info[kSecCodeInfoTeamIdentifier as String] != nil
+    }()
+
+    static var unsignedBuildMessage: String {
+        String(localized: "This copy of Battistics is not signed with its Developer ID, so macOS will not run the power helper for it.")
+    }
+
+    private func requireTeamSignature() throws {
+        guard Self.isTeamSigned else { throw Failure.unsignedBuild }
+    }
 
     /// A continuation can only be resumed once, but three things race to do
     /// it here: the reply, the XPC error handler, and the timeout.
@@ -60,6 +96,9 @@ final class PowerHelperClient {
     private static let replyTimeout: Duration = .seconds(2)
     private static let probeTimeout: Duration = .seconds(1)
     private static let leaseTimeout: Duration = .seconds(8)
+    /// How long a re-registered helper gets to come up before giving up.
+    private static let relaunchWindow: Duration = .seconds(8)
+    private static let relaunchInterval: Duration = .milliseconds(500)
 
     private(set) var status: SMAppService.Status = .notRegistered
     /// Registered is not the same as running: a helper launchd cannot start
@@ -70,6 +109,11 @@ final class PowerHelperClient {
     /// being broken every time it appears, because the probe is async and
     /// the first render beats it.
     private(set) var hasProbed = false
+    /// Answering, but with an older build than this app ships: launchd kept
+    /// the previous process alive through an update or rebuild. Power
+    /// settings still work through it; closed-lid sessions need the current
+    /// one.
+    private(set) var isOutdated = false
 
     @ObservationIgnored private var connection: NSXPCConnection?
     @ObservationIgnored private var connectionID: UUID?
@@ -133,6 +177,8 @@ final class PowerHelperClient {
     /// Installed *and* answering, which is what callers actually need.
     var canApply: Bool { isInstalled && isReachable }
     var isInstalledButSilent: Bool { isInstalled && hasProbed && !isReachable }
+    /// Silent or outdated: both are fixed by re-registering.
+    var needsRepair: Bool { isInstalledButSilent || (isInstalled && isOutdated) }
     /// macOS wants the user to approve the daemon in Login Items first.
     var needsApproval: Bool { status == .requiresApproval }
 
@@ -141,6 +187,7 @@ final class PowerHelperClient {
         guard status == .enabled else {
             probeID = nil
             isReachable = false
+            isOutdated = false
             hasProbed = false
             return
         }
@@ -151,29 +198,103 @@ final class PowerHelperClient {
         Task { await probeReachability(id: id) }
     }
 
+    /// Re-reads only the registration, probing just when it changed. Cheap
+    /// enough to call every second while someone is approving the helper.
+    func refreshStatusIfChanged() {
+        if service.status != status { refreshStatus() }
+    }
+
     private func probeReachability(id: UUID) async {
         guard probeID == id, status == .enabled else { return }
-        let probedConnection: NSXPCConnection
-        do { probedConnection = try activeConnection() }
-        catch {
-            isReachable = false
-            hasProbed = true
-            return
-        }
+        let build = await askBuild(timeout: Self.probeTimeout)
+        guard probeID == id, status == .enabled else { return }
+        record(build)
+    }
+
+    private enum BuildCheck { case current, outdated, silent }
+
+    private func askBuild(timeout: Duration) async -> BuildCheck {
+        let asked: NSXPCConnection
+        do { asked = try activeConnection() } catch { return .silent }
         do {
-            _ = try await send(timeout: Self.probeTimeout, on: probedConnection) { proxy, done in
-                proxy.version { @Sendable _ in done(0) }
+            let code = try await send(timeout: timeout, on: asked) { proxy, done in
+                proxy.version { @Sendable version in done(version == powerHelperBuild ? 0 : 1) }
             }
-            guard probeID == id, connection === probedConnection, status == .enabled else { return }
-            isReachable = true
-            hasProbed = true
+            return code == 0 ? .current : .outdated
         } catch {
-            guard probeID == id, connection === probedConnection, status == .enabled else { return }
-            isReachable = false
-            hasProbed = true
-            probedConnection.invalidate()
-            connection = nil
-            connectionID = nil
+            // A connection made before launchd (re)started the daemon stays
+            // dead. Drop it so the next question reaches the new process.
+            if connection === asked {
+                asked.invalidate()
+                connection = nil
+                connectionID = nil
+            }
+            return .silent
+        }
+    }
+
+    private func record(_ build: BuildCheck) {
+        isReachable = build != .silent
+        isOutdated = build == .outdated
+        hasProbed = true
+    }
+
+    /// Gets a current, answering helper for a closed-lid session, doing
+    /// whatever is missing: installs it when absent, and re-registers one
+    /// that is silent or older than this app, then waits for launchd to bring
+    /// the new process up. Throws a `Failure` naming what is still missing.
+    ///
+    /// Runs only for an explicit closed-lid request. macOS still asks the
+    /// user to allow a newly registered daemon in Login Items; that surfaces
+    /// as `needsApproval`.
+    func prepareForLidSleep() async throws {
+        try requireTeamSignature()
+        status = service.status
+        if status == .requiresApproval { throw Failure.needsApproval }
+        if status != .enabled {
+            do {
+                try install()
+            } catch {
+                if needsApproval { throw Failure.needsApproval }
+                let underlying = error as NSError
+                throw Failure.installFailed(domain: underlying.domain, code: underlying.code)
+            }
+            if needsApproval { throw Failure.needsApproval }
+        }
+        let build = await askBuild(timeout: Self.replyTimeout)
+        record(build)
+        if build == .current { return }
+        try await repair()
+    }
+
+    /// Re-registers the helper and waits for launchd to bring up the new
+    /// process, so success means the current build is answering rather than
+    /// that a registration call returned.
+    func repair() async throws {
+        try requireTeamSignature()
+        do {
+            try reinstall()
+        } catch {
+            if needsApproval { throw Failure.needsApproval }
+            let underlying = error as NSError
+            throw Failure.installFailed(domain: underlying.domain, code: underlying.code)
+        }
+        if needsApproval { throw Failure.needsApproval }
+        var last = BuildCheck.silent
+        let deadline = ContinuousClock.now + Self.relaunchWindow
+        while ContinuousClock.now < deadline {
+            last = await askBuild(timeout: Self.probeTimeout)
+            if last == .current { break }
+            try? await Task.sleep(for: Self.relaunchInterval)
+        }
+        // Supersede the probe reinstall started, which may still be waiting
+        // on the process this loop just saw come up.
+        probeID = nil
+        record(last)
+        switch last {
+        case .current: return
+        case .outdated: throw Failure.outdated
+        case .silent: throw Failure.unreachable
         }
     }
 
@@ -196,6 +317,7 @@ final class PowerHelperClient {
     }
 
     func install() throws {
+        try requireTeamSignature()
         do {
             try service.register()
         } catch {
@@ -219,6 +341,7 @@ final class PowerHelperClient {
     /// Sparkle update replaces the helper, so a registration made before one
     /// can end up pointing at a binary that no longer matches.
     func reinstall() throws {
+        try requireTeamSignature()
         probeID = nil
         connection?.invalidate()
         connection = nil
@@ -229,6 +352,7 @@ final class PowerHelperClient {
     }
 
     func remove() throws {
+        try requireTeamSignature()
         probeID = nil
         connection?.invalidate()
         connection = nil
@@ -244,14 +368,14 @@ final class PowerHelperClient {
     func acquireLidSleepLease(
         _ sessionID: String, ifStillRequested: @escaping @MainActor () -> Bool
     ) async throws -> LidSleepLeaseResult {
-        guard canApply else { throw Failure.notConnected }
+        guard isInstalled else { throw Failure.notConnected }
         // Pin every lease operation to the endpoint that acquired it. A new
         // connection has a different helper-side identity and cannot renew it.
         let connection = try activeConnection()
         let version = try await send(timeout: Self.replyTimeout, on: connection) { proxy, done in
-            proxy.version { @Sendable version in done(version == "3" ? 0 : -1) }
+            proxy.version { @Sendable version in done(version == powerHelperBuild ? 0 : 1) }
         }
-        guard version == 0 else { throw Failure.rejected(version) }
+        guard version == 0 else { throw Failure.outdated }
         // stop() can run while the version RPC is suspended. Do not acquire
         // after cancellation, even briefly while waiting for cleanup.
         guard ifStillRequested() else { return .inactive }

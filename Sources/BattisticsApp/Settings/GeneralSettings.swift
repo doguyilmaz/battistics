@@ -4,6 +4,7 @@ import SwiftUI
 
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(UpdaterModel.self) private var updater
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.showDockIcon) private var showDockIcon = false
     @AppStorage(Prefs.openDashboardAtLaunch) private var openDashboardAtLaunch = false
@@ -16,11 +17,20 @@ struct GeneralSettings: View {
     @State private var loginItemError: String?
 
     var body: some View {
-        Form {
+        @Bindable var updater = updater
+        return Form {
             Section {
                 Toggle("Start at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in
                         updateLoginItem(enabled)
+                    }
+                    // Login Items can be changed in System Settings behind
+                    // our back; re-read when the user comes back.
+                    .onReceive(
+                        NotificationCenter.default.publisher(
+                            for: NSApplication.didBecomeActiveNotification)
+                    ) { _ in
+                        launchAtLogin = SMAppService.mainApp.status == .enabled
                     }
                 if let loginItemError {
                     Text(loginItemError)
@@ -41,6 +51,21 @@ struct GeneralSettings: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
+            }
+            ThemeAndIconSections()
+            Section("Updates") {
+                Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
+                Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
+                LabeledContent {
+                    Button("Check Now") {
+                        updater.checkForUpdates()
+                    }
+                    .disabled(!updater.canCheckForUpdates)
+                } label: {
+                    Text(lastCheckedText)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
             }
             Section("Experiments") {
                 HStack {
@@ -63,7 +88,19 @@ struct GeneralSettings: View {
         .formStyle(.grouped)
     }
 
+    /// Sparkle checks daily, counted from the last check rather than from
+    /// launch, so "never" here means it has not run yet, not that it is off.
+    private var lastCheckedText: String {
+        guard let date = updater.lastCheckDate else {
+            return String(localized: "Checked automatically every 24 hours")
+        }
+        return String(
+            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
+    }
+
     private func updateLoginItem(_ enabled: Bool) {
+        // A re-read above changes the toggle too; that is not a request.
+        guard enabled != (SMAppService.mainApp.status == .enabled) else { return }
         do {
             if enabled {
                 try SMAppService.mainApp.register()
@@ -73,7 +110,7 @@ struct GeneralSettings: View {
             loginItemError = nil
         } catch {
             launchAtLogin = SMAppService.mainApp.status == .enabled
-            loginItemError = "Could not update the login item: \(error.localizedDescription)"
+            loginItemError = String(localized: "Could not update the login item: \(error.localizedDescription)")
         }
     }
 }

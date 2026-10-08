@@ -62,8 +62,8 @@ struct PowerFlowPresentation {
 
     func watts(_ value: Double?, signed: Bool = false) -> String {
         guard let value else { return "—" }
-        if abs(value) < 0.05 { return "0.0 W" }
-        return String(format: signed ? "%+.1f W" : "%.1f W", signed ? value : abs(value))
+        if abs(value) < 0.05 { return Formatting.watts(0) }
+        return Formatting.watts(signed ? value : abs(value), signed: signed)
     }
 
     var batteryLabel: String {

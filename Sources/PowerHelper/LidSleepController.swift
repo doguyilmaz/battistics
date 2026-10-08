@@ -1,6 +1,7 @@
 import BattisticsCore
 import Foundation
 import IOKit
+import IOKit.pwr_mgt
 
 /// All lease state, file I/O and pmset calls belong to this serial queue.
 final class LidSleepController: @unchecked Sendable {
@@ -15,7 +16,13 @@ final class LidSleepController: @unchecked Sendable {
         queue.async { [self] in
             lease = LidSleepLease(
                 read: { try Self.readSleepDisabled() },
-                write: { _ = try Self.pmset(["-a", "disablesleep", $0 ? "1" : "0"]) },
+                write: { [self] disabled in
+                    _ = try Self.pmset(["-a", "disablesleep", disabled ? "1" : "0"])
+                    Self.waitUntilApplied(disabled)
+                    // Queued, so it runs after the lease has verified the
+                    // write and dropped its session.
+                    if !disabled { queue.async { self.sleepIfLidClosed(attempt: 0) } }
+                },
                 save: { [journal] record in
                     try record.encoded().write(to: journal, options: .atomic)
                 },
@@ -87,15 +94,79 @@ final class LidSleepController: @unchecked Sendable {
                         leeway: .milliseconds(250))
     }
 
-    /// The same root-domain property exported by pmset, without spawning a
-    /// process on every heartbeat. Absent or malformed values remain unknown.
+    /// Turning sleep back on does not make the kernel look at the lid again:
+    /// it evaluates clamshell sleep on lid and power events, and a sleep it
+    /// refused while the override was on is never retried. Without this, a
+    /// session that ends with the lid shut leaves the Mac running in the bag
+    /// until the battery dies. Asks for the sleep the lid would have caused,
+    /// and only when the kernel says the lid wants it, so clamshell use with
+    /// an external display and power is left alone.
+    private func sleepIfLidClosed(attempt: Int) {
+        // A session acquired since then owns the lid again.
+        guard lease.expirationDate == nil, Self.lidClosedWantsSleep(),
+              (try? Self.readSleepDisabled()) == false else { return }
+        // Refused while powerd is still applying the setting. Retry briefly
+        // rather than leave the Mac awake on a race.
+        guard Self.requestSleep() == Self.notPermitted, attempt < 10 else { return }
+        queue.asyncAfter(deadline: .now() + .milliseconds(500)) { [self] in
+            sleepIfLidClosed(attempt: attempt + 1)
+        }
+    }
+
+    /// pmset stores the setting and returns; powerd hands it to the kernel a
+    /// moment later. The lease reads back right after writing and would take
+    /// the old value for someone else's change, so give powerd up to two
+    /// seconds to catch up before it looks.
+    private static func waitUntilApplied(_ disabled: Bool) {
+        for _ in 0..<40 {
+            if (try? readSleepDisabled()) == disabled { return }
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+    }
+
+    /// `kIOReturnNotPermitted`, which Swift cannot import: it is built from
+    /// function-like macros.
+    private static let notPermitted = IOReturn(bitPattern: 0xE000_02E2)
+
+    private static func lidClosedWantsSleep() -> Bool {
+        let root = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPMrootDomain"))
+        guard root != IO_OBJECT_NULL else { return false }
+        defer { IOObjectRelease(root) }
+        func flag(_ key: String) -> Bool {
+            let value = IORegistryEntryCreateCFProperty(root, key as CFString, kCFAllocatorDefault, 0)?
+                .takeRetainedValue()
+            return (value as? Bool) == true
+        }
+        // CausesSleep is false in clamshell mode with a display and power.
+        return flag("AppleClamshellState") && flag("AppleClamshellCausesSleep")
+    }
+
+    private static func requestSleep() -> IOReturn? {
+        let connection = IOPMFindPowerManagement(kIOMainPortDefault)
+        guard connection != IO_OBJECT_NULL else { return nil }
+        defer { IOServiceClose(connection) }
+        return IOPMSleepSystem(connection)
+    }
+
+    /// The root-domain property pmset sets, read without spawning a process
+    /// on every heartbeat. The kernel only publishes it once something has
+    /// set it since boot, so when it is absent this asks pmset, which reports
+    /// powerd's copy. Absent from both means it was never set: sleep is on.
     private static func readSleepDisabled() throws -> Bool {
+        if let value = try registrySleepDisabled() { return value }
+        let output = try pmset(["-g"])
+        if let value = PowerSettingsReader.sleepDisabled(in: output) { return value }
+        guard !output.contains("SleepDisabled") else { throw CocoaError(.fileReadCorruptFile) }
+        return false
+    }
+
+    private static func registrySleepDisabled() throws -> Bool? {
         let root = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPMrootDomain"))
         guard root != IO_OBJECT_NULL else { throw CocoaError(.fileReadUnknown) }
         defer { IOObjectRelease(root) }
         guard let value = IORegistryEntryCreateCFProperty(root, "SleepDisabled" as CFString,
                                                         kCFAllocatorDefault, 0)?.takeRetainedValue() else {
-            throw CocoaError(.fileReadUnknown)
+            return nil
         }
         if CFGetTypeID(value) == CFBooleanGetTypeID() {
             return CFBooleanGetValue((value as! CFBoolean))

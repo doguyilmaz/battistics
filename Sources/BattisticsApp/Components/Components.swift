@@ -1,8 +1,8 @@
+import BattisticsCore
 import SwiftUI
 
-/// Card background: Liquid Glass on macOS 26, material with a hairline
-/// border before it. The only place in the app that branches on OS version
-/// for chrome, so views stay clean.
+/// Card background: Liquid Glass on macOS 26, a quiet platter from macOS 27,
+/// material with a hairline border before 26.
 struct GlassCard<Content: View>: View {
     var cornerRadius: CGFloat = 12
     @ViewBuilder var content: () -> Content
@@ -19,7 +19,10 @@ struct GlassBackground: View {
     var cornerRadius: CGFloat = 12
 
     var body: some View {
-        if #available(macOS 26.0, *) {
+        if #available(macOS 27.0, *) {
+            // Glass nested in the popover's own glass comes out tinted on 27.
+            PlatterBackground(cornerRadius: cornerRadius)
+        } else if #available(macOS 26.0, *) {
             Color.clear.glassEffect(.regular, in: .rect(cornerRadius: cornerRadius))
         } else {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -29,6 +32,26 @@ struct GlassBackground: View {
                         .strokeBorder(.quaternary, lineWidth: 1)
                 }
         }
+    }
+}
+
+/// Fixed opacities, so the glass transparency setting cannot tint it.
+private struct PlatterBackground: View {
+    var cornerRadius: CGFloat
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    var body: some View {
+        let dark = colorScheme == .dark
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        shape
+            .fill(Color.white.opacity(dark ? 0.06 : 0.55))
+            .overlay {
+                shape.strokeBorder(
+                    (dark ? Color.white : Color.black)
+                        .opacity(contrast == .increased ? 0.3 : (dark ? 0.08 : 0.07)),
+                    lineWidth: contrast == .increased ? 1 : 0.5)
+            }
     }
 }
 
@@ -72,7 +95,7 @@ struct GaugeRing: View {
                 // stack they push the number off centre, so a charging ring
                 // stops lining up with the ones beside it. Offsets are fixed
                 // because the number's size is, whatever the diameter.
-                Text(valueText ?? "\(Int(value.rounded()))%")
+                Text(valueText ?? Formatting.percent(value))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .contentTransition(.numericText())
@@ -97,7 +120,7 @@ struct GaugeRing: View {
                 }
             }
             .frame(width: diameter, height: diameter)
-            Text(title)
+            Text(title.appLocalized)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -112,7 +135,7 @@ struct StatRow: View {
 
     var body: some View {
         HStack {
-            Text(label)
+            Text(label.appLocalized)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 12)
             Text(value)
@@ -137,7 +160,7 @@ struct SectionHeader: View {
 
     var body: some View {
         HStack {
-            Text(title.uppercased())
+            Text(title.appLocalized.uppercased(with: .appLanguage))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .kerning(0.6)
@@ -163,8 +186,8 @@ struct SectionHeader: View {
                     VStack(alignment: .leading, spacing: 10) {
                         ForEach(help, id: \.term) { entry in
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(entry.term).font(.caption.weight(.semibold))
-                                Text(entry.explanation)
+                                Text(entry.term.appLocalized).font(.caption.weight(.semibold))
+                                Text(entry.explanation.appLocalized)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -176,6 +199,23 @@ struct SectionHeader: View {
                 }
             }
         }
+    }
+}
+
+extension String {
+    /// This string looked up in the app's catalog; `Text(someString)` never
+    /// localizes.
+    /// A string that is not a key comes back unchanged.
+    var appLocalized: String {
+        Bundle.main.localizedString(forKey: self, value: nil, table: nil)
+    }
+}
+
+extension Locale {
+    /// The language the app is actually showing, which can differ from the
+    /// region. Uppercasing "i" needs it: Turkish turns it into "İ".
+    static var appLanguage: Locale {
+        Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
     }
 }
 

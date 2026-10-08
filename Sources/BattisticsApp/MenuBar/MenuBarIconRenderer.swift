@@ -101,10 +101,10 @@ enum MenuBarIconRenderer {
         case .none:
             return nil
         case .chargePercent:
-            return "\(snapshot.percent)%"
+            return Formatting.percent(Double(snapshot.percent))
         case .healthPercent:
             guard snapshot.hasHealthReading else { return "H—" }
-            return "H\(Int(snapshot.displayHealthPercent.rounded()))%"
+            return "H" + Formatting.percent(snapshot.displayHealthPercent)
         case .timeRemaining:
             guard let minutes = snapshot.timeRemainingMin else { return nil }
             return Formatting.clock(minutes: minutes)
@@ -114,7 +114,7 @@ enum MenuBarIconRenderer {
             return "\(Int(value.rounded()))°"
         case .watts:
             guard let watts = snapshot.watts else { return nil }
-            return String(format: "%.1fW", abs(watts))
+            return abs(watts).formatted(.number.precision(.fractionLength(1))) + "W"
         case .currentmAh:
             return "\(snapshot.rawCurrentCapacity)"
         }

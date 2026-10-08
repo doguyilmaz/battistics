@@ -12,7 +12,9 @@ struct PopoverView: View {
     @Environment(PowerAuthorization.self) private var auth
     @Environment(PowerHelperClient.self) private var helper
     @Environment(PowerSettingsModel.self) private var powerModel
+    @Environment(UpdaterModel.self) private var updater
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismiss) private var dismiss
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
     @AppStorage(Prefs.showPowerFlow) private var showPowerFlow = true
     @State private var windowVisible = false
@@ -65,6 +67,11 @@ struct PopoverView: View {
             if let error = keepAwake.errorMessage {
                 Text(error).font(.caption)
                     .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if let version = updater.pendingUpdateVersion {
+                updateRow(version)
             }
             footer
         }
@@ -111,6 +118,7 @@ struct PopoverView: View {
                 Button {
                     openWindow(id: "mini")
                     NSApp.activate()
+                    closePanel()
                 } label: {
                     Image(systemName: "pin")
                         .font(.system(size: 11))
@@ -169,7 +177,7 @@ struct PopoverView: View {
                 if let watts = snapshot.watts {
                     StatRow(
                         label: "Power",
-                        value: String(format: "%+.1f W", watts),
+                        value: Formatting.watts(watts, signed: true),
                         valueColor: watts < 0 ? .orange : nil)
                 }
                 if let amperage = snapshot.amperageMA {
@@ -232,7 +240,7 @@ struct PopoverView: View {
                                     overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))
                                 ) {
                                     HStack(spacing: 4) {
-                                        Text("\(Int(selected.value.rounded()))%")
+                                        Text(Formatting.percent(selected.value))
                                             .font(.caption2.weight(.semibold))
                                         Text(selected.date, format: .dateTime.hour().minute())
                                             .font(.caption2)
@@ -323,8 +331,9 @@ struct PopoverView: View {
         } label: {
             Image(systemName: lowPowerIsOn ? "leaf.fill" : "leaf")
                 .foregroundStyle(lowPowerIsOn ? Color.lowPower : Color.secondary)
+                .font(.system(size: 10))
         }
-        .menuStyle(.button)
+        .iconMenu()
         .help("Low Power Mode")
     }
 
@@ -383,39 +392,69 @@ struct PopoverView: View {
         .help("Keep Awake")
     }
 
-    @ViewBuilder private var footer: some View {
-        if !isPinnedWindow {
-            HStack {
-                Button {
-                    model.dashboardPane = .overview
-                    openWindow(id: "dashboard")
-                    NSApp.activate()
-                } label: {
-                    // Names the pane it actually opens, and reuses that
-                    // pane's own icon. "Dashboard" survives only as an
-                    // internal type name.
-                    Label("Overview", systemImage: DashboardPane.overview.icon)
-                }
-                Spacer()
-                powerMenu
-                keepAwakeMenu.disabled(keepAwake.isChanging)
-                Button {
-                    model.dashboardPane = .general
-                    openWindow(id: "dashboard")
-                    NSApp.activate()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .help("Settings")
-                Button {
-                    NSApp.terminate(nil)
-                } label: {
-                    Image(systemName: "power")
-                }
-                .help("Quit Battistics")
-            }
-            .controlSize(.small)
+    /// An update Sparkle is holding after a background check.
+    private func updateRow(_ version: String) -> some View {
+        Button {
+            updater.checkForUpdates()
+            closePanel()
+        } label: {
+            Label("Battistics \(version) is available", systemImage: "arrow.down.circle.fill")
+                .font(.caption.weight(.medium))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.accentColor)
+        .help("Show the update")
+    }
+
+    /// Shown in the pinned window too.
+    private var footer: some View {
+        HStack {
+            Button("Overview") { openDashboard(at: .overview) }
+            Spacer()
+            powerMenu
+            keepAwakeMenu.disabled(keepAwake.isChanging)
+            appMenu
+        }
+        .controlSize(.small)
+    }
+
+    /// The app's own commands: without a Dock icon there is no visible main
+    /// menu to find them in.
+    private var appMenu: some View {
+        Menu {
+            Button("Settings…") { openDashboard(at: .general) }
+            Button("Check for Updates…") {
+                updater.checkForUpdates()
+                closePanel()
+            }
+            .disabled(!updater.canCheckForUpdates)
+            Button("Report a Problem…") {
+                model.reportRequested = true
+                openDashboard(at: .about)
+            }
+            Button("About Battistics") { openDashboard(at: .about) }
+            Divider()
+            Button("Quit Battistics") { NSApp.terminate(nil) }
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: 10))
+        }
+        .iconMenu()
+        .help("Settings, updates, support and Quit")
+    }
+
+    private func openDashboard(at pane: DashboardPane) {
+        model.dashboardPane = pane
+        openWindow(id: "dashboard")
+        NSApp.activate()
+        closePanel()
+    }
+
+    /// The pinned window stays open; that is what pinning is for.
+    private func closePanel() {
+        if !isPinnedWindow { dismiss() }
     }
 
     @ViewBuilder private var timeOnBatteryRow: some View {
@@ -429,7 +468,7 @@ struct PopoverView: View {
     }
 
     private func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = model.lastUnplugDate else { return "N/A" }
+        guard let unplugged = model.lastUnplugDate else { return String(localized: "N/A") }
         return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
@@ -444,20 +483,21 @@ struct PopoverView: View {
     private func statusText(_ snapshot: BatterySnapshot) -> String {
         if snapshot.isCharging {
             if let minutes = snapshot.timeRemainingMin {
-                return "Charging · \(Formatting.clock(minutes: minutes)) until full"
+                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
             }
-            return "Charging"
+            return String(localized: "Charging")
         }
         if snapshot.externalConnected {
             return snapshot.fullyCharged || snapshot.percent >= 100
-                ? "Fully charged · plugged in"
-                : "Plugged in · charging on hold"
+                ? String(localized: "Fully charged · plugged in")
+                : String(localized: "Plugged in · charging on hold")
         }
         if let minutes = snapshot.timeRemainingMin {
-            return "On battery · \(Formatting.clock(minutes: minutes)) remaining"
+            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
         }
-        return "On battery"
+        return String(localized: "On battery")
     }
+
 
     private func statusWord(_ status: HealthStatus) -> String {
         switch status {
@@ -473,5 +513,17 @@ struct PopoverView: View {
         case .fair: .orange
         case .poor: .red
         }
+    }
+}
+
+private extension View {
+    /// Without its arrow a small menu button draws a shorter bezel than the
+    /// buttons beside it; the large size with a rounded rectangle matches them.
+    func iconMenu() -> some View {
+        menuStyle(.button)
+            .menuIndicator(.hidden)
+            .controlSize(.large)
+            .buttonBorderShape(.roundedRectangle)
+            .fixedSize()
     }
 }

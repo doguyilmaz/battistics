@@ -298,16 +298,6 @@
         }
       }
     },
-    "Appearance": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görünüm"
-          }
-        }
-      }
-    },
     "Apple Rated Health": {
       "extractionState": "manual",
       "localizations": {
@@ -655,22 +645,6 @@
         }
       }
     },
-    "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İkisi de sürümünüz, macOS sürümü ve Mac modeliyle hazır açılır. Siz göndermeden hiçbir şey gönderilmez."
-          }
-        }
-      }
-    },
     "Cancel": {
       "extractionState": "manual",
       "localizations": {
@@ -959,16 +933,6 @@
         }
       }
     },
-    "Copy Report": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporu Kopyala"
-          }
-        }
-      }
-    },
     "Could not change the setting": {
       "extractionState": "manual",
       "localizations": {
@@ -1059,16 +1023,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kritik"
-          }
-        }
-      }
-    },
-    "Critical red kicks in at 10%.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kritik kırmızı %10'da devreye girer."
           }
         }
       }
@@ -1851,16 +1805,6 @@
     "Model": {
       "shouldTranslate": false
     },
-    "Monitor": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İzleme"
-          }
-        }
-      }
-    },
     "Month": {
       "localizations": {
         "tr": {
@@ -2203,22 +2147,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sistem Bildirim Ayarlarını Aç…"
-          }
-        }
-      }
-    },
-    "Open an Issue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open an Issue"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Konu Aç"
           }
         }
       }
@@ -2675,22 +2603,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dock simgesini göster"
-          }
-        }
-      }
-    },
-    "Show Report": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Report"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporu Göster"
           }
         }
       }
@@ -3442,23 +3354,6 @@
         }
       }
     },
-    "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requires the power helper. Keeps the Mac running with its lid closed on battery or adapter."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerektirir. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
-          }
-        }
-      }
-    },
     "Sleep Display Now": {
       "extractionState": "manual",
       "localizations": {
@@ -3472,23 +3367,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ekranı Şimdi Uyut"
-          }
-        }
-      }
-    },
-    "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not start Keep Awake. For closed-lid mode, install or repair the power helper in System settings."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut başlatılamadı. Kapak kapalı modu için Sistem bölümünden güç yardımcısını kurun veya onarın."
           }
         }
       }
@@ -3540,23 +3418,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç yardımcısıyla bağlantı kesildi. Uyanık Tut durduruldu."
-          }
-        }
-      }
-    },
-    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler."
           }
         }
       }
@@ -3659,6 +3520,1798 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı Uyanık Tut oturumu sona erdi."
+          }
+        }
+      }
+    },
+    "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Ayarları > Genel > Giriş Öğeleri ve Uzantılar bölümünde Battistics'e izin verin. Kapak kapalı Uyanık Tut, izin verildiği anda başlar."
+          }
+        }
+      }
+    },
+    "macOS did not install the power helper that closed-lid mode needs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS did not install the power helper that closed-lid mode needs."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS, kapak kapalı modun ihtiyaç duyduğu güç yardımcısını kurmadı."
+          }
+        }
+      }
+    },
+    "An older power helper is still running. Restart the Mac to replace it, then try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An older power helper is still running. Restart the Mac to replace it, then try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eski bir güç yardımcısı hâlâ çalışıyor. Değiştirmek için Mac'i yeniden başlatın, ardından tekrar deneyin."
+          }
+        }
+      }
+    },
+    "The power helper did not respond, even after it was registered again. Use Repair in the Power pane or restart the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The power helper did not respond, even after it was registered again. Use Repair in the Power pane or restart the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı yeniden kaydedildikten sonra bile yanıt vermedi. Güç bölümündeki Onar düğmesini kullanın veya Mac'i yeniden başlatın."
+          }
+        }
+      }
+    },
+    "macOS did not accept the Keep Awake request. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS did not accept the Keep Awake request. Try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS, Uyanık Tut isteğini kabul etmedi. Tekrar deneyin."
+          }
+        }
+      }
+    },
+    "An older helper is still running. Closed-lid Keep Awake needs the current one; Repair replaces it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An older helper is still running. Closed-lid Keep Awake needs the current one; Repair replaces it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eski bir yardımcı bileşen hâlâ çalışıyor. Kapak kapalı Uyanık Tut güncel sürümü gerektirir; Onar onu değiştirir."
+          }
+        }
+      }
+    },
+    "The helper was registered again but did not start. Restarting the Mac usually fixes this.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The helper was registered again but did not start. Restarting the Mac usually fixes this."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcı bileşen yeniden kaydedildi ancak başlamadı. Mac'i yeniden başlatmak genellikle bunu düzeltir."
+          }
+        }
+      }
+    },
+    "Uses the power helper, set up the first time you turn this on. Keeps the Mac running with its lid closed on battery or adapter.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uses the power helper, set up the first time you turn this on. Keeps the Mac running with its lid closed on battery or adapter."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İlk açtığınızda kurulan güç yardımcısını kullanır. Pilde veya adaptörde, kapak kapalıyken Mac çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran modları uyku engelleme isteği kullanır. Kapak kapalı modu ayrıca güç yardımcısıyla sistem uykusunu geçici olarak devre dışı bırakır ve oturum bitince önceki ayarı geri yükler. O sırada kapak hâlâ kapalıysa Mac her zamanki gibi uyku moduna geçer."
+          }
+        }
+      }
+    },
+    "Update Available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme Var"
+          }
+        }
+      }
+    },
+    "Battistics %@ is ready to install. Click to see what's new.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ is ready to install. Click to see what's new."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ kurulmaya hazır. Yenilikleri görmek için tıklayın."
+          }
+        }
+      }
+    },
+    "Battistics %@ is available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ is available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics %@ kullanılabilir"
+          }
+        }
+      }
+    },
+    "Show the update": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show the update"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellemeyi göster"
+          }
+        }
+      }
+    },
+    "Battery pack voltage.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery pack voltage."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil paketinin voltajı."
+          }
+        }
+      }
+    },
+    "Battery power. Negative means draining; positive means charging.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery power. Negative means draining; positive means charging."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil gücü. Negatif değer boşalmayı, pozitif değer şarjı gösterir."
+          }
+        }
+      }
+    },
+    "Battery temperature. Prolonged heat speeds up aging.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery temperature. Prolonged heat speeds up aging."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil sıcaklığı. Uzun süreli ısı yaşlanmayı hızlandırır."
+          }
+        }
+      }
+    },
+    "Capacity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite"
+          }
+        }
+      }
+    },
+    "Charge stored now, in milliampere-hours (mAh).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charge stored now, in milliampere-hours (mAh)."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şu anda depolanan şarj, miliamper-saat (mAh) cinsinden."
+          }
+        }
+      }
+    },
+    "One full battery's use, possibly across several sessions.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One full battery's use, possibly across several sessions."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir tam pil dolusunun kullanımı; birkaç oturuma yayılmış olabilir."
+          }
+        }
+      }
+    },
+    "The battery's capacity when new.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The battery's capacity when new."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilin yeniyken sahip olduğu kapasite."
+          }
+        }
+      }
+    },
+    "Time since the adapter was unplugged.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time since the adapter was unplugged."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptör çıkarıldığından beri geçen süre."
+          }
+        }
+      }
+    },
+    "Today's full-charge capacity. It declines with age and use.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's full-charge capacity. It declines with age and use."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugünkü tam şarj kapasitesi. Yaş ve kullanımla azalır."
+          }
+        }
+      }
+    },
+    "Charging · %@ until full": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charging · %@ until full"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj oluyor · dolmasına %@"
+          }
+        }
+      }
+    },
+    "Fully charged · plugged in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fully charged · plugged in"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam dolu · prize takılı"
+          }
+        }
+      }
+    },
+    "Plugged in · charging on hold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugged in · charging on hold"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prize takılı · şarj beklemede"
+          }
+        }
+      }
+    },
+    "On battery · %@ remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On battery · %@ remaining"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilde · %@ kaldı"
+          }
+        }
+      }
+    },
+    "On battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilde"
+          }
+        }
+      }
+    },
+    "History deleted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "History deleted."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçmiş silindi."
+          }
+        }
+      }
+    },
+    "Exported to %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exported to %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dosyasına aktarıldı."
+          }
+        }
+      }
+    },
+    "Export failed: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export failed: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dışa aktarma başarısız: %@"
+          }
+        }
+      }
+    },
+    "Imported %lld rows.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported %lld rows."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld satır içe aktarıldı."
+          }
+        }
+      }
+    },
+    "Import failed: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import failed: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İçe aktarma başarısız: %@"
+          }
+        }
+      }
+    },
+    "Could not update the login item: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not update the login item: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş öğesi güncellenemedi: %@"
+          }
+        }
+      }
+    },
+    "Above %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Above %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ üzerinde"
+          }
+        }
+      }
+    },
+    "External power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "External power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harici güç"
+          }
+        }
+      }
+    },
+    "Report a Problem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report a Problem"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorun Bildir"
+          }
+        }
+      }
+    },
+    "Report a Problem…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report a Problem…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorun Bildir…"
+          }
+        }
+      }
+    },
+    "A prefilled issue or email opens for you to describe what happened. Battistics adds only these lines, and nothing is sent until you send it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A prefilled issue or email opens for you to describe what happened. Battistics adds only these lines, and nothing is sent until you send it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne olduğunu anlatmanız için önceden doldurulmuş bir issue veya e-posta açılır. Battistics yalnızca bu satırları ekler ve siz göndermeden hiçbir şey gönderilmez."
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show in Finder"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder'da Göster"
+          }
+        }
+      }
+    },
+    "Crash files contain your account name in their paths, so attaching one is up to you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crash files contain your account name in their paths, so attaching one is up to you."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çökme dosyalarının yollarında hesap adınız geçer, bu yüzden eklemek size kalmıştır."
+          }
+        }
+      }
+    },
+    "Open a GitHub Issue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open a GitHub Issue"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub'da Issue Aç"
+          }
+        }
+      }
+    },
+    "About Battistics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Battistics"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Hakkında"
+          }
+        }
+      }
+    },
+    "Settings, updates, support and Quit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings, updates, support and Quit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar, güncellemeler, destek ve çıkış"
+          }
+        }
+      }
+    },
+    "Copy Battery Summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Battery Summary"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil Özetini Kopyala"
+          }
+        }
+      }
+    },
+    "Controls": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controls"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontroller"
+          }
+        }
+      }
+    },
+    "Help": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardım"
+          }
+        }
+      }
+    },
+    "Details…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayrıntılar…"
+          }
+        }
+      }
+    },
+    "Done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitti"
+          }
+        }
+      }
+    },
+    "Serial number, manufacture date, Apple's rating and a copyable summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serial number, manufacture date, Apple's rating and a copyable summary"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seri numarası, üretim tarihi, Apple'ın değerlendirmesi ve kopyalanabilir bir özet"
+          }
+        }
+      }
+    },
+    "Sleep and Energy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep and Energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku ve Enerji"
+          }
+        }
+      }
+    },
+    "Power Helper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Helper"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Yardımcısı"
+          }
+        }
+      }
+    },
+    "Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kritik kırmızı %10'da devreye girer. Düşük pil bildirimlerinin Bildirimler bölümünde kendi eşiği vardır."
+          }
+        }
+      }
+    },
+    "Current": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akım"
+          }
+        }
+      }
+    },
+    "About energy sampling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About energy sampling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji örneklemesi hakkında"
+          }
+        }
+      }
+    },
+    "Energy sampling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energy sampling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji örneklemesi"
+          }
+        }
+      }
+    },
+    "Up to 20 processes, ranked by energy use or, if unavailable, CPU use.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to 20 processes, ranked by energy use or, if unavailable, CPU use."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En fazla 20 işlem; enerji kullanımına, bu yoksa CPU kullanımına göre sıralanır."
+          }
+        }
+      }
+    },
+    "100% CPU equals one logical core. Using several cores can exceed 100%.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100% CPU equals one logical core. Using several cores can exceed 100%."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%100 CPU bir mantıksal çekirdeğe eşittir. Birden fazla çekirdek kullanan işlemler %100'ü aşabilir."
+          }
+        }
+      }
+    },
+    "Updates only while this pane is visible.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates only while this pane is visible."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca bu bölüm görünürken güncellenir."
+          }
+        }
+      }
+    },
+    "%lld cycles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cycles"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld döngü"
+          }
+        }
+      }
+    },
+    "Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı"
+          }
+        }
+      }
+    },
+    "Experimental": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experimental"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneysel"
+          }
+        }
+      }
+    },
+    "Estimated battery power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated battery power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini pil gücü"
+          }
+        }
+      }
+    },
+    "Estimated system power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated system power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini sistem gücü"
+          }
+        }
+      }
+    },
+    "Battery = Voltage × Current": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery = Voltage × Current"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil = Voltaj × Akım"
+          }
+        }
+      }
+    },
+    "System = Input - Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System = Input - Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem = Giriş - Pil"
+          }
+        }
+      }
+    },
+    "About Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı hakkında"
+          }
+        }
+      }
+    },
+    "Power Flow · Experimental": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Flow · Experimental"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı · Deneysel"
+          }
+        }
+      }
+    },
+    "Adapter capacity: %lld W": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adapter capacity: %lld W"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptör kapasitesi: %lld W"
+          }
+        }
+      }
+    },
+    "System updated: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System updated: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem güncellemesi: %@"
+          }
+        }
+      }
+    },
+    "Update time unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update time unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme zamanı bilinmiyor"
+          }
+        }
+      }
+    },
+    "Yellow warnings mark calculated values.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yellow warnings mark calculated values."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sarı uyarılar hesaplanmış değerleri gösterir."
+          }
+        }
+      }
+    },
+    "Some readings are unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some readings are unavailable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bazı okumalar kullanılamıyor."
+          }
+        }
+      }
+    },
+    "Input is power entering your Mac, not the adapter’s maximum wattage or power at the wall.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input is power entering your Mac, not the adapter’s maximum wattage or power at the wall."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş, Mac'inize giren güçtür; adaptörün en yüksek gücü veya prizden çekilen güç değildir."
+          }
+        }
+      }
+    },
+    "Battery: + means charging, - means discharging. Open a yellow warning for calculation details.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery: + means charging, - means discharging. Open a yellow warning for calculation details."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil: + şarj oluyor, - boşalıyor demektir. Hesaplama ayrıntıları için sarı uyarıyı açın."
+          }
+        }
+      }
+    },
+    "These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu deneysel macOS okumaları gecikebilir veya kullanılamayabilir. Farklı güncelleme zamanları ve güç kayıpları dağılımı yaklaşık kılar."
+          }
+        }
+      }
+    },
+    "The update time does not confirm when each reading was measured.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The update time does not confirm when each reading was measured."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme zamanı, her okumanın ne zaman ölçüldüğünü doğrulamaz."
+          }
+        }
+      }
+    },
+    "Estimated readings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated readings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini okumalar"
+          }
+        }
+      }
+    },
+    "System estimated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System estimated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem tahmini"
+          }
+        }
+      }
+    },
+    "Battery estimated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery estimated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil tahmini"
+          }
+        }
+      }
+    },
+    "Readings inconsistent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings inconsistent"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar tutarsız"
+          }
+        }
+      }
+    },
+    "Readings may lag": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings may lag"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar gecikebilir"
+          }
+        }
+      }
+    },
+    "Readings unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar kullanılamıyor"
+          }
+        }
+      }
+    },
+    "Reported load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reported load"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen yük"
+          }
+        }
+      }
+    },
+    "Estimated load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated load"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini yük"
+          }
+        }
+      }
+    },
+    "Load unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yük bilinmiyor"
+          }
+        }
+      }
+    },
+    "The reported battery reading is inconsistent. A valid reported reading will replace this estimate automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reported battery reading is inconsistent. A valid reported reading will replace this estimate automatically."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen pil okuması tutarsız. Geçerli bir okuma geldiğinde bu tahminin yerini otomatik olarak alır."
+          }
+        }
+      }
+    },
+    "The reported system reading is unavailable or inconsistent. A valid reported reading will replace this estimate automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reported system reading is unavailable or inconsistent. A valid reported reading will replace this estimate automatically."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen sistem okuması yok veya tutarsız. Geçerli bir okuma geldiğinde bu tahminin yerini otomatik olarak alır."
+          }
+        }
+      }
+    },
+    "Discharging": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discharging"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boşalıyor"
+          }
+        }
+      }
+    },
+    "No flow indicated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No flow indicated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akış görünmüyor"
+          }
+        }
+      }
+    },
+    "Direction unknown": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direction unknown"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yön bilinmiyor"
+          }
+        }
+      }
+    },
+    "In %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş %@"
+          }
+        }
+      }
+    },
+    "Input": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş"
+          }
+        }
+      }
+    },
+    "Mac %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac %@"
+          }
+        }
+      }
+    },
+    "Bat %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bat %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %@"
+          }
+        }
+      }
+    },
+    "Experimental Power Flow. Use the information button for sources and limitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experimental Power Flow. Use the information button for sources and limitations."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneysel Güç Akışı. Kaynaklar ve sınırlamalar için bilgi düğmesini kullanın."
+          }
+        }
+      }
+    },
+    "Low threshold: %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low threshold: %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük eşiği: %%%lld"
+          }
+        }
+      }
+    },
+    "Experiments": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experiments"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneyler"
+          }
+        }
+      }
+    },
+    "Show Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışını göster"
+          }
+        }
+      }
+    },
+    "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç okumalarını Enerji bölümünde ve açılır panelde gösterir. Varsayılan olarak açıktır; destek Mac'e ve macOS sürümüne göre değişir."
+          }
+        }
+      }
+    },
+    "Notify at %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notify at %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%lld olunca bildir"
+          }
+        }
+      }
+    },
+    "Remind on every further %lld%% drop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind on every further %lld%% drop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her %%%lld düşüşte yeniden hatırlat"
+          }
+        }
+      }
+    },
+    "After %@ hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After %@ hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ saat sonra"
+          }
+        }
+      }
+    },
+    "%lldh %lldm": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld sa %2$lld dk"
+          }
+        }
+      }
+    },
+    "%lldm": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld dk"
+          }
+        }
+      }
+    },
+    "%@ years": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yıl"
+          }
+        }
+      }
+    },
+    "1 month": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 ay"
+          }
+        }
+      }
+    },
+    "%lld months": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ay"
+          }
+        }
+      }
+    },
+    "This copy of Battistics is not signed with its Developer ID, so macOS will not run the power helper for it.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Battistics kopyası Developer ID ile imzalanmamış, bu yüzden macOS güç yardımcısını onun için çalıştırmaz."
           }
         }
       }

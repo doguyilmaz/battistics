@@ -61,7 +61,7 @@ struct HistorySettings: View {
                 Task {
                     await model.deleteHistory()
                     await refreshSize()
-                    statusMessage = "History deleted."
+                    statusMessage = String(localized: "History deleted.")
                 }
             }
         } message: {
@@ -83,9 +83,9 @@ struct HistorySettings: View {
                 let csv = await model.history.exportCSV()
                 do {
                     try csv.write(to: url, atomically: true, encoding: .utf8)
-                    statusMessage = "Exported to \(url.lastPathComponent)."
+                    statusMessage = String(localized: "Exported to \(url.lastPathComponent).")
                 } catch {
-                    statusMessage = "Export failed: \(error.localizedDescription)"
+                    statusMessage = String(localized: "Export failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -102,9 +102,9 @@ struct HistorySettings: View {
                     let text = try String(contentsOf: url, encoding: .utf8)
                     let count = try await model.history.importCSV(text)
                     await refreshSize()
-                    statusMessage = "Imported \(count) rows."
+                    statusMessage = String(localized: "Imported \(count) rows.")
                 } catch {
-                    statusMessage = "Import failed: \(error.localizedDescription)"
+                    statusMessage = String(localized: "Import failed: \(error.localizedDescription)")
                 }
             }
         }

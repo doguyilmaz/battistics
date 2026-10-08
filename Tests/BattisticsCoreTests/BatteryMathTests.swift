@@ -273,10 +273,24 @@ struct BatteryMathTests {
 
 @Suite("Formatting")
 struct FormattingTests {
+    private let en = Locale(identifier: "en_US")
+    private let tr = Locale(identifier: "tr_TR")
+
     @Test func temperatureUnits() {
-        #expect(Formatting.temperature(34.5, unit: .celsius) == "34.5°C")
-        #expect(Formatting.temperature(34.5, unit: .fahrenheit) == "94.1°F")
-        #expect(Formatting.temperature(34.5, unit: .both) == "34.5°C / 94.1°F")
+        #expect(Formatting.temperature(34.5, unit: .celsius, locale: en) == "34.5°C")
+        #expect(Formatting.temperature(34.5, unit: .fahrenheit, locale: en) == "94.1°F")
+        #expect(Formatting.temperature(34.5, unit: .both, locale: en) == "34.5°C / 94.1°F")
+    }
+
+    @Test func numbersFollowTheRegion() {
+        #expect(Formatting.temperature(34.5, unit: .celsius, locale: tr) == "34,5°C")
+        #expect(Formatting.watts(-4.1, signed: true, locale: tr) == "-4,1 W")
+        #expect(Formatting.watts(4.1, signed: true, locale: en) == "+4.1 W")
+        #expect(Formatting.volts(millivolts: 11_060, locale: tr) == "11,06 V")
+        #expect(Formatting.milliamps(-1125, locale: tr) == "-1.125 mA")
+        #expect(Formatting.percent(84, locale: en) == "84%")
+        #expect(Formatting.percent(84, locale: tr) == "%84")
+        #expect(Formatting.percentPrecise(84.3, locale: tr) == "%84,3")
     }
 
     @Test func durations() {
@@ -288,7 +302,7 @@ struct FormattingTests {
 
     @Test func age() {
         let fourYearsAgo = Date().addingTimeInterval(-4.7 * 365.25 * 24 * 3600)
-        #expect(Formatting.age(from: fourYearsAgo) == "4.7 years")
+        #expect(Formatting.age(from: fourYearsAgo, locale: en) == "4.7 years")
         let eightMonthsAgo = Date().addingTimeInterval(-8 * 30.44 * 24 * 3600)
         #expect(Formatting.age(from: eightMonthsAgo) == "8 months")
     }

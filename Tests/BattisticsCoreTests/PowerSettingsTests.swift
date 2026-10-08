@@ -114,6 +114,27 @@ struct PowerSettingsTests {
     }
 }
 
+@Suite("Closed-lid sleep setting")
+struct SleepDisabledParsingTests {
+    @Test func systemWideFlagIsRead() {
+        let output = """
+            System-wide power settings:
+             SleepDisabled\t\t1
+            Currently in use:
+             standby              1
+             sleep                1
+            """
+        #expect(PowerSettingsReader.sleepDisabled(in: output) == true)
+        #expect(PowerSettingsReader.sleepDisabled(in: output.replacingOccurrences(of: "\t\t1", with: "\t\t0")) == false)
+    }
+
+    @Test func missingOrMalformedFlagIsUnknown() {
+        #expect(PowerSettingsReader.sleepDisabled(in: "Currently in use:\n sleep 1\n") == nil)
+        #expect(PowerSettingsReader.sleepDisabled(in: " SleepDisabled 2\n") == nil)
+        #expect(PowerSettingsReader.sleepDisabled(in: " SleepDisabled\n") == nil)
+    }
+}
+
 @Suite("Low Power Mode activity")
 struct LowPowerActivityTests {
     @Test func configuredIsNotTheSameAsActive() {

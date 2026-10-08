@@ -25,7 +25,7 @@ struct PowerFlowCard: View {
                 }
                 HStack(spacing: 12) {
                     node("Input", icon: "powerplug", watts: flow.telemetry?.inputWatts,
-                         detail: "External power")
+                         detail: String(localized: "External power"))
                     arrow((flow.telemetry?.inputWatts ?? 0) > 0 ? "arrow.right" : nil)
                     node("System", icon: "laptopcomputer", watts: flow.telemetry?.systemLoadWatts,
                          detail: flow.systemLabel, estimate: flow.systemIsEstimated ? .system : nil)

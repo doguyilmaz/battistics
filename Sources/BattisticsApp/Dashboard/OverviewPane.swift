@@ -3,6 +3,8 @@ import SwiftUI
 
 struct OverviewPane: View {
     var isVisible = true
+    /// Opens the full battery details.
+    var showDetails: () -> Void = {}
 
     @Environment(AppModel.self) private var model
     @Environment(PowerSettingsModel.self) private var powerModel
@@ -81,6 +83,12 @@ struct OverviewPane: View {
             }
             .padding(.vertical, 8)
         }
+        .overlay(alignment: .topTrailing) {
+            Button("Details…", action: showDetails)
+                .controlSize(.small)
+                .help("Serial number, manufacture date, Apple's rating and a copyable summary")
+                .padding(12)
+        }
     }
 
     private func capacityCard(_ snapshot: BatterySnapshot) -> some View {
@@ -115,7 +123,7 @@ struct OverviewPane: View {
                 if let watts = snapshot.watts {
                     StatRow(
                         label: "Power",
-                        value: String(format: "%+.1f W", watts),
+                        value: Formatting.watts(watts, signed: true),
                         valueColor: watts < 0 ? .orange : nil)
                 }
                 if let amperage = snapshot.amperageMA {
@@ -140,7 +148,7 @@ struct OverviewPane: View {
     }
 
     private func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = model.lastUnplugDate else { return "N/A" }
+        guard let unplugged = model.lastUnplugDate else { return String(localized: "N/A") }
         return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
@@ -178,17 +186,19 @@ struct OverviewPane: View {
     private func statusLine(_ snapshot: BatterySnapshot) -> String {
         if snapshot.isCharging {
             if let minutes = snapshot.timeRemainingMin {
-                return "Charging · \(Formatting.clock(minutes: minutes)) until full"
+                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
             }
-            return "Charging"
+            return String(localized: "Charging")
         }
         if snapshot.externalConnected {
             return snapshot.fullyCharged || snapshot.percent >= 100
-                ? "Fully charged · plugged in" : "Plugged in · charging on hold"
+                ? String(localized: "Fully charged · plugged in")
+                : String(localized: "Plugged in · charging on hold")
         }
         if let minutes = snapshot.timeRemainingMin {
-            return "On battery · \(Formatting.clock(minutes: minutes)) remaining"
+            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
         }
-        return "On battery"
+        return String(localized: "On battery")
     }
+
 }

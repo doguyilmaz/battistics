@@ -144,6 +144,22 @@ public enum PowerSettingsReader {
         return settings
     }
 
+    /// The system-wide `SleepDisabled` flag from plain `pmset -g` output,
+    /// which lists it under "System-wide power settings". Nil when the line
+    /// is missing or its value is not a plain 0 or 1.
+    public static func sleepDisabled(in text: String) -> Bool? {
+        for rawLine in text.split(separator: "\n") {
+            let fields = rawLine.split(whereSeparator: \.isWhitespace)
+            guard fields.count == 2, fields[0] == "SleepDisabled" else { continue }
+            switch fields[1] {
+            case "0": return false
+            case "1": return true
+            default: return nil
+            }
+        }
+        return nil
+    }
+
     private static func apply(key: String, value: String, to source: inout PowerSettings.Source) {
         let number = Int(value)
         let flag = number.map { $0 != 0 }

@@ -135,6 +135,13 @@ struct BattisticsApp: App {
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
+            CommandGroup(replacing: .help) {
+                Button("Report a Problem…") {
+                    model.reportRequested = true
+                    model.dashboardPane = .about
+                    AppDelegate.openDashboard()
+                }
+            }
         }
     }
 }

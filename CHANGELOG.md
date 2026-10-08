@@ -1,5 +1,50 @@
 # Changelog
 
+## 1.4.0
+
+- Closed-lid Keep Awake sets up its power helper itself. Turning it on
+  installs the helper, starts once it is allowed in Login Items, and
+  replaces a helper left running by an earlier version. When something is
+  still missing, the message says what, not just "could not start"
+- A closed-lid session that ends with the lid still shut lets the Mac sleep,
+  as closing the lid normally would, instead of running until the battery
+  is empty. The previous sleep setting is restored as before
+- The detached window keeps the Overview, Low Power Mode, Keep Awake and
+  settings buttons
+- The dashboard sidebar's divider no longer runs through the window title
+- On macOS 27, cards in the popover and dashboard use a plain background,
+  since Liquid Glass nested in the popover changed their colors
+- An update found in the background no longer opens its window behind
+  other apps, where it could sit unnoticed for weeks. It shows in the menu
+  bar panel and, when notifications are allowed, as a notification; either
+  one opens it. Right after launch it still opens directly
+- Turkish now covers the stat labels, gauge titles, section headers and
+  their help, and the status line in the popover and Overview. They were
+  translated but always drawn in English
+- Helper crashes are detected in About. Their reports were looked up under
+  the wrong name and in the wrong folder
+- The high temperature notification threshold follows the temperature unit
+  setting instead of always showing Celsius
+- "Start at login" reflects changes made in System Settings
+- One "Report a Problem…" replaces the separate issue and email buttons.
+  It shows exactly what is added to the report and any recent crash file,
+  and it is reachable from the popover's new settings menu and the Help
+  menu, not only from the bottom of About
+- The popover's gear button opens a menu with Settings, Check for Updates,
+  Report a Problem, About and Quit. The footer is more compact, and the
+  popover closes when one of its buttons opens a window
+- Numbers follow the region's format, and durations and battery age are
+  translated: Turkish shows "%85", "34,5°C", "7 sa 23 dk" and "3,8 yıl"
+- Details' "Copy Report" is now "Copy Battery Summary", so "report" means
+  only a problem report
+- The dashboard sidebar is grouped as Battery, Controls, Settings and
+  Help. Details opens from Overview instead of repeating it as its own
+  pane; System is now Power, with the power helper in its own section;
+  Appearance is now Menu Bar, and its theme and app icon moved to General,
+  together with Updates from About
+- Notifications, Energy, Power Flow and the History totals are translated
+  into Turkish
+
 ## 1.3.1
 
 - Power Flow is now enabled by default for new installations and can be

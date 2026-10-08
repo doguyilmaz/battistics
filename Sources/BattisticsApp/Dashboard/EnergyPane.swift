@@ -160,7 +160,7 @@ struct EnergyPane: View {
                     .frame(width: 90)
                     .tint(.orange)
             }
-            Text(String(format: "%.1f%% CPU", sample.cpuPercent))
+            Text(Formatting.percentPrecise(sample.cpuPercent) + " CPU")
                 .font(.caption)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
