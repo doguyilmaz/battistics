@@ -117,13 +117,13 @@ CONTENT=$(printf '%s\n' "$CASK" | base64 | tr -d '\n')
 
 if [ "$exists" = 1 ]; then
     gh api "repos/$TAP/contents/$CASK_PATH" -X PUT \
-        -f "message=Brew cask update for battistics version v$VERSION" \
+        -f "message=battistics v$VERSION" \
         -f "content=$CONTENT" \
         -f "sha=$(gh api "repos/$TAP/contents/$CASK_PATH" --jq .sha)" \
         --jq '.commit.html_url'
 else
     gh api "repos/$TAP/contents/$CASK_PATH" -X PUT \
-        -f "message=Brew cask update for battistics version v$VERSION" \
+        -f "message=battistics v$VERSION" \
         -f "content=$CONTENT" \
         --jq '.commit.html_url'
 fi
