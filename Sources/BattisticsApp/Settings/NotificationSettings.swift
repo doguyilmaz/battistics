@@ -1,4 +1,5 @@
 import AppKit
+import BattisticsCore
 import SwiftUI
 
 struct NotificationSettings: View {
@@ -15,6 +16,12 @@ struct NotificationSettings: View {
     @AppStorage(Prefs.alertHighTempEnabled) private var highTempEnabled = true
     @AppStorage(Prefs.alertHighTempThreshold) private var highTempThreshold = 40.0
     @AppStorage(Prefs.alertHealthDropEnabled) private var healthDropEnabled = true
+    @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue
+
+    private var thresholdText: String {
+        let unit = TemperatureUnit(rawValue: temperatureUnitRaw) ?? .both
+        return Formatting.temperature(highTempThreshold, unit: unit)
+    }
 
     var body: some View {
         Form {
@@ -56,7 +63,8 @@ struct NotificationSettings: View {
             Section("Health") {
                 Toggle("High battery temperature", isOn: $highTempEnabled)
                 if highTempEnabled {
-                    LabeledContent("Above \(Int(highTempThreshold))°C") {
+                    // Stored in Celsius, shown in the unit chosen in General.
+                    LabeledContent("Above \(thresholdText)") {
                         Slider(value: $highTempThreshold, in: 35...50, step: 1)
                     }
                 }

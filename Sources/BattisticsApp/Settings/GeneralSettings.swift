@@ -22,6 +22,14 @@ struct GeneralSettings: View {
                     .onChange(of: launchAtLogin) { _, enabled in
                         updateLoginItem(enabled)
                     }
+                    // Login Items can be changed in System Settings behind
+                    // our back; re-read when the user comes back.
+                    .onReceive(
+                        NotificationCenter.default.publisher(
+                            for: NSApplication.didBecomeActiveNotification)
+                    ) { _ in
+                        launchAtLogin = SMAppService.mainApp.status == .enabled
+                    }
                 if let loginItemError {
                     Text(loginItemError)
                         .font(.caption)
@@ -64,6 +72,11 @@ struct GeneralSettings: View {
     }
 
     private func updateLoginItem(_ enabled: Bool) {
+        // A re-read above changes the toggle too; that is not a request.
+        guard enabled != (SMAppService.mainApp.status == .enabled) else {
+            loginItemError = nil
+            return
+        }
         do {
             if enabled {
                 try SMAppService.mainApp.register()
@@ -73,7 +86,7 @@ struct GeneralSettings: View {
             loginItemError = nil
         } catch {
             launchAtLogin = SMAppService.mainApp.status == .enabled
-            loginItemError = "Could not update the login item: \(error.localizedDescription)"
+            loginItemError = String(localized: "Could not update the login item: \(error.localizedDescription)")
         }
     }
 }

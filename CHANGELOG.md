@@ -18,6 +18,14 @@
   other apps, where it could sit unnoticed for weeks. It shows in the menu
   bar panel and, when notifications are allowed, as a notification; either
   one opens it. Right after launch it still opens directly
+- Turkish now covers the stat labels, gauge titles, section headers and
+  their help, and the status line in the popover and Overview. They were
+  translated but always drawn in English
+- Helper crashes are detected in About. Their reports were looked up under
+  the wrong name and in the wrong folder
+- The high temperature notification threshold follows the temperature unit
+  setting instead of always showing Celsius
+- "Start at login" reflects changes made in System Settings
 
 ## 1.3.1
 

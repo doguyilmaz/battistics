@@ -127,7 +127,7 @@ struct GaugeRing: View {
                 }
             }
             .frame(width: diameter, height: diameter)
-            Text(title)
+            Text(title.appLocalized)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -142,7 +142,7 @@ struct StatRow: View {
 
     var body: some View {
         HStack {
-            Text(label)
+            Text(label.appLocalized)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 12)
             Text(value)
@@ -167,7 +167,7 @@ struct SectionHeader: View {
 
     var body: some View {
         HStack {
-            Text(title.uppercased())
+            Text(title.appLocalized.uppercased(with: .appLanguage))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .kerning(0.6)
@@ -193,8 +193,8 @@ struct SectionHeader: View {
                     VStack(alignment: .leading, spacing: 10) {
                         ForEach(help, id: \.term) { entry in
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(entry.term).font(.caption.weight(.semibold))
-                                Text(entry.explanation)
+                                Text(entry.term.appLocalized).font(.caption.weight(.semibold))
+                                Text(entry.explanation.appLocalized)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -206,6 +206,24 @@ struct SectionHeader: View {
                 }
             }
         }
+    }
+}
+
+extension String {
+    /// This string as a key in the app's catalog. The components above take
+    /// plain strings so callers can pass literals, and `Text(someString)`
+    /// never localizes: without this every label they draw stayed English.
+    /// A string that is not a key comes back unchanged.
+    var appLocalized: String {
+        Bundle.main.localizedString(forKey: self, value: nil, table: nil)
+    }
+}
+
+extension Locale {
+    /// The language the app is actually showing, which can differ from the
+    /// region. Uppercasing "i" needs it: Turkish turns it into "İ".
+    static var appLanguage: Locale {
+        Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
     }
 }
 
