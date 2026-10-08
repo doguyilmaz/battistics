@@ -392,9 +392,7 @@ struct PopoverView: View {
         .help("Keep Awake")
     }
 
-    /// A scheduled check found an update while Battistics was in the
-    /// background. Sparkle holds the alert instead of opening it behind
-    /// other windows, so this is where it gets noticed.
+    /// An update Sparkle is holding after a background check.
     private func updateRow(_ version: String) -> some View {
         Button {
             updater.checkForUpdates()
@@ -410,8 +408,7 @@ struct PopoverView: View {
         .help("Show the update")
     }
 
-    /// Shown in the detached window too: it is the same panel, and Low Power
-    /// Mode and Keep Awake are exactly what someone keeps it pinned for.
+    /// Shown in the pinned window too.
     private var footer: some View {
         HStack {
             Button("Overview") { openDashboard(at: .overview) }
@@ -423,9 +420,8 @@ struct PopoverView: View {
         .controlSize(.small)
     }
 
-    /// Everything about the app itself, in one place. A menu bar app has no
-    /// visible main menu unless its Dock icon is on, so without this the
-    /// Help and update commands were out of reach for most people.
+    /// The app's own commands: without a Dock icon there is no visible main
+    /// menu to find them in.
     private var appMenu: some View {
         Menu {
             Button("Settings…") { openDashboard(at: .general) }

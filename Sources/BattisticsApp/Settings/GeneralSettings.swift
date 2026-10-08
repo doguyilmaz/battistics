@@ -53,7 +53,6 @@ struct GeneralSettings: View {
                 Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
             }
             ThemeAndIconSections()
-            // Moved from About: it is a setting, and About is for support.
             Section("Updates") {
                 Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
                 Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)

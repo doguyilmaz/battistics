@@ -84,8 +84,7 @@ final class UpdaterModel {
             .removeDeliveredNotifications(withIdentifiers: [updateNotificationID])
     }
 
-    /// Never asks for permission: an update is not worth a prompt. Anyone
-    /// who allowed battery alerts gets it, everyone else sees the panel.
+    /// Only when notifications are already allowed; never prompts for them.
     private static func postReminder(for version: String) async {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
@@ -100,14 +99,10 @@ final class UpdaterModel {
     }
 }
 
-/// Sparkle's gentle reminders, which a menu bar app needs.
-///
-/// Without them Sparkle treats an accessory app found in the background by
-/// opening the update alert without activating it, so it lands behind
-/// whatever is in front and can sit there unnoticed for weeks. It logs a
-/// warning saying exactly that. Now Sparkle shows the alert itself only
-/// when it would arrive in focus, which is right after launch; otherwise it
-/// holds it, and the panel and a notification point to it.
+/// Sparkle's gentle reminders. An accessory app's background alert would
+/// open behind other windows, so Sparkle shows it only when it arrives in
+/// focus (right after launch) and otherwise holds it for the panel and a
+/// notification.
 @MainActor
 private final class UpdateReminders: NSObject, @preconcurrency SPUStandardUserDriverDelegate {
     /// The version, and whether Sparkle left showing it to us.

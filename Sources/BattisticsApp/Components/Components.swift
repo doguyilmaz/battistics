@@ -2,8 +2,7 @@ import BattisticsCore
 import SwiftUI
 
 /// Card background: Liquid Glass on macOS 26, a quiet platter from macOS 27,
-/// material with a hairline border before 26. The only place in the app that
-/// branches on OS version for chrome, so views stay clean.
+/// material with a hairline border before 26.
 struct GlassCard<Content: View>: View {
     var cornerRadius: CGFloat = 12
     @ViewBuilder var content: () -> Content
@@ -21,11 +20,7 @@ struct GlassBackground: View {
 
     var body: some View {
         if #available(macOS 27.0, *) {
-            // macOS 27 retuned Liquid Glass around a system-wide transparency
-            // setting. These cards sit on the popover's own glass, and nested
-            // there they came out tinted, shifting the colors inside them.
-            // Apple's guidance keeps glass for controls, not content, so
-            // content cards get a plain platter instead.
+            // Glass nested in the popover's own glass comes out tinted on 27.
             PlatterBackground(cornerRadius: cornerRadius)
         } else if #available(macOS 26.0, *) {
             Color.clear.glassEffect(.regular, in: .rect(cornerRadius: cornerRadius))
@@ -40,10 +35,7 @@ struct GlassBackground: View {
     }
 }
 
-/// Lighter than what it sits on in both appearances, like the grouped boxes
-/// in System Settings, with a hairline edge that firms up under Increase
-/// Contrast. Fixed opacities rather than a material, so it looks the same
-/// whatever the glass transparency is set to.
+/// Fixed opacities, so the glass transparency setting cannot tint it.
 private struct PlatterBackground: View {
     var cornerRadius: CGFloat
     @Environment(\.colorScheme) private var colorScheme
@@ -211,9 +203,8 @@ struct SectionHeader: View {
 }
 
 extension String {
-    /// This string as a key in the app's catalog. The components above take
-    /// plain strings so callers can pass literals, and `Text(someString)`
-    /// never localizes: without this every label they draw stayed English.
+    /// This string looked up in the app's catalog; `Text(someString)` never
+    /// localizes.
     /// A string that is not a key comes back unchanged.
     var appLocalized: String {
         Bundle.main.localizedString(forKey: self, value: nil, table: nil)

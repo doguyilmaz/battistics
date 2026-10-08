@@ -86,9 +86,8 @@ enum IssueReporter {
 /// if one is there, it really crashed, and the file is what the user needs to
 /// attach anyway.
 enum CrashWatch {
-    /// macOS names reports after the executable, and a helper crash is
-    /// exactly the kind the user cannot see. The helper's executable is
-    /// BattisticsPowerHelper; "Battistics-" alone does not match it.
+    /// Reports are named after the executable; "Battistics-" does not match
+    /// the helper's.
     private static let prefixes = ["Battistics-", "BattisticsPowerHelper-"]
 
     /// The app's reports land in the user's library. The helper runs as

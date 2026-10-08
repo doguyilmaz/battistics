@@ -3,7 +3,6 @@ import SwiftUI
 
 /// The Menu Bar pane: everything about the menu bar item, icon style with
 /// visual previews, live status preview strip, text slots and color rules.
-/// Theme and app icon are not about the menu bar and live in General.
 struct AppearanceSettings: View {
     @AppStorage(Prefs.menuBarIconStyle) private var iconStyleRaw = MenuBarIconStyle.bat.rawValue
     @AppStorage(Prefs.menuBarPercentInside) private var percentInside = false

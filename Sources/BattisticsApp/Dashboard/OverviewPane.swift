@@ -3,7 +3,7 @@ import SwiftUI
 
 struct OverviewPane: View {
     var isVisible = true
-    /// Opens the full battery details, which used to be their own pane.
+    /// Opens the full battery details.
     var showDetails: () -> Void = {}
 
     @Environment(AppModel.self) private var model

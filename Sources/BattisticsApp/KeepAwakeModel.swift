@@ -97,8 +97,6 @@ final class KeepAwakeModel {
                 }
                 guard sessionID == id else { return }
                 if mode == .lidClosed {
-                    // Installs, approves or repairs the helper as needed, so
-                    // choosing the mode is enough to make it work.
                     try await helper.prepareForLidSleep()
                     guard sessionID == id else { return }
                     let result = try await helper.acquireLidSleepLease(id) { [weak self] in
@@ -163,8 +161,6 @@ final class KeepAwakeModel {
         }
     }
 
-    /// Says what is actually missing instead of one catch-all sentence, and
-    /// turns the one step only the user can take into the next action.
     private func showStartFailure(_ error: Error, duration: KeepAwakeDuration) {
         isStoppedReasonInformational = false
         switch error {

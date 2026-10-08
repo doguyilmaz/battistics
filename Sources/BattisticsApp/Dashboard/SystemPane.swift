@@ -106,9 +106,6 @@ struct SystemPane: View {
                 Text("Sleep and Energy")
             }
 
-            // Its own section rather than a footer: closed-lid Keep Awake and
-            // every row above depend on it, and this is where people look for
-            // installing, repairing or removing it.
             Section("Power Helper") {
                 permissionRow
             }
@@ -149,9 +146,7 @@ struct SystemPane: View {
             Button("Open Login Items…") { helper.openLoginItemsSettings() }
                 .controlSize(.small)
         } else if helper.needsRepair {
-            // Registered but not answering, or answering as an older build,
-            // has no way out otherwise: the button would offer to remove a
-            // helper, when re-registering is what fixes it.
+            // Silent or outdated: re-registering fixes it, removing does not.
             Button("Repair") { repairHelper() }
                 .controlSize(.small)
                 .disabled(isRepairing)

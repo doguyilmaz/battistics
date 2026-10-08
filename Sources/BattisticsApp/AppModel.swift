@@ -17,8 +17,7 @@ final class AppModel {
     /// Which dashboard pane is showing; settable from the popover and the
     /// Settings menu command so they can deep-link into the window.
     var dashboardPane: DashboardPane = .overview
-    /// Set by "Report a Problem…" in the popover and the Help menu; the
-    /// About pane presents the report sheet and clears it.
+    /// The About pane presents the report sheet and clears this.
     var reportRequested = false
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?

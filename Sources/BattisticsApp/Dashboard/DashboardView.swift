@@ -16,8 +16,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    // Details is not listed: it opens as a sheet from Overview, which
-    // already shows most of it. The case stays for battistics:// links.
+    // Not in the sidebar; kept for battistics://dashboard/details.
     static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
     static let controlPanes: [DashboardPane] = [.system]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]
@@ -30,8 +29,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: String(localized: "Details")
         case .peripherals: String(localized: "Peripherals")
         case .energy: String(localized: "Energy")
-        // Raw values stay "system" and "appearance" so existing links and
-        // saved state keep working.
+        // Raw values are persisted and used in links: never rename them.
         case .system: String(localized: "Power")
         case .general: String(localized: "General")
         case .appearance: String(localized: "Menu Bar")
@@ -166,8 +164,7 @@ struct DashboardView: View {
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
         .frame(width: 180)
-        // Stops at the toolbar. The toolbar spans the whole window in this
-        // layout, so a full-height line ran through its title.
+        // No ignoresSafeArea: the line would cross the toolbar title.
         .overlay(alignment: .trailing) {
             Divider()
         }
