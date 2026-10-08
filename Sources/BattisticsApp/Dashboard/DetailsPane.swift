@@ -88,7 +88,7 @@ struct DetailsPane: View {
                     }
                 }
                 Section {
-                    Button("Copy Report") {
+                    Button("Copy Battery Summary") {
                         copyReport(snapshot)
                     }
                 }

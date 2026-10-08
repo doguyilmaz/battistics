@@ -26,6 +26,14 @@
 - The high temperature notification threshold follows the temperature unit
   setting instead of always showing Celsius
 - "Start at login" reflects changes made in System Settings
+- One "Report a Problem…" replaces the separate issue and email buttons.
+  It shows exactly what is added to the report and any recent crash file,
+  and it is reachable from the popover's new settings menu and the Help
+  menu, not only from the bottom of About
+- The popover's gear button is a menu with Settings, Check for Updates,
+  Report a Problem, About and Quit
+- Details' "Copy Report" is now "Copy Battery Summary", so "report" means
+  only a problem report
 
 ## 1.3.1
 

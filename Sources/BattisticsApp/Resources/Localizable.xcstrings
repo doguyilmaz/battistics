@@ -655,22 +655,6 @@
         }
       }
     },
-    "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İkisi de sürümünüz, macOS sürümü ve Mac modeliyle hazır açılır. Siz göndermeden hiçbir şey gönderilmez."
-          }
-        }
-      }
-    },
     "Cancel": {
       "extractionState": "manual",
       "localizations": {
@@ -955,16 +939,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "İçerik"
-          }
-        }
-      }
-    },
-    "Copy Report": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporu Kopyala"
           }
         }
       }
@@ -2207,22 +2181,6 @@
         }
       }
     },
-    "Open an Issue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open an Issue"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Konu Aç"
-          }
-        }
-      }
-    },
     "Open as a floating window that stays on top": {
       "localizations": {
         "tr": {
@@ -2675,22 +2633,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dock simgesini göster"
-          }
-        }
-      }
-    },
-    "Show Report": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Report"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raporu Göster"
           }
         }
       }
@@ -4203,6 +4145,159 @@
           "stringUnit": {
             "state": "translated",
             "value": "Harici güç"
+          }
+        }
+      }
+    },
+    "Report a Problem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report a Problem"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorun Bildir"
+          }
+        }
+      }
+    },
+    "Report a Problem…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report a Problem…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorun Bildir…"
+          }
+        }
+      }
+    },
+    "A prefilled issue or email opens for you to describe what happened. Battistics adds only these lines, and nothing is sent until you send it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A prefilled issue or email opens for you to describe what happened. Battistics adds only these lines, and nothing is sent until you send it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne olduğunu anlatmanız için önceden doldurulmuş bir issue veya e-posta açılır. Battistics yalnızca bu satırları ekler ve siz göndermeden hiçbir şey gönderilmez."
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show in Finder"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder'da Göster"
+          }
+        }
+      }
+    },
+    "Crash files contain your account name in their paths, so attaching one is up to you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crash files contain your account name in their paths, so attaching one is up to you."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çökme dosyalarının yollarında hesap adınız geçer, bu yüzden eklemek size kalmıştır."
+          }
+        }
+      }
+    },
+    "Open a GitHub Issue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open a GitHub Issue"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub'da Issue Aç"
+          }
+        }
+      }
+    },
+    "About Battistics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Battistics"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Hakkında"
+          }
+        }
+      }
+    },
+    "Settings, updates, support and Quit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings, updates, support and Quit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar, güncellemeler, destek ve çıkış"
+          }
+        }
+      }
+    },
+    "Copy Battery Summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Battery Summary"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil Özetini Kopyala"
           }
         }
       }

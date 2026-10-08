@@ -131,6 +131,16 @@ enum CrashWatch {
         NSWorkspace.shared.activateFileViewerSelecting([report])
     }
 
+    /// "Battistics quit unexpectedly yesterday", for the About pane and the
+    /// report sheet.
+    static func description(of report: URL) -> String {
+        guard let date = date(of: report) else {
+            return String(localized: "Battistics quit unexpectedly recently")
+        }
+        return String(
+            localized: "Battistics quit unexpectedly \(date.formatted(.relative(presentation: .named)))")
+    }
+
     static func date(of report: URL) -> Date? {
         try? report.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
     }

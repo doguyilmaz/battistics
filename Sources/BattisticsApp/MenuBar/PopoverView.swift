@@ -421,22 +421,39 @@ struct PopoverView: View {
             Spacer()
             powerMenu
             keepAwakeMenu.disabled(keepAwake.isChanging)
-            Button {
-                model.dashboardPane = .general
-                openWindow(id: "dashboard")
-                NSApp.activate()
-            } label: {
-                Image(systemName: "gearshape")
-            }
-            .help("Settings")
-            Button {
-                NSApp.terminate(nil)
-            } label: {
-                Image(systemName: "power")
-            }
-            .help("Quit Battistics")
+            appMenu
         }
         .controlSize(.small)
+    }
+
+    /// Everything about the app itself, in one place. A menu bar app has no
+    /// visible main menu unless its Dock icon is on, so without this the
+    /// Help and update commands were out of reach for most people.
+    private var appMenu: some View {
+        Menu {
+            Button("Settings…") { openDashboard(at: .general) }
+            Button("Check for Updates…") { updater.checkForUpdates() }
+                .disabled(!updater.canCheckForUpdates)
+            Button("Report a Problem…") {
+                model.reportRequested = true
+                openDashboard(at: .about)
+            }
+            Button("About Battistics") { openDashboard(at: .about) }
+            Divider()
+            Button("Quit Battistics") { NSApp.terminate(nil) }
+        } label: {
+            Image(systemName: "gearshape")
+        }
+        .menuStyle(.button)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help("Settings, updates, support and Quit")
+    }
+
+    private func openDashboard(at pane: DashboardPane) {
+        model.dashboardPane = pane
+        openWindow(id: "dashboard")
+        NSApp.activate()
     }
 
     @ViewBuilder private var timeOnBatteryRow: some View {

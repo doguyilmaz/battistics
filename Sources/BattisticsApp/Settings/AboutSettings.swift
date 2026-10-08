@@ -2,6 +2,8 @@ import SwiftUI
 
 struct AboutSettings: View {
     @Environment(UpdaterModel.self) private var updater
+    @Environment(AppModel.self) private var model
+    @State private var showingReport = false
 
     static var versionString: String { IssueReporter.appVersion }
 
@@ -66,29 +68,20 @@ struct AboutSettings: View {
             }
             Section("Support") {
                 if let crashReport {
-                    LabeledContent {
-                        Button("Show Report") { CrashWatch.reveal(crashReport) }
-                    } label: {
-                        Text(crashedText(CrashWatch.date(of: crashReport)))
-                            .font(.callout)
+                    Label {
+                        Text(CrashWatch.description(of: crashReport))
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
                     }
+                    .font(.callout)
                 }
                 LabeledContent {
-                    HStack(spacing: 8) {
-                        Button("Open an Issue") {
-                            IssueReporter.openGitHubIssue(title: issueTitle)
-                        }
-                        Button("Send an Email") {
-                            IssueReporter.openEmail(subject: issueTitle)
-                        }
-                    }
+                    Button("Report a Problem…") { showingReport = true }
                 } label: {
                     Text("Found a bug, or something behaving oddly?")
                         .font(.callout)
                 }
-                Text("Both open prefilled with your version, macOS release and Mac model. Nothing is sent until you send it.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
             Section {
                 Text("Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.")
@@ -97,24 +90,21 @@ struct AboutSettings: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear { crashReport = CrashWatch.latestReport() }
-    }
-
-    private var issueTitle: String {
-        crashReport == nil
-            ? String(localized: "Battistics \(Self.versionString)")
-            : String(localized: "Crash on Battistics \(Self.versionString)")
-    }
-
-    /// macOS shows its own "quit unexpectedly" dialog, so this is not news by
-    /// the time it is read; it is here to put the file next to the buttons
-    /// that send it.
-    private func crashedText(_ date: Date?) -> String {
-        guard let date else {
-            return String(localized: "Battistics quit unexpectedly recently")
+        .sheet(isPresented: $showingReport) {
+            ReportProblemSheet(crashReport: crashReport)
         }
-        return String(
-            localized: "Battistics quit unexpectedly \(date.formatted(.relative(presentation: .named)))")
+        .onAppear {
+            crashReport = CrashWatch.latestReport()
+            presentRequestedReport()
+        }
+        // The popover and the Help menu ask for the sheet by setting this.
+        .onChange(of: model.reportRequested) { presentRequestedReport() }
+    }
+
+    private func presentRequestedReport() {
+        guard model.reportRequested else { return }
+        model.reportRequested = false
+        showingReport = true
     }
 
     /// Sparkle checks daily, counted from the last check rather than from
