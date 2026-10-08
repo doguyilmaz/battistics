@@ -177,6 +177,8 @@ final class KeepAwakeModel {
             errorMessage = String(localized: "macOS did not install the power helper that closed-lid mode needs.") + " (\(domain) \(code))"
         case PowerHelperClient.Failure.outdated:
             errorMessage = String(localized: "An older power helper is still running. Restart the Mac to replace it, then try again.")
+        case PowerHelperClient.Failure.unsignedBuild:
+            errorMessage = PowerHelperClient.unsignedBuildMessage
         case is PowerHelperClient.Failure:
             errorMessage = String(localized: "The power helper did not respond, even after it was registered again. Use Repair in the Power pane or restart the Mac.")
         default:

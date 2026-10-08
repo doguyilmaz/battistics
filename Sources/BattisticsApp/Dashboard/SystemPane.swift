@@ -201,6 +201,10 @@ struct SystemPane: View {
     private func installHelper() {
         do {
             try helper.install()
+        } catch PowerHelperClient.Failure.unsignedBuild {
+            failure = PaneFailure(
+                title: String(localized: "Could not install the helper"),
+                message: PowerHelperClient.unsignedBuildMessage)
         } catch {
             // macOS only reveals a recorded denial when a registration is
             // attempted — status reports .notRegistered until then — so this
@@ -255,6 +259,10 @@ struct SystemPane: View {
                 try await helper.repair()
             } catch PowerHelperClient.Failure.needsApproval {
                 // The row now offers Login Items, which is the answer.
+            } catch PowerHelperClient.Failure.unsignedBuild {
+                failure = PaneFailure(
+                    title: String(localized: "Could not repair the helper"),
+                    message: PowerHelperClient.unsignedBuildMessage)
             } catch PowerHelperClient.Failure.installFailed(let domain, let code) {
                 failure = PaneFailure(
                     title: String(localized: "Could not repair the helper"),
@@ -274,6 +282,10 @@ struct SystemPane: View {
     private func removeHelper() {
         do {
             try helper.remove()
+        } catch PowerHelperClient.Failure.unsignedBuild {
+            failure = PaneFailure(
+                title: String(localized: "Could not remove the helper"),
+                message: PowerHelperClient.unsignedBuildMessage)
         } catch {
             let underlying = error as NSError
             failure = PaneFailure(

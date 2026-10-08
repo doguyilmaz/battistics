@@ -67,6 +67,8 @@ struct PopoverView: View {
             if let error = keepAwake.errorMessage {
                 Text(error).font(.caption)
                     .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             if let version = updater.pendingUpdateVersion {
                 updateRow(version)

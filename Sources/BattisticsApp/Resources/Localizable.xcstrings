@@ -5305,6 +5305,16 @@
           }
         }
       }
+    },
+    "This copy of Battistics is not signed with its Developer ID, so macOS will not run the power helper for it.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Battistics kopyası Developer ID ile imzalanmamış, bu yüzden macOS güç yardımcısını onun için çalıştırmaz."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

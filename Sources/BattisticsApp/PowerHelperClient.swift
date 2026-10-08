@@ -2,6 +2,7 @@ import AppKit
 import BattisticsCore
 import Foundation
 import Observation
+import Security
 import ServiceManagement
 
 /// Talks to the privileged helper, when one is installed.
@@ -23,6 +24,33 @@ final class PowerHelperClient {
         case installFailed(domain: String, code: Int)
         /// An older helper still answers after re-registering it.
         case outdated
+        /// This copy has no team signature, so launchd would refuse to run a
+        /// helper registered from it.
+        case unsignedBuild
+    }
+
+    /// A local Debug build is ad-hoc signed. Registering from one points
+    /// launchd at a helper it kills on launch, and drops the installed
+    /// copy's working registration on the way.
+    static let isTeamSigned: Bool = {
+        var code: SecCode?
+        var staticCode: SecStaticCode?
+        var info: CFDictionary?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
+            SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
+            SecCodeCopySigningInformation(
+                staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &info) == errSecSuccess,
+            let info = info as? [String: Any]
+        else { return false }
+        return info[kSecCodeInfoTeamIdentifier as String] != nil
+    }()
+
+    static var unsignedBuildMessage: String {
+        String(localized: "This copy of Battistics is not signed with its Developer ID, so macOS will not run the power helper for it.")
+    }
+
+    private func requireTeamSignature() throws {
+        guard Self.isTeamSigned else { throw Failure.unsignedBuild }
     }
 
     /// A continuation can only be resumed once, but three things race to do
@@ -220,6 +248,7 @@ final class PowerHelperClient {
     /// user to allow a newly registered daemon in Login Items; that surfaces
     /// as `needsApproval`.
     func prepareForLidSleep() async throws {
+        try requireTeamSignature()
         status = service.status
         if status == .requiresApproval { throw Failure.needsApproval }
         if status != .enabled {
@@ -242,6 +271,7 @@ final class PowerHelperClient {
     /// process, so success means the current build is answering rather than
     /// that a registration call returned.
     func repair() async throws {
+        try requireTeamSignature()
         do {
             try reinstall()
         } catch {
@@ -287,6 +317,7 @@ final class PowerHelperClient {
     }
 
     func install() throws {
+        try requireTeamSignature()
         do {
             try service.register()
         } catch {
@@ -310,6 +341,7 @@ final class PowerHelperClient {
     /// Sparkle update replaces the helper, so a registration made before one
     /// can end up pointing at a binary that no longer matches.
     func reinstall() throws {
+        try requireTeamSignature()
         probeID = nil
         connection?.invalidate()
         connection = nil
@@ -320,6 +352,7 @@ final class PowerHelperClient {
     }
 
     func remove() throws {
+        try requireTeamSignature()
         probeID = nil
         connection?.invalidate()
         connection = nil
