@@ -1,3 +1,4 @@
+import AppKit
 import BattisticsCore
 import CoreBluetooth
 import Foundation
@@ -32,6 +33,7 @@ final class BluetoothGATTReader {
     @ObservationIgnored private var session: GATTSession?
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var isVisible = false
+    @ObservationIgnored private var promptWatch: NSObjectProtocol?
 
     var isEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: Prefs.readBluetoothBatteries) }
@@ -59,6 +61,7 @@ final class BluetoothGATTReader {
 
     private func start() {
         guard session == nil else { return refresh() }
+        if CBManager.authorization == .notDetermined { returnHereAfterPrompt() }
         state = .waiting
         batteries = []
         let generation = UUID()
@@ -86,7 +89,40 @@ final class BluetoothGATTReader {
         state = .off
     }
 
+    /// macOS's prompt belongs to another process, and when it closes the
+    /// system activates the last regular app rather than a Dock-less one, so
+    /// the window the user answered from drops behind it. Plain `activate()`
+    /// is declined from the background; `ignoringOtherApps` is not.
+    private func returnHereAfterPrompt() {
+        guard promptWatch == nil, NSApp.isActive, let window = NSApp.keyWindow else { return }
+        promptWatch = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self, weak window] _ in
+            // The activation lands as the prompt closes; the answer can trail it.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                MainActor.assumeIsolated {
+                    guard let self, self.promptWatch != nil,
+                        CBManager.authorization != .notDetermined
+                    else { return }
+                    self.endPromptWatch()
+                    guard let window, window.isVisible, !NSApp.isActive else { return }
+                    NSApp.activate(ignoringOtherApps: true)
+                    window.makeKeyAndOrderFront(nil)
+                }
+            }
+        }
+        // An unanswered prompt must not pull focus back minutes later.
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(120))
+            self?.endPromptWatch()
+        }
+    }
 
+    private func endPromptWatch() {
+        guard let promptWatch else { return }
+        NSWorkspace.shared.notificationCenter.removeObserver(promptWatch)
+        self.promptWatch = nil
+    }
 }
 
 /// Every CoreBluetooth interaction, kept off the main actor because the
