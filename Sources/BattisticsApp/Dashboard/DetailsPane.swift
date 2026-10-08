@@ -1,6 +1,25 @@
 import BattisticsCore
 import SwiftUI
 
+/// Details as a sheet over Overview, with its own way out.
+struct BatteryDetailsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 0) {
+            DetailsPane()
+            Divider()
+            HStack {
+                Spacer()
+                Button("Done") { dismiss() }
+                    .keyboardShortcut(.defaultAction)
+            }
+            .padding(12)
+        }
+        .frame(width: 500, height: 500)
+    }
+}
+
 struct DetailsPane: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.both.rawValue

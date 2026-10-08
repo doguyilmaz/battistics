@@ -3,6 +3,8 @@ import SwiftUI
 
 struct OverviewPane: View {
     var isVisible = true
+    /// Opens the full battery details, which used to be their own pane.
+    var showDetails: () -> Void = {}
 
     @Environment(AppModel.self) private var model
     @Environment(PowerSettingsModel.self) private var powerModel
@@ -80,6 +82,12 @@ struct OverviewPane: View {
                     .foregroundStyle(.secondary)
             }
             .padding(.vertical, 8)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button("Details…", action: showDetails)
+                .controlSize(.small)
+                .help("Serial number, manufacture date, Apple's rating and a copyable summary")
+                .padding(12)
         }
     }
 

@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct AboutSettings: View {
-    @Environment(UpdaterModel.self) private var updater
     @Environment(AppModel.self) private var model
     @State private var showingReport = false
 
@@ -13,7 +12,6 @@ struct AboutSettings: View {
     @State private var crashReport: URL?
 
     var body: some View {
-        @Bindable var updater = updater
         Form {
             Section {
                 VStack(spacing: 10) {
@@ -51,20 +49,6 @@ struct AboutSettings: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-            }
-            Section("Updates") {
-                Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
-                Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
-                LabeledContent {
-                    Button("Check Now") {
-                        updater.checkForUpdates()
-                    }
-                    .disabled(!updater.canCheckForUpdates)
-                } label: {
-                    Text(lastCheckedText)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
             }
             Section("Support") {
                 if let crashReport {
@@ -105,15 +89,5 @@ struct AboutSettings: View {
         guard model.reportRequested else { return }
         model.reportRequested = false
         showingReport = true
-    }
-
-    /// Sparkle checks daily, counted from the last check rather than from
-    /// launch, so "never" here means it has not run yet, not that it is off.
-    private var lastCheckedText: String {
-        guard let date = updater.lastCheckDate else {
-            return String(localized: "Checked automatically every 24 hours")
-        }
-        return String(
-            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
     }
 }

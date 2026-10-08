@@ -4,6 +4,7 @@ import SwiftUI
 
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(UpdaterModel.self) private var updater
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.showDockIcon) private var showDockIcon = false
     @AppStorage(Prefs.openDashboardAtLaunch) private var openDashboardAtLaunch = false
@@ -16,7 +17,8 @@ struct GeneralSettings: View {
     @State private var loginItemError: String?
 
     var body: some View {
-        Form {
+        @Bindable var updater = updater
+        return Form {
             Section {
                 Toggle("Start at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in
@@ -50,6 +52,22 @@ struct GeneralSettings: View {
                     .foregroundStyle(.secondary)
                 Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
             }
+            ThemeAndIconSections()
+            // Moved from About: it is a setting, and About is for support.
+            Section("Updates") {
+                Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
+                Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
+                LabeledContent {
+                    Button("Check Now") {
+                        updater.checkForUpdates()
+                    }
+                    .disabled(!updater.canCheckForUpdates)
+                } label: {
+                    Text(lastCheckedText)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
             Section("Experiments") {
                 HStack {
                     Toggle("Show Power Flow", isOn: $showPowerFlow)
@@ -69,6 +87,16 @@ struct GeneralSettings: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    /// Sparkle checks daily, counted from the last check rather than from
+    /// launch, so "never" here means it has not run yet, not that it is off.
+    private var lastCheckedText: String {
+        guard let date = updater.lastCheckDate else {
+            return String(localized: "Checked automatically every 24 hours")
+        }
+        return String(
+            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
     }
 
     private func updateLoginItem(_ enabled: Bool) {

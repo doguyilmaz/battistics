@@ -103,15 +103,18 @@ struct SystemPane: View {
                     }
                 }
             } header: {
-                Text("Power")
-            } footer: {
-                // Now that every row in this section is writable, permission
-                // belongs to the section rather than riding one control.
+                Text("Sleep and Energy")
+            }
+
+            // Its own section rather than a footer: closed-lid Keep Awake and
+            // every row above depend on it, and this is where people look for
+            // installing, repairing or removing it.
+            Section("Power Helper") {
                 permissionRow
             }
         }
         .formStyle(.grouped)
-        .navigationTitle("System")
+        .navigationTitle("Power")
         .alert(
             failure?.title ?? "", isPresented: failureBinding, presenting: failure
         ) { _ in
@@ -137,9 +140,8 @@ struct SystemPane: View {
             Spacer(minLength: 12)
             permissionAction
         }
-        .font(.caption)
+        .font(.callout)
         .foregroundStyle(helper.isInstalled || auth.isUnlocked ? Color.accentColor : Color.secondary)
-        .padding(.top, 2)
     }
 
     @ViewBuilder private var permissionAction: some View {

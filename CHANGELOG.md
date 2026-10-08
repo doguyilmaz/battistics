@@ -34,6 +34,12 @@
   Report a Problem, About and Quit
 - Details' "Copy Report" is now "Copy Battery Summary", so "report" means
   only a problem report
+- The dashboard sidebar is grouped as Battery, Controls, Settings and
+  Help. Details opens from Overview instead of repeating it as its own
+  pane; System is now Power, with the power helper in its own section;
+  Appearance is now Menu Bar, and its theme and app icon moved to General,
+  together with Updates from About
+- Notifications, Energy and Power Flow are translated into Turkish
 
 ## 1.3.1
 

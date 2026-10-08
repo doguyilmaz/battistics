@@ -298,16 +298,6 @@
         }
       }
     },
-    "Appearance": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görünüm"
-          }
-        }
-      }
-    },
     "Apple Rated Health": {
       "extractionState": "manual",
       "localizations": {
@@ -1033,16 +1023,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kritik"
-          }
-        }
-      }
-    },
-    "Critical red kicks in at 10%.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kritik kırmızı %10'da devreye girer."
           }
         }
       }
@@ -1824,16 +1804,6 @@
     },
     "Model": {
       "shouldTranslate": false
-    },
-    "Monitor": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İzleme"
-          }
-        }
-      }
     },
     "Month": {
       "localizations": {
@@ -4298,6 +4268,975 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil Özetini Kopyala"
+          }
+        }
+      }
+    },
+    "Controls": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controls"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontroller"
+          }
+        }
+      }
+    },
+    "Help": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardım"
+          }
+        }
+      }
+    },
+    "Details…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayrıntılar…"
+          }
+        }
+      }
+    },
+    "Done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitti"
+          }
+        }
+      }
+    },
+    "Serial number, manufacture date, Apple's rating and a copyable summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serial number, manufacture date, Apple's rating and a copyable summary"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seri numarası, üretim tarihi, Apple'ın değerlendirmesi ve kopyalanabilir bir özet"
+          }
+        }
+      }
+    },
+    "Sleep and Energy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep and Energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku ve Enerji"
+          }
+        }
+      }
+    },
+    "Power Helper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Helper"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Yardımcısı"
+          }
+        }
+      }
+    },
+    "Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kritik kırmızı %10'da devreye girer. Düşük pil bildirimlerinin Bildirimler bölümünde kendi eşiği vardır."
+          }
+        }
+      }
+    },
+    "Current": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akım"
+          }
+        }
+      }
+    },
+    "About energy sampling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About energy sampling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji örneklemesi hakkında"
+          }
+        }
+      }
+    },
+    "Energy sampling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energy sampling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerji örneklemesi"
+          }
+        }
+      }
+    },
+    "Up to 20 processes, ranked by energy use or, if unavailable, CPU use.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to 20 processes, ranked by energy use or, if unavailable, CPU use."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En fazla 20 işlem; enerji kullanımına, bu yoksa CPU kullanımına göre sıralanır."
+          }
+        }
+      }
+    },
+    "100% CPU equals one logical core. Using several cores can exceed 100%.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100% CPU equals one logical core. Using several cores can exceed 100%."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%100 CPU bir mantıksal çekirdeğe eşittir. Birden fazla çekirdek kullanan işlemler %100'ü aşabilir."
+          }
+        }
+      }
+    },
+    "Updates only while this pane is visible.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates only while this pane is visible."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca bu bölüm görünürken güncellenir."
+          }
+        }
+      }
+    },
+    "%lld cycles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cycles"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld döngü"
+          }
+        }
+      }
+    },
+    "Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı"
+          }
+        }
+      }
+    },
+    "Experimental": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experimental"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneysel"
+          }
+        }
+      }
+    },
+    "Estimated battery power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated battery power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini pil gücü"
+          }
+        }
+      }
+    },
+    "Estimated system power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated system power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini sistem gücü"
+          }
+        }
+      }
+    },
+    "Battery = Voltage × Current": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery = Voltage × Current"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil = Voltaj × Akım"
+          }
+        }
+      }
+    },
+    "System = Input - Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System = Input - Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem = Giriş - Pil"
+          }
+        }
+      }
+    },
+    "About Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı hakkında"
+          }
+        }
+      }
+    },
+    "Power Flow · Experimental": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Flow · Experimental"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışı · Deneysel"
+          }
+        }
+      }
+    },
+    "Adapter capacity: %lld W": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adapter capacity: %lld W"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptör kapasitesi: %lld W"
+          }
+        }
+      }
+    },
+    "System updated: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System updated: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem güncellemesi: %@"
+          }
+        }
+      }
+    },
+    "Update time unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update time unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme zamanı bilinmiyor"
+          }
+        }
+      }
+    },
+    "Yellow warnings mark calculated values.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yellow warnings mark calculated values."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sarı uyarılar hesaplanmış değerleri gösterir."
+          }
+        }
+      }
+    },
+    "Some readings are unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some readings are unavailable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bazı okumalar kullanılamıyor."
+          }
+        }
+      }
+    },
+    "Input is power entering your Mac, not the adapter’s maximum wattage or power at the wall.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input is power entering your Mac, not the adapter’s maximum wattage or power at the wall."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş, Mac'inize giren güçtür; adaptörün en yüksek gücü veya prizden çekilen güç değildir."
+          }
+        }
+      }
+    },
+    "Battery: + means charging, - means discharging. Open a yellow warning for calculation details.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery: + means charging, - means discharging. Open a yellow warning for calculation details."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil: + şarj oluyor, - boşalıyor demektir. Hesaplama ayrıntıları için sarı uyarıyı açın."
+          }
+        }
+      }
+    },
+    "These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu deneysel macOS okumaları gecikebilir veya kullanılamayabilir. Farklı güncelleme zamanları ve güç kayıpları dağılımı yaklaşık kılar."
+          }
+        }
+      }
+    },
+    "The update time does not confirm when each reading was measured.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The update time does not confirm when each reading was measured."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleme zamanı, her okumanın ne zaman ölçüldüğünü doğrulamaz."
+          }
+        }
+      }
+    },
+    "Estimated readings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated readings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini okumalar"
+          }
+        }
+      }
+    },
+    "System estimated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System estimated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem tahmini"
+          }
+        }
+      }
+    },
+    "Battery estimated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery estimated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil tahmini"
+          }
+        }
+      }
+    },
+    "Readings inconsistent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings inconsistent"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar tutarsız"
+          }
+        }
+      }
+    },
+    "Readings may lag": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings may lag"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar gecikebilir"
+          }
+        }
+      }
+    },
+    "Readings unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readings unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okumalar kullanılamıyor"
+          }
+        }
+      }
+    },
+    "Reported load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reported load"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen yük"
+          }
+        }
+      }
+    },
+    "Estimated load": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated load"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini yük"
+          }
+        }
+      }
+    },
+    "Load unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yük bilinmiyor"
+          }
+        }
+      }
+    },
+    "The reported battery reading is inconsistent. A valid reported reading will replace this estimate automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reported battery reading is inconsistent. A valid reported reading will replace this estimate automatically."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen pil okuması tutarsız. Geçerli bir okuma geldiğinde bu tahminin yerini otomatik olarak alır."
+          }
+        }
+      }
+    },
+    "The reported system reading is unavailable or inconsistent. A valid reported reading will replace this estimate automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reported system reading is unavailable or inconsistent. A valid reported reading will replace this estimate automatically."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirilen sistem okuması yok veya tutarsız. Geçerli bir okuma geldiğinde bu tahminin yerini otomatik olarak alır."
+          }
+        }
+      }
+    },
+    "Discharging": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discharging"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boşalıyor"
+          }
+        }
+      }
+    },
+    "No flow indicated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No flow indicated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akış görünmüyor"
+          }
+        }
+      }
+    },
+    "Direction unknown": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direction unknown"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yön bilinmiyor"
+          }
+        }
+      }
+    },
+    "In %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giriş %@"
+          }
+        }
+      }
+    },
+    "Mac %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac %@"
+          }
+        }
+      }
+    },
+    "Bat %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bat %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %@"
+          }
+        }
+      }
+    },
+    "Experimental Power Flow. Use the information button for sources and limitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experimental Power Flow. Use the information button for sources and limitations."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneysel Güç Akışı. Kaynaklar ve sınırlamalar için bilgi düğmesini kullanın."
+          }
+        }
+      }
+    },
+    "Low threshold: %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low threshold: %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük eşiği: %%%lld"
+          }
+        }
+      }
+    },
+    "Experiments": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experiments"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneyler"
+          }
+        }
+      }
+    },
+    "Show Power Flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Power Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Akışını göster"
+          }
+        }
+      }
+    },
+    "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç okumalarını Enerji bölümünde ve açılır panelde gösterir. Varsayılan olarak açıktır; destek Mac'e ve macOS sürümüne göre değişir."
+          }
+        }
+      }
+    },
+    "Notify at %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notify at %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%lld olunca bildir"
+          }
+        }
+      }
+    },
+    "Remind on every further %lld%% drop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind on every further %lld%% drop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her %%%lld düşüşte yeniden hatırlat"
+          }
+        }
+      }
+    },
+    "After %@ hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After %@ hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ saat sonra"
           }
         }
       }

@@ -16,8 +16,12 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    static let monitorPanes: [DashboardPane] = [.overview, .history, .details, .peripherals, .energy, .system]
-    static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data, .about]
+    // Details is not listed: it opens as a sheet from Overview, which
+    // already shows most of it. The case stays for battistics:// links.
+    static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
+    static let controlPanes: [DashboardPane] = [.system]
+    static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]
+    static let helpPanes: [DashboardPane] = [.about]
 
     var title: String {
         switch self {
@@ -26,9 +30,11 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: String(localized: "Details")
         case .peripherals: String(localized: "Peripherals")
         case .energy: String(localized: "Energy")
-        case .system: String(localized: "System")
+        // Raw values stay "system" and "appearance" so existing links and
+        // saved state keep working.
+        case .system: String(localized: "Power")
         case .general: String(localized: "General")
-        case .appearance: String(localized: "Appearance")
+        case .appearance: String(localized: "Menu Bar")
         case .notifications: String(localized: "Notifications")
         case .data: String(localized: "Data")
         case .about: String(localized: "About")
@@ -44,7 +50,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .energy: "bolt.circle"
         case .system: "switch.2"
         case .general: "gearshape"
-        case .appearance: "paintbrush"
+        case .appearance: "menubar.rectangle"
         case .notifications: "bell.badge"
         case .data: "internaldrive"
         case .about: "info.circle"
@@ -62,6 +68,7 @@ struct DashboardView: View {
     @AppStorage(Prefs.keepDashboardOnTop) private var keepOnTop = false
     @State private var sidebarVisible = true
     @State private var windowVisible = false
+    @State private var showingDetails = false
 
     private func keepAwakeTitle(at date: Date) -> String {
         guard let seconds = keepAwake.remaining(at: date) else {
@@ -123,6 +130,16 @@ struct DashboardView: View {
             guard windowVisible else { return }
             await model.refreshSensorsWhileVisible(every: .seconds(3))
         }
+        .sheet(isPresented: $showingDetails) {
+            BatteryDetailsSheet()
+        }
+        // A battistics://dashboard/details link lands on Overview with the
+        // details sheet open.
+        .onChange(of: model.dashboardPane, initial: true) {
+            guard model.dashboardPane == .details else { return }
+            model.dashboardPane = .overview
+            showingDetails = true
+        }
     }
 
     private var selectionBinding: Binding<DashboardPane?> {
@@ -134,16 +151,10 @@ struct DashboardView: View {
 
     private var sidebar: some View {
         List(selection: selectionBinding) {
-            Section("Monitor") {
-                ForEach(DashboardPane.monitorPanes) { pane in
-                    Label(pane.title, systemImage: pane.icon).tag(pane)
-                }
-            }
-            Section("Settings") {
-                ForEach(DashboardPane.settingsPanes) { pane in
-                    Label(pane.title, systemImage: pane.icon).tag(pane)
-                }
-            }
+            Section("Battery") { rows(DashboardPane.batteryPanes) }
+            Section("Controls") { rows(DashboardPane.controlPanes) }
+            Section("Settings") { rows(DashboardPane.settingsPanes) }
+            Section("Help") { rows(DashboardPane.helpPanes) }
         }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
@@ -155,11 +166,17 @@ struct DashboardView: View {
         }
     }
 
+    private func rows(_ panes: [DashboardPane]) -> some View {
+        ForEach(panes) { pane in
+            Label(pane.title, systemImage: pane.icon).tag(pane)
+        }
+    }
+
     @ViewBuilder private var detailView: some View {
         switch model.dashboardPane {
-        case .overview: OverviewPane(isVisible: windowVisible)
+        case .overview, .details:
+            OverviewPane(isVisible: windowVisible) { showingDetails = true }
         case .history: HistoryPane()
-        case .details: DetailsPane()
         case .peripherals: PeripheralsPane()
         case .energy: EnergyPane(isVisible: windowVisible)
         case .system: SystemPane()
