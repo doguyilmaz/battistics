@@ -1,9 +1,7 @@
 # Changelog
 
-## 1.3.1
+## Unreleased
 
-- Power Flow is now enabled by default for new installations and can be
-  disabled from General settings. Existing preferences are preserved.
 - Closed-lid Keep Awake sets up its power helper itself. Turning it on
   installs the helper, starts once it is allowed in Login Items, and
   replaces a helper left running by an earlier version. When something is
@@ -16,6 +14,11 @@
 - The dashboard sidebar's divider no longer runs through the window title
 - On macOS 27, cards in the popover and dashboard use a plain background,
   since Liquid Glass nested in the popover changed their colors
+
+## 1.3.1
+
+- Power Flow is now enabled by default for new installations and can be
+  disabled from General settings. Existing preferences are preserved.
 
 ## 1.3.0
 
