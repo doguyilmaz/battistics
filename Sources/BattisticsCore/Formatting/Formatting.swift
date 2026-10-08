@@ -21,16 +21,20 @@ public enum TemperatureUnit: String, Sendable, CaseIterable {
     public var symbol: String { self == .fahrenheit ? "°F" : "°C" }
 }
 
+/// Numbers follow `Locale.current`, which inside the app is the app's
+/// language with the Mac's region: Turkish gets "34,5" and "%84". Words come
+/// from the app's catalog; `bundle: .main` is the app at run time, and this
+/// package has no catalog of its own.
 public enum Formatting {
-    public static func temperature(_ celsius: Double, unit: TemperatureUnit) -> String {
-        let fahrenheit = celsius * 9 / 5 + 32
+    public static func temperature(
+        _ celsius: Double, unit: TemperatureUnit, locale: Locale = .current
+    ) -> String {
+        let c = decimal(celsius, digits: 1, locale) + "°C"
+        let f = decimal(celsius * 9 / 5 + 32, digits: 1, locale) + "°F"
         switch unit {
-        case .both:
-            return String(format: "%.1f°C / %.1f°F", celsius, fahrenheit)
-        case .celsius:
-            return String(format: "%.1f°C", celsius)
-        case .fahrenheit:
-            return String(format: "%.1f°F", fahrenheit)
+        case .both: return "\(c) / \(f)"
+        case .celsius: return c
+        case .fahrenheit: return f
         }
     }
 
@@ -38,8 +42,8 @@ public enum Formatting {
     public static func duration(minutes: Int) -> String {
         let hours = minutes / 60
         let mins = minutes % 60
-        if hours > 0 { return "\(hours)h \(mins)m" }
-        return "\(mins)m"
+        if hours > 0 { return String(localized: "\(hours)h \(mins)m", bundle: .main) }
+        return String(localized: "\(mins)m", bundle: .main)
     }
 
     /// "2:14" style, used in the menu bar.
@@ -47,35 +51,44 @@ public enum Formatting {
         String(format: "%d:%02d", minutes / 60, minutes % 60)
     }
 
-    public static func mAh(_ value: Int) -> String {
-        "\(value.formatted(.number.grouping(.automatic))) mAh"
+    public static func mAh(_ value: Int, locale: Locale = .current) -> String {
+        "\(value.formatted(.number.locale(locale))) mAh"
     }
 
-    public static func watts(_ value: Double) -> String {
-        String(format: "%.1f W", value)
+    public static func watts(_ value: Double, signed: Bool = false, locale: Locale = .current) -> String {
+        let style = FloatingPointFormatStyle<Double>.number.precision(.fractionLength(1)).locale(locale)
+        return value.formatted(signed ? style.sign(strategy: .always()) : style) + " W"
     }
 
-    public static func volts(millivolts: Int) -> String {
-        String(format: "%.2f V", Double(millivolts) / 1000)
+    public static func volts(millivolts: Int, locale: Locale = .current) -> String {
+        decimal(Double(millivolts) / 1000, digits: 2, locale) + " V"
     }
 
-    public static func milliamps(_ value: Int) -> String {
-        "\(value) mA"
+    public static func milliamps(_ value: Int, locale: Locale = .current) -> String {
+        "\(value.formatted(.number.locale(locale))) mA"
     }
 
-    public static func percent(_ value: Double) -> String {
-        String(format: "%.0f%%", value)
+    public static func percent(_ value: Double, locale: Locale = .current) -> String {
+        (value / 100).formatted(.percent.precision(.fractionLength(0)).locale(locale))
     }
 
-    public static func percentPrecise(_ value: Double) -> String {
-        String(format: "%.1f%%", value)
+    public static func percentPrecise(_ value: Double, locale: Locale = .current) -> String {
+        (value / 100).formatted(.percent.precision(.fractionLength(1)).locale(locale))
     }
 
     /// Battery age as "4.7 years" or "8 months" under one year.
-    public static func age(from date: Date, to now: Date = Date()) -> String {
+    public static func age(from date: Date, to now: Date = Date(), locale: Locale = .current) -> String {
         let years = now.timeIntervalSince(date) / (365.25 * 24 * 3600)
-        if years >= 1 { return String(format: "%.1f years", years) }
+        if years >= 1 {
+            return String(localized: "\(decimal(years, digits: 1, locale)) years", bundle: .main)
+        }
         let months = max(Int((years * 12).rounded()), 1)
-        return months == 1 ? "1 month" : "\(months) months"
+        return months == 1
+            ? String(localized: "1 month", bundle: .main)
+            : String(localized: "\(months) months", bundle: .main)
+    }
+
+    private static func decimal(_ value: Double, digits: Int, _ locale: Locale) -> String {
+        value.formatted(.number.precision(.fractionLength(digits)).locale(locale))
     }
 }

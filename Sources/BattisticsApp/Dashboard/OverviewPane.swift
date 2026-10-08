@@ -123,7 +123,7 @@ struct OverviewPane: View {
                 if let watts = snapshot.watts {
                     StatRow(
                         label: "Power",
-                        value: String(format: "%+.1f W", watts),
+                        value: Formatting.watts(watts, signed: true),
                         valueColor: watts < 0 ? .orange : nil)
                 }
                 if let amperage = snapshot.amperageMA {

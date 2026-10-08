@@ -352,7 +352,7 @@ struct HistoryPane: View {
         }
     }
 
-    private func totalItem(_ label: String, seconds: TimeInterval, color: Color) -> some View {
+    private func totalItem(_ label: LocalizedStringKey, seconds: TimeInterval, color: Color) -> some View {
         HStack(spacing: 8) {
             Circle().fill(color).frame(width: 8, height: 8)
             VStack(alignment: .leading, spacing: 0) {
@@ -366,7 +366,7 @@ struct HistoryPane: View {
         }
     }
 
-    private func emptyState(_ message: String) -> some View {
+    private func emptyState(_ message: LocalizedStringKey) -> some View {
         ContentUnavailableView(
             "No data yet", systemImage: "chart.line.downtrend.xyaxis", description: Text(message)
         )
@@ -440,10 +440,10 @@ struct HistoryPane: View {
 
     private func valueLabel(_ value: Double) -> String {
         switch chart.tab {
-        case .charge: "\(Int(value.rounded()))%"
+        case .charge: Formatting.percent(value)
         case .power: Formatting.watts(value)
         // Already converted on load, so this labels rather than converts.
-        case .temperature: String(format: "%.1f%@", value, chart.temperatureUnit.symbol)
+        case .temperature: value.formatted(.number.precision(.fractionLength(1))) + chart.temperatureUnit.symbol
         case .health: Formatting.percentPrecise(value)
         }
     }

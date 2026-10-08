@@ -69,7 +69,7 @@ final class PowerHelperClient {
     private static let probeTimeout: Duration = .seconds(1)
     private static let leaseTimeout: Duration = .seconds(8)
     /// How long a re-registered helper gets to come up before giving up.
-    private static let relaunchAttempts = 16
+    private static let relaunchWindow: Duration = .seconds(8)
     private static let relaunchInterval: Duration = .milliseconds(500)
 
     private(set) var status: SMAppService.Status = .notRegistered
@@ -251,7 +251,8 @@ final class PowerHelperClient {
         }
         if needsApproval { throw Failure.needsApproval }
         var last = BuildCheck.silent
-        for _ in 0..<Self.relaunchAttempts {
+        let deadline = ContinuousClock.now + Self.relaunchWindow
+        while ContinuousClock.now < deadline {
             last = await askBuild(timeout: Self.probeTimeout)
             if last == .current { break }
             try? await Task.sleep(for: Self.relaunchInterval)

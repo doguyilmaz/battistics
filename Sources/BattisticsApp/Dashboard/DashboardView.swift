@@ -136,9 +136,16 @@ struct DashboardView: View {
         // A battistics://dashboard/details link lands on Overview with the
         // details sheet open.
         .onChange(of: model.dashboardPane, initial: true) {
-            guard model.dashboardPane == .details else { return }
-            model.dashboardPane = .overview
-            showingDetails = true
+            switch model.dashboardPane {
+            case .details:
+                model.dashboardPane = .overview
+                showingDetails = true
+            case .overview:
+                break
+            default:
+                // The sheet belongs to Overview.
+                showingDetails = false
+            }
         }
     }
 

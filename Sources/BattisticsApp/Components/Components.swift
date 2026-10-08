@@ -1,3 +1,4 @@
+import BattisticsCore
 import SwiftUI
 
 /// Card background: Liquid Glass on macOS 26, a quiet platter from macOS 27,
@@ -102,7 +103,7 @@ struct GaugeRing: View {
                 // stack they push the number off centre, so a charging ring
                 // stops lining up with the ones beside it. Offsets are fixed
                 // because the number's size is, whatever the diameter.
-                Text(valueText ?? "\(Int(value.rounded()))%")
+                Text(valueText ?? Formatting.percent(value))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .contentTransition(.numericText())

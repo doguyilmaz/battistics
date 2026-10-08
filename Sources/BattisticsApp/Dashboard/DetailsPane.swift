@@ -65,7 +65,7 @@ struct DetailsPane: View {
                         "Measured Health",
                         value: (snapshot.hasMeasuredHealthReading ? Formatting.percentPrecise(snapshot.measuredHealthPercent) : "—"))
                     if let percent = model.appleHealth?.maximumCapacityPercent {
-                        LabeledContent("Apple Rated Health", value: "\(percent)%")
+                        LabeledContent("Apple Rated Health", value: Formatting.percent(Double(percent)))
                     }
                     if let condition = model.appleHealth?.condition {
                         LabeledContent("Condition", value: condition)
@@ -87,7 +87,7 @@ struct DetailsPane: View {
                         LabeledContent("Amperage", value: Formatting.milliamps(amperage))
                     }
                     if let watts = snapshot.watts {
-                        LabeledContent("Power", value: String(format: "%+.1f W", watts))
+                        LabeledContent("Power", value: Formatting.watts(watts, signed: true))
                     }
                 }
                 if let adapter = snapshot.adapter, snapshot.externalConnected {
@@ -148,7 +148,7 @@ struct DetailsPane: View {
             lines.append("Voltage: \(Formatting.volts(millivolts: voltage))")
         }
         if let watts = snapshot.watts {
-            lines.append("Power: \(String(format: "%+.1f W", watts))")
+            lines.append("Power: \(Formatting.watts(watts, signed: true))")
         }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(lines.joined(separator: "\n"), forType: .string)

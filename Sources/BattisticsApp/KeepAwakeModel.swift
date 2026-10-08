@@ -178,7 +178,7 @@ final class KeepAwakeModel {
         case PowerHelperClient.Failure.outdated:
             errorMessage = String(localized: "An older power helper is still running. Restart the Mac to replace it, then try again.")
         case is PowerHelperClient.Failure:
-            errorMessage = String(localized: "The power helper did not respond, even after it was registered again. Use Repair in the System pane or restart the Mac.")
+            errorMessage = String(localized: "The power helper did not respond, even after it was registered again. Use Repair in the Power pane or restart the Mac.")
         default:
             errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
         }

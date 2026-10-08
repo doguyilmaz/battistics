@@ -134,7 +134,7 @@ struct AppearanceSettings: View {
                     percent: percent, charging: charging, config: config)
             )
             .frame(height: 27)
-            Text("\(percent)%")
+            Text(Formatting.percent(Double(percent)))
                 .font(.caption2)
                 .monospacedDigit()
             Text(label)

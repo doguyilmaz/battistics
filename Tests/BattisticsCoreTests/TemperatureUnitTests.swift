@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import BattisticsCore
@@ -35,8 +36,8 @@ struct TemperatureUnitTests {
     /// Formatting still takes Celsius and converts internally; the new helpers
     /// must not have changed what existing callers see.
     @Test func textFormattingIsUnchanged() {
-        #expect(Formatting.temperature(35, unit: .celsius) == "35.0°C")
-        #expect(Formatting.temperature(35, unit: .fahrenheit) == "95.0°F")
-        #expect(Formatting.temperature(35, unit: .both) == "35.0°C / 95.0°F")
+        #expect(Formatting.temperature(35, unit: .celsius, locale: Locale(identifier: "en_US")) == "35.0°C")
+        #expect(Formatting.temperature(35, unit: .fahrenheit, locale: Locale(identifier: "en_US")) == "95.0°F")
+        #expect(Formatting.temperature(35, unit: .both, locale: Locale(identifier: "en_US")) == "35.0°C / 95.0°F")
     }
 }

@@ -66,6 +66,8 @@ final class UpdaterModel {
 
     /// Also brings back an update Sparkle is holding for a reminder.
     func checkForUpdates() {
+        // Sparkle never activates an accessory app itself.
+        NSApp.activate()
         controller.checkForUpdates(nil)
     }
 

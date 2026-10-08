@@ -101,10 +101,7 @@ struct GeneralSettings: View {
 
     private func updateLoginItem(_ enabled: Bool) {
         // A re-read above changes the toggle too; that is not a request.
-        guard enabled != (SMAppService.mainApp.status == .enabled) else {
-            loginItemError = nil
-            return
-        }
+        guard enabled != (SMAppService.mainApp.status == .enabled) else { return }
         do {
             if enabled {
                 try SMAppService.mainApp.register()
