@@ -1,18 +1,54 @@
 name: Release
 
-# Push a version tag to ship: git tag v1.0.1 && git push --tags
-# The tag is the single source of truth for the version. project.yml is
-# stamped from it before generating the project.
+# Ships when main gets a CHANGELOG version that has no tag yet, or when a
+# vX.Y.Z tag is pushed. project.yml is stamped from that version before
+# generating the project.
 on:
   push:
+    branches: [main]
     tags: ['v*']
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: resolve
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          VERSION=$(awk '/^## /{ print $2; exit }' CHANGELOG.md)
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Top of CHANGELOG is \"$VERSION\": nothing to release."
+            exit 0
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "v$VERSION is already tagged: nothing to release."
+            exit 0
+          fi
+          # Pushed with GITHUB_TOKEN, which does not start another run.
+          git tag "v$VERSION" "$GITHUB_SHA"
+          git push origin "v$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
   release:
+    needs: version
+    if: needs.version.outputs.version != ''
     runs-on: macos-26
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -35,9 +71,8 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$KEYCHAIN" login.keychain
 
-      - name: Stamp version from tag
+      - name: Stamp version
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           sed -E -i '' "s/CFBundleShortVersionString: \"[^\"]*\"/CFBundleShortVersionString: \"$VERSION\"/" project.yml
           sed -E -i '' "s/CFBundleVersion: \"[^\"]*\"/CFBundleVersion: \"$VERSION\"/" project.yml
 
@@ -64,14 +99,13 @@ jobs:
         env:
           SPARKLE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           rm -rf dist/release && mkdir -p dist/release
           cp "dist/Battistics-$VERSION.dmg" dist/release/
           KEY_FILE="$RUNNER_TEMP/sparkle_key"
           printf '%s' "$SPARKLE_KEY" > "$KEY_FILE"
           .build/xcode/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast dist/release \
             --ed-key-file "$KEY_FILE" \
-            --download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/${GITHUB_REF_NAME}/"
+            --download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/v${VERSION}/"
           rm "$KEY_FILE"
           # appcast-2.xml is the live feed. generate_appcast already names it
           # that, because it derives the filename from SUFeedURL in the app's
@@ -87,7 +121,6 @@ jobs:
         run: |
           # Release notes come from the CHANGELOG section for this version,
           # so the page reads like the changelog rather than a commit list.
-          VERSION="${GITHUB_REF_NAME#v}"
           awk -v want="## $VERSION" '
             $0 == want { found = 1; next }
             /^## / { if (found) exit }
@@ -98,10 +131,10 @@ jobs:
           else
             NOTES=(--generate-notes)
           fi
-          gh release create "$GITHUB_REF_NAME" \
+          gh release create "v$VERSION" \
             dist/release/Battistics-*.dmg \
             dist/release/appcast-2.xml dist/release/appcast.xml \
-            --title "Battistics-${GITHUB_REF_NAME#v}" "${NOTES[@]}"
+            --title "Battistics-$VERSION" "${NOTES[@]}"
 
       # Publishes the Homebrew cask. Runs last and hashes the DMG that was
       # uploaded rather than the one `make dmg` built: stapling the
@@ -114,4 +147,4 @@ jobs:
       - name: Update Homebrew tap
         env:
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-        run: ./scripts/update-tap.sh "${GITHUB_REF_NAME#v}" dist/release/Battistics-*.dmg
+        run: ./scripts/update-tap.sh "$VERSION" dist/release/Battistics-*.dmg
