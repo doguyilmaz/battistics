@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.0
 
 - Closed-lid Keep Awake sets up its power helper itself. Turning it on
   installs the helper, starts once it is allowed in Login Items, and
