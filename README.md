@@ -11,7 +11,7 @@ macOS 14+ · Apple Silicon</p>
 
 <p align="center">
   <img src="docs/popover.png" width="252" alt="Menu bar popover">
-  <img src="docs/appearance.png" width="560" alt="Appearance settings">
+  <img src="docs/menubar.png" width="560" alt="Menu bar settings">
 </p>
 
 ## Features
@@ -22,6 +22,9 @@ macOS 14+ · Apple Silicon</p>
 - Notifications for low battery, full charge, charge limit, high temperature and health decline
 - Battery levels of connected keyboards, mice, trackpads and headphones
 - Energy view showing the busiest apps, sampled only while open
+- Power Flow: adapter input, system load and battery charge or discharge side by side
+- Keep Awake for 15 minutes to 12 hours or until turned off, with the display on, the display asleep or the lid closed
+- Low Power Mode, Energy Mode and the sleep timers in one place, without a password once the helper is installed
 - CSV export and import of the full history
 - English and Turkish
 
