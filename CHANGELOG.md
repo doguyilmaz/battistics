@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1
+
+- The popover's Keep Awake menu marks the duration and mode you picked. The
+  choice was applied, but the menu kept marking the one it first opened with
+
 ## 1.4.0
 
 - Closed-lid Keep Awake sets up its power helper itself. Turning it on
