@@ -1,10 +1,16 @@
 # Releasing Battistics
 
-The git tag is the single source of truth for the version. To ship:
+To ship, rename `## Unreleased` in `CHANGELOG.md` to the version (for
+example `## 1.0.1`) and merge it into `main`. The `Release` workflow tags
+`v1.0.1` itself when the top heading is a version with no tag yet; any other
+push to `main` releases nothing. Do not create the release on GitHub by
+hand: the workflow creates it, and an existing one makes it fail.
+
+Pushing a tag yourself still works, for a commit that is not on `main`:
 
 ```sh
 git tag v1.0.1
-git push --tags
+git push origin v1.0.1
 ```
 
 The `Release` workflow stamps the version into `project.yml`, runs the core
