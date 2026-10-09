@@ -389,6 +389,9 @@ struct PopoverView: View {
             keepAwake.toggle()
         }
         .menuStyle(.button)
+        // A menu with a primary action builds its items once and never
+        // updates them; a new identity rebuilds them.
+        .id("\(keepAwake.isActive) \(keepAwake.duration.rawValue) \(keepAwake.mode.rawValue)")
         .help("Keep Awake")
     }
 
