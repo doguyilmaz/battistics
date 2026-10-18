@@ -10,8 +10,8 @@
 The tour is explanatory. It navigates and scrolls but never changes power or
 notification preferences. Return advances, Escape skips, and keyboard focus
 stays in the tour. The card uses an opaque background for readability. Focus
-bounds come from SwiftUI anchors, not fixed control coordinates. Only the
-explanation can scroll if it needs more space; navigation stays outside it.
+bounds come from SwiftUI anchors, not fixed control coordinates. The card fits
+its text without an empty scrolling area; navigation stays pinned at the bottom.
 The Keep Awake step highlights its switch, mode and duration together, including
 when a live session card is present. The backdrop uses ultra-thin material with
 an accent outline; Reduce Transparency uses a neutral background instead.

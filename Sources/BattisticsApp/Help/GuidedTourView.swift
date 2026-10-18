@@ -5,8 +5,6 @@ struct GuidedTourView: View {
     @Binding var step: TourStep
     @FocusState private var nextFocused: Bool
 
-    static let height: CGFloat = 204
-
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -17,12 +15,8 @@ struct GuidedTourView: View {
                     .font(.caption).monospacedDigit().foregroundStyle(.secondary)
             }
             Text(step.title).font(.headline).accessibilityAddTraits(.isHeader)
-            ScrollView {
-                Text(step.detail).font(.callout).fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .id(step)
-            .frame(maxHeight: .infinity)
+            Text(step.detail).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
             HStack {
                 Button("Skip Tour") { finish() }
                     .buttonStyle(.plain).foregroundStyle(.secondary)
@@ -41,7 +35,7 @@ struct GuidedTourView: View {
             }
         }
         .padding(16)
-        .frame(height: Self.height)
+        .fixedSize(horizontal: false, vertical: true)
         .background(Color(nsColor: .windowBackgroundColor), in: RoundedRectangle(cornerRadius: 16))
         .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(.primary.opacity(0.15)) }
         .shadow(color: .black.opacity(0.25), radius: 16, y: 6)

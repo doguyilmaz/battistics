@@ -71,6 +71,7 @@ struct DashboardView: View {
     @State private var windowVisible = false
     @State private var showingDetails = false
     @State private var tourStep = TourStep.overview
+    @State private var tourCardHeight: CGFloat = 0
 
     private func keepAwakeTitle(at date: Date) -> String {
         guard let seconds = keepAwake.remaining(at: date) else {
@@ -101,13 +102,20 @@ struct DashboardView: View {
             if model.tourRequested {
                 GeometryReader { geometry in
                     let available = CGRect(x: 0, y: 0, width: geometry.size.width,
-                                           height: geometry.size.height - GuidedTourView.height - 32)
+                                           height: max(0, geometry.size.height - tourCardHeight - 32))
                     let focus = anchors[tourStep].map { geometry[$0].insetBy(dx: -6, dy: -6).intersection(available) }
                     ZStack(alignment: .bottom) {
                         TourSpotlight(focus: focus.flatMap { $0.isNull ? nil : $0 })
                             .allowsHitTesting(false)
                         GuidedTourView(step: $tourStep)
                             .frame(maxWidth: 620)
+                            .background {
+                                GeometryReader { card in
+                                    Color.clear.onChange(of: card.size.height, initial: true) {
+                                        tourCardHeight = card.size.height
+                                    }
+                                }
+                            }
                             .padding(16)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -20,6 +20,7 @@
   in English and Turkish
 - Tour focus uses a blurred backdrop; the Keep Awake step shows the switch,
   mode and duration together, including during an active session.
+- Tour cards fit their content without a fixed-height empty area.
 - Optional Apple Intelligence Q&A on macOS 26+ using the built-in help articles,
   with availability checks, cancellation, sources, and no cloud fallback
 - Opt-in local MCP server with status, bounded task start, and owned task stop;

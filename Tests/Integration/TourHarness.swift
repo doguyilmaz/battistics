@@ -63,10 +63,13 @@ struct TourHarness {
             try await settle()
             precondition(model.dashboardPane == step.pane, "Wrong pane for \(step)")
             let target = try require(probe.frames[step])
+            let card = try find("tour.card", in: host)
+            let cardFrame = try require(attribute(card, "accessibilityFrame") as? NSValue).rectValue
+            precondition(cardFrame.height < 180, "Tour card has unnecessary empty space: \(cardFrame)")
             if step == .power {
                 precondition(target.height > 60, "Power focus must include switch, mode and duration: \(target)")
             }
-            precondition(target.minY >= 0 && target.maxY < 545 - GuidedTourView.height - 20,
+            precondition(target.minY >= 0 && target.maxY < 545 - cardFrame.height - 20,
                          "Target obscured for \(step): \(target)")
             let button = try find("tour.next", in: host)
             let frame = try require(attribute(button, "accessibilityFrame") as? NSValue).rectValue
@@ -119,8 +122,10 @@ struct TourHarness {
         try press(find("tour.next", in: host))
         try await settle()
         let activeTarget = try require(probe.frames[.power])
+        let activeCard = try find("tour.card", in: host)
+        let activeCardHeight = try require(attribute(activeCard, "accessibilityFrame") as? NSValue).rectValue.height
         precondition(activeTarget.height > 100 && activeTarget.minY >= 0
-                     && activeTarget.maxY < 545 - GuidedTourView.height - 20,
+                     && activeTarget.maxY < 545 - activeCardHeight - 20,
                      "Active session obscures Power focus: \(activeTarget)")
         try capture(host, step: .power, suffix: "-active")
         precondition(awake.isActive, "Tour changed the running session")
