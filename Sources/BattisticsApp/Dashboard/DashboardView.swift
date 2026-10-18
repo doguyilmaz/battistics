@@ -13,6 +13,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     case notifications
     case data
     case about
+    case help
 
     var id: String { rawValue }
 
@@ -20,7 +21,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
     static let controlPanes: [DashboardPane] = [.system]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]
-    static let helpPanes: [DashboardPane] = [.about]
+    static let helpPanes: [DashboardPane] = [.help, .about]
 
     var title: String {
         switch self {
@@ -36,6 +37,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .notifications: String(localized: "Notifications")
         case .data: String(localized: "Data")
         case .about: String(localized: "About")
+        case .help: String(localized: "Help & Assistant")
         }
     }
 
@@ -52,6 +54,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .notifications: "bell.badge"
         case .data: "internaldrive"
         case .about: "info.circle"
+        case .help: "questionmark.circle"
         }
     }
 }
@@ -76,13 +79,22 @@ struct DashboardView: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            if sidebarVisible {
-                sidebar
-                    .transition(.move(edge: .leading))
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                if sidebarVisible {
+                    sidebar
+                        .transition(.move(edge: .leading))
+                }
+                detailView
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .overlay {
+                        if model.tourRequested {
+                            RoundedRectangle(cornerRadius: 8).stroke(Color.accentColor, lineWidth: 2)
+                                .padding(3).allowsHitTesting(false)
+                        }
+                    }
             }
-            detailView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if model.tourRequested { GuidedTourView() }
         }
         .frame(width: 860, height: 545)
         .toolbar {
@@ -124,6 +136,14 @@ struct DashboardView: View {
         .navigationTitle(model.dashboardPane.title)
         .background(WindowLevelConfigurator(keepOnTop: keepOnTop))
         .background(WindowVisibilityReader(isVisible: $windowVisible))
+        .onChange(of: windowVisible) {
+            if windowVisible && !UserDefaults.standard.bool(forKey: Prefs.hasSeenTour) {
+                model.tourRequested = true
+            }
+        }
+        .onChange(of: model.tourRequested) {
+            if model.tourRequested { sidebarVisible = true }
+        }
         .task(id: windowVisible) {
             guard windowVisible else { return }
             await model.refreshSensorsWhileVisible(every: .seconds(3))
@@ -189,6 +209,7 @@ struct DashboardView: View {
         case .notifications: NotificationSettings()
         case .data: HistorySettings()
         case .about: AboutSettings()
+        case .help: HelpPane()
         }
     }
 }

@@ -19,6 +19,7 @@ final class AppModel {
     var dashboardPane: DashboardPane = .overview
     /// The About pane presents the report sheet and clears this.
     var reportRequested = false
+    var tourRequested = false
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?
     @ObservationIgnored private var appleHealthTask: Task<Void, Never>?

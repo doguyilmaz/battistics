@@ -24,6 +24,8 @@ macOS 14+ · Apple Silicon</p>
 - Energy view showing the busiest apps, sampled only while open
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed
 - Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
+- A five-step first-run tour and searchable English/Turkish help
+- Optional on-device Q&A using Apple Intelligence on supported Macs with macOS 26+
 - CSV export and import of the full history
 - English and Turkish
 
@@ -63,6 +65,19 @@ Protection requires Battistics to be running and able to read system state.
 A sudden charge drop can skip the warning. Ending closed-lid mode may allow
 immediate sleep. Connect power for work that cannot be interrupted, and keep
 vents clear; never put a running, closed Mac inside a bag.
+
+### Tour and local help
+
+The first dashboard visit opens a short tour; skip or replay it from **Help**.
+**Help & Assistant** includes searchable answers on macOS 14+. On macOS 26+,
+the optional assistant uses Apple's on-device Foundation Models when the model,
+Apple Intelligence, and app language are available. AI selects a relevant guide
+article and the app shows its reviewed text and source. It cannot change settings
+and has no cloud fallback. Battistics does not save questions or answers. If the
+selected article does not answer the question, the full guide is always available.
+
+Direct fan-speed overrides are not included in this version.
+See [feature scope and verification](docs/session-protection.md).
 
 ## Light by design
 

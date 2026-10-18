@@ -144,6 +144,7 @@ enum Prefs {
     static let keepAwakeWarnOnLowBattery = "keepAwakeWarnOnLowBattery"
     static let keepAwakeWarningPercent = "keepAwakeWarningPercent"
     static let keepAwakeStopOnThermalPressure = "keepAwakeStopOnThermalPressure"
+    static let hasSeenTour = "hasSeenTour"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 

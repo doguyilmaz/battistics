@@ -1,6 +1,6 @@
-# Session protection
+# Session protection and guided help
 
-Keep Awake can warn or end a session at user-selected limits.
+This iteration focuses on understandable Keep Awake limits and discoverability.
 “Stop at X%” ends the Battistics session. It does not issue shutdown or force
 system sleep: macOS resumes its normal behavior, including immediate sleep when
 the lid is closed. Battery depletion, sleep, and an actual shutdown cannot be
@@ -27,7 +27,24 @@ distinguished from a user's anecdote alone.
 - Protections are best effort while the app runs. They cannot guarantee a
   warning before abrupt power loss or timely action if the process is suspended.
 
-## Fan control
+## Help
+
+The tour visits Overview, Power, Notifications, History, and Help, highlights the
+current pane, supports Back/Next/Skip, and never enables settings. Finishing or
+skipping persists locally; Help can replay it.
+
+Built-in help is available offline on macOS 14+. The optional assistant checks
+macOS 26+, model readiness, Apple Intelligence eligibility, and app-language
+support. It receives only a bounded question and up to three relevant built-in
+articles. Guided generation returns only an article number, validated against
+the supplied candidates. The app displays that article's reviewed localized
+answer; model-authored prose is never shown. This avoids invented functionality
+observed during Turkish free-form generation testing. Each question creates a
+fresh session with bounded output; no tools, settings writes, cloud fallback,
+or persisted conversation are provided.
+Cancellation and unavailable/error states return the user to the same guide.
+
+## Deliberate scope boundaries
 
 Direct fan overrides need hardware-specific support and a separate recovery
 design. They are technically possible: [Macs Fan Control](https://crystalidea.com/macs-fan-control/faq)
@@ -36,9 +53,37 @@ reads macOS thermal signals and does not write fan settings. Apple's
 [fan guidance](https://support.apple.com/en-us/101576) explains ventilation and
 automatic cooling.
 
+The assistant uses Apple's [Foundation Models framework](https://developer.apple.com/documentation/foundationmodels)
+without raising the app's macOS 14 deployment target.
+
 ## Verification
 
 `swift test` covers threshold crossing, warning deduplication/rearming, sudden
 charge drops, AC transitions, invalid/missing readings, opt-in defaults,
 configuration changes, thermal recovery, and threshold bounds alongside the
 existing assertion/lease tests. `make build` compiles the macOS app and helper.
+
+Development verification for this change: 171 core tests passed; the app and
+helper built with Xcode 26.6 targeting macOS 14. English/Turkish help, protection,
+and dashboard-tour views were rendered in an isolated AppKit harness. Live
+on-device article selection and cancellation were exercised in both languages.
+Foundation Models is weak-linked for older macOS versions. The signed helper's
+physical closed-lid flow and lock-screen delivery still need the release checks
+below; rendering views does not exercise those system behaviors.
+
+Manual release checks on a signed app:
+
+1. On first launch, walk all five tour steps; verify Back, Skip, Done, replay,
+   and both languages without changing any power settings.
+2. Enable a battery stop above the current charge while unplugged. Confirm the
+   session ends and cannot restart until conditions permit it. Repeat after
+   enabling closed-lid mode, checking helper restoration with the lid open first.
+3. Verify a warning with notifications denied, then during screen lock/unlock.
+   Connect power and confirm the battery warning clears and can rearm on unplug.
+4. Check protection with all windows closed and history sampling disabled.
+5. Check the assistant with Apple Intelligence disabled, model downloading,
+   unsupported language, and ready states; ask a guide-related question and
+   cancel another. Verify the selected answer matches the displayed source.
+
+Use simulated readings for depletion and thermal tests; do not deliberately
+drain or overheat a development Mac.

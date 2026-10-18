@@ -5316,6 +5316,72 @@
         }
       }
     },
+    "AI selected this answer from the built-in guide on this Mac. Check the source if it does not answer your question.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI bu yanıtı Mac’inizdeki hazır rehberden seçti. Sorunuzu karşılamıyorsa kaynak yazıyı kontrol edin."
+          }
+        }
+      }
+    },
+    "Apple's on-device model is not ready yet. Try again after its download finishes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple’ın cihaz içi modeli henüz hazır değil. İndirme tamamlandıktan sonra yeniden deneyin."
+          }
+        }
+      }
+    },
+    "Ask Battistics": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’e Sor"
+          }
+        }
+      }
+    },
+    "Ask On-Device AI": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz İçi AI’a Sor"
+          }
+        }
+      }
+    },
+    "Back": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri"
+          }
+        }
+      }
+    },
+    "Battery capacity is an estimate that shifts with temperature, charge, and controller calibration. Battistics shows controller-based health alongside Apple's separately modeled verdict. Small daily changes do not necessarily mean wear. History helps reveal longer trends; battery temperature is not CPU or enclosure temperature. Battistics does not diagnose hardware faults.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil kapasitesi; sıcaklık, şarj ve denetleyici kalibrasyonuyla değişen bir tahmindir. Battistics, denetleyiciden hesaplanan sağlığı Apple’ın ayrı modeliyle verdiği değerlendirmeyle birlikte gösterir. Küçük günlük değişimler mutlaka aşınma anlamına gelmez. Geçmiş, uzun vadeli eğilimleri görmenizi sağlar; pil sıcaklığı işlemci veya kasa sıcaklığı değildir. Battistics donanım arızası teşhisi yapmaz."
+          }
+        }
+      }
+    },
     "Battery is at %lld%%. Keep Awake cannot prevent an empty battery from interrupting your work. Connect power soon.": {
       "extractionState": "manual",
       "localizations": {
@@ -5338,6 +5404,116 @@
         }
       }
     },
+    "Built-in Answers": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır Yanıtlar"
+          }
+        }
+      }
+    },
+    "Built-in help works offline on macOS 14 and later. The optional assistant uses Apple's on-device Foundation Models on macOS 26 or later when Apple Intelligence, its model, and the language are available. AI selects a relevant guide article; the answer is the reviewed guide text, not generated instructions. It cannot change settings and has no cloud fallback. Questions and answers are not saved by Battistics. If the selection does not answer your question, browse the source articles. Optional update checks are separate.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır yardım içerikleri macOS 14 ve üzerinde çevrimdışı çalışır. İsteğe bağlı asistan, macOS 26 veya üzerinde Apple Intelligence, model ve dil kullanılabilirken Apple’ın cihaz içi Foundation Models altyapısını kullanır. AI ilgili rehber yazısını seçer; gösterilen yanıt üretilmiş talimatlar değil, gözden geçirilmiş rehber metnidir. Ayarları değiştiremez ve bulut alternatifi yoktur. Battistics soruları ve yanıtları kaydetmez. Seçilen yanıt sorunuzu karşılamıyorsa kaynak yazılara göz atın. İsteğe bağlı güncelleme kontrolleri ayrıdır."
+          }
+        }
+      }
+    },
+    "Can Battistics cool my Mac or control its fans?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Mac’imi soğutabilir veya fanlarını yönetebilir mi?"
+          }
+        }
+      }
+    },
+    "Can I keep a development task awake until it finishes?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir geliştirme işi bitene kadar Mac’i uyanık tutabilir miyim?"
+          }
+        }
+      }
+    },
+    "Can Keep Awake stop at a battery percentage?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut belirli bir pil yüzdesinde durabilir mi?"
+          }
+        }
+      }
+    },
+    "Check Availability": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullanılabilirliği Kontrol Et"
+          }
+        }
+      }
+    },
+    "Choose a Keep Awake mode and duration here. Closed-lid mode needs the power helper. Scroll to Session Protection to choose a battery stop level; automatic stopping starts off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buradan Uyanık Tut modunu ve süresini seçin. Kapak kapalı modu güç yardımcısını gerektirir. Pil durdurma seviyesini seçmek için Oturum Koruması’na kaydırın; otomatik durdurma başlangıçta kapalıdır."
+          }
+        }
+      }
+    },
+    "Choose low-charge and temperature alerts. macOS may ask for notification permission when an alert first arrives. Keep Awake also shows an in-app warning.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük şarj ve sıcaklık uyarılarını seçin. İlk uyarıda macOS bildirim izni isteyebilir. Uyanık Tut ayrıca uygulama içi uyarı gösterir."
+          }
+        }
+      }
+    },
+    "Closed-lid Keep Awake temporarily changes a privileged system sleep setting. Approve the power helper in System Settings → General → Login Items & Extensions when prompted. The helper restores the setting after the session; if Battistics quits or crashes, its lease expires within about 45 seconds. An external change is left alone. If the helper is unavailable, use Repair in Power. Developer builds without a signing team cannot register the helper.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı Uyanık Tut modu, yönetici yetkisi isteyen bir sistem uyku ayarını geçici olarak değiştirir. İstendiğinde Sistem Ayarları → Genel → Giriş Öğeleri ve Genişletmeler bölümünden güç yardımcısını onaylayın. Yardımcı oturumdan sonra ayarı geri yükler; Battistics kapanır veya çökerse oturumun yetkisi yaklaşık 45 saniye içinde sona erer. Başka bir uygulamanın yaptığı değişikliğe dokunulmaz. Yardımcı çalışmıyorsa Güç bölümünden Onar’ı kullanın. İmzalama takımı olmayan geliştirici derlemeleri yardımcıyı kaydedemez."
+          }
+        }
+      }
+    },
+    "Does the assistant send my data anywhere?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asistan verilerimi bir yere gönderiyor mu?"
+          }
+        }
+      }
+    },
     "Elevated": {
       "extractionState": "manual",
       "localizations": {
@@ -5345,6 +5521,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yükselmiş"
+          }
+        }
+      }
+    },
+    "Enable Apple Intelligence in System Settings to use the assistant. Built-in help works without it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asistanı kullanmak için Sistem Ayarları’ndan Apple Intelligence’ı açın. Hazır yardım içerikleri onsuz da çalışır."
+          }
+        }
+      }
+    },
+    "Ending Keep Awake restores normal sleep behavior. With the lid closed, the Mac may sleep immediately. That alone does not prove a shutdown or battery fault. At very low charge, connect power before ending the session and save your work. Session Protection can warn at a chosen percentage, at least 5 points above an enabled stop level. A sudden drop may skip the warning. Notifications need macOS permission; an in-app notice is also shown.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u sonlandırmak normal uyku davranışını geri getirir. Kapak kapalıysa Mac hemen uyuyabilir. Bu tek başına kapanma veya pil arızası olduğunu göstermez. Şarj çok düşükse oturumu bitirmeden önce güç adaptörünü bağlayın ve çalışmanızı kaydedin. Oturum Koruması, durdurma etkinse bu seviyenin en az 5 puan üzerinde, seçtiğiniz yüzdede uyarabilir. Ani düşüş uyarıyı atlayabilir. Bildirimler macOS izni gerektirir; ayrıca uygulama içi uyarı gösterilir."
           }
         }
       }
@@ -5360,6 +5558,28 @@
         }
       }
     },
+    "Help & Assistant": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardım ve Asistan"
+          }
+        }
+      }
+    },
+    "Help is always close by": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardım her zaman elinizin altında"
+          }
+        }
+      }
+    },
     "High": {
       "extractionState": "manual",
       "localizations": {
@@ -5367,6 +5587,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yüksek"
+          }
+        }
+      }
+    },
+    "History reveals charge, power, and temperature trends as readings accumulate. Manage recording and CSV export in Data. Your history stays on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ölçümler biriktikçe Geçmiş, şarj, güç ve sıcaklık eğilimlerini gösterir. Kayıt ve CSV dışa aktarma seçeneklerini Veri bölümünden yönetin. Geçmişiniz bu Mac’te kalır."
+          }
+        }
+      }
+    },
+    "History shows charge, power, temperature, and health trends recorded locally. New installations need time to collect samples. In Data you can export or import CSV, delete history, and control optional power recording. Turning off power recording does not turn off Keep Awake protection. Energy shows busy apps only while its view is open.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçmiş; yerel olarak kaydedilen şarj, güç, sıcaklık ve sağlık eğilimlerini gösterir. Yeni kurulumlarda örneklerin birikmesi zaman alır. Veri bölümünden CSV içe veya dışa aktarabilir, geçmişi silebilir ve isteğe bağlı güç kaydını yönetebilirsiniz. Güç kaydını kapatmak Uyanık Tut korumasını kapatmaz. Enerji bölümü, yoğun çalışan uygulamaları yalnızca kendi görünümü açıkken örnekler."
+          }
+        }
+      }
+    },
+    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. The duration applies when a session starts; changing it does not extend a running session. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Süre oturum başlarken uygulanır; sonradan değiştirmek çalışan oturumu uzatmaz. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
           }
         }
       }
@@ -5426,6 +5679,105 @@
         }
       }
     },
+    "Keep your question under 600 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorunuzu 600 karakterin altında tutun."
+          }
+        }
+      }
+    },
+    "Know before power runs low": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil azalmadan haberiniz olsun"
+          }
+        }
+      }
+    },
+    "Learn the controls in a short guided tour, or find an answer below.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kısa tanıtımla kontrolleri öğrenin veya aşağıda yanıt arayın."
+          }
+        }
+      }
+    },
+    "Make yourself at home": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’i keşfedin"
+          }
+        }
+      }
+    },
+    "Next": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İleri"
+          }
+        }
+      }
+    },
+    "No matching articles. Try battery, sleep, heat, history, or assistant.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleşen yazı yok. Pil, uyku, ısınma, geçmiş veya asistan sözcüklerini deneyin."
+          }
+        }
+      }
+    },
+    "No matching guide article. Try asking about Keep Awake, battery protection, heat, history, or privacy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleşen rehber yazısı yok. Uyanık Tut, pil koruması, ısınma, geçmiş veya gizlilik hakkında sormayı deneyin."
+          }
+        }
+      }
+    },
+    "Open %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Bölümünü Aç"
+          }
+        }
+      }
+    },
+    "Open Battistics from the menu bar to see charge, health, and power use. Overview brings those readings together; click a battery detail to learn more.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarjı, pil sağlığını ve güç kullanımını görmek için menü çubuğundan Battistics’i açın. Genel Bakış bu bilgileri bir araya getirir; daha fazlası için pil ayrıntılarına tıklayın."
+          }
+        }
+      }
+    },
     "Protection works while Battistics is running. A sudden charge drop may skip the warning level. Keep power connected for work that cannot be interrupted.": {
       "extractionState": "manual",
       "localizations": {
@@ -5437,6 +5789,50 @@
         }
       }
     },
+    "Quick Tour": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hızlı Tanıtım"
+          }
+        }
+      }
+    },
+    "Ready on this Mac. Answers use the built-in guide and cannot change settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te hazır. Yanıtlar hazır rehbere dayanır ve ayarları değiştiremez."
+          }
+        }
+      }
+    },
+    "Search help or ask a question": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımda arayın veya bir soru sorun"
+          }
+        }
+      }
+    },
+    "Search the built-in answers, or ask the on-device assistant when Apple Intelligence is available. Replay this tour anytime from Help. The tour never changes your power settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır yanıtlarda arayın veya Apple Intelligence kullanılabiliyorsa cihaz içi asistana sorun. Bu tanıtımı Yardım’dan istediğiniz zaman yeniden başlatabilirsiniz. Tanıtım güç ayarlarınızı değiştirmez."
+          }
+        }
+      }
+    },
     "Session Protection": {
       "extractionState": "manual",
       "localizations": {
@@ -5444,6 +5840,61 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oturum Koruması"
+          }
+        }
+      }
+    },
+    "Show All Answers": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm Yanıtları Göster"
+          }
+        }
+      }
+    },
+    "Skip Tour": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanıtımı Atla"
+          }
+        }
+      }
+    },
+    "Source Articles": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaynak Yazılar"
+          }
+        }
+      }
+    },
+    "Stay awake, with limits": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sınırları belirleyerek uyanık tutun"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adım %lld / %lld"
           }
         }
       }
@@ -5492,6 +5943,61 @@
         }
       }
     },
+    "Take a Tour…": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanıtımı Başlat…"
+          }
+        }
+      }
+    },
+    "The assistant could not answer this question. Read the source articles below or try a shorter question.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asistan bu soruyu yanıtlayamadı. Aşağıdaki kaynak yazıları okuyun veya daha kısa bir soru deneyin."
+          }
+        }
+      }
+    },
+    "The assistant needs macOS 26 or later and Apple Intelligence. Built-in help works on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asistan, macOS 26 veya üzerini ve Apple Intelligence’ı gerektirir. Hazır yardım içerikleri bu Mac’te çalışır."
+          }
+        }
+      }
+    },
+    "The on-device model does not support the app language yet. Built-in help is available below.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz içi model henüz uygulamanın dilini desteklemiyor. Aşağıdaki hazır yardım içeriklerini kullanabilirsiniz."
+          }
+        }
+      }
+    },
+    "The on-device model is unavailable. You can still search all built-in answers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz içi model kullanılamıyor. Tüm hazır yanıtlarda arama yapabilirsiniz."
+          }
+        }
+      }
+    },
     "Thermal Care": {
       "extractionState": "manual",
       "localizations": {
@@ -5499,6 +6005,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Isıl Koruma"
+          }
+        }
+      }
+    },
+    "Thinking on this Mac…": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te düşünüyor…"
+          }
+        }
+      }
+    },
+    "This Mac does not support the on-device model. You can still search all built-in answers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac cihaz içi modeli desteklemiyor. Tüm hazır yanıtlarda arama yapabilirsiniz."
+          }
+        }
+      }
+    },
+    "Understand changes over time": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaman içindeki değişimi anlayın"
           }
         }
       }
@@ -5536,6 +6075,94 @@
         }
       }
     },
+    "Where is my history and how can I export it?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçmişim nerede, nasıl dışa aktarabilirim?"
+          }
+        }
+      }
+    },
+    "Which Keep Awake mode should I choose?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangi Uyanık Tut modunu seçmeliyim?"
+          }
+        }
+      }
+    },
+    "Why did my Mac sleep when I turned Keep Awake off?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u kapattığımda Mac’im neden uyudu?"
+          }
+        }
+      }
+    },
+    "Why do battery health readings differ?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil sağlığı ölçümleri neden farklı?"
+          }
+        }
+      }
+    },
+    "Why does closed-lid mode need permission?": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı modu neden izin istiyor?"
+          }
+        }
+      }
+    },
+    "Yes. In Power → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet. Güç → Oturum Koruması bölümünden Pil azaldığında Uyanık Tut’u durdur seçeneğini açın ve %5–50 arasında bir seviye seçin. Varsayılan olarak kapalıdır; önceden seçilen seviye %10’dur. Pil gücündeyken bu seviyede veya altında Battistics oturumu bitirir ve normal uykuya izin verir. Mac’i kapatmaz veya uygulamaları sonlandırmaz. Kural için Battistics’in çalışması ve geçerli bir pil ölçümü gerekir; ani güç kaybına karşı garanti vermez."
+          }
+        }
+      }
+    },
+    "Your battery at a glance": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir bakışta piliniz"
+          }
+        }
+      }
+    },
+    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Power → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Güç → Isıl Koruma bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl Koruma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
+          }
+        }
+      }
+    },
     "Keep Awake ended because macOS reported high thermal pressure. Let the Mac cool before starting another session. Battistics does not change fan speeds.": {
       "extractionState": "manual",
       "localizations": {
@@ -5565,6 +6192,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS yüksek ısıl baskı bildiriyor. Kapağı açın, havalandırma deliklerini açık tutun ve ağır işleri azaltın. Battistics fan hızlarını değiştirmez."
+          }
+        }
+      }
+    },
+    "For now, start a timed Keep Awake session in Power. There is no Battistics MCP server in this version. For a terminal command with the lid open, macOS also provides caffeinate -i followed by the command and its arguments; its idle-sleep assertion lasts until the command exits. This does not enable Battistics closed-lid mode and does not protect against battery depletion. A future MCP integration should use bounded, owned sessions that respect battery and thermal protection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdilik Güç bölümünden süreli bir Uyanık Tut oturumu başlatın. Bu sürümde Battistics MCP sunucusu yoktur. Kapak açıkken bir terminal komutu için macOS’un caffeinate -i aracının ardından komutu ve argümanlarını da kullanabilirsiniz; boşta uyumayı engelleyen isteği komut bitene kadar sürer. Bu, Battistics’in kapak kapalı modunu açmaz ve pilin bitmesine karşı koruma sağlamaz. Gelecekteki MCP entegrasyonu, pil ve ısıl korumaya uyan, süreli ve sahipliği belli oturumlar kullanmalıdır."
           }
         }
       }

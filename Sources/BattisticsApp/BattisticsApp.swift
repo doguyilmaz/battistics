@@ -12,7 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// This works in every icon configuration; a view-based approach only
     /// runs when the menu bar label happens to exist.
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if UserDefaults.standard.bool(forKey: Prefs.openDashboardAtLaunch) {
+        if UserDefaults.standard.bool(forKey: Prefs.openDashboardAtLaunch)
+            || !UserDefaults.standard.bool(forKey: Prefs.hasSeenTour) {
             Self.openDashboard()
         }
     }
@@ -141,6 +142,14 @@ struct BattisticsApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
             CommandGroup(replacing: .help) {
+                Button("Take a Tour…") {
+                    model.tourRequested = true
+                    AppDelegate.openDashboard()
+                }
+                Button("Help & Assistant") {
+                    model.dashboardPane = .help
+                    AppDelegate.openDashboard()
+                }
                 Button("Report a Problem…") {
                     model.reportRequested = true
                     model.dashboardPane = .about

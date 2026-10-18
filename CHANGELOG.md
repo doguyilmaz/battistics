@@ -6,6 +6,10 @@
   retained stop reasons. Automatic stopping is off by default
 - System thermal-pressure warnings and optional session stopping; Battistics
   does not change fan speeds
+- Five-step first-run tour, replayable from Help, plus searchable local answers
+  in English and Turkish
+- Optional Apple Intelligence Q&A on macOS 26+ using the built-in help articles,
+  with availability checks, cancellation, sources, and no cloud fallback
 
 ## 1.4.1
 
