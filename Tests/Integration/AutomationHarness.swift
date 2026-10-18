@@ -36,6 +36,8 @@ struct AutomationHarness {
         let id = try require(start.status?.sessionID)
         precondition(awake.isActive && awake.displayedMode == .displayMaySleep)
         precondition(automation.activeTaskName == "Build the project")
+        precondition(automation.activeSource == .mcp)
+        precondition(awake.start(profile: .overnight) == nil)
         let deadline = awake.session?.deadline
         let heartbeat = try await first.request(.init(.heartbeat, sessionID: id))
         precondition(heartbeat.status?.sessionID == id && awake.session?.deadline == deadline)
@@ -46,9 +48,22 @@ struct AutomationHarness {
         let conflict = try await other.request(.init(.start, name: "Another build", durationMinutes: 15))
         precondition(conflict.error?.code == "busy" && awake.session?.deadline == deadline)
         awake.stop()
-        precondition(automation.activeTaskName == nil)
+        precondition(automation.activeTaskName == nil && automation.activeSource == nil)
         let lateHeartbeat = try await first.request(.init(.heartbeat, sessionID: id))
         precondition(lateHeartbeat.error?.code == "inactive" && !awake.isActive)
+
+        let savedMode = awake.mode, savedDuration = awake.duration
+        let protection = awake.safety.configuration
+        for profile in KeepAwakeProfile.allCases {
+            await awake.start(profile: profile)?.value
+            precondition(awake.isActive && awake.sessionName == profile.title)
+            precondition(awake.session?.mode == profile.mode && awake.session?.duration == profile.duration)
+            precondition(awake.session?.deadline != nil && profile.mode != .lidClosed)
+            precondition(awake.mode == savedMode && awake.duration == savedDuration)
+            precondition(awake.safety.configuration == protection)
+            awake.stop()
+            precondition(awake.sessionName == nil)
+        }
 
         await awake.start(mode: .displayMaySleep, duration: .fifteenMinutes)?.value
         let manualID = awake.sessionIdentifier
@@ -87,14 +102,15 @@ struct AutomationHarness {
         awake.safety.onStop?(.thermalStop)
         precondition(!awake.isActive && automation.activeTaskName == nil)
 
-        _ = try await newClient.request(.init(.start, name: "Visible automation task", durationMinutes: 15))
-        try await capture(automation)
+        _ = try await newClient.request(.init(.start, name: "Build the project", durationMinutes: 15, source: .command))
+        precondition(automation.activeSource == .command)
+        try await capture(automation, awake: awake)
         automation.enabled = false
         precondition(!awake.isActive)
         try await eventually { !automation.isListening }
         await newClient.close()
         try FileManager.default.removeItem(atPath: endpoint.directory)
-        print("PASS: app ownership, manual takeover, stale messages, disconnect, disable, protection stop, and automation UI")
+        print("PASS: ownership, profiles, source labels, manual takeover, stale messages, disconnect, protection, and UI")
     }
 
     private static func require<T>(_ value: T?) throws -> T {
@@ -110,10 +126,22 @@ struct AutomationHarness {
         precondition(predicate(), "Expected app lifecycle transition within two seconds")
     }
 
-    private static func capture(_ automation: AutomationModel) async throws {
-        let host = NSHostingView(rootView: Form { AutomationSettings() }.formStyle(.grouped)
-            .environment(automation).frame(width: 680, height: 545))
-        host.frame = NSRect(x: 0, y: 0, width: 680, height: 545)
+    private static func capture(_ automation: AutomationModel, awake: KeepAwakeModel) async throws {
+        try await render(Form { AutomationSettings() }.formStyle(.grouped).environment(automation),
+                         name: "automation", width: 680, height: 760)
+        try await render(Form {
+            Section("Current session") { KeepAwakeSessionCard() }
+            KeepAwakeProfiles()
+            KeepAwakeSafetySettings()
+        }.formStyle(.grouped).environment(automation).environment(awake),
+                         name: "profiles", width: 680, height: 850)
+        try await render(KeepAwakeSessionCard().padding(14).environment(automation).environment(awake),
+                         name: "session-card", width: 340, height: 160)
+    }
+
+    private static func render(_ view: some View, name: String, width: CGFloat, height: CGFloat) async throws {
+        let host = NSHostingView(rootView: view.frame(width: width, height: height))
+        host.frame = NSRect(x: 0, y: 0, width: width, height: height)
         let window = NSWindow(contentRect: host.frame, styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = host
@@ -124,7 +152,7 @@ struct AutomationHarness {
         host.cacheDisplay(in: host.bounds, to: bitmap)
         let language = Bundle.main.preferredLocalizations.first ?? "en"
         try require(bitmap.representation(using: .png, properties: [:]))
-            .write(to: URL(fileURLWithPath: "/private/tmp/battistics-automation-\(language).png"))
+            .write(to: URL(fileURLWithPath: "/private/tmp/battistics-\(name)-\(language).png"))
         window.close()
     }
 }

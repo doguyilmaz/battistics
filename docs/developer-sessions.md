@@ -4,8 +4,8 @@ Implementation checklist:
 
 - [x] Optional adapter-disconnect notice during Keep Awake, off by default.
 - [x] Bundled `battistics run` command with bounded connection-owned sessions.
-- [ ] Finite profiles and a live session card in the Power pane and menu popover.
-- [ ] English/Turkish copy, lifecycle tests, app build and UI verification.
+- [x] Finite profiles and a live session card in the Power pane and menu popover.
+- [x] English/Turkish copy, lifecycle tests, app build and UI verification.
 
 ## Command contract
 
@@ -52,3 +52,16 @@ can start. AI Focus is a timer, not AI task detection.
 The live card shows the task/profile, origin, actual mode and remaining time,
 with an explicit stop action. Command completion is bounded by the timer and
 existing protection, just like MCP work.
+
+## Verification
+
+- `swift test`: 187 core, CLI and MCP tests passed.
+- `python3 scripts/test-cli.py`: isolated IPC with real child processes; argv,
+  inherited stdin/stdout/environment, exit codes, startup refusal, missing
+  command, INT/TERM/HUP forwarding, PTY input/Ctrl+C, and continued command
+  execution after lease loss. No power settings are changed by this test.
+- `python3 scripts/test-automation.py`: isolated app controller checks profile
+  durations, preservation of defaults/protections, prevention of takeover,
+  origin cleanup, existing ownership behavior, and English/Turkish UI rendering.
+- Debug app build, nested code-signature verification and bundled MCP smoke
+  test passed. Physical closed-lid operation still needs a signed-app check.

@@ -21,10 +21,6 @@ struct AutomationSettings: View {
                 Toggle("Allow closed-lid tasks", isOn: $automation.closedLidAllowed)
                 Text("Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.")
                     .font(.caption).foregroundStyle(.secondary)
-                if let name = automation.activeTaskName {
-                    LabeledContent("Automation task", value: name)
-                    Button("Stop task") { automation.stopOwnedSession() }
-                }
                 Picker("Client configuration", selection: $codexConfiguration) {
                     Text("JSON (Claude / Cursor)").tag(false)
                     Text("TOML (Codex)").tag(true)

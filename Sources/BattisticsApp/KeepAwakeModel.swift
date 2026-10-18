@@ -12,6 +12,7 @@ final class KeepAwakeModel {
     private enum StartFailure: Error { case protection(KeepAwakeSafetyPolicy.Event) }
     let safety = KeepAwakeSafetyMonitor()
     private(set) var session: KeepAwakeSession?
+    private(set) var sessionName: String?
 
     @ObservationIgnored private let assertion = WakeAssertion()
     @ObservationIgnored private var expiryTask: Task<Void, Never>?
@@ -85,8 +86,14 @@ final class KeepAwakeModel {
     }
 
     @discardableResult
+    func start(profile: KeepAwakeProfile) -> Task<Void, Never>? {
+        guard !isActive, !isChanging, !isAwaitingHelperApproval else { return nil }
+        return start(mode: profile.mode, duration: profile.duration, name: profile.title)
+    }
+
+    @discardableResult
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
-               id: String = UUID().uuidString, allowHelperSetup: Bool = true) -> Task<Void, Never>? {
+               id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
         if let event = safety.blockingEvent() {
             let wasActive = isActive
@@ -153,6 +160,7 @@ final class KeepAwakeModel {
                     throw CocoaError(.featureUnsupported)
                 }
                 session = new
+                sessionName = name
                 scheduleExpiry(for: new, now: Date())
                 if mode == .lidClosed {
                     renewalActivity = ProcessInfo.processInfo.beginActivity(
@@ -298,6 +306,7 @@ final class KeepAwakeModel {
         }
         assertion.release()
         session = nil
+        sessionName = nil
         if let endedID { onSessionEnded?(endedID) }
     }
 

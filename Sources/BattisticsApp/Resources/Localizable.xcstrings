@@ -6741,6 +6741,374 @@
           }
         }
       }
+    },
+    "AI Focus": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Focus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Odak"
+          }
+        }
+      }
+    },
+    "Long Build": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long Build"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uzun Derleme"
+          }
+        }
+      }
+    },
+    "Overnight": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overnight"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gece Boyu"
+          }
+        }
+      }
+    },
+    "Presentation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presentation"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sunum"
+          }
+        }
+      }
+    },
+    "2 hours · display may sleep. A timer for AI work; use MCP to stop when the task finishes.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 hours · display may sleep. A timer for AI work; use MCP to stop when the task finishes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 saat · ekran uyuyabilir. Yapay zekâ çalışmaları için süreli oturum; iş bitince durdurmak için MCP kullanın."
+          }
+        }
+      }
+    },
+    "4 hours · display may sleep. For long builds, tests and exports.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 hours · display may sleep. For long builds, tests and exports."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 saat · ekran uyuyabilir. Uzun derlemeler, testler ve dışa aktarmalar için."
+          }
+        }
+      }
+    },
+    "12 hours · display may sleep. Connect power and leave the lid open.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "12 hours · display may sleep. Connect power and leave the lid open."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "12 saat · ekran uyuyabilir. Güç adaptörünü bağlayın ve kapağı açık bırakın."
+          }
+        }
+      }
+    },
+    "1 hour · display stays on. For demos and presentations.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 hour · display stays on. For demos and presentations."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 saat · ekran açık kalır. Demolar ve sunumlar için."
+          }
+        }
+      }
+    },
+    "Ready-made profiles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready-made profiles"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır profiller"
+          }
+        }
+      }
+    },
+    "Start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlat"
+          }
+        }
+      }
+    },
+    "Start %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ başlat"
+          }
+        }
+      }
+    },
+    "Profiles keep your battery and thermal protections. Stop the current session before starting another. Closed-lid mode is a separate choice.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profiles keep your battery and thermal protections. Stop the current session before starting another. Closed-lid mode is a separate choice."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profiller pil ve ısı korumalarınızı korur. Yeni oturum başlatmadan önce mevcut oturumu durdurun. Kapak kapalı modu ayrıca seçilir."
+          }
+        }
+      }
+    },
+    "Current session": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current session"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktif oturum"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durdur"
+          }
+        }
+      }
+    },
+    "Terminal command": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal command"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal komutu"
+          }
+        }
+      }
+    },
+    "AI task · MCP": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI task · MCP"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ görevi · MCP"
+          }
+        }
+      }
+    },
+    "Started manually": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Started manually"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elle başlatıldı"
+          }
+        }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil"
+          }
+        }
+      }
+    },
+    "Stops at %lld%% battery": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops at %lld%% battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %%%lld seviyesinde durur"
+          }
+        }
+      }
+    },
+    "Stops under high thermal pressure": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops under high thermal pressure"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek ısıl baskıda durur"
+          }
+        }
+      }
+    },
+    "Less than a minute left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Less than a minute left"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir dakikadan az kaldı"
+          }
+        }
+      }
+    },
+    "%@ left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ left"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kaldı"
+          }
+        }
+      }
+    },
+    "Profiles and terminal commands…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profiles and terminal commands…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profiller ve terminal komutları…"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

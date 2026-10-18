@@ -26,6 +26,9 @@ struct SystemPane: View {
     var body: some View {
         @Bindable var keepAwake = keepAwake
         return Form {
+            if keepAwake.isActive {
+                Section("Current session") { KeepAwakeSessionCard() }
+            }
             Section("Keep Awake") {
                 Toggle(
                     "Prevent this Mac from sleeping",
@@ -57,13 +60,11 @@ struct SystemPane: View {
                 if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
                     Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
                 }
-                if keepAwake.isActive {
-                    LabeledContent("Time remaining", value: remainingText)
-                }
             }
 
             .disabled(keepAwake.isChanging)
 
+            KeepAwakeProfiles()
             KeepAwakeSafetySettings()
             AutomationSettings()
 
@@ -398,13 +399,4 @@ struct SystemPane: View {
         }
     }
 
-    private var remainingText: String {
-        // Reading the snapshot subscribes this view to the dashboard's
-        // refresh loop, which is what re-evaluates the countdown.
-        _ = model.snapshot
-        guard let seconds = keepAwake.remaining() else {
-            return String(localized: "Until turned off")
-        }
-        return Formatting.duration(minutes: Int(seconds / 60))
-    }
 }

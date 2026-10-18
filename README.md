@@ -26,6 +26,8 @@ macOS 14+ · Apple Silicon</p>
 - Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
 - A five-step first-run tour and searchable English/Turkish help
 - Optional on-device Q&A using Apple Intelligence on supported Macs with macOS 26+
+- Finite AI Focus, Long Build, Overnight and Presentation profiles with a live session card
+- Optional power adapter disconnect warnings during Keep Awake
 - Opt-in local MCP automation for named, bounded Keep Awake tasks owned by an AI client
 - CSV export and import of the full history
 - English and Turkish

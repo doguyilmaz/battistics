@@ -27,6 +27,7 @@ struct PopoverView: View {
     var body: some View {
         VStack(spacing: 12) {
             header
+            if keepAwake.isActive { KeepAwakeSessionCard() }
             if let snapshot = model.snapshot, snapshot.batteryInstalled {
                 HStack(spacing: 28) {
                     GaugeRing(
@@ -78,6 +79,11 @@ struct PopoverView: View {
             if let version = updater.pendingUpdateVersion {
                 updateRow(version)
             }
+            Button { openDashboard(at: .system) } label: {
+                Label("Profiles and terminal commands…", systemImage: "terminal")
+                    .font(.caption).frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain).foregroundStyle(Color.accentColor)
             footer
         }
         .padding(14)
@@ -112,12 +118,6 @@ struct PopoverView: View {
             Text("Battistics")
                 .font(.headline)
                 .fixedSize()
-            // Before the Spacer on purpose: everything left of it is
-            // left-aligned and everything right of it is pinned right, so the
-            // Spacer absorbs the whole width change and nothing moves.
-            if keepAwake.isActive {
-                keepAwakeChip
-            }
             Spacer()
             if !isPinnedWindow {
                 Button {
@@ -271,48 +271,6 @@ struct PopoverView: View {
                 .frame(height: 46)
             }
         }
-    }
-
-    /// Matches the banner it replaces: cup, message, and its own close
-    /// button. Measured at 117.6pt worst case against 122.2pt of header room,
-    /// so it survives the widest health badge and the longest duration.
-    private var keepAwakeChip: some View {
-        HStack(spacing: 3) {
-            Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 9))
-            Group {
-                if windowVisible, let session = keepAwake.session, session.deadline != nil {
-                    TimelineView(.periodic(from: session.startedAt, by: 60)) { _ in
-                        Text(chipText(at: Date()))
-                    }
-                } else {
-                    Text(chipText(at: Date()))
-                }
-            }
-                .font(.system(size: 10, weight: .medium))
-                .monospacedDigit()
-                .lineLimit(1)
-            Button {
-                keepAwake.stop()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 8, weight: .bold))
-            }
-            .buttonStyle(.plain)
-            .padding(.leading, 1)
-            .help("Turn off Keep Awake")
-        }
-        .foregroundStyle(Color.accentColor)
-        .padding(.horizontal, 5)
-        .padding(.vertical, 2)
-        .background(Color.accentColor.opacity(0.14), in: Capsule())
-    }
-
-    private func chipText(at date: Date) -> String {
-        guard let seconds = keepAwake.remaining(at: date) else {
-            return String(localized: "Awake")
-        }
-        return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
     }
 
     /// Low Power Mode only. The sleep timers are set-and-forget and belong
