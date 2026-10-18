@@ -20,6 +20,7 @@ struct OverviewPane: View {
             // overview always fits.
             VStack(spacing: 16) {
                 hero(snapshot)
+                    .tourTarget(.overview)
                 HStack(alignment: .top, spacing: 16) {
                     capacityCard(snapshot)
                     liveCard(snapshot)
@@ -35,6 +36,7 @@ struct OverviewPane: View {
                 systemImage: "minus.plus.batteryblock.exclamationmark",
                 description: Text("Battistics needs a Mac with a built-in battery.")
             )
+            .tourTarget(.overview)
         }
     }
 

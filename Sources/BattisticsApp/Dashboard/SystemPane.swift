@@ -35,6 +35,7 @@ struct SystemPane: View {
                     isOn: Binding(
                         get: { keepAwake.isActive },
                         set: { _ in keepAwake.toggle() }))
+                    .tourTarget(.power)
 
                 Picker("Mode", selection: $keepAwake.displayedMode) {
                     ForEach(KeepAwakeMode.allCases) { mode in
@@ -115,6 +116,7 @@ struct SystemPane: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(TourScrollModifier())
         .navigationTitle("Power")
         .alert(
             failure?.title ?? "", isPresented: failureBinding, presenting: failure

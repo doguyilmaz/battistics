@@ -3,10 +3,13 @@
 import json
 import plistlib
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
+tour = "--tour" in sys.argv
+harness = "TourHarness" if tour else "AutomationHarness"
 products = root / ".build/xcode/Build/Products/Debug"
 assert (products / "BattisticsCore.o").exists(), "Run make build first"
 with tempfile.TemporaryDirectory(prefix="battistics-qa-") as temporary:
@@ -34,8 +37,8 @@ with tempfile.TemporaryDirectory(prefix="battistics-qa-") as temporary:
         "swiftc", "-parse-as-library", "-swift-version", "6",
         "-module-name", "BattisticsAutomationQA", "-I", str(products), "-F", str(products),
         "-framework", "Sparkle", "-lsqlite3", "-Xlinker", "-rpath", "-Xlinker", str(products),
-        str(products / "BattisticsCore.o"), *sources, str(root / "Tests/Integration/AutomationHarness.swift"),
+        str(products / "BattisticsCore.o"), *sources, str(root / f"Tests/Integration/{harness}.swift"),
         "-o", str(executable),
     ], cwd=root, check=True)
     for language in ["en", "tr"]:
-        subprocess.run([str(executable), "-AppleLanguages", f"({language})"], check=True, timeout=30)
+        subprocess.run([str(executable), "-AppleLanguages", f"({language})"], check=True, timeout=60)

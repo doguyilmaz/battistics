@@ -122,6 +122,7 @@ struct HistoryPane: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .tourTarget(.history)
 
             // Always laid out. Hiding it on the Health tab moved everything
             // below by its whole height every time that tab was selected.

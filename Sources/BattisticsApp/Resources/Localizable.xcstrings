@@ -7109,6 +7109,150 @@
           }
         }
       }
+    },
+    "Start with a ready-made profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start with a ready-made profile"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır bir profille başlayın"
+          }
+        }
+      }
+    },
+    "Choose when Keep Awake should stop": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose when Keep Awake should stop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’un ne zaman duracağını seçin"
+          }
+        }
+      }
+    },
+    "These gauges show your current charge and battery health. Open Battistics from the menu bar whenever you need a quick check.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These gauges show your current charge and battery health. Open Battistics from the menu bar whenever you need a quick check."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu göstergeler mevcut şarjınızı ve pil sağlığını gösterir. Hızlıca kontrol etmek için menü çubuğundan Battistics’i açabilirsiniz."
+          }
+        }
+      }
+    },
+    "This switch starts Keep Awake. Choose whether the display stays on and set a time limit below it. Closed-lid mode requires the power helper. Nothing starts during this tour.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This switch starts Keep Awake. Choose whether the display stays on and set a time limit below it. Closed-lid mode requires the power helper. Nothing starts during this tour."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu anahtar Uyanık Tut’u başlatır. Altından ekranın açık kalıp kalmayacağını ve süreyi seçin. Kapak kapalı modu güç yardımcısını gerektirir. Bu tur sırasında oturum başlatılmaz."
+          }
+        }
+      }
+    },
+    "AI Focus, Long Build, Overnight and Presentation combine a mode with a time limit. They keep your protection settings. AI Focus is a timer; it does not detect when an AI task finishes.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Focus, Long Build, Overnight and Presentation combine a mode with a time limit. They keep your protection settings. AI Focus is a timer; it does not detect when an AI task finishes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Odak, Uzun Derleme, Gece Boyu ve Sunum bir modu süre sınırıyla birleştirir. Koruma ayarlarınız korunur. AI Odak süreli bir oturumdur; yapay zekâ görevinin bittiğini algılamaz."
+          }
+        }
+      }
+    },
+    "Turn this on to end Keep Awake at your chosen battery level. It allows normal sleep; it does not shut down the Mac. Battery warnings and the optional adapter-disconnect warning are here too.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn this on to end Keep Awake at your chosen battery level. It allows normal sleep; it does not shut down the Mac. Battery warnings and the optional adapter-disconnect warning are here too."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seçtiğiniz pil seviyesinde Uyanık Tut’u bitirmek için bunu açın. Mac’i kapatmaz; normal uykuya izin verir. Pil uyarıları ve isteğe bağlı adaptör çıkarılma uyarısı da burada."
+          }
+        }
+      }
+    },
+    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration are in this section.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration are in this section."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Terminal kurulumu ve MCP yapılandırması bu bölümde."
+          }
+        }
+      }
+    },
+    "Search here for built-in answers. On supported Macs, the on-device assistant can help find an answer. Replay this tour from Help anytime. Your settings have not changed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search here for built-in answers. On supported Macs, the on-device assistant can help find an answer. Replay this tour from Help anytime. Your settings have not changed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerleşik yanıtları buradan arayın. Desteklenen Mac’lerde cihaz içi asistan yanıt bulmanıza yardımcı olabilir. Turu Yardım’dan tekrar açabilirsiniz. Ayarlarınız değiştirilmedi."
+          }
+        }
+      }
+    },
+    "Keep Awake for developer tasks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake for developer tasks"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geliştirme görevleri boyunca uyanık tutun"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

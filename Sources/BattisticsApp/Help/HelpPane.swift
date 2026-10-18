@@ -23,6 +23,7 @@ struct HelpPane: View {
                 TextField("Search help or ask a question", text: $query, axis: .vertical)
                     .lineLimit(1...3)
                     .onSubmit { assistant.ask(query) }
+                    .tourTarget(.help)
                 Text(assistant.availabilityMessage).font(.caption).foregroundStyle(.secondary)
                 HStack {
                     if assistant.isResponding {
@@ -67,6 +68,7 @@ struct HelpPane: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(TourScrollModifier())
         .task { assistant.refreshAvailability() }
         .onChange(of: scenePhase) { if scenePhase == .active { assistant.refreshAvailability() } }
         .onDisappear { assistant.cancel() }

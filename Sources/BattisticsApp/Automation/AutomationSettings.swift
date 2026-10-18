@@ -10,6 +10,7 @@ struct AutomationSettings: View {
         @Bindable var automation = automation
         Section("Local automation") {
             Toggle("Allow terminal and AI tasks", isOn: $automation.enabled)
+                .tourTarget(.automation)
             Text("Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply.")
                 .font(.caption).foregroundStyle(.secondary)
             if automation.enabled {

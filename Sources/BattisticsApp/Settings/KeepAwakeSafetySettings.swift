@@ -11,6 +11,7 @@ struct KeepAwakeSafetySettings: View {
             Text("Only during Keep Awake. The session continues on battery with your existing protection settings.")
                 .font(.caption).foregroundStyle(.secondary)
             Toggle("Stop Keep Awake on low battery", isOn: $safety.configuration.stopOnLowBattery)
+                .tourTarget(.protection)
             if safety.configuration.stopOnLowBattery {
                 Stepper(value: stopPercent, in: 5...50, step: 5) {
                     LabeledContent("Stop at", value: Formatting.percent(Double(safety.configuration.effectiveStopPercent)))

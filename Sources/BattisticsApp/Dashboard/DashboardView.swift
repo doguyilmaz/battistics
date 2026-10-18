@@ -70,6 +70,7 @@ struct DashboardView: View {
     @State private var sidebarVisible = true
     @State private var windowVisible = false
     @State private var showingDetails = false
+    @State private var tourStep = TourStep.overview
 
     private func keepAwakeTitle(at date: Date) -> String {
         guard let seconds = keepAwake.remaining(at: date) else {
@@ -79,24 +80,40 @@ struct DashboardView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                if sidebarVisible {
-                    sidebar
-                        .transition(.move(edge: .leading))
-                }
-                detailView
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay {
-                        if model.tourRequested {
-                            RoundedRectangle(cornerRadius: 8).stroke(Color.accentColor, lineWidth: 2)
-                                .padding(3).allowsHitTesting(false)
-                        }
-                    }
+        HStack(spacing: 0) {
+            if sidebarVisible {
+                sidebar
+                    .transition(.move(edge: .leading))
+                    .allowsHitTesting(!model.tourRequested)
+                    .disabled(model.tourRequested)
+                    .accessibilityHidden(model.tourRequested)
             }
-            if model.tourRequested { GuidedTourView() }
+            detailView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .allowsHitTesting(!model.tourRequested)
+                .disabled(model.tourRequested)
+                .accessibilityHidden(model.tourRequested)
         }
         .frame(width: 860, height: 545)
+        .environment(\.tourStep, model.tourRequested ? tourStep : nil)
+        .overlayPreferenceValue(TourTargetPreference.self) { anchors in
+            if model.tourRequested {
+                GeometryReader { geometry in
+                    let available = CGRect(x: 0, y: 0, width: geometry.size.width,
+                                           height: geometry.size.height - GuidedTourView.height - 32)
+                    let focus = anchors[tourStep].map { geometry[$0].insetBy(dx: -6, dy: -6).intersection(available) }
+                    ZStack(alignment: .bottom) {
+                        TourSpotlight(focus: focus.flatMap { $0.isNull ? nil : $0 })
+                            .allowsHitTesting(false)
+                        GuidedTourView(step: $tourStep)
+                            .frame(maxWidth: 620)
+                            .padding(16)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
@@ -108,6 +125,7 @@ struct DashboardView: View {
                 }
                 .help("Toggle sidebar")
                 .keyboardShortcut("s", modifiers: [.command, .control])
+                .disabled(model.tourRequested)
             }
             // Top right of the window, not inside a pane: Keep Awake applies
             // to the whole Mac, not to whatever pane happens to be showing,
@@ -130,6 +148,7 @@ struct DashboardView: View {
                             .monospacedDigit()
                     }
                     .help("Keep Awake is on. Click to turn it off.")
+                    .disabled(model.tourRequested)
                 }
             }
         }
@@ -141,8 +160,13 @@ struct DashboardView: View {
                 model.tourRequested = true
             }
         }
-        .onChange(of: model.tourRequested) {
-            if model.tourRequested { sidebarVisible = true }
+        .onChange(of: model.tourRequested, initial: true) {
+            if model.tourRequested {
+                sidebarVisible = true
+                showingDetails = false
+                tourStep = .overview
+                model.dashboardPane = .overview
+            }
         }
         .task(id: windowVisible) {
             guard windowVisible else { return }
@@ -154,6 +178,7 @@ struct DashboardView: View {
         // A battistics://dashboard/details link lands on Overview with the
         // details sheet open.
         .onChange(of: model.dashboardPane, initial: true) {
+            if model.tourRequested, model.dashboardPane != tourStep.pane { model.tourRequested = false }
             switch model.dashboardPane {
             case .details:
                 model.dashboardPane = .overview
