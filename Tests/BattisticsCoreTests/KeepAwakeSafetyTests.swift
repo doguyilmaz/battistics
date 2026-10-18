@@ -106,4 +106,30 @@ struct KeepAwakeSafetyTests {
         #expect(high.effectiveWarningPercent == 80)
         #expect(reversed.effectiveWarningPercent == 45)
     }
+
+    @Test func adapterWarningIsOptInAndRequiresAnObservedTransition() {
+        var policy = KeepAwakeSafetyPolicy()
+        let enabled = KeepAwakeSafetyPolicy.Configuration(warnOnAdapterDisconnect: true)
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled).isEmpty)
+        _ = policy.evaluate(snapshot: battery(70, ac: true), thermalPressure: false, configuration: .init())
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: .init()).isEmpty)
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled).isEmpty)
+        _ = policy.evaluate(snapshot: battery(70, ac: true), thermalPressure: false, configuration: enabled)
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled) == [.adapterDisconnected])
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled).isEmpty)
+        _ = policy.evaluate(snapshot: battery(70, ac: true), thermalPressure: false, configuration: enabled)
+        #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled) == [.adapterDisconnected])
+    }
+
+    @Test func missingAdapterReadingsDoNotInventAnUnplugAndProtectionTakesPriority() {
+        let enabled = KeepAwakeSafetyPolicy.Configuration(stopOnLowBattery: true, warnOnAdapterDisconnect: true)
+        for unknown in [nil, battery(-1), battery(70, installed: false)] {
+            var policy = KeepAwakeSafetyPolicy()
+            _ = policy.evaluate(snapshot: battery(70, ac: true), thermalPressure: false, configuration: enabled)
+            #expect(policy.evaluate(snapshot: unknown, thermalPressure: false, configuration: enabled).isEmpty)
+            #expect(policy.evaluate(snapshot: battery(70), thermalPressure: false, configuration: enabled).isEmpty)
+            _ = policy.evaluate(snapshot: battery(8, ac: true), thermalPressure: false, configuration: enabled)
+            #expect(policy.evaluate(snapshot: battery(8), thermalPressure: false, configuration: enabled) == [.batteryStop(percent: 8)])
+        }
+    }
 }

@@ -9,17 +9,19 @@ public struct KeepAwakeSafetyPolicy: Sendable {
         public var warnOnLowBattery: Bool
         public var warningPercent: Int
         public var stopOnThermalPressure: Bool
+        public var warnOnAdapterDisconnect: Bool
 
         public init(
             stopOnLowBattery: Bool = false, stopPercent: Int = 10,
             warnOnLowBattery: Bool = true, warningPercent: Int = 20,
-            stopOnThermalPressure: Bool = false
+            stopOnThermalPressure: Bool = false, warnOnAdapterDisconnect: Bool = false
         ) {
             self.stopOnLowBattery = stopOnLowBattery
             self.stopPercent = stopPercent
             self.warnOnLowBattery = warnOnLowBattery
             self.warningPercent = warningPercent
             self.stopOnThermalPressure = stopOnThermalPressure
+            self.warnOnAdapterDisconnect = warnOnAdapterDisconnect
         }
 
         public var effectiveStopPercent: Int { min(max(stopPercent, 5), 50) }
@@ -33,17 +35,19 @@ public struct KeepAwakeSafetyPolicy: Sendable {
         case batteryStop(percent: Int)
         case thermalWarning
         case thermalStop
+        case adapterDisconnected
 
         public var endsSession: Bool {
             switch self {
             case .batteryStop, .thermalStop: true
-            case .batteryWarning, .thermalWarning: false
+            case .batteryWarning, .thermalWarning, .adapterDisconnected: false
             }
         }
     }
 
     private var batteryWarningSent = false
     private var thermalWarningSent = false
+    private var wasOnAdapter: Bool?
 
     public init() {}
 
@@ -71,6 +75,10 @@ public struct KeepAwakeSafetyPolicy: Sendable {
 
         var events: [Event] = []
         if let snapshot, snapshot.batteryInstalled, (0...100).contains(snapshot.percent) {
+            if wasOnAdapter == true, !snapshot.externalConnected, configuration.warnOnAdapterDisconnect {
+                events.append(.adapterDisconnected)
+            }
+            wasOnAdapter = snapshot.externalConnected
             if snapshot.externalConnected
                 || snapshot.percent > configuration.effectiveWarningPercent + 2 {
                 batteryWarningSent = false
@@ -81,7 +89,7 @@ public struct KeepAwakeSafetyPolicy: Sendable {
                     percent: snapshot.percent,
                     stopAt: configuration.stopOnLowBattery ? configuration.effectiveStopPercent : nil))
             }
-        }
+        } else { wasOnAdapter = nil }
         if thermalPressure {
             if !thermalWarningSent {
                 thermalWarningSent = true

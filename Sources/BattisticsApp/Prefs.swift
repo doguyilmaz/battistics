@@ -144,6 +144,7 @@ enum Prefs {
     static let keepAwakeWarnOnLowBattery = "keepAwakeWarnOnLowBattery"
     static let keepAwakeWarningPercent = "keepAwakeWarningPercent"
     static let keepAwakeStopOnThermalPressure = "keepAwakeStopOnThermalPressure"
+    static let keepAwakeWarnOnAdapterDisconnect = "keepAwakeWarnOnAdapterDisconnect"
     static let hasSeenTour = "hasSeenTour"
     static let automationEnabled = "automationEnabled"
     static let automationClosedLidAllowed = "automationClosedLidAllowed"
@@ -197,6 +198,7 @@ enum Prefs {
             keepAwakeWarnOnLowBattery: true,
             keepAwakeWarningPercent: 20,
             keepAwakeStopOnThermalPressure: false,
+            keepAwakeWarnOnAdapterDisconnect: false,
             automationEnabled: false,
             automationClosedLidAllowed: false,
             readBluetoothBatteries: false,
@@ -249,7 +251,8 @@ enum Prefs {
             stopPercent: defaults.integer(forKey: keepAwakeStopPercent),
             warnOnLowBattery: defaults.bool(forKey: keepAwakeWarnOnLowBattery),
             warningPercent: defaults.integer(forKey: keepAwakeWarningPercent),
-            stopOnThermalPressure: defaults.bool(forKey: keepAwakeStopOnThermalPressure))
+            stopOnThermalPressure: defaults.bool(forKey: keepAwakeStopOnThermalPressure),
+            warnOnAdapterDisconnect: defaults.bool(forKey: keepAwakeWarnOnAdapterDisconnect))
     }
 
     static func saveSafetyConfiguration(_ configuration: KeepAwakeSafetyPolicy.Configuration) {
@@ -259,5 +262,6 @@ enum Prefs {
         defaults.set(configuration.warnOnLowBattery, forKey: keepAwakeWarnOnLowBattery)
         defaults.set(configuration.effectiveWarningPercent, forKey: keepAwakeWarningPercent)
         defaults.set(configuration.stopOnThermalPressure, forKey: keepAwakeStopOnThermalPressure)
+        defaults.set(configuration.warnOnAdapterDisconnect, forKey: keepAwakeWarnOnAdapterDisconnect)
     }
 }

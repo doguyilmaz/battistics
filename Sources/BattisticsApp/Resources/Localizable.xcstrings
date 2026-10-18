@@ -6518,6 +6518,54 @@
           }
         }
       }
+    },
+    "Warn when the power adapter disconnects": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warn when the power adapter disconnects"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç adaptörü çıkarıldığında uyar"
+          }
+        }
+      }
+    },
+    "Only during Keep Awake. The session continues on battery with your existing protection settings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only during Keep Awake. The session continues on battery with your existing protection settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca Uyanık Tut etkinken. Oturum, mevcut koruma ayarlarınızla pil üzerinden devam eder."
+          }
+        }
+      }
+    },
+    "Power adapter disconnected. Keep Awake is still running on battery. Connect power for uninterrupted work; your battery and thermal protections still apply.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power adapter disconnected. Keep Awake is still running on battery. Connect power for uninterrupted work; your battery and thermal protections still apply."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç adaptörü çıkarıldı. Uyanık Tut pil üzerinden çalışmaya devam ediyor. Kesintisiz çalışma için güç bağlayın; pil ve ısı korumalarınız geçerli olmaya devam eder."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

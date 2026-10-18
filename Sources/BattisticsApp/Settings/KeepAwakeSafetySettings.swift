@@ -7,6 +7,9 @@ struct KeepAwakeSafetySettings: View {
     var body: some View {
         @Bindable var safety = keepAwake.safety
         Section("Session Protection") {
+            Toggle("Warn when the power adapter disconnects", isOn: $safety.configuration.warnOnAdapterDisconnect)
+            Text("Only during Keep Awake. The session continues on battery with your existing protection settings.")
+                .font(.caption).foregroundStyle(.secondary)
             Toggle("Stop Keep Awake on low battery", isOn: $safety.configuration.stopOnLowBattery)
             if safety.configuration.stopOnLowBattery {
                 Stepper(value: stopPercent, in: 5...50, step: 5) {

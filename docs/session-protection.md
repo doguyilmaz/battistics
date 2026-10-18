@@ -94,3 +94,9 @@ Manual release checks on a signed app:
 
 Use simulated readings for depletion and thermal tests; do not deliberately
 drain or overheat a development Mac.
+
+Adapter-disconnect warnings are optional and off by default. During an active
+session, an observed adapter-to-battery transition produces a notification and
+an in-app notice. Starting on battery or losing sensor readings does not invent
+a transition. Reconnecting rearms the warning. Battery/thermal stops take
+priority; unplugging alone does not stop the session.
