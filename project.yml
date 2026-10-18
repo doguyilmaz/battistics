@@ -99,7 +99,10 @@ targets:
       - target: BattisticsCLI
         codeSign: true
         copy:
-          destination: executables
+          # Keep the lowercase CLI separate from the Battistics app executable
+          # on macOS volumes with case-insensitive filenames.
+          destination: wrapper
+          subpath: Contents/Helpers
       - target: BattisticsMCP
         codeSign: true
         copy:

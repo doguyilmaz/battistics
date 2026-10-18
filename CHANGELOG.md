@@ -7,6 +7,8 @@
 
 - Command-scoped Keep Awake through the bundled CLI, with preserved exit codes,
   signal forwarding and bounded sessions; discoverable setup in Power.
+- Bundle the CLI separately from the app executable to avoid filename collisions
+  on case-insensitive macOS volumes.
 - Optional adapter-disconnect notices while Keep Awake is active.
 
 - Optional Keep Awake stop at a chosen battery level, with advance warnings and

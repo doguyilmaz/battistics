@@ -42,7 +42,7 @@ struct AutomationSettings: View {
             Text("battistics run --name Build -- swift build")
                 .font(.system(.caption, design: .monospaced)).textSelection(.enabled)
             Button("Copy Terminal setup") {
-                let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/battistics").path
+                let path = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/battistics").path
                 let quote: (String) -> String = { "'" + $0.replacingOccurrences(of: "'", with: "'\\''") + "'" }
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString("alias battistics=\(quote(quote(path)))\n", forType: .string)
