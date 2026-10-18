@@ -56,7 +56,7 @@ extension Notification.Name {
 @main
 struct BattisticsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @State private var model = AppModel()
+    @State private var model: AppModel
     @State private var updater = UpdaterModel()
     @State private var keepAwake: KeepAwakeModel
     @State private var powerAuth = PowerAuthorization()
@@ -68,9 +68,14 @@ struct BattisticsApp: App {
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
 
     init() {
+        Prefs.registerDefaults()
         let helper = PowerHelperClient()
+        let awake = KeepAwakeModel(helper: helper)
         _powerHelper = State(initialValue: helper)
-        _keepAwake = State(initialValue: KeepAwakeModel(helper: helper))
+        _keepAwake = State(initialValue: awake)
+        _model = State(initialValue: AppModel(
+            onBatteryReading: { [weak awake] in awake?.safety.update($0) },
+            suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true }))
     }
 
     private var colorScheme: ColorScheme? {

@@ -5315,6 +5315,259 @@
           }
         }
       }
+    },
+    "Battery is at %lld%%. Keep Awake cannot prevent an empty battery from interrupting your work. Connect power soon.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %%%lld seviyesinde. Uyanık Tut, pil bittiğinde çalışmanızın kesilmesini önleyemez. Kısa süre içinde güç adaptörünü bağlayın."
+          }
+        }
+      }
+    },
+    "Battery is at %lld%%. Keep Awake will stop at %lld%%. Connect power or save your work; with the lid closed, the Mac may sleep immediately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %%%lld seviyesinde. Uyanık Tut %%%lld seviyesinde duracak. Güç adaptörünü bağlayın veya çalışmanızı kaydedin; kapak kapalıysa Mac hemen uyuyabilir."
+          }
+        }
+      }
+    },
+    "Elevated": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yükselmiş"
+          }
+        }
+      }
+    },
+    "Ends Keep Awake and allows normal sleep. It does not shut down the Mac or close your apps. Disabled by default.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u sonlandırır ve normal uykuya izin verir. Mac’i kapatmaz, uygulamalarınızı sonlandırmaz. Varsayılan olarak kapalıdır."
+          }
+        }
+      }
+    },
+    "High": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek"
+          }
+        }
+      }
+    },
+    "Keep Awake cannot start at %lld%% with battery protection enabled. Connect power before starting a session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil koruması etkinken Uyanık Tut %%%lld seviyesinde başlayamaz. Bir oturum başlatmadan önce güç adaptörünü bağlayın."
+          }
+        }
+      }
+    },
+    "Keep Awake cannot start while macOS reports high thermal pressure and thermal protection is enabled. Let the Mac cool first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isıl koruma etkinken ve macOS yüksek ısıl baskı bildirirken Uyanık Tut başlayamaz. Önce Mac’in soğumasını bekleyin."
+          }
+        }
+      }
+    },
+    "Keep Awake ended because battery charge reached %lld%%. Normal sleep is allowed again. Connect power before starting another session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil şarjı %%%lld seviyesine ulaştığı için Uyanık Tut sonlandı. Normal uykuya yeniden izin veriliyor. Yeni bir oturum başlatmadan önce güç adaptörünü bağlayın."
+          }
+        }
+      }
+    },
+    "Keep Awake needs attention": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut için uyarı"
+          }
+        }
+      }
+    },
+    "Keep Awake not started": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut başlatılmadı"
+          }
+        }
+      }
+    },
+    "Protection works while Battistics is running. A sudden charge drop may skip the warning level. Keep power connected for work that cannot be interrupted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koruma, Battistics çalışırken etkindir. Ani bir şarj düşüşü uyarı seviyesini atlayabilir. Kesintiye uğramaması gereken işler için güç adaptörünü bağlı tutun."
+          }
+        }
+      }
+    },
+    "Session Protection": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum Koruması"
+          }
+        }
+      }
+    },
+    "Stop Keep Awake on low battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil azaldığında Uyanık Tut’u durdur"
+          }
+        }
+      }
+    },
+    "Stop Keep Awake under high thermal pressure": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek ısıl baskıda Uyanık Tut’u durdur"
+          }
+        }
+      }
+    },
+    "Stop at": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durdurma seviyesi"
+          }
+        }
+      }
+    },
+    "System thermal pressure": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistemin ısıl durumu"
+          }
+        }
+      }
+    },
+    "Thermal Care": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isıl Koruma"
+          }
+        }
+      }
+    },
+    "Unknown": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmiyor"
+          }
+        }
+      }
+    },
+    "Warn at": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyarı seviyesi"
+          }
+        }
+      }
+    },
+    "Warn me before the battery runs low": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil azalmadan önce beni uyar"
+          }
+        }
+      }
+    },
+    "Keep Awake ended because macOS reported high thermal pressure. Let the Mac cool before starting another session. Battistics does not change fan speeds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS yüksek ısıl baskı bildirdiği için Uyanık Tut sonlandı. Yeni bir oturum başlatmadan önce Mac’in soğumasını bekleyin. Battistics fan hızlarını değiştirmez."
+          }
+        }
+      }
+    },
+    "Warns when macOS reports serious or critical thermal pressure. The optional stop applies on battery and power adapter. Battistics does not change fan speeds; keep vents clear and never run a closed Mac in a bag.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ciddi veya kritik ısıl baskı bildirdiğinde uyarır. İsteğe bağlı durdurma pilde ve güç adaptöründe geçerlidir. Battistics fan hızlarını değiştirmez; havalandırmayı açık tutun ve kapağı kapalı Mac’i çantada çalıştırmayın."
+          }
+        }
+      }
+    },
+    "macOS reports high thermal pressure. Open the lid, keep the vents clear, and reduce heavy workloads. Battistics does not change fan speeds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS yüksek ısıl baskı bildiriyor. Kapağı açın, havalandırma deliklerini açık tutun ve ağır işleri azaltın. Battistics fan hızlarını değiştirmez."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

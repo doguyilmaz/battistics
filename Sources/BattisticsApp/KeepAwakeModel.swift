@@ -4,12 +4,13 @@ import Foundation
 import Observation
 import SwiftUI
 
-/// Owns the live keep-awake session. Separate from `AppModel` because it has
-/// nothing to do with reading the battery; it only holds an assertion and a
-/// deadline.
+/// Owns the live keep-awake assertion, deadline, and protection lifecycle.
+/// AppModel feeds battery readings to the safety monitor independently of UI.
 @MainActor
 @Observable
 final class KeepAwakeModel {
+    private enum StartFailure: Error { case protection(KeepAwakeSafetyPolicy.Event) }
+    let safety = KeepAwakeSafetyMonitor()
     private(set) var session: KeepAwakeSession?
 
     @ObservationIgnored private let assertion = WakeAssertion()
@@ -55,6 +56,12 @@ final class KeepAwakeModel {
         self.helper = helper
         mode = KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "") ?? .displayOn
         duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
+        safety.onStop = { [weak self] event in
+            guard let self else { return }
+            let id = self.sessionID ?? UUID().uuidString
+            self.stop()
+            self.showSafetyReason(event, id: id)
+        }
         activationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -69,6 +76,12 @@ final class KeepAwakeModel {
 
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date()) {
         guard !isChanging else { return }
+        if let event = safety.blockingEvent() {
+            let wasActive = isActive
+            if wasActive { stop() }
+            showSafetyReason(event, id: UUID().uuidString, starting: !wasActive)
+            return
+        }
         cancelApprovalWait()
         let previousLeaseID = session?.mode == .lidClosed ? sessionID : nil
         clearLocalSession()
@@ -79,7 +92,12 @@ final class KeepAwakeModel {
         isStoppedReasonInformational = false
         notice.dismiss()
         Task {
-            defer { isChanging = false }
+            defer {
+                isChanging = false
+                // A safety stop may immediately start async lease cleanup.
+                // Do not overwrite that cleanup's busy state afterward.
+                if sessionID == id, session != nil { safety.startSession() }
+            }
             var releasingPrevious = previousLeaseID != nil
             do {
                 if let previousLeaseID {
@@ -115,6 +133,9 @@ final class KeepAwakeModel {
                         return
                     }
                 }
+                // Authorization can take long enough for charge or thermal
+                // conditions to change. Recheck before creating the assertion.
+                if let event = safety.blockingEvent() { throw StartFailure.protection(event) }
                 let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
                 guard !new.hasExpired(at: Date()),
                     assertion.take(mode: mode, until: new.deadline) else {
@@ -164,6 +185,8 @@ final class KeepAwakeModel {
     private func showStartFailure(_ error: Error, duration: KeepAwakeDuration) {
         isStoppedReasonInformational = false
         switch error {
+        case StartFailure.protection(let event):
+            showSafetyReason(event, id: UUID().uuidString, starting: true)
         case PowerHelperClient.Failure.needsApproval:
             isStoppedReasonInformational = true
             errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
@@ -247,6 +270,7 @@ final class KeepAwakeModel {
     }
 
     private func clearLocalSession() {
+        safety.endSession()
         sessionID = nil
         expiryTask?.cancel()
         expiryTask = nil
@@ -295,6 +319,7 @@ final class KeepAwakeModel {
     }
 
     private func reconcileAfterWakeOrActivation() {
+        safety.refresh()
         guard let session else { return }
         if session.hasExpired(at: Date()) {
             stop()
@@ -352,6 +377,13 @@ final class KeepAwakeModel {
     /// correct through app nap and sleep.
     func remaining(at now: Date = Date()) -> TimeInterval? {
         session?.remaining(at: now)
+    }
+
+    private func showSafetyReason(_ event: KeepAwakeSafetyPolicy.Event, id: String, starting: Bool = false) {
+        isStoppedReasonInformational = true
+        errorMessage = KeepAwakeSafetyMonitor.message(for: event, starting: starting)
+        notice.show(sessionID: id, message: errorMessage ?? "",
+                    title: starting ? String(localized: "Keep Awake not started") : String(localized: "Keep Awake stopped"))
     }
 
     /// One-shot, not a poll. The kernel releases the assertion on its own

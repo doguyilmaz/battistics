@@ -23,6 +23,7 @@ macOS 14+ · Apple Silicon</p>
 - Battery levels of connected keyboards, mice, trackpads and headphones
 - Energy view showing the busiest apps, sampled only while open
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed
+- Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
 - CSV export and import of the full history
 - English and Turkish
 
@@ -42,6 +43,26 @@ All three work on battery or adapter and end on their timer even if Battistics i
 
 ¹ Unless it is in clamshell mode, with an external display and power connected.
 ² Only if Lock Screen settings require a password after the display turns off.
+
+### Session protection
+
+In **Power → Session Protection**, optionally end Keep Awake at 5–50% charge
+(10% preselected; automatic stopping is **off by default**). This releases the
+session and permits normal sleep; it never requests shutdown or closes apps.
+The battery rule applies only on battery power. Low-charge warnings default to
+20% and can be changed or disabled independently. When automatic stopping is
+enabled, the warning level stays at least five percentage points above it.
+Warnings appear in the app as well as through macOS notifications when allowed.
+
+**Power → Thermal Care** reports the system thermal state and warns during a
+session when macOS reports serious or critical pressure. An optional stop works
+on either power source. Battistics does not change fan speeds; battery temperature is
+not a CPU-temperature measurement.
+
+Protection requires Battistics to be running and able to read system state.
+A sudden charge drop can skip the warning. Ending closed-lid mode may allow
+immediate sleep. Connect power for work that cannot be interrupted, and keep
+vents clear; never put a running, closed Mac inside a bag.
 
 ## Light by design
 

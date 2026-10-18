@@ -64,6 +64,11 @@ struct PopoverView: View {
                 )
                 .frame(height: 200)
             }
+            if let warning = keepAwake.safety.warningMessage {
+                Label(warning, systemImage: "exclamationmark.triangle")
+                    .font(.caption).foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             if let error = keepAwake.errorMessage {
                 Text(error).font(.caption)
                     .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)

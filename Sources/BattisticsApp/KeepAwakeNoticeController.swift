@@ -6,6 +6,7 @@ final class KeepAwakeNoticeController {
     private var panel: KeepAwakeNoticePanel?
     private var lastNoticedSessionID: String?
     private var pendingMessage: String?
+    private var pendingTitle = String(localized: "Keep Awake stopped")
     private var suspended = false
     private var screenLocked = false
     private var sessionInactive = false
@@ -51,13 +52,14 @@ final class KeepAwakeNoticeController {
         })
     }
 
-    func show(sessionID: String, message: String) {
+    func show(sessionID: String, message: String, title: String = String(localized: "Keep Awake stopped")) {
         guard lastNoticedSessionID != sessionID else { return }
         lastNoticedSessionID = sessionID
         panel?.close()
         panel = nil
         suspended = false
         pendingMessage = message
+        pendingTitle = title
         presentPendingNotice()
     }
 
@@ -106,7 +108,7 @@ final class KeepAwakeNoticeController {
         panel.titleVisibility = .hidden
         panel.titlebarAppearsTransparent = true
 
-        let title = NSTextField(labelWithString: String(localized: "Keep Awake stopped"))
+        let title = NSTextField(labelWithString: pendingTitle)
         title.font = .systemFont(ofSize: 15, weight: .semibold)
         let detail = NSTextField(wrappingLabelWithString: message)
         detail.font = detailFont

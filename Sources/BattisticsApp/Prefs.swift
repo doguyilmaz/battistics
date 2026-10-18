@@ -139,6 +139,11 @@ enum Prefs {
     static let keepAwakeMode = "keepAwakeMode"
     static let keepAwakeDuration = "keepAwakeDuration"
     static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
+    static let keepAwakeStopOnLowBattery = "keepAwakeStopOnLowBattery"
+    static let keepAwakeStopPercent = "keepAwakeStopPercent"
+    static let keepAwakeWarnOnLowBattery = "keepAwakeWarnOnLowBattery"
+    static let keepAwakeWarningPercent = "keepAwakeWarningPercent"
+    static let keepAwakeStopOnThermalPressure = "keepAwakeStopOnThermalPressure"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 
@@ -184,6 +189,11 @@ enum Prefs {
             keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
             keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
             keepAwakeMenuBarIcon: true,
+            keepAwakeStopOnLowBattery: false,
+            keepAwakeStopPercent: 10,
+            keepAwakeWarnOnLowBattery: true,
+            keepAwakeWarningPercent: 20,
+            keepAwakeStopOnThermalPressure: false,
             readBluetoothBatteries: false,
 
             showPowerFlow: true,
@@ -225,5 +235,24 @@ enum Prefs {
 
     static var temperatureUnitValue: TemperatureUnit {
         TemperatureUnit(rawValue: UserDefaults.standard.string(forKey: temperatureUnit) ?? "") ?? .both
+    }
+
+    static func safetyConfiguration() -> KeepAwakeSafetyPolicy.Configuration {
+        let defaults = UserDefaults.standard
+        return .init(
+            stopOnLowBattery: defaults.bool(forKey: keepAwakeStopOnLowBattery),
+            stopPercent: defaults.integer(forKey: keepAwakeStopPercent),
+            warnOnLowBattery: defaults.bool(forKey: keepAwakeWarnOnLowBattery),
+            warningPercent: defaults.integer(forKey: keepAwakeWarningPercent),
+            stopOnThermalPressure: defaults.bool(forKey: keepAwakeStopOnThermalPressure))
+    }
+
+    static func saveSafetyConfiguration(_ configuration: KeepAwakeSafetyPolicy.Configuration) {
+        let defaults = UserDefaults.standard
+        defaults.set(configuration.stopOnLowBattery, forKey: keepAwakeStopOnLowBattery)
+        defaults.set(configuration.effectiveStopPercent, forKey: keepAwakeStopPercent)
+        defaults.set(configuration.warnOnLowBattery, forKey: keepAwakeWarnOnLowBattery)
+        defaults.set(configuration.effectiveWarningPercent, forKey: keepAwakeWarningPercent)
+        defaults.set(configuration.stopOnThermalPressure, forKey: keepAwakeStopOnThermalPressure)
     }
 }

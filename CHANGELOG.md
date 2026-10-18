@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Optional Keep Awake stop at a chosen battery level, with advance warnings and
+  retained stop reasons. Automatic stopping is off by default
+- System thermal-pressure warnings and optional session stopping; Battistics
+  does not change fan speeds
+
 ## 1.4.1
 
 - The popover's Keep Awake menu marks the duration and mode you picked. The

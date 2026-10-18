@@ -44,14 +44,20 @@ final class AppModel {
     @ObservationIgnored private var lastTransitionSnapshot: BatterySnapshot?
     /// Injectable for tests; production reads IOKit.
     @ObservationIgnored private let batteryProvider: () -> BatterySnapshot?
+    @ObservationIgnored private let onBatteryReading: (BatterySnapshot?) -> Void
+    @ObservationIgnored private let suppressLowBatteryNotification: () -> Bool
 
     init(
         historyDirectory: URL? = nil,
         batteryProvider: @escaping () -> BatterySnapshot? = {
             BatteryReader.read(includePowerFlow: UserDefaults.standard.bool(forKey: Prefs.showPowerFlow))
-        }
+        },
+        onBatteryReading: @escaping (BatterySnapshot?) -> Void = { _ in },
+        suppressLowBatteryNotification: @escaping () -> Bool = { false }
     ) {
         self.batteryProvider = batteryProvider
+        self.onBatteryReading = onBatteryReading
+        self.suppressLowBatteryNotification = suppressLowBatteryNotification
         Prefs.registerDefaults()
         let directory =
             historyDirectory
@@ -96,6 +102,7 @@ final class AppModel {
     /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
         guard let current = batteryProvider() else {
+            onBatteryReading(nil)
             if snapshot != nil { snapshot = nil }
             powerFlowReadAt = nil
             return
@@ -147,6 +154,7 @@ final class AppModel {
     /// transitions are recorded and alerted no matter which path (power
     /// event, UI poll, background sampler) observed them first.
     private func ingest(_ current: BatterySnapshot) {
+        onBatteryReading(current)
         powerFlowReadAt = current.powerFlow?.readAt
         let previous = lastTransitionSnapshot
         // Timestamp-only changes do not affect battery presentation. Alerts
@@ -260,6 +268,9 @@ final class AppModel {
         let alerts = AlertRules.evaluate(
             snapshot: snapshot, config: Prefs.alertConfig(), state: &alertState)
         for alert in alerts {
+            // The session-specific notice already explains the upcoming stop.
+            // Keep evaluating general alert state without sending two banners.
+            if case .lowBattery = alert, suppressLowBatteryNotification() { continue }
             alertDispatcher.deliver(alert)
         }
     }

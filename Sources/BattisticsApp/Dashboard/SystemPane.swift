@@ -64,6 +64,8 @@ struct SystemPane: View {
 
             .disabled(keepAwake.isChanging)
 
+            KeepAwakeSafetySettings()
+
             Section {
                 Text(
                     "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would."
