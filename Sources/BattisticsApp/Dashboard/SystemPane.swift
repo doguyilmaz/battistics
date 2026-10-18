@@ -30,40 +30,41 @@ struct SystemPane: View {
                 Section("Current session") { KeepAwakeSessionCard() }
             }
             Section("Keep Awake") {
-                Toggle(
-                    "Prevent this Mac from sleeping",
-                    isOn: Binding(
-                        get: { keepAwake.isActive },
-                        set: { _ in keepAwake.toggle() }))
-                    .tourTarget(.power)
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(
+                        "Prevent this Mac from sleeping",
+                        isOn: Binding(
+                            get: { keepAwake.isActive },
+                            set: { _ in keepAwake.toggle() }))
 
-                Picker("Mode", selection: $keepAwake.displayedMode) {
-                    ForEach(KeepAwakeMode.allCases) { mode in
-                        Text(mode.label).tag(mode)
+                    Picker("Mode", selection: $keepAwake.displayedMode) {
+                        ForEach(KeepAwakeMode.allCases) { mode in
+                            Text(mode.label).tag(mode)
+                        }
+                    }
+                    if let caption = keepAwake.displayedMode.caption {
+                        Text(caption)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
+                        ForEach(KeepAwakeDuration.allCases) { duration in
+                            Text(duration.label).tag(duration)
+                        }
+                    }
+
+                    if let error = keepAwake.errorMessage {
+                        Text(error)
+                            .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
+                    }
+                    if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
+                        Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
                     }
                 }
-                if let caption = keepAwake.displayedMode.caption {
-                    Text(caption)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
-                    ForEach(KeepAwakeDuration.allCases) { duration in
-                        Text(duration.label).tag(duration)
-                    }
-                }
-
-                if let error = keepAwake.errorMessage {
-                    Text(error)
-                        .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
-                }
-                if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
-                    Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
-                }
+                .disabled(keepAwake.isChanging)
+                .tourTarget(.power)
             }
-
-            .disabled(keepAwake.isChanging)
 
             KeepAwakeProfiles()
             KeepAwakeSafetySettings()

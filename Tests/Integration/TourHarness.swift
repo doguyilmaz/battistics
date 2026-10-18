@@ -63,6 +63,9 @@ struct TourHarness {
             try await settle()
             precondition(model.dashboardPane == step.pane, "Wrong pane for \(step)")
             let target = try require(probe.frames[step])
+            if step == .power {
+                precondition(target.height > 60, "Power focus must include switch, mode and duration: \(target)")
+            }
             precondition(target.minY >= 0 && target.maxY < 545 - GuidedTourView.height - 20,
                          "Target obscured for \(step): \(target)")
             let button = try find("tour.next", in: host)
@@ -107,6 +110,20 @@ struct TourHarness {
         try sendKey("\u{1b}", code: 53, to: window)
         try await settle()
         precondition(!model.tourRequested, "Escape did not dismiss tour")
+        // The live session card above Keep Awake must not push step 2 out of view.
+        await awake.start(mode: .displayMaySleep, duration: .fifteenMinutes)?.value
+        defer { awake.stop() }
+        precondition(awake.isActive)
+        model.tourRequested = true
+        try await settle()
+        try press(find("tour.next", in: host))
+        try await settle()
+        let activeTarget = try require(probe.frames[.power])
+        precondition(activeTarget.height > 100 && activeTarget.minY >= 0
+                     && activeTarget.maxY < 545 - GuidedTourView.height - 20,
+                     "Active session obscures Power focus: \(activeTarget)")
+        try capture(host, step: .power, suffix: "-active")
+        precondition(awake.isActive, "Tour changed the running session")
         window.close()
         print("PASS: visible targets, pinned controls during scroll, Next/Back/Done/Skip/replay, Return/Escape, settings unchanged")
     }
@@ -154,13 +171,25 @@ struct TourHarness {
         return value
     }
 
-    private static func capture(_ host: NSView, step: TourStep) throws {
+    private static func capture(_ host: NSView, step: TourStep, suffix: String = "") throws {
+        let language = Bundle.main.preferredLocalizations.first ?? "en"
+        let path = "/private/tmp/battistics-tour-\(language)-\(step.rawValue)\(suffix).png"
+        if ProcessInfo.processInfo.environment["BATTISTICS_TOUR_SCREENSHOTS"] == "1",
+           let window = host.window {
+            // Window-server capture includes the live material backdrop blur.
+            let capture = Process()
+            capture.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+            capture.arguments = ["-x", "-l", String(window.windowNumber), path]
+            try capture.run()
+            capture.waitUntilExit()
+            precondition(capture.terminationStatus == 0, "Window screenshot failed")
+            return
+        }
         host.layoutSubtreeIfNeeded()
         let bitmap = try require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
         host.cacheDisplay(in: host.bounds, to: bitmap)
-        let language = Bundle.main.preferredLocalizations.first ?? "en"
         try require(bitmap.representation(using: .png, properties: [:]))
-            .write(to: URL(fileURLWithPath: "/private/tmp/battistics-tour-\(language)-\(step.rawValue).png"))
+            .write(to: URL(fileURLWithPath: path))
     }
 
     private static var battery: BatterySnapshot {
