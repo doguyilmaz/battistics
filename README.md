@@ -22,8 +22,26 @@ macOS 14+ · Apple Silicon</p>
 - Notifications for low battery, full charge, charge limit, high temperature and health decline
 - Battery levels of connected keyboards, mice, trackpads and headphones
 - Energy view showing the busiest apps, sampled only while open
+- Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed
 - CSV export and import of the full history
 - English and Turkish
+
+## Keep Awake modes
+
+| | Keep the display on | Let the display sleep | Stay awake with the lid closed |
+|---|---|---|---|
+| Display | Stays lit | Sleeps on its timer | Sleeps on its timer; the built-in one is off while shut |
+| Closing the lid | Mac sleeps¹ | Mac sleeps¹ | Mac keeps running |
+| Screen locks² | When you lock it or close the lid | When the display sleeps | When the display sleeps or the lid closes |
+| Apple menu › Sleep | Works | Works | Ignored until the session ends |
+| Battery use | Highest, the screen stays on | Low | Low, but a closed bag traps heat |
+| Setup | None | None | Power helper, approved once in Login Items |
+| Equivalent | `caffeinate -d` | `caffeinate -i` | `caffeinate -i` + `pmset disablesleep 1` |
+
+All three work on battery or adapter and end on their timer even if Battistics is suspended. Closed-lid mode only borrows the system sleep setting: if Battistics quits or crashes the helper restores it within 45 seconds, a change made elsewhere is left alone, and a session that ends with the lid shut lets the Mac sleep.
+
+¹ Unless it is in clamshell mode, with an external display and power connected.
+² Only if Lock Screen settings require a password after the display turns off.
 
 ## Light by design
 
