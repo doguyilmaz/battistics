@@ -3,7 +3,8 @@
 ## Unreleased
 
 - Finite Keep Awake profiles and a live task card showing origin, remaining time
-  and enabled stop protections; quick access from the menu popover.
+  and enabled stop protections. Profiles and terminal setup live in Power,
+  without an extra shortcut row in the menu popover.
 
 - Command-scoped Keep Awake through the bundled CLI, with preserved exit codes,
   signal forwarding and bounded sessions; discoverable setup in Power.

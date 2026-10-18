@@ -79,11 +79,6 @@ struct PopoverView: View {
             if let version = updater.pendingUpdateVersion {
                 updateRow(version)
             }
-            Button { openDashboard(at: .system) } label: {
-                Label("Profiles and terminal commands…", systemImage: "terminal")
-                    .font(.caption).frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.plain).foregroundStyle(Color.accentColor)
             footer
         }
         .padding(14)

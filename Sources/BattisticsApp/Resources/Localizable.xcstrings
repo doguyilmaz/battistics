@@ -7094,22 +7094,6 @@
         }
       }
     },
-    "Profiles and terminal commands…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profiles and terminal commands…"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profiller ve terminal komutları…"
-          }
-        }
-      }
-    },
     "Start with a ready-made profile": {
       "localizations": {
         "en": {
