@@ -72,7 +72,7 @@ actor MCPAutomationBridge {
             ownedID = nil
             heartbeat?.cancel()
             heartbeat = nil
-            return result(.init(code: "unavailable", message: "Could not reach Battistics. Open the app and enable Local MCP automation in Power. The connection was closed; inspect status before retrying a start."))
+            return result(.init(code: "unavailable", message: "Could not reach Battistics. Open the app and enable Local automation in Power. The connection was closed; inspect status before retrying a start."))
         }
     }
 

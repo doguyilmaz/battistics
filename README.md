@@ -79,13 +79,28 @@ selected article does not answer the question, the full guide is always availabl
 
 ### Local MCP automation
 
-In **Power → Local MCP automation**, enable access and copy the configuration
+In **Power → Local automation**, enable access and copy the configuration
 for your AI client. It can read status, start a named task for 15 minutes to
 12 hours, and stop its own task when work finishes. Other clients and manual
 sessions are left alone. Disconnects, deadlines, user stops, and enabled battery
 or thermal protections end the task. Closed-lid tasks require a separate opt-in
 and an already installed helper. No cloud service or network port is used.
 See the [MCP setup and tool contract](docs/mcp.md).
+
+### Command-scoped Keep Awake
+
+In Power, use **Copy Terminal setup** and paste it into your shell. Then run:
+
+```sh
+battistics run --name Build -- swift build
+battistics run --minutes 60 -- sh -c 'make build && make test'
+```
+
+The command inherits your terminal streams, environment and working directory.
+Its exit releases Keep Awake; the default upper limit is 12 hours. Protection
+or a manual stop may end Keep Awake sooner without killing your command.
+Interactive AI terminals should use MCP task start/stop instead of process
+lifetime. See the [command contract](docs/developer-sessions.md).
 
 Direct fan-speed overrides are not included in this version.
 See [feature scope and verification](docs/session-protection.md).

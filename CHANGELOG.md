@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Command-scoped Keep Awake through the bundled CLI, with preserved exit codes,
+  signal forwarding and bounded sessions; discoverable setup in Power.
+- Optional adapter-disconnect notices while Keep Awake is active.
+
 - Optional Keep Awake stop at a chosen battery level, with advance warnings and
   retained stop reasons. Automatic stopping is off by default
 - System thermal-pressure warnings and optional session stopping; Battistics

@@ -6,12 +6,15 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "BattisticsCore", targets: ["BattisticsCore"]),
+        .executable(name: "battistics", targets: ["BattisticsCLI"]),
         .executable(name: "battistics-mcp", targets: ["BattisticsMCP"])
     ],
     dependencies: [
         .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.1")
     ],
     targets: [
+        .executableTarget(name: "BattisticsCLI", dependencies: ["BattisticsCore"]),
+        .testTarget(name: "BattisticsCLITests", dependencies: ["BattisticsCLI", "BattisticsCore"]),
         .target(
             name: "BattisticsCore",
             linkerSettings: [.linkedLibrary("sqlite3")]

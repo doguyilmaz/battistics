@@ -2,7 +2,7 @@
 
 Battistics exposes a local stdio MCP server through the bundled
 `Battistics.app/Contents/MacOS/battistics-mcp` executable. Open Battistics,
-enable **Local MCP automation** in Power, and copy the client configuration
+enable **Local automation** in Power, and copy the client configuration
 from that section. Automation is off by default. No cloud service, TCP port,
 API key, or history access is involved.
 
@@ -87,3 +87,8 @@ and the protection-stop callback. It renders English/Turkish automation views
 to `/private/tmp/battistics-automation-{en,tr}.png`. It uses its own preference
 domain and temporary endpoint and never installs a helper or enables closed-lid
 mode. Physical closed-lid automation still requires a signed-app release check.
+
+The same opt-in local connection also supports the bundled `battistics run` CLI.
+IPC v1 accepts optional `source` (`mcp` or `command`) on start; absent means
+`mcp`. This identifies the UI origin only and grants no additional privileges.
+Public MCP tools and their schemas are unchanged.

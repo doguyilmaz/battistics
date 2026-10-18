@@ -8,9 +8,9 @@ struct AutomationSettings: View {
 
     var body: some View {
         @Bindable var automation = automation
-        Section("Local MCP automation") {
-            Toggle("Allow AI clients to start Keep Awake tasks", isOn: $automation.enabled)
-            Text("AI clients can start a named task for up to 12 hours and stop their own task when finished. Your battery and thermal protections still apply.")
+        Section("Local automation") {
+            Toggle("Allow terminal and AI tasks", isOn: $automation.enabled)
+            Text("Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply.")
                 .font(.caption).foregroundStyle(.secondary)
             if automation.enabled {
                 if automation.errorMessage == nil {
@@ -22,8 +22,8 @@ struct AutomationSettings: View {
                 Text("Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.")
                     .font(.caption).foregroundStyle(.secondary)
                 if let name = automation.activeTaskName {
-                    LabeledContent("AI task", value: name)
-                    Button("Stop AI task") { automation.stopOwnedSession() }
+                    LabeledContent("Automation task", value: name)
+                    Button("Stop task") { automation.stopOwnedSession() }
                 }
                 Picker("Client configuration", selection: $codexConfiguration) {
                     Text("JSON (Claude / Cursor)").tag(false)
@@ -38,6 +38,22 @@ struct AutomationSettings: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             if let error = automation.errorMessage { Text(error).foregroundStyle(.red) }
+        }
+        Section("Keep awake until a command finishes") {
+            Text("Run a build, test suite or script from Terminal. Keep Awake ends when the command exits, or earlier if its time limit or your protection settings apply.")
+                .font(.caption).foregroundStyle(.secondary)
+            Text("battistics run --name Build -- swift build")
+                .font(.system(.caption, design: .monospaced)).textSelection(.enabled)
+            Button("Copy Terminal setup") {
+                let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/battistics").path
+                let quote: (String) -> String = { "'" + $0.replacingOccurrences(of: "'", with: "'\\''") + "'" }
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString("alias battistics=\(quote(quote(path)))\n", forType: .string)
+            }
+            Text("Paste once in your shell, then run the example. Enable local automation above and keep Battistics open. The default limit is 12 hours; use --minutes to choose a shorter limit.")
+                .font(.caption).foregroundStyle(.secondary)
+            Text("An interactive AI terminal can stay open after work finishes. Use MCP to start a task before work and stop it afterward; process lifetime alone cannot detect AI task completion.")
+                .font(.caption).foregroundStyle(.secondary)
         }
     }
 

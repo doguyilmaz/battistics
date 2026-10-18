@@ -21,6 +21,7 @@ final class AutomationModel {
     private(set) var isListening = false
     private(set) var errorMessage: String?
     private(set) var activeTaskName: String?
+    private(set) var activeSource: AutomationRequest.Source?
     @ObservationIgnored private let awake: KeepAwakeModel
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored private let endpoint: LocalAutomationEndpoint
@@ -56,6 +57,7 @@ final class AutomationModel {
         lease = nil
         ownedMode = nil
         activeTaskName = nil
+        activeSource = nil
         watchdog?.cancel()
         watchdog = nil
         if let activity { ProcessInfo.processInfo.endActivity(activity); self.activity = nil }
@@ -103,7 +105,7 @@ final class AutomationModel {
     }
 
     private func handle(_ request: AutomationRequest, from owner: UUID) async -> AutomationReply {
-        guard enabled else { return .init(code: "disabled", message: "Enable Local MCP automation in Battistics > Power.") }
+        guard enabled else { return .init(code: "disabled", message: "Enable Local automation in Battistics > Power.") }
         guard connections.contains(owner) else { return .init(code: "unavailable", message: "The client disconnected.") }
         guard request.version == 1 else { return .init(code: "invalid_request", message: "Unsupported IPC version.") }
         if lease?.isExpired(at: Date()) == true { stopOwnedSession() }
@@ -127,6 +129,7 @@ final class AutomationModel {
             lease = AutomationLease(id: id, owner: owner, name: arguments.name,
                                     deadline: now.addingTimeInterval(Double(arguments.duration.rawValue) * 60), now: now)
             activeTaskName = arguments.name
+            activeSource = request.source ?? .mcp
             ownedMode = arguments.mode
             startWatchdog()
             let start = awake.start(mode: arguments.mode, duration: arguments.duration, now: now,
@@ -174,7 +177,7 @@ final class AutomationModel {
 
     private func startWatchdog() {
         activity = ProcessInfo.processInfo.beginActivity(options: .userInitiatedAllowingIdleSystemSleep,
-                                                        reason: "Monitoring a bounded MCP Keep Awake session")
+                                                        reason: "Monitoring a bounded automation Keep Awake session")
         watchdog = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(5))

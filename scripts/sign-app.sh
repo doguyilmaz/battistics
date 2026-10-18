@@ -28,7 +28,7 @@ if [ -d "$SPARKLE" ]; then
     codesign "${FLAGS[@]}" "$SPARKLE"
 fi
 
-for TOOL in BattisticsPowerHelper battistics-mcp; do
+for TOOL in BattisticsPowerHelper battistics-mcp battistics; do
     if [ -f "$APP/Contents/MacOS/$TOOL" ]; then
         codesign "${FLAGS[@]}" "$APP/Contents/MacOS/$TOOL"
     fi

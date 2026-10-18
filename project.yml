@@ -34,6 +34,18 @@ settings:
     DEAD_CODE_STRIPPING: YES
 
 targets:
+  BattisticsCLI:
+    type: tool
+    platform: macOS
+    sources: [Sources/BattisticsCLI]
+    dependencies:
+      - package: BattisticsCore
+    settings:
+      base:
+        PRODUCT_NAME: battistics
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.CLI
+        SKIP_INSTALL: YES
+
   BattisticsMCP:
     type: tool
     platform: macOS
@@ -84,6 +96,10 @@ targets:
     dependencies:
       - package: BattisticsCore
       - package: Sparkle
+      - target: BattisticsCLI
+        codeSign: true
+        copy:
+          destination: executables
       - target: BattisticsMCP
         codeSign: true
         copy:

@@ -6485,23 +6485,6 @@
         }
       }
     },
-    "Yes. Enable Local MCP automation in Power and copy the configuration into a trusted AI client. The client can start a named Keep Awake task for 15 minutes to 12 hours, read status, and stop its own task. Ask it to stop when the work finishes; Battistics cannot infer task completion. Disconnecting the client ends its task, with a timeout if it stops responding. Manual stops and battery or thermal protection always win. Closed-lid tasks need a separate opt-in and an already installed power helper. MCP cannot change protections or fan speeds. Keep Battistics open while using automation.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yes. Enable Local MCP automation in Power and copy the configuration into a trusted AI client. The client can start a named Keep Awake task for 15 minutes to 12 hours, read status, and stop its own task. Ask it to stop when the work finishes; Battistics cannot infer task completion. Disconnecting the client ends its task, with a timeout if it stops responding. Manual stops and battery or thermal protection always win. Closed-lid tasks need a separate opt-in and an already installed power helper. MCP cannot change protections or fan speeds. Keep Battistics open while using automation."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Evet. Güç bölümünde Yerel MCP otomasyonunu etkinleştirin ve yapılandırmayı güvendiğiniz bir yapay zekâ istemcisine kopyalayın. İstemci 15 dakika ile 12 saat arasında adlandırılmış bir Uyanık Tut görevi başlatabilir, durumu okuyabilir ve kendi görevini durdurabilir. İş bitince durdurmasını isteyin; Battistics işin bittiğini kendiliğinden anlayamaz. İstemci bağlantıyı keserse görevi sona erer; yanıt vermeyi bırakırsa zaman aşımı uygulanır. Elle durdurma ile pil ve ısıl korumalar her zaman önceliklidir. Kapak kapalı görevler ayrıca izin ve önceden kurulmuş güç yardımcısı gerektirir. MCP, korumaları veya fan hızlarını değiştiremez. Otomasyonu kullanırken Battistics’i açık tutun."
-          }
-        }
-      }
-    },
     "Next session duration": {
       "extractionState": "manual",
       "localizations": {
@@ -6563,6 +6546,198 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç adaptörü çıkarıldı. Uyanık Tut pil üzerinden çalışmaya devam ediyor. Kesintisiz çalışma için güç bağlayın; pil ve ısı korumalarınız geçerli olmaya devam eder."
+          }
+        }
+      }
+    },
+    "Local automation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local automation"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel otomasyon"
+          }
+        }
+      }
+    },
+    "Allow terminal and AI tasks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow terminal and AI tasks"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal ve yapay zekâ görevlerine izin ver"
+          }
+        }
+      }
+    },
+    "Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal komutları ve yapay zekâ istemcileri en fazla 12 saatlik adlandırılmış bir görev başlatabilir. Pil ve ısı korumalarınız geçerli olmaya devam eder."
+          }
+        }
+      }
+    },
+    "Automation task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automation task"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomasyon görevi"
+          }
+        }
+      }
+    },
+    "Stop task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop task"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görevi durdur"
+          }
+        }
+      }
+    },
+    "Keep awake until a command finishes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep awake until a command finishes"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komut bitene kadar uyanık tut"
+          }
+        }
+      }
+    },
+    "Run a build, test suite or script from Terminal. Keep Awake ends when the command exits, or earlier if its time limit or your protection settings apply.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run a build, test suite or script from Terminal. Keep Awake ends when the command exits, or earlier if its time limit or your protection settings apply."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal üzerinden derleme, test veya betik çalıştırın. Uyanık Tut, komut bittiğinde ya da süre sınırı veya koruma ayarları devreye girdiğinde sona erer."
+          }
+        }
+      }
+    },
+    "battistics run --name Build -- swift build": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "battistics run --name Build -- swift build"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "battistics run --name Build -- swift build"
+          }
+        }
+      }
+    },
+    "Copy Terminal setup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Terminal setup"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal kurulumunu kopyala"
+          }
+        }
+      }
+    },
+    "Paste once in your shell, then run the example. Enable local automation above and keep Battistics open. The default limit is 12 hours; use --minutes to choose a shorter limit.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste once in your shell, then run the example. Enable local automation above and keep Battistics open. The default limit is 12 hours; use --minutes to choose a shorter limit."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kabuğunuza bir kez yapıştırın, ardından örneği çalıştırın. Yukarıdan yerel otomasyonu açın ve Battistics’i açık tutun. Varsayılan sınır 12 saattir; daha kısa bir sınır için --minutes kullanın."
+          }
+        }
+      }
+    },
+    "An interactive AI terminal can stay open after work finishes. Use MCP to start a task before work and stop it afterward; process lifetime alone cannot detect AI task completion.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An interactive AI terminal can stay open after work finishes. Use MCP to start a task before work and stop it afterward; process lifetime alone cannot detect AI task completion."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etkileşimli bir yapay zekâ terminali iş bittikten sonra açık kalabilir. MCP ile işe başlamadan önce görev başlatın ve iş bitince durdurun; yalnızca sürecin açık olması işin bitip bitmediğini göstermez."
+          }
+        }
+      }
+    },
+    "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet. Güç bölümünden Yerel otomasyonu açın. Derleme veya betikler için Terminal kurulumunu kopyalayıp battistics run kullanın; komut bitince Uyanık Tut sona erer, üst sınır 12 saattir. Etkileşimli bir yapay zekâ terminali için MCP yapılandırmasını güvendiğiniz istemciye ekleyin ve işe başlamadan görev başlatıp bitince durdurmasını isteyin. Açık kalan bir süreç tek başına işin bittiğini göstermez. Elle durdurma, süre sınırı, bağlantı kesilmesi veya pil ve ısı koruması, komutunuzu sonlandırmadan Uyanık Tut’u daha erken bitirebilir. Kapak kapalı görevler ayrı izin ve kurulu yardımcı gerektirir. Battistics’i açık tutun."
           }
         }
       }
