@@ -375,14 +375,14 @@ struct PopoverView: View {
                 Button("Turn Off") { keepAwake.stop() }
                 Divider()
             }
-            Picker("Duration", selection: $keepAwake.duration) {
+            Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
                 ForEach(KeepAwakeDuration.allCases) { duration in
                     Text(duration.label).tag(duration)
                 }
             }
             .pickerStyle(.inline)
             Divider()
-            Picker("Mode", selection: $keepAwake.mode) {
+            Picker("Mode", selection: $keepAwake.displayedMode) {
                 ForEach(KeepAwakeMode.allCases) { mode in
                     Text(mode.label).tag(mode)
                 }
@@ -396,7 +396,7 @@ struct PopoverView: View {
         .menuStyle(.button)
         // A menu with a primary action builds its items once and never
         // updates them; a new identity rebuilds them.
-        .id("\(keepAwake.isActive) \(keepAwake.duration.rawValue) \(keepAwake.mode.rawValue)")
+        .id("\(keepAwake.isActive) \(keepAwake.duration.rawValue) \(keepAwake.displayedMode.rawValue)")
         .help("Keep Awake")
     }
 

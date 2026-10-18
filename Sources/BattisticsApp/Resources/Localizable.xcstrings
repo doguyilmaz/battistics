@@ -6196,13 +6196,325 @@
         }
       }
     },
-    "For now, start a timed Keep Awake session in Power. There is no Battistics MCP server in this version. For a terminal command with the lid open, macOS also provides caffeinate -i followed by the command and its arguments; its idle-sleep assertion lasts until the command exits. This does not enable Battistics closed-lid mode and does not protect against battery depletion. A future MCP integration should use bounded, owned sessions that respect battery and thermal protection.": {
+    "Set up the power helper in Battistics before using closed-lid automation.": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up the power helper in Battistics before using closed-lid automation."
+          }
+        },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şimdilik Güç bölümünden süreli bir Uyanık Tut oturumu başlatın. Bu sürümde Battistics MCP sunucusu yoktur. Kapak açıkken bir terminal komutu için macOS’un caffeinate -i aracının ardından komutu ve argümanlarını da kullanabilirsiniz; boşta uyumayı engelleyen isteği komut bitene kadar sürer. Bu, Battistics’in kapak kapalı modunu açmaz ve pilin bitmesine karşı koruma sağlamaz. Gelecekteki MCP entegrasyonu, pil ve ısıl korumaya uyan, süreli ve sahipliği belli oturumlar kullanmalıdır."
+            "value": "Kapak kapalı otomasyonu kullanmadan önce Battistics’te güç yardımcısını kurun."
+          }
+        }
+      }
+    },
+    "Could not open local automation. Close other copies of Battistics, then turn automation off and on.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not open local automation. Close other copies of Battistics, then turn automation off and on."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel otomasyon başlatılamadı. Battistics’in diğer kopyalarını kapatın, ardından otomasyonu kapatıp yeniden açın."
+          }
+        }
+      }
+    },
+    "Local MCP automation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local MCP automation"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel MCP otomasyonu"
+          }
+        }
+      }
+    },
+    "Allow AI clients to start Keep Awake tasks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow AI clients to start Keep Awake tasks"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ istemcileri Uyanık Tut görevleri başlatabilsin"
+          }
+        }
+      }
+    },
+    "AI clients can start a named task for up to 12 hours and stop their own task when finished. Your battery and thermal protections still apply.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI clients can start a named task for up to 12 hours and stop their own task when finished. Your battery and thermal protections still apply."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ istemcileri en fazla 12 saatlik adlandırılmış bir görev başlatabilir ve işleri bitince kendi görevlerini durdurabilir. Pil ve ısıl korumalarınız geçerli kalır."
+          }
+        }
+      }
+    },
+    "Ready for local clients": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready for local clients"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel istemcilere hazır"
+          }
+        }
+      }
+    },
+    "Starting…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlatılıyor…"
+          }
+        }
+      }
+    },
+    "Allow closed-lid tasks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow closed-lid tasks"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı görevlere izin ver"
+          }
+        }
+      }
+    },
+    "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısının önceden kurulmuş olması gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
+          }
+        }
+      }
+    },
+    "AI task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI task"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ görevi"
+          }
+        }
+      }
+    },
+    "Stop AI task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop AI task"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ görevini durdur"
+          }
+        }
+      }
+    },
+    "Client configuration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client configuration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İstemci yapılandırması"
+          }
+        }
+      }
+    },
+    "JSON (Claude / Cursor)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON (Claude / Cursor)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON (Claude / Cursor)"
+          }
+        }
+      }
+    },
+    "TOML (Codex)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TOML (Codex)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TOML (Codex)"
+          }
+        }
+      }
+    },
+    "Copy MCP configuration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy MCP configuration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP yapılandırmasını kopyala"
+          }
+        }
+      }
+    },
+    "Copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopyalandı"
+          }
+        }
+      }
+    },
+    "Keep Battistics open. If the client disconnects or stops responding, its task ends and normal sleep is allowed again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Battistics open. If the client disconnects or stops responding, its task ends and normal sleep is allowed again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’i açık tutun. İstemci bağlantıyı keser veya yanıt vermeyi bırakırsa görevi sona erer ve normal uykuya yeniden izin verilir."
+          }
+        }
+      }
+    },
+    "Yes. Enable Local MCP automation in Power and copy the configuration into a trusted AI client. The client can start a named Keep Awake task for 15 minutes to 12 hours, read status, and stop its own task. Ask it to stop when the work finishes; Battistics cannot infer task completion. Disconnecting the client ends its task, with a timeout if it stops responding. Manual stops and battery or thermal protection always win. Closed-lid tasks need a separate opt-in and an already installed power helper. MCP cannot change protections or fan speeds. Keep Battistics open while using automation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes. Enable Local MCP automation in Power and copy the configuration into a trusted AI client. The client can start a named Keep Awake task for 15 minutes to 12 hours, read status, and stop its own task. Ask it to stop when the work finishes; Battistics cannot infer task completion. Disconnecting the client ends its task, with a timeout if it stops responding. Manual stops and battery or thermal protection always win. Closed-lid tasks need a separate opt-in and an already installed power helper. MCP cannot change protections or fan speeds. Keep Battistics open while using automation."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet. Güç bölümünde Yerel MCP otomasyonunu etkinleştirin ve yapılandırmayı güvendiğiniz bir yapay zekâ istemcisine kopyalayın. İstemci 15 dakika ile 12 saat arasında adlandırılmış bir Uyanık Tut görevi başlatabilir, durumu okuyabilir ve kendi görevini durdurabilir. İş bitince durdurmasını isteyin; Battistics işin bittiğini kendiliğinden anlayamaz. İstemci bağlantıyı keserse görevi sona erer; yanıt vermeyi bırakırsa zaman aşımı uygulanır. Elle durdurma ile pil ve ısıl korumalar her zaman önceliklidir. Kapak kapalı görevler ayrıca izin ve önceden kurulmuş güç yardımcısı gerektirir. MCP, korumaları veya fan hızlarını değiştiremez. Otomasyonu kullanırken Battistics’i açık tutun."
+          }
+        }
+      }
+    },
+    "Next session duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next session duration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonraki oturum süresi"
           }
         }
       }

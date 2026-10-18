@@ -145,6 +145,8 @@ enum Prefs {
     static let keepAwakeWarningPercent = "keepAwakeWarningPercent"
     static let keepAwakeStopOnThermalPressure = "keepAwakeStopOnThermalPressure"
     static let hasSeenTour = "hasSeenTour"
+    static let automationEnabled = "automationEnabled"
+    static let automationClosedLidAllowed = "automationClosedLidAllowed"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 
@@ -195,6 +197,8 @@ enum Prefs {
             keepAwakeWarnOnLowBattery: true,
             keepAwakeWarningPercent: 20,
             keepAwakeStopOnThermalPressure: false,
+            automationEnabled: false,
+            automationClosedLidAllowed: false,
             readBluetoothBatteries: false,
 
             showPowerFlow: true,

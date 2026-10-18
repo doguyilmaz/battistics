@@ -28,6 +28,11 @@ if [ -d "$SPARKLE" ]; then
     codesign "${FLAGS[@]}" "$SPARKLE"
 fi
 
+for TOOL in BattisticsPowerHelper battistics-mcp; do
+    if [ -f "$APP/Contents/MacOS/$TOOL" ]; then
+        codesign "${FLAGS[@]}" "$APP/Contents/MacOS/$TOOL"
+    fi
+done
 codesign "${FLAGS[@]}" "$APP"
 codesign --verify --deep --strict "$APP"
 echo "Signed $APP with $IDENTITY"

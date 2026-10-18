@@ -33,18 +33,18 @@ struct SystemPane: View {
                         get: { keepAwake.isActive },
                         set: { _ in keepAwake.toggle() }))
 
-                Picker("Mode", selection: $keepAwake.mode) {
+                Picker("Mode", selection: $keepAwake.displayedMode) {
                     ForEach(KeepAwakeMode.allCases) { mode in
                         Text(mode.label).tag(mode)
                     }
                 }
-                if let caption = keepAwake.mode.caption {
+                if let caption = keepAwake.displayedMode.caption {
                     Text(caption)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                Picker("Duration", selection: $keepAwake.duration) {
+                Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
                     ForEach(KeepAwakeDuration.allCases) { duration in
                         Text(duration.label).tag(duration)
                     }
@@ -54,7 +54,7 @@ struct SystemPane: View {
                     Text(error)
                         .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
                 }
-                if keepAwake.isActive && keepAwake.mode != .displayOn {
+                if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
                     Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
                 }
                 if keepAwake.isActive {
@@ -65,6 +65,7 @@ struct SystemPane: View {
             .disabled(keepAwake.isChanging)
 
             KeepAwakeSafetySettings()
+            AutomationSettings()
 
             Section {
                 Text(

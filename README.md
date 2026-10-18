@@ -26,6 +26,7 @@ macOS 14+ · Apple Silicon</p>
 - Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
 - A five-step first-run tour and searchable English/Turkish help
 - Optional on-device Q&A using Apple Intelligence on supported Macs with macOS 26+
+- Opt-in local MCP automation for named, bounded Keep Awake tasks owned by an AI client
 - CSV export and import of the full history
 - English and Turkish
 
@@ -76,6 +77,16 @@ article and the app shows its reviewed text and source. It cannot change setting
 and has no cloud fallback. Battistics does not save questions or answers. If the
 selected article does not answer the question, the full guide is always available.
 
+### Local MCP automation
+
+In **Power → Local MCP automation**, enable access and copy the configuration
+for your AI client. It can read status, start a named task for 15 minutes to
+12 hours, and stop its own task when work finishes. Other clients and manual
+sessions are left alone. Disconnects, deadlines, user stops, and enabled battery
+or thermal protections end the task. Closed-lid tasks require a separate opt-in
+and an already installed helper. No cloud service or network port is used.
+See the [MCP setup and tool contract](docs/mcp.md).
+
 Direct fan-speed overrides are not included in this version.
 See [feature scope and verification](docs/session-protection.md).
 
@@ -102,6 +113,8 @@ make test   # unit tests
 ```
 
 Run `make gen` and open `Battistics.xcodeproj` to work in Xcode.
+The MCP dependency requires Swift 6.1 or later. After a debug build,
+`python3 scripts/test-mcp-stdio.py` checks the bundled MCP server.
 
 ## Privacy
 

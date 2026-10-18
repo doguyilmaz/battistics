@@ -11,6 +11,9 @@ packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.6.0"
+  MCP:
+    url: https://github.com/modelcontextprotocol/swift-sdk.git
+    from: "0.12.1"
 
 fileGroups:
   - README.md
@@ -31,6 +34,20 @@ settings:
     DEAD_CODE_STRIPPING: YES
 
 targets:
+  BattisticsMCP:
+    type: tool
+    platform: macOS
+    sources: [Sources/BattisticsMCP]
+    dependencies:
+      - package: BattisticsCore
+      - package: MCP
+        product: MCP
+    settings:
+      base:
+        PRODUCT_NAME: battistics-mcp
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.MCP
+        SKIP_INSTALL: YES
+
   # Privileged helper. A separate root process by necessity: setting power
   # preferences needs root, and the alternative is prompting on every change.
   BattisticsPowerHelper:
@@ -67,6 +84,10 @@ targets:
     dependencies:
       - package: BattisticsCore
       - package: Sparkle
+      - target: BattisticsMCP
+        codeSign: true
+        copy:
+          destination: executables
       # Lands in Contents/MacOS, which is what the plist's BundleProgram
       # points at. `embed: false` here would suppress the copy phase entirely.
       - target: BattisticsPowerHelper

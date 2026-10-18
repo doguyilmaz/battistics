@@ -60,6 +60,7 @@ struct BattisticsApp: App {
     @State private var model: AppModel
     @State private var updater = UpdaterModel()
     @State private var keepAwake: KeepAwakeModel
+    @State private var automation: AutomationModel
     @State private var powerAuth = PowerAuthorization()
     @State private var powerSettings = PowerSettingsModel()
     @State private var powerHelper: PowerHelperClient
@@ -74,6 +75,7 @@ struct BattisticsApp: App {
         let awake = KeepAwakeModel(helper: helper)
         _powerHelper = State(initialValue: helper)
         _keepAwake = State(initialValue: awake)
+        _automation = State(initialValue: AutomationModel(awake: awake, helper: helper))
         _model = State(initialValue: AppModel(
             onBatteryReading: { [weak awake] in awake?.safety.update($0) },
             suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true }))
@@ -89,6 +91,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(automation)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
@@ -104,6 +107,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(automation)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
@@ -119,6 +123,7 @@ struct BattisticsApp: App {
                 .environment(model)
                 .environment(updater)
                 .environment(keepAwake)
+                .environment(automation)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)

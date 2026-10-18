@@ -10,6 +10,9 @@
   in English and Turkish
 - Optional Apple Intelligence Q&A on macOS 26+ using the built-in help articles,
   with availability checks, cancellation, sources, and no cloud fallback
+- Opt-in local MCP server with status, bounded task start, and owned task stop;
+  disconnect cleanup, a heartbeat timeout, existing protections, and separate
+  closed-lid permission. Copy JSON or Codex configuration from Power
 
 ## 1.4.1
 

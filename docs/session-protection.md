@@ -56,6 +56,11 @@ automatic cooling.
 The assistant uses Apple's [Foundation Models framework](https://developer.apple.com/documentation/foundationmodels)
 without raising the app's macOS 14 deployment target.
 
+The [local MCP integration](mcp.md) owns bounded, named work sessions, releases
+them on explicit completion or client loss, requires local opt-in, and preserves
+the user's battery/thermal rules. Arbitrary shell execution, fan overrides, and
+unrestricted privileged power settings remain outside its scope.
+
 ## Verification
 
 `swift test` covers threshold crossing, warning deduplication/rearming, sudden
@@ -63,13 +68,15 @@ charge drops, AC transitions, invalid/missing readings, opt-in defaults,
 configuration changes, thermal recovery, and threshold bounds alongside the
 existing assertion/lease tests. `make build` compiles the macOS app and helper.
 
-Development verification for this change: 171 core tests passed; the app and
-helper built with Xcode 26.6 targeting macOS 14. English/Turkish help, protection,
+Development verification for this change: 181 core and MCP tests passed; the app,
+helper, and MCP executable built with Xcode 26.6 targeting macOS 14. English/Turkish help, protection,
 and dashboard-tour views were rendered in an isolated AppKit harness. Live
 on-device article selection and cancellation were exercised in both languages.
 Foundation Models is weak-linked for older macOS versions. The signed helper's
 physical closed-lid flow and lock-screen delivery still need the release checks
 below; rendering views does not exercise those system behaviors.
+MCP handshake/discovery/error/EOF checks and the isolated app lifecycle harness
+also passed; see [MCP verification](mcp.md#verification).
 
 Manual release checks on a signed app:
 

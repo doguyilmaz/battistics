@@ -24,6 +24,9 @@ final class KeepAwakeModel {
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored private var leaseTask: Task<Void, Never>?
     @ObservationIgnored private var sessionID: String?
+    @ObservationIgnored var onSessionEnded: ((String) -> Void)?
+    var sessionIdentifier: String? { sessionID }
+    var isAwaitingHelperApproval: Bool { approvalTask != nil }
     @ObservationIgnored private var reconcilingSessionID: String?
     @ObservationIgnored private let notice = KeepAwakeNoticeController()
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
@@ -38,7 +41,7 @@ final class KeepAwakeModel {
     var mode: KeepAwakeMode {
         didSet {
             UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
-            if let session, oldValue != mode {
+            if let session, session.mode != mode {
                 start(mode: mode, duration: session.duration, now: session.startedAt)
             } else if mode != .lidClosed, approvalTask != nil {
                 // Nothing left to wait for once closed-lid is no longer wanted.
@@ -50,6 +53,13 @@ final class KeepAwakeModel {
 
     var duration: KeepAwakeDuration {
         didSet { UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration) }
+    }
+
+    /// Automation does not overwrite the user's next-session defaults. Pickers
+    /// still show the actual running mode and let the user take over explicitly.
+    var displayedMode: KeepAwakeMode {
+        get { session?.mode ?? mode }
+        set { mode = newValue }
     }
 
     init(helper: PowerHelperClient) {
@@ -74,24 +84,25 @@ final class KeepAwakeModel {
         }
     }
 
-    func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date()) {
-        guard !isChanging else { return }
+    @discardableResult
+    func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
+               id: String = UUID().uuidString, allowHelperSetup: Bool = true) -> Task<Void, Never>? {
+        guard !isChanging else { return nil }
         if let event = safety.blockingEvent() {
             let wasActive = isActive
             if wasActive { stop() }
             showSafetyReason(event, id: UUID().uuidString, starting: !wasActive)
-            return
+            return nil
         }
         cancelApprovalWait()
         let previousLeaseID = session?.mode == .lidClosed ? sessionID : nil
         clearLocalSession()
-        let id = UUID().uuidString
         sessionID = id
         isChanging = true
         errorMessage = nil
         isStoppedReasonInformational = false
         notice.dismiss()
-        Task {
+        return Task {
             defer {
                 isChanging = false
                 // A safety stop may immediately start async lease cleanup.
@@ -115,7 +126,7 @@ final class KeepAwakeModel {
                 }
                 guard sessionID == id else { return }
                 if mode == .lidClosed {
-                    try await helper.prepareForLidSleep()
+                    if allowHelperSetup { try await helper.prepareForLidSleep() }
                     guard sessionID == id else { return }
                     let result = try await helper.acquireLidSleepLease(id) { [weak self] in
                         self?.sessionID == id
@@ -177,17 +188,21 @@ final class KeepAwakeModel {
                     guard sessionID == id else { return }
                     clearLocalSession()
                 }
-                showStartFailure(error, duration: duration)
+                showStartFailure(error, duration: duration, allowHelperSetup: allowHelperSetup)
             }
         }
     }
 
-    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration) {
+    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool) {
         isStoppedReasonInformational = false
         switch error {
         case StartFailure.protection(let event):
             showSafetyReason(event, id: UUID().uuidString, starting: true)
         case PowerHelperClient.Failure.needsApproval:
+            guard allowHelperSetup else {
+                errorMessage = String(localized: "Set up the power helper in Battistics before using closed-lid automation.")
+                return
+            }
             isStoppedReasonInformational = true
             errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
             helper.openLoginItemsSettings()
@@ -270,6 +285,7 @@ final class KeepAwakeModel {
     }
 
     private func clearLocalSession() {
+        let endedID = sessionID
         safety.endSession()
         sessionID = nil
         expiryTask?.cancel()
@@ -282,10 +298,11 @@ final class KeepAwakeModel {
         }
         assertion.release()
         session = nil
+        if let endedID { onSessionEnded?(endedID) }
     }
 
     func toggle() {
-        isActive ? stop() : start(mode: mode, duration: duration)
+        if isActive { stop() } else { start(mode: mode, duration: duration) }
     }
 
     func sleepDisplayNow() {
