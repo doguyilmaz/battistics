@@ -10,7 +10,7 @@ packages:
     path: .
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
-    from: "2.6.0"
+    from: "2.9.0"
 
 fileGroups:
   - README.md
@@ -94,6 +94,8 @@ targets:
         SUFeedURL: https://github.com/doguyilmaz/battistics/releases/latest/download/appcast-2.xml
         SUEnableAutomaticChecks: true
         SUPublicEDKey: j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=
+        SURequireSignedFeed: true
+        SUVerifyUpdateBeforeExtraction: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics

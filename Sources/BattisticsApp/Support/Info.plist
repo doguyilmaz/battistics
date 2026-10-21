@@ -50,5 +50,9 @@
 	<string>https://github.com/doguyilmaz/battistics/releases/latest/download/appcast-2.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=</string>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
 </dict>
 </plist>
