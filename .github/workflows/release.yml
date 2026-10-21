@@ -1,34 +1,31 @@
 name: Release
 
-# Ships when main gets a CHANGELOG version that has no tag yet, or when a
-# vX.Y.Z tag is pushed. project.yml is stamped from that version before
-# generating the project.
+# A release starts when main gets a CHANGELOG version that has no tag yet or
+# when a vX.Y.Z tag is pushed. On main the version job only pushes the tag
+# with the tapster tag key. That tag starts this workflow again: the tag run
+# builds the app, signs it ad hoc and opens a draft release for the tapster
+# hub, which signs, notarizes and publishes it and writes the feed and the
+# cask.
 on:
   push:
     branches: [main]
-    tags: ['v*']
-
-permissions:
-  contents: write
-
-concurrency:
-  group: release
-  cancel-in-progress: false
-
+    paths: [CHANGELOG.md]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+permissions: {}
 jobs:
   version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.resolve.outputs.version }}
+    if: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions: { contents: read }
     steps:
-      - uses: actions/checkout@v4
-
-      - id: resolve
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { ssh-key: "${{ secrets.TAPSTER_TAG_KEY }}" }
+      - name: Read the version from CHANGELOG
+        id: resolve
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ]; then
-            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          set -euo pipefail
           VERSION=$(awk '/^## /{ print $2; exit }' CHANGELOG.md)
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Top of CHANGELOG is \"$VERSION\": nothing to release."
@@ -38,113 +35,85 @@ jobs:
             echo "v$VERSION is already tagged: nothing to release."
             exit 0
           fi
-          # Pushed with GITHUB_TOKEN, which does not start another run.
-          git tag "v$VERSION" "$GITHUB_SHA"
-          git push origin "v$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-  release:
-    needs: version
-    if: needs.version.outputs.version != ''
+      - name: Push the release tag
+        if: ${{ steps.resolve.outputs.version != '' }}
+        env: { VERSION: "${{ steps.resolve.outputs.version }}" }
+        run: git tag "v$VERSION" && git push origin "v$VERSION"
+  build:
+    if: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+    # macos-26 links against the macOS 26 SDK, so the app gets the current
+    # system appearance instead of compatibility mode.
     runs-on: macos-26
-    env:
-      VERSION: ${{ needs.version.outputs.version }}
+    permissions: { contents: read }
     steps:
-      - uses: actions/checkout@v4
-
+      - name: Refuse anything but a tag
+        if: ${{ github.ref_type != 'tag' }}
+        run: |
+          echo "::error::Run this workflow on a tag like v1.2.3."
+          exit 1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
       - name: Install XcodeGen
         run: brew install xcodegen
-
-      - name: Import signing certificate
-        env:
-          CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
-          CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-        run: |
-          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
-          KEYCHAIN_PASS=$(uuidgen)
-          security create-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN"
-          security unlock-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN"
-          echo "$CERT_P12" | base64 --decode > cert.p12
-          security import cert.p12 -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T /usr/bin/codesign
-          rm cert.p12
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
-          security list-keychains -d user -s "$KEYCHAIN" login.keychain
-
-      - name: Stamp version
-        run: |
-          sed -E -i '' "s/CFBundleShortVersionString: \"[^\"]*\"/CFBundleShortVersionString: \"$VERSION\"/" project.yml
-          sed -E -i '' "s/CFBundleVersion: \"[^\"]*\"/CFBundleVersion: \"$VERSION\"/" project.yml
-
       - name: Core tests
         run: swift test
-
-      - name: Build signed DMG
-        env:
-          SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        run: make dmg
-
-      - name: Notarize and staple
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+      - name: Build the app, signed ad hoc
+        env: { TAG: "${{ github.ref_name }}" }
         run: |
-          xcrun notarytool submit dist/Battistics-*.dmg \
-            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
-            --password "$NOTARY_PASSWORD" --wait
-          xcrun stapler staple dist/Battistics-*.dmg
-
-      - name: Generate signed appcast
-        env:
-          SPARKLE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-        run: |
-          rm -rf dist/release && mkdir -p dist/release
-          cp "dist/Battistics-$VERSION.dmg" dist/release/
-          KEY_FILE="$RUNNER_TEMP/sparkle_key"
-          printf '%s' "$SPARKLE_KEY" > "$KEY_FILE"
-          .build/xcode/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast dist/release \
-            --ed-key-file "$KEY_FILE" \
-            --download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/v${VERSION}/"
-          rm "$KEY_FILE"
-          # appcast-2.xml is the live feed. generate_appcast already names it
-          # that, because it derives the filename from SUFeedURL in the app's
-          # Info.plist; the mv is only a guard in case that stops being true.
-          # appcast.xml stays the frozen informational feed for pre-1.1.0
-          # builds, whose bundle identifier Sparkle will not update across.
-          [ -f dist/release/appcast-2.xml ] || mv dist/release/appcast.xml dist/release/appcast-2.xml
-          cp scripts/legacy-appcast.xml dist/release/appcast.xml
-
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Release notes come from the CHANGELOG section for this version,
-          # so the page reads like the changelog rather than a commit list.
-          awk -v want="## $VERSION" '
-            $0 == want { found = 1; next }
-            /^## / { if (found) exit }
-            found { print }
-          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          if [ -s "$RUNNER_TEMP/notes.md" ]; then
-            NOTES=(--notes-file "$RUNNER_TEMP/notes.md")
-          else
-            NOTES=(--generate-notes)
+          set -euo pipefail
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$TAG is not a tag like v1.2.3."
+            exit 1
           fi
-          gh release create "v$VERSION" \
-            dist/release/Battistics-*.dmg \
-            dist/release/appcast-2.xml dist/release/appcast.xml \
-            --title "Battistics-$VERSION" "${NOTES[@]}"
-
-      # Publishes the Homebrew cask. Runs last and hashes the DMG that was
-      # uploaded rather than the one `make dmg` built: stapling the
-      # notarization ticket rewrites the image, so the two differ.
-      #
-      # github.token is scoped to this repository and cannot write to the tap,
-      # so this needs a HOMEBREW_TAP_GITHUB_TOKEN secret with contents write on it. Without
-      # one the step says so and succeeds — a stale cask is worth less than a
-      # release pipeline that keeps working.
-      - name: Update Homebrew tap
-        env:
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-        run: ./scripts/update-tap.sh "$VERSION" dist/release/Battistics-*.dmg
+          export VERSION="${TAG#v}"
+          sed -E -i '' "s/CFBundleShortVersionString: \"[^\"]*\"/CFBundleShortVersionString: \"$VERSION\"/" project.yml
+          sed -E -i '' "s/CFBundleVersion: \"[^\"]*\"/CFBundleVersion: \"$VERSION\"/" project.yml
+          make app
+          for key in CFBundleShortVersionString CFBundleVersion; do
+            test "$(/usr/libexec/PlistBuddy -c "Print $key" dist/Battistics.app/Contents/Info.plist)" = "$VERSION"
+          done
+          codesign --verify --strict --deep dist/Battistics.app
+      - name: Pack the app
+        env: { TAG: "${{ github.ref_name }}" }
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"
+          tar -C dist --no-mac-metadata --no-xattrs -czf "$RUNNER_TEMP/out/Battistics-${TAG#v}.app.tar.gz" Battistics.app
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with: { name: app, path: "${{ runner.temp }}/out", if-no-files-found: error, retention-days: 1 }
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions: { contents: write, id-token: write, attestations: write }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with: { name: app, path: dist }
+      - name: List the files
+        run: |
+          set -euo pipefail
+          # The frozen feed for copies older than 1.1.0. The hub checks it
+          # against the digest pinned under carry in tapster.yml.
+          cp "scripts/legacy-appcast.xml" "dist/appcast.xml"
+          cd dist && sha256sum -- * > checksums.txt
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        if: ${{ !github.event.repository.private }}
+        with: { subject-checksums: dist/checksums.txt }
+      - name: Hand the draft to the tapster hub
+        env: { GH_TOKEN: "${{ github.token }}", TAG: "${{ github.ref_name }}" }
+        run: |
+          set -euo pipefail
+          awk -v want="## ${TAG#v}" '$0 == want { found = 1; next } /^## / { if (found) exit } found { print }' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if [ -s "$RUNNER_TEMP/notes.md" ]; then notes=(--notes-file "$RUNNER_TEMP/notes.md"); else notes=(--generate-notes); fi
+          gh release create "$TAG" dist/* --draft --verify-tag --title "Battistics-${TAG#v}" "${notes[@]}"
+      - name: Ring the tapster hub
+        if: ${{ vars.TAPSTER_DOORBELL != '' }}
+        continue-on-error: true
+        env: { DOORBELL: "${{ vars.TAPSTER_DOORBELL }}" }
+        run: |
+          set -euo pipefail
+          token=$(curl -fsS -G --data-urlencode "audience=$DOORBELL" -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+          echo "::add-mask::$token"
+          curl -fsS -X POST -H "Authorization: Bearer $token" "$DOORBELL"
