@@ -67,6 +67,9 @@ actor MCPAutomationBridge {
                 heartbeat?.cancel()
                 heartbeat = nil
             }
+            // Ownership is per connection; an idle one would only hold one of
+            // the app's few client slots until this MCP process exits.
+            if ownedID == nil { await client.close() }
             return result(reply)
         } catch {
             ownedID = nil

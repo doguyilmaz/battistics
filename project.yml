@@ -13,7 +13,7 @@ packages:
     from: "2.6.0"
   MCP:
     url: https://github.com/modelcontextprotocol/swift-sdk.git
-    from: "0.12.1"
+    exactVersion: "0.12.1"
 
 fileGroups:
   - README.md

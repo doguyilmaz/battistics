@@ -34,15 +34,16 @@ final class CommandProcess: @unchecked Sendable {
         identifier = pid
     }
 
-    func waitForExit() async -> Int32 {
+    /// The exit code, plus the signal when the child was killed by one.
+    func waitForExit() async -> (code: Int32, signal: Int32?) {
         await withCheckedContinuation { continuation in
             waitQueue.async {
                 var status: Int32 = 0
                 var result: pid_t
                 repeat { result = waitpid(self.identifier, &status, 0) } while result < 0 && errno == EINTR
-                guard result == self.identifier else { continuation.resume(returning: 70); return }
+                guard result == self.identifier else { continuation.resume(returning: (70, nil)); return }
                 let signal = status & 0x7f
-                continuation.resume(returning: signal == 0 ? (status >> 8) & 0xff : 128 + signal)
+                continuation.resume(returning: signal == 0 ? ((status >> 8) & 0xff, nil) : (128 + signal, signal))
             }
         }
     }

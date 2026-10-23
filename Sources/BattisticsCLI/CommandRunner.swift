@@ -10,6 +10,7 @@ final class CommandRunner {
     private var receivedSignal: Int32?
     private var heartbeat: Task<Void, Never>?
     private var ownsSession = false
+    private var childSignal: Int32?
 
     init(client: LocalAutomationClient = .init()) { self.client = client }
 
@@ -39,7 +40,7 @@ final class CommandRunner {
             process = child
             report("Keep Awake started; maximum \(options.request.durationMinutes ?? 720) minutes.")
             startHeartbeat(id: id)
-            code = await child.waitForExit()
+            (code, childSignal) = await child.waitForExit()
             process = nil
         } catch {
             report("Could not launch command: \(error.localizedDescription)")
@@ -50,6 +51,16 @@ final class CommandRunner {
         if ownsSession { _ = try? await client.request(.init(.stop, sessionID: id)) }
         await client.close()
         return code
+    }
+
+    /// Dies from the command's signal when it had one, so a shell loop
+    /// around `battistics run` stops on Ctrl-C as it would without it.
+    func finish(_ code: Int32) -> Never {
+        if let childSignal {
+            signal(childSignal, SIG_DFL)
+            kill(getpid(), childSignal)
+        }
+        exit(code)
     }
 
     private func startHeartbeat(id: UUID) {
@@ -79,7 +90,10 @@ final class CommandRunner {
             source.setEventHandler { [weak self] in
                 guard let self else { return }
                 self.receivedSignal = number
-                if let process = self.process { kill(process.identifier, number) }
+                // The child shares our process group: when we are in the
+                // terminal's foreground, Ctrl-C and hangup already reached it.
+                let fromTerminal = number != SIGTERM && tcgetpgrp(STDIN_FILENO) == getpgrp()
+                if let process = self.process, !fromTerminal { kill(process.identifier, number) }
             }
             source.resume()
             signals.append(source)

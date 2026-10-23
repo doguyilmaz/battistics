@@ -16,7 +16,7 @@ public final class LocalAutomationClient: @unchecked Sendable {
         let data = try JSONEncoder().encode(request) + Data([10])
         return try await withCheckedThrowingContinuation { continuation in
             queue.async {
-                do { continuation.resume(returning: try self.exchange(data)) }
+                do { continuation.resume(returning: try self.exchange(data, timeout: request.operation == .start ? 15 : 5)) }
                 catch { self.disconnect(); continuation.resume(throwing: error) }
             }
         }
@@ -61,9 +61,10 @@ public final class LocalAutomationClient: @unchecked Sendable {
         } catch { Darwin.close(socketFD); throw error }
     }
 
-    private func exchange(_ data: Data) throws -> AutomationReply {
+    /// A closed-lid start waits on the power helper for up to 10 seconds.
+    private func exchange(_ data: Data, timeout seconds: UInt64) throws -> AutomationReply {
         guard data.count <= 16_384 else { throw POSIXError(.EMSGSIZE) }
-        let deadline = DispatchTime.now().uptimeNanoseconds + 5_000_000_000
+        let deadline = DispatchTime.now().uptimeNanoseconds + seconds * 1_000_000_000
         try connectIfNeeded()
         try data.withUnsafeBytes { buffer in
             var offset = 0

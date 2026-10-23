@@ -106,7 +106,7 @@ with tempfile.TemporaryDirectory(prefix="battistics-cli-", dir="/private/tmp") a
         assert b"started" in process.stderr.readline()
         process.send_signal(number)
         _, err = process.communicate(timeout=10)
-        assert process.returncode == 128 + number, (number, process.returncode, err)
+        assert process.returncode == -number, (number, process.returncode, err)
         server.finish()
         assert server.requests[-1]["operation"] == "stop"
 
@@ -136,7 +136,7 @@ with tempfile.TemporaryDirectory(prefix="battistics-cli-", dir="/private/tmp") a
                     pass
             waited, status = os.waitpid(pid, os.WNOHANG)
             if waited:
-                assert os.waitstatus_to_exitcode(status) == 130, status
+                assert os.waitstatus_to_exitcode(status) == -signal.SIGINT, status
                 break
             time.sleep(0.05)
         else:

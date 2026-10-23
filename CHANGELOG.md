@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Picking a duration during a Keep Awake session now applies to that session,
+  counted from the change, instead of silently waiting for the next one.
+- Stop on Low Battery is also in the menu bar's Keep Awake menu.
+- Updating from an earlier version no longer opens the tour unasked, and
+  leaving the tour any way counts as seen.
+- `battistics run` no longer sends a second Ctrl-C to the command, and exits
+  by the command's signal so shell loops stop; closed-lid starts get time to
+  finish; the MCP SDK is pinned to an exact version.
+
 - Finite Keep Awake profiles and a live task card showing origin, remaining time
   and enabled stop protections. Profiles and terminal setup live in Power,
   without an extra shortcut row in the menu popover.

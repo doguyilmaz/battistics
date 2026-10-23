@@ -10,7 +10,7 @@ let package = Package(
         .executable(name: "battistics-mcp", targets: ["BattisticsMCP"])
     ],
     dependencies: [
-        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.1")
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", exact: "0.12.1")
     ],
     targets: [
         .executableTarget(name: "BattisticsCLI", dependencies: ["BattisticsCore"]),

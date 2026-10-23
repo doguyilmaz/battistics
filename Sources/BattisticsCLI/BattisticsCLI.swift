@@ -12,7 +12,7 @@ struct BattisticsCLI {
         do {
             let options = try RunOptions(arguments: arguments)
             let runner = CommandRunner()
-            exit(await runner.run(options))
+            runner.finish(await runner.run(options))
         } catch {
             FileHandle.standardError.write(Data((RunOptions.usage + "\n").utf8))
             exit(64)
