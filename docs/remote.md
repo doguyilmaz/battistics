@@ -63,3 +63,9 @@ The iPhone pane on the Mac and the phone's settings both explain this.
 - A widget or Live Activity.
 - Device builds need the team set in `project.yml`; the scheme builds for the
   Simulator as is.
+
+## Developing
+
+`BATTISTICS_REMOTE_SERVE=/tmp/pair.txt python3 scripts/test-automation.py --remote`
+serves the protocol on loopback from an isolated test app and writes a pairing
+link; open it in the Simulator, which shares the Mac's loopback.
