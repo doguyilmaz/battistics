@@ -106,6 +106,13 @@ struct PairingSheet: View {
                 Text("This iPhone will see its battery and connection, and can start or stop Keep Awake.")
                     .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
+            Label(pairing.host, systemImage: pairing.isTailscaleHost ? "lock.shield" : "exclamationmark.shield")
+                .font(.footnote.monospaced())
+                .foregroundStyle(pairing.isTailscaleHost ? Color.secondary : Color.orange)
+            if !pairing.isTailscaleHost {
+                Text("This address is not on Tailscale. Pair only with a code shown by Battistics on your own Mac.")
+                    .font(.footnote).foregroundStyle(.orange).multilineTextAlignment(.center)
+            }
             if let failure = flow.failure {
                 Label(failure, systemImage: "exclamationmark.triangle")
                     .font(.footnote).foregroundStyle(.orange)

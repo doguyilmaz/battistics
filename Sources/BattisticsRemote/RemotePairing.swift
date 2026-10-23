@@ -64,6 +64,14 @@ public struct RemotePairing: Codable, Sendable, Equatable, Identifiable {
         token.count == 43 && token.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }
     }
 
+    /// A Tailscale address or MagicDNS name. Anything else did not come from
+    /// a Mac's pairing screen and deserves a warning.
+    public var isTailscaleHost: Bool {
+        if host.hasSuffix(".ts.net") { return true }
+        let parts = host.split(separator: ".").compactMap { UInt8($0) }
+        return parts.count == 4 && parts[0] == 100 && (64...127).contains(parts[1])
+    }
+
     static func isValidHost(_ host: String) -> Bool {
         (1...253).contains(host.count) && host.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || ".-:".contains($0)) }
     }

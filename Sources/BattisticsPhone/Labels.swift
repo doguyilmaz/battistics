@@ -92,7 +92,7 @@ enum DurationLabel {
     }
 
     static func long(minutes: Int) -> String {
-        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .narrow))
+        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
     }
 
     static func spoken(minutes: Int) -> String {

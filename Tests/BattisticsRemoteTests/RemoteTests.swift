@@ -117,3 +117,17 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: .some(nil), to: nil).isEmpty)
     }
 }
+
+@Suite("Pairing hosts")
+struct PairingHostTests {
+    @Test func onlyTailscaleAddressesAreTrusted() {
+        func pairing(_ host: String) -> RemotePairing { .init(name: "Mac", host: host, port: 1, token: "t") }
+        #expect(pairing("100.64.0.1").isTailscaleHost)
+        #expect(pairing("100.127.255.254").isTailscaleHost)
+        #expect(pairing("mac.tail1234.ts.net").isTailscaleHost)
+        #expect(!pairing("100.128.0.1").isTailscaleHost)
+        #expect(!pairing("192.168.1.10").isTailscaleHost)
+        #expect(!pairing("127.0.0.1").isTailscaleHost)
+        #expect(!pairing("evil.example.com").isTailscaleHost)
+    }
+}

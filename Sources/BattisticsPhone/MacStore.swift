@@ -27,6 +27,11 @@ final class MacStore {
     }
 
     private init() {
+        // Keychain items outlive the app; a reinstall must not bring old pairings back.
+        if !UserDefaults.standard.bool(forKey: "installed") {
+            Keychain.save(Data("[]".utf8))
+            UserDefaults.standard.set(true, forKey: "installed")
+        }
         macs = Keychain.load().flatMap { try? JSONDecoder().decode([RemotePairing].self, from: $0) } ?? []
         readings = UserDefaults.standard.data(forKey: "readings")
             .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
@@ -52,7 +57,8 @@ final class MacStore {
         }
         var pairing = pairing
         pairing.name = status.machineName
-        macs.removeAll { $0.host == pairing.host && $0.port == pairing.port }
+        for old in macs where old.host == pairing.host { readings[old.id] = nil }
+        macs.removeAll { $0.host == pairing.host }
         macs.append(pairing)
         saveMacs()
         selectedID = pairing.id

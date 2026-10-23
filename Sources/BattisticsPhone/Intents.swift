@@ -12,6 +12,7 @@ enum IntentDuration: Int, AppEnum {
 }
 
 struct StartKeepAwakeIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake"
     static let description = IntentDescription("Starts Keep Awake on your Mac with the display allowed to sleep.")
 
@@ -28,6 +29,7 @@ struct StartKeepAwakeIntent: AppIntent {
 }
 
 struct StopKeepAwakeIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Let Mac Sleep"
     static let description = IntentDescription("Stops Keep Awake on your Mac.")
 
@@ -40,6 +42,7 @@ struct StopKeepAwakeIntent: AppIntent {
 }
 
 struct MacStatusIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Check Mac"
     static let description = IntentDescription("Tells you your Mac’s battery and whether it is kept awake.")
 
