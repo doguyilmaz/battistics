@@ -26,3 +26,5 @@ jobs:
         run: python3 scripts/test-mcp-stdio.py
       - name: Command lifecycle integration
         run: python3 scripts/test-cli.py
+      - name: App automation integration
+        run: python3 scripts/test-automation.py

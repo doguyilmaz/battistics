@@ -25,6 +25,15 @@ public struct KeepAwakeSafetyPolicy: Sendable {
         }
 
         public var effectiveStopPercent: Int { min(max(stopPercent, 5), 50) }
+
+        /// The stop as one value for a single picker; 0 means off.
+        public var batteryStopLevel: Int {
+            get { stopOnLowBattery ? effectiveStopPercent : 0 }
+            set {
+                stopOnLowBattery = newValue > 0
+                if newValue > 0 { stopPercent = newValue }
+            }
+        }
         public var effectiveWarningPercent: Int {
             max(min(max(warningPercent, 10), 80), stopOnLowBattery ? effectiveStopPercent + 5 : 10)
         }

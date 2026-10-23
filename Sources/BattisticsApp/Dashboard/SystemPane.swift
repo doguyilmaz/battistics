@@ -48,7 +48,7 @@ struct SystemPane: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
+                    Picker("Duration", selection: $keepAwake.displayedDuration) {
                         ForEach(KeepAwakeDuration.allCases) { duration in
                             Text(duration.label).tag(duration)
                         }

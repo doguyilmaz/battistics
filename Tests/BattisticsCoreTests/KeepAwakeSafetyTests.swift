@@ -23,6 +23,16 @@ struct KeepAwakeSafetyTests {
         #expect(!events.contains { $0.endsSession })
     }
 
+    @Test func batteryStopLevelTogglesStopAndKeepsWarningAbove() {
+        var configuration = KeepAwakeSafetyPolicy.Configuration(warningPercent: 15)
+        #expect(configuration.batteryStopLevel == 0)
+        configuration.batteryStopLevel = 30
+        #expect(configuration.stopOnLowBattery && configuration.effectiveStopPercent == 30)
+        #expect(configuration.effectiveWarningPercent == 35)
+        configuration.batteryStopLevel = 0
+        #expect(!configuration.stopOnLowBattery && configuration.stopPercent == 30)
+    }
+
     @Test func warningPrecedesStopAndDoesNotRepeatOnEveryReading() {
         var policy = KeepAwakeSafetyPolicy()
         let configuration = KeepAwakeSafetyPolicy.Configuration(stopOnLowBattery: true)

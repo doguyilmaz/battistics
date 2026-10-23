@@ -53,7 +53,10 @@ final class KeepAwakeModel {
     }
 
     var duration: KeepAwakeDuration {
-        didSet { UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration) }
+        didSet {
+            UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration)
+            if let session, session.duration != duration { retime(session, to: duration) }
+        }
     }
 
     /// Automation does not overwrite the user's next-session defaults. Pickers
@@ -61,6 +64,11 @@ final class KeepAwakeModel {
     var displayedMode: KeepAwakeMode {
         get { session?.mode ?? mode }
         set { mode = newValue }
+    }
+
+    var displayedDuration: KeepAwakeDuration {
+        get { session?.duration ?? duration }
+        set { duration = newValue }
     }
 
     init(helper: PowerHelperClient) {
@@ -410,6 +418,24 @@ final class KeepAwakeModel {
         errorMessage = KeepAwakeSafetyMonitor.message(for: event, starting: starting)
         notice.show(sessionID: id, message: errorMessage ?? "",
                     title: starting ? String(localized: "Keep Awake not started") : String(localized: "Keep Awake stopped"))
+    }
+
+    /// A new duration counts from now. The closed-lid lease is untouched; it
+    /// does not carry a deadline of its own.
+    private func retime(_ current: KeepAwakeSession, to duration: KeepAwakeDuration) {
+        guard !isChanging else { return }
+        let now = Date()
+        let new = KeepAwakeSession(mode: current.mode, duration: duration, startedAt: now)
+        guard assertion.take(mode: new.mode, until: new.deadline, now: now) else {
+            stop()
+            isStoppedReasonInformational = false
+            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            return
+        }
+        session = new
+        scheduleExpiry(for: new, now: now)
+        // A duration the user picks takes the session over from automation.
+        if let sessionID { onSessionEnded?(sessionID) }
     }
 
     /// One-shot, not a poll. The kernel releases the assertion on its own

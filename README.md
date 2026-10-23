@@ -24,7 +24,7 @@ macOS 14+ · Apple Silicon</p>
 - Energy view showing the busiest apps, sampled only while open
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed
 - Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
-- A five-step first-run tour and searchable English/Turkish help
+- A short first-run tour and searchable English/Turkish help
 - Optional on-device Q&A using Apple Intelligence on supported Macs with macOS 26+
 - Finite AI Focus, Long Build, Overnight and Presentation profiles with a live session card
 - Optional power adapter disconnect warnings during Keep Awake
@@ -51,7 +51,7 @@ All three work on battery or adapter and end on their timer even if Battistics i
 
 ### Session protection
 
-In **Power → Session Protection**, optionally end Keep Awake at 5–50% charge
+In **Power → Session Protection**, or **Stop on Low Battery** in the menu bar's Keep Awake menu, optionally end Keep Awake at 5–50% charge
 (10% preselected; automatic stopping is **off by default**). This releases the
 session and permits normal sleep; it never requests shutdown or closes apps.
 The battery rule applies only on battery power. Low-charge warnings default to

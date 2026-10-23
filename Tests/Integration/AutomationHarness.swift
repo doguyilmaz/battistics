@@ -65,6 +65,15 @@ struct AutomationHarness {
             precondition(awake.sessionName == nil)
         }
 
+        await awake.start(mode: .displayMaySleep, duration: .indefinite)?.value
+        let retimedID = awake.sessionIdentifier
+        awake.displayedDuration = .fifteenMinutes
+        let remaining = awake.remaining() ?? 0
+        precondition(awake.sessionIdentifier == retimedID && awake.session?.duration == .fifteenMinutes)
+        precondition(remaining > 14 * 60 && remaining <= 15 * 60)
+        awake.stop()
+        awake.duration = savedDuration
+
         await awake.start(mode: .displayMaySleep, duration: .fifteenMinutes)?.value
         let manualID = awake.sessionIdentifier
         let manualConflict = try await first.request(.init(.start, name: "Replace manual", durationMinutes: 15))
@@ -95,6 +104,15 @@ struct AutomationHarness {
         let staleStop = try await newClient.request(.init(.stop, sessionID: takeoverID))
         precondition(staleStop.error?.code == "inactive" && awake.isActive)
         awake.stop()
+
+        let retimeTakeover = try await newClient.request(.init(.start, name: "User duration takeover", durationMinutes: 15))
+        let retimeTakeoverID = try require(retimeTakeover.status?.sessionID)
+        awake.displayedDuration = .oneHour
+        precondition(awake.session?.duration == .oneHour && automation.activeTaskName == nil)
+        let retimedStop = try await newClient.request(.init(.stop, sessionID: retimeTakeoverID))
+        precondition(retimedStop.error?.code == "inactive" && awake.isActive)
+        awake.stop()
+        awake.duration = savedDuration
 
         _ = try await newClient.request(.init(.start, name: "Protection test", durationMinutes: 15))
         // Exercise the same stop callback used by real battery/thermal policy

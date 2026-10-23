@@ -323,12 +323,13 @@ struct PopoverView: View {
 
     private var keepAwakeMenu: some View {
         @Bindable var keepAwake = keepAwake
+        @Bindable var safety = keepAwake.safety
         return Menu {
             if keepAwake.isActive {
                 Button("Turn Off") { keepAwake.stop() }
                 Divider()
             }
-            Picker(keepAwake.isActive ? String(localized: "Next session duration") : String(localized: "Duration"), selection: $keepAwake.duration) {
+            Picker("Duration", selection: $keepAwake.displayedDuration) {
                 ForEach(KeepAwakeDuration.allCases) { duration in
                     Text(duration.label).tag(duration)
                 }
@@ -341,6 +342,14 @@ struct PopoverView: View {
                 }
             }
             .pickerStyle(.inline)
+            Divider()
+            Picker("Stop on Low Battery", selection: $safety.configuration.batteryStopLevel) {
+                Text("Never").tag(0)
+                ForEach(batteryStopLevels, id: \.self) { level in
+                    Text(Formatting.percent(Double(level))).tag(level)
+                }
+            }
+            .pickerStyle(.menu)
         } label: {
             Image(systemName: keepAwake.isActive ? "cup.and.saucer.fill" : "cup.and.saucer")
         } primaryAction: {
@@ -349,8 +358,13 @@ struct PopoverView: View {
         .menuStyle(.button)
         // A menu with a primary action builds its items once and never
         // updates them; a new identity rebuilds them.
-        .id("\(keepAwake.isActive) \(keepAwake.duration.rawValue) \(keepAwake.displayedMode.rawValue)")
+        .id("\(keepAwake.isActive) \(keepAwake.displayedDuration.rawValue) \(keepAwake.displayedMode.rawValue) \(keepAwake.safety.configuration.batteryStopLevel)")
         .help("Keep Awake")
+    }
+
+    private var batteryStopLevels: [Int] {
+        let current = keepAwake.safety.configuration.batteryStopLevel
+        return Set([5, 10, 15, 20, 30]).union(current > 0 ? [current] : []).sorted()
     }
 
     /// An update Sparkle is holding after a background check.
