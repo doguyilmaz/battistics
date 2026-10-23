@@ -38,6 +38,7 @@ struct RemoteHarness {
         remote.startPairing()
         let invite = try require(remote.invite)
         precondition(invite.pairing.port == port && RemotePairing(url: invite.pairing.url) == invite.pairing)
+        try await render(RemotePane().environment(remote).environment(network), name: "remote-pane")
         let phone = RemotePairing(name: invite.pairing.name, host: "127.0.0.1", port: port, token: invite.pairing.token)
         func send(_ operation: RemoteRequest.Operation, mode: RemoteStatus.Mode? = nil, minutes: Int? = nil,
                   as pairing: RemotePairing = phone) async throws -> RemoteReply {
@@ -92,6 +93,22 @@ struct RemoteHarness {
             try await Task.sleep(for: .seconds(60))
             if remote.invite == nil, remote.devices.isEmpty { remote.startPairing() }
         }
+    }
+
+    private static func render(_ view: some View, name: String) async throws {
+        let host = NSHostingView(rootView: view.frame(width: 640, height: 720))
+        host.frame = NSRect(x: 0, y: 0, width: 640, height: 720)
+        let window = NSWindow(contentRect: host.frame, styleMask: [.titled], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = host
+        window.orderFront(nil)
+        try await Task.sleep(for: .milliseconds(300))
+        let bitmap = try require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
+        host.cacheDisplay(in: host.bounds, to: bitmap)
+        let language = Bundle.main.preferredLocalizations.first ?? "en"
+        try require(bitmap.representation(using: .png, properties: [:]))
+            .write(to: URL(fileURLWithPath: "/private/tmp/battistics-\(name)-\(language).png"))
+        window.close()
     }
 
     private static func require<T>(_ value: T?) throws -> T {
