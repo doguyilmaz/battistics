@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """After make build, exercise the app controller in an isolated macOS bundle."""
 import json
+import os
 import plistlib
 import subprocess
 import sys
@@ -40,4 +41,4 @@ with tempfile.TemporaryDirectory(prefix="battistics-qa-") as temporary:
         "-o", str(executable),
     ], cwd=root, check=True)
     for language in ["en", "tr"]:
-        subprocess.run([str(executable), "-AppleLanguages", f"({language})"], check=True, timeout=60)
+        subprocess.run([str(executable), "-AppleLanguages", f"({language})"], check=True, timeout=None if "BATTISTICS_REMOTE_SERVE" in os.environ else 60)

@@ -31,6 +31,9 @@ struct RemoteHarness {
         let remote = RemoteAccessModel(awake: awake, automation: automation, helper: helper, network: network,
                                        port: port, extraHosts: ["127.0.0.1"])
         try await eventually { remote.addresses.contains("127.0.0.1") }
+        if let path = ProcessInfo.processInfo.environment["BATTISTICS_REMOTE_SERVE"] {
+            try await serve(remote, awake: awake, pairingFile: path)
+        }
 
         remote.startPairing()
         let invite = try require(remote.invite)
@@ -76,6 +79,19 @@ struct RemoteHarness {
             preconditionFailure("A disabled server answered")
         } catch {}
         print("PASS: pairing, status, start limits, busy, phone stop reason, unauthorized, unpair, disable")
+    }
+
+    /// Keeps serving for manual checks from the iOS Simulator, which shares
+    /// this Mac's loopback. Writes the pairing link to `pairingFile`.
+    private static func serve(_ remote: RemoteAccessModel, awake: KeepAwakeModel, pairingFile: String) async throws -> Never {
+        remote.startPairing()
+        let url = try require(remote.invite).pairing.url.absoluteString
+        try url.write(toFile: pairingFile, atomically: true, encoding: .utf8)
+        print(url)
+        while true {
+            try await Task.sleep(for: .seconds(60))
+            if remote.invite == nil, remote.devices.isEmpty { remote.startPairing() }
+        }
     }
 
     private static func require<T>(_ value: T?) throws -> T {

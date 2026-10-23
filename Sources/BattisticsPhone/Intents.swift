@@ -1,0 +1,73 @@
+import AppIntents
+import BattisticsRemote
+
+enum IntentDuration: Int, AppEnum {
+    case fifteen = 15, thirty = 30, hour = 60, twoHours = 120, fourHours = 240, sixHours = 360, twelveHours = 720
+
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Duration"
+    static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+        .fifteen: "15 minutes", .thirty: "30 minutes", .hour: "1 hour", .twoHours: "2 hours",
+        .fourHours: "4 hours", .sixHours: "6 hours", .twelveHours: "12 hours",
+    ]
+}
+
+struct StartKeepAwakeIntent: AppIntent {
+    static let title: LocalizedStringResource = "Keep Mac Awake"
+    static let description = IntentDescription("Starts Keep Awake on your Mac with the display allowed to sleep.")
+
+    @Parameter(title: "Duration", default: .hour) var duration: IntentDuration
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.start(mac, mode: .displayMaySleep, minutes: duration.rawValue) {
+            return .result(dialog: "\(failure)")
+        }
+        return .result(dialog: "\(mac.name) stays awake for \(DurationLabel.long(minutes: duration.rawValue)).")
+    }
+}
+
+struct StopKeepAwakeIntent: AppIntent {
+    static let title: LocalizedStringResource = "Let Mac Sleep"
+    static let description = IntentDescription("Stops Keep Awake on your Mac.")
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.stop(mac) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "Keep Awake is off on \(mac.name).")
+    }
+}
+
+struct MacStatusIntent: AppIntent {
+    static let title: LocalizedStringResource = "Check Mac"
+    static let description = IntentDescription("Tells you your Mac’s battery and whether it is kept awake.")
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        await MacStore.shared.refresh(mac)
+        guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status else {
+            return .result(dialog: "\(mac.name) is not answering.")
+        }
+        let battery = status.battery.map { String(localized: "Battery \($0.percent)%.") } ?? ""
+        let awake = status.session == nil ? String(localized: "Keep Awake is off.") : String(localized: "Keep Awake is on.")
+        return .result(dialog: "\(battery) \(awake)")
+    }
+}
+
+enum IntentFailure: Error, CustomLocalizedStringResourceConvertible {
+    case notPaired
+    var localizedStringResource: LocalizedStringResource { "Pair a Mac in Battistics Remote first." }
+}
+
+struct Shortcuts: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(intent: StartKeepAwakeIntent(), phrases: ["Keep my Mac awake with \(.applicationName)"],
+                    shortTitle: "Keep Awake", systemImageName: "cup.and.saucer.fill")
+        AppShortcut(intent: StopKeepAwakeIntent(), phrases: ["Let my Mac sleep with \(.applicationName)"],
+                    shortTitle: "Let Sleep", systemImageName: "moon.zzz")
+        AppShortcut(intent: MacStatusIntent(), phrases: ["Check my Mac with \(.applicationName)"],
+                    shortTitle: "Check Mac", systemImageName: "laptopcomputer")
+    }
+}
