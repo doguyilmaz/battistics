@@ -7764,6 +7764,40 @@
           }
         }
       }
+    },
+    "Can I check or control my Mac from my iPhone?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can I check or control my Mac from my iPhone?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’imi iPhone’dan kontrol edebilir miyim?"
+          }
+        }
+      }
+    },
+    "Yes, with Battistics Remote and Tailscale on both devices. In Battistics › iPhone, allow access and choose Pair an iPhone, then scan the code with the iPhone Camera. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Nothing is opened beyond your Tailscale network, and only paired iPhones can connect. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, with Battistics Remote and Tailscale on both devices. In Battistics › iPhone, allow access and choose Pair an iPhone, then scan the code with the iPhone Camera. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Nothing is opened beyond your Tailscale network, and only paired iPhones can connect. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet, Battistics Remote ve iki cihazda da Tailscale ile. Battistics › iPhone’da erişime izin verip iPhone Eşleştir’i seçin, sonra kodu iPhone Kamera’sıyla tarayın. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı ve Uyanık Tut’u gösterir; 12 saate kadar oturum başlatabilir veya durdurabilir. Tailscale ağınızın dışına hiçbir şey açılmaz ve yalnızca eşleştirilmiş iPhone’lar bağlanabilir. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1,7 +1,7 @@
 import Foundation
 
 enum HelpArticle: String, CaseIterable, Identifiable {
-    case keepAwake, lowBattery, warnings, heat, helper, health, history, privacy, automation
+    case keepAwake, lowBattery, warnings, heat, helper, health, history, privacy, automation, phone
     var id: String { rawValue }
 
     var title: String {
@@ -15,6 +15,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .history: String(localized: "Where is my history and how can I export it?")
         case .privacy: String(localized: "Does the assistant send my data anywhere?")
         case .automation: String(localized: "Can I keep a development task awake until it finishes?")
+        case .phone: String(localized: "Can I check or control my Mac from my iPhone?")
         }
     }
 
@@ -38,6 +39,8 @@ enum HelpArticle: String, CaseIterable, Identifiable {
             String(localized: "Built-in help works offline on macOS 14 and later. The optional assistant uses Apple's on-device Foundation Models on macOS 26 or later when Apple Intelligence, its model, and the language are available. AI selects a relevant guide article; the answer is the reviewed guide text, not generated instructions. It cannot change settings and has no cloud fallback. Questions and answers are not saved by Battistics. If the selection does not answer your question, browse the source articles. Optional update checks are separate.")
         case .automation:
             String(localized: "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.")
+        case .phone:
+            String(localized: "Yes, with Battistics Remote and Tailscale on both devices. In Battistics › iPhone, allow access and choose Pair an iPhone, then scan the code with the iPhone Camera. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Nothing is opened beyond your Tailscale network, and only paired iPhones can connect. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.")
         }
     }
 
@@ -47,6 +50,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .health: .overview
         case .history: .data
         case .privacy: .about
+        case .phone: .phone
         }
     }
 
@@ -61,6 +65,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .history: "history csv export import data energy geçmiş veri dışa içe aktar enerji"
         case .privacy: "assistant intelligence ai privacy offline local asistan zeka gizlilik çevrimdışı yerel"
         case .automation: "mcp agent task project code build terminal automation görev proje otomasyon iş"
+        case .phone: "iphone phone remote tailscale hotspot bag pocket telefon uzaktan çanta cep erişim noktası"
         }
     }
 

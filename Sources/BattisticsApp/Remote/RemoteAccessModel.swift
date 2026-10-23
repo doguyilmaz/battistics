@@ -43,6 +43,7 @@ final class RemoteAccessModel {
     @ObservationIgnored let network: NetworkMonitor
     @ObservationIgnored private var server: RemoteServer?
     @ObservationIgnored private var inviteExpiry: Task<Void, Never>?
+    @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private let port: UInt16
     @ObservationIgnored private let extraHosts: Set<String>
 
@@ -74,6 +75,15 @@ final class RemoteAccessModel {
     }
 
     func rebind() async {
+        retry?.cancel()
+        // Tailscale can assign its address after the network change is reported.
+        if enabled, TailscaleAddress.current().isEmpty {
+            retry = Task { [weak self] in
+                try? await Task.sleep(for: .seconds(30))
+                guard !Task.isCancelled else { return }
+                await self?.rebind()
+            }
+        }
         let wanted = enabled ? TailscaleAddress.current().union(extraHosts) : []
         if wanted.isEmpty {
             await server?.stop()

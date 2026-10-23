@@ -28,3 +28,9 @@ jobs:
         run: python3 scripts/test-cli.py
       - name: App automation integration
         run: python3 scripts/test-automation.py
+      - name: iPhone remote integration
+        run: python3 scripts/test-automation.py --remote
+      - name: Build iPhone app
+        run: |
+          xcodebuild -project Battistics.xcodeproj -scheme BattisticsPhone \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath .build/xcode build
