@@ -2,42 +2,23 @@
 
 ## Unreleased
 
-- Picking a duration during a Keep Awake session now applies to that session,
-  counted from the change, instead of silently waiting for the next one.
-- Stop on Low Battery is also in the menu bar's Keep Awake menu.
-- Updating from an earlier version no longer opens the tour unasked, and
-  leaving the tour any way counts as seen.
-- `battistics run` no longer sends a second Ctrl-C to the command, and exits
-  by the command's signal so shell loops stop; closed-lid starts get time to
-  finish; the MCP SDK is pinned to an exact version.
-- The automation socket lives in the per-user temporary folder, Sparkle is
-  pinned, and the tour's first step reads correctly on Macs without a battery.
-
-- Finite Keep Awake profiles and a live task card showing origin, remaining time
-  and enabled stop protections. Profiles and terminal setup live in Power,
-  without an extra shortcut row in the menu popover.
-
-- Command-scoped Keep Awake through the bundled CLI, with preserved exit codes,
-  signal forwarding and bounded sessions; discoverable setup in Power.
-- Bundle the CLI separately from the app executable to avoid filename collisions
-  on case-insensitive macOS volumes.
-- Optional adapter-disconnect notices while Keep Awake is active.
-
-- Optional Keep Awake stop at a chosen battery level, with advance warnings and
-  retained stop reasons. Automatic stopping is off by default
-- System thermal-pressure warnings and optional session stopping; Battistics
-  does not change fan speeds
-- Eight-step first-run tour with focused spotlights, automatic scrolling and
-  fixed navigation controls, replayable from Help; searchable local answers
-  in English and Turkish
-- Tour focus uses a blurred backdrop; the Keep Awake step shows the switch,
-  mode and duration together, including during an active session.
-- Tour cards fit their content without a fixed-height empty area.
-- Optional Apple Intelligence Q&A on macOS 26+ using the built-in help articles,
-  with availability checks, cancellation, sources, and no cloud fallback
-- Opt-in local MCP server with status, bounded task start, and owned task stop;
-  disconnect cleanup, a heartbeat timeout, existing protections, and separate
-  closed-lid permission. Copy JSON or Codex configuration from Power
+- Battistics Remote for iPhone: battery and time left, connection, lid, heat
+  and Keep Awake for a Mac on your Tailscale network, with start and stop,
+  local notifications and Siri shortcuts. Off by default on the Mac; pair by
+  QR code.
+- The Keep Awake card shows the connection, a closed lid and, on battery,
+  when the charge will not last the session.
+- Optional Keep Awake stop at a battery level, also in the menu bar's Keep
+  Awake menu, with advance warnings; off by default. Optional stop under heavy
+  thermal pressure; fan speeds are not changed.
+- Optional warning when the adapter is unplugged during Keep Awake.
+- Picking a duration during a session applies it from that moment.
+- Keep Awake for terminal commands with `battistics run`, and for AI tasks
+  through a bundled, opt-in local MCP server.
+- AI Focus, Long Build, Overnight and Presentation profiles, and a session card
+  showing what started Keep Awake and why the last one ended.
+- An eight-step tour on first launch, replayable from Help, and searchable help
+  in English and Turkish with optional on-device answers on macOS 26.
 
 ## 1.4.1
 

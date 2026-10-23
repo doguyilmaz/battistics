@@ -73,22 +73,11 @@ Diagnostics belong on stderr; stdout is reserved for MCP messages.
 
 ## Verification
 
-`swift test` covers argument validation, lease ownership/deadlines, private
-socket permissions and locking, malformed/oversized frames, disconnect during
-an asynchronous request, and MCP result serialization. After `make build`,
-`python3 scripts/test-mcp-stdio.py` checks the bundled executable's handshake,
-tool discovery, schemas, errors, and EOF shutdown without changing power state;
-CI runs it too.
+`swift test` covers validation, ownership, socket permissions and framing.
+After `make build`, `python3 scripts/test-mcp-stdio.py` checks the bundled
+server's handshake, tools and shutdown, and `python3 scripts/test-automation.py`
+exercises the app controller with short real assertions in an isolated test
+app. Neither installs the helper or enables closed-lid mode.
 
-On a development Mac, `python3 scripts/test-automation.py` compiles an isolated
-test app, exercises real idle/display assertions for a few seconds, and checks
-manual/foreign ownership, stale requests, user takeover, disconnect, disable,
-and the protection-stop callback. It renders English/Turkish automation views
-to `/private/tmp/battistics-automation-{en,tr}.png`. It uses its own preference
-domain and temporary endpoint and never installs a helper or enables closed-lid
-mode. Physical closed-lid automation still requires a signed-app release check.
-
-The same opt-in local connection also supports the bundled `battistics run` CLI.
-IPC v1 accepts optional `source` (`mcp` or `command`) on start; absent means
-`mcp`. This identifies the UI origin only and grants no additional privileges.
-Public MCP tools and their schemas are unchanged.
+The same local connection serves `battistics run`; a start may carry `source`
+(`mcp` or `command`), which only labels the session in the UI.

@@ -22,13 +22,11 @@ macOS 14+ · Apple Silicon</p>
 - Notifications for low battery, full charge, charge limit, high temperature and health decline
 - Battery levels of connected keyboards, mice, trackpads and headphones
 - Energy view showing the busiest apps, sampled only while open
-- Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed
-- Optional low-battery stop, advance warnings, and system thermal-pressure protection for Keep Awake
-- A short first-run tour and searchable English/Turkish help
-- Optional on-device Q&A using Apple Intelligence on supported Macs with macOS 26+
-- Finite AI Focus, Long Build, Overnight and Presentation profiles with a live session card
-- Optional power adapter disconnect warnings during Keep Awake
-- Opt-in local MCP automation for named, bounded Keep Awake tasks owned by an AI client
+- Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed, with ready-made profiles
+- Optional stop at a battery level or under heat, low-battery and unplug warnings
+- Keep Awake for terminal commands and AI tasks through a bundled CLI and local MCP server
+- Battistics Remote for iPhone: battery, connection and Keep Awake over Tailscale
+- A short tour and searchable help, with optional on-device answers on macOS 26
 - CSV export and import of the full history
 - English and Turkish
 
@@ -49,63 +47,34 @@ All three work on battery or adapter and end on their timer even if Battistics i
 ¹ Unless it is in clamshell mode, with an external display and power connected.
 ² Only if Lock Screen settings require a password after the display turns off.
 
-### Session protection
+### Protection
 
-In **Power → Session Protection**, or **Stop on Low Battery** in the menu bar's Keep Awake menu, optionally end Keep Awake at 5–50% charge
-(10% preselected; automatic stopping is **off by default**). This releases the
-session and permits normal sleep; it never requests shutdown or closes apps.
-The battery rule applies only on battery power. Low-charge warnings default to
-20% and can be changed or disabled independently. When automatic stopping is
-enabled, the warning level stays at least five percentage points above it.
-Warnings appear in the app as well as through macOS notifications when allowed.
+In **Power › Session Protection**, or **Stop on Low Battery** in the menu bar's
+Keep Awake menu, Keep Awake can end at 5–50% charge on battery. It is off by
+default and only ends the session; it never shuts the Mac down. Warnings start
+at 20%. **Thermal Care** warns under heavy thermal pressure and can stop the
+session. Fan speeds are not changed. Details: [session protection](docs/session-protection.md).
 
-**Power → Thermal Care** reports the system thermal state and warns during a
-session when macOS reports serious or critical pressure. An optional stop works
-on either power source. Battistics does not change fan speeds; battery temperature is
-not a CPU-temperature measurement.
+### Terminal and AI tasks
 
-Protection requires Battistics to be running and able to read system state.
-A sudden charge drop can skip the warning. Ending closed-lid mode may allow
-immediate sleep. Connect power for work that cannot be interrupted, and keep
-vents clear; never put a running, closed Mac inside a bag.
-
-### Tour and local help
-
-The first dashboard visit opens a short tour; skip or replay it from **Help**.
-**Help & Assistant** includes searchable answers on macOS 14+. On macOS 26+,
-the optional assistant uses Apple's on-device Foundation Models when the model,
-Apple Intelligence, and app language are available. AI selects a relevant guide
-article and the app shows its reviewed text and source. It cannot change settings
-and has no cloud fallback. Battistics does not save questions or answers. If the
-selected article does not answer the question, the full guide is always available.
-
-### Local MCP automation
-
-In **Power → Local automation**, enable access and copy the configuration
-for your AI client. It can read status, start a named task for 15 minutes to
-12 hours, and stop its own task when work finishes. Other clients and manual
-sessions are left alone. Disconnects, deadlines, user stops, and enabled battery
-or thermal protections end the task. Closed-lid tasks require a separate opt-in
-and an already installed helper. No cloud service or network port is used.
-See the [MCP setup and tool contract](docs/mcp.md).
-
-### Command-scoped Keep Awake
-
-In Power, use **Copy Terminal setup** and paste it into your shell. Then run:
+Turn on **Power › Local automation**, then:
 
 ```sh
 battistics run --name Build -- swift build
-battistics run --minutes 60 -- sh -c 'make build && make test'
 ```
 
-The command inherits your terminal streams, environment and working directory.
-Its exit releases Keep Awake; the default upper limit is 12 hours. Protection
-or a manual stop may end Keep Awake sooner without killing your command.
-Interactive AI terminals should use MCP task start/stop instead of process
-lifetime. See the [command contract](docs/developer-sessions.md).
+Keep Awake lasts as long as the command, 12 hours at most, and never kills it.
+AI clients use the bundled MCP server to start and stop a named task. See the
+[command contract](docs/developer-sessions.md) and [MCP setup](docs/mcp.md).
 
-Direct fan-speed overrides are not included in this version.
-See [feature scope and verification](docs/session-protection.md).
+### iPhone
+
+Battistics Remote shows the Mac's battery, how long it lasts, its connection,
+lid and heat, and starts or stops Keep Awake, even with the lid closed in a bag.
+Turn on **iPhone** in Battistics, pair by scanning its code, and run Tailscale
+on both devices; nothing is exposed beyond your tailnet. With no Wi‑Fi, a Mac
+set to join hotspots automatically uses the iPhone's hotspot. See
+[remote companion](docs/remote.md).
 
 ## Light by design
 
@@ -131,11 +100,15 @@ make test   # unit tests
 
 Run `make gen` and open `Battistics.xcodeproj` to work in Xcode.
 The MCP dependency requires Swift 6.1 or later. After a debug build,
-`python3 scripts/test-mcp-stdio.py` checks the bundled MCP server.
+`scripts/test-cli.py`, `scripts/test-mcp-stdio.py` and
+`scripts/test-automation.py` (`--tour`, `--remote`) run the integration checks.
+The iPhone app is the `BattisticsPhone` scheme.
 
 ## Privacy
 
-Runs entirely on your Mac. The only network request is the optional update check.
+Runs entirely on your Mac. The only network request is the optional update
+check. iPhone access is off by default; when on, it listens only on the
+Tailscale interface and answers only paired iPhones.
 
 ## License
 

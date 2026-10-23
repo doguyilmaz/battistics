@@ -386,23 +386,6 @@
         }
       }
     },
-    "Awake · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Awake · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık · %@"
-          }
-        }
-      }
-    },
     "Bat": {
       "localizations": {
         "tr": {
@@ -538,23 +521,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Battistics %@"
-          }
-        }
-      }
-    },
-    "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics holds a power assertion while this is on, the same mechanism the built-in caffeinate tool uses. It is released when you turn it off, when the timer runs out, or when Battistics quits."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu açıkken Battistics bir güç bildirimi tutar; yerleşik caffeinate aracının kullandığı mekanizmanın aynısı. Kapattığınızda, süre dolduğunda veya Battistics'ten çıktığınızda bırakılır."
           }
         }
       }
@@ -2073,23 +2039,6 @@
         }
       }
     },
-    "Only works on power adapter; macOS ignores it on battery.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Only works on power adapter; macOS ignores it on battery."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yalnızca güç adaptöründe çalışır; macOS pil modunda yok sayar."
-          }
-        }
-      }
-    },
     "Open Battery Settings…": {
       "extractionState": "manual",
       "localizations": {
@@ -2501,32 +2450,12 @@
         }
       }
     },
-    "Runs entirely on this Mac. The only network request is the optional update check.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tamamen bu Mac'te çalışır. Tek ağ isteği isteğe bağlı güncelleme denetimidir."
-          }
-        }
-      }
-    },
     "Sampling interval": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Örnekleme aralığı"
-          }
-        }
-      }
-    },
-    "Sampling runs only while this view is visible.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnekleme yalnızca bu görünüm ekrandayken çalışır."
           }
         }
       }
@@ -2849,46 +2778,12 @@
         }
       }
     },
-    "The screen turns off, the Mac keeps running.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The screen turns off, the Mac keeps running."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran kapanır, Mac çalışmaya devam eder."
-          }
-        }
-      }
-    },
     "Theme": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
             "value": "Tema"
-          }
-        }
-      }
-    },
-    "These are macOS's own settings, shown for the power source in use. Battistics reads them and does not change them.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "These are macOS's own settings, shown for the power source in use. Battistics reads them and does not change them."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bunlar macOS'un kendi ayarlarıdır ve kullanımdaki güç kaynağı için gösterilir. Battistics bunları okur, değiştirmez."
           }
         }
       }
@@ -2943,23 +2838,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapat"
-          }
-        }
-      }
-    },
-    "Turn off Keep Awake": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn off Keep Awake"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut'u kapat"
           }
         }
       }
@@ -3371,23 +3249,6 @@
         }
       }
     },
-    "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not confirm restoring sleep. The helper will retry after its lease expires; repair the helper if sleep remains disabled."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyku ayarının geri yüklendiği doğrulanamadı. Yardımcı oturum süresi dolunca yeniden deneyecek; uyku devre dışı kalırsa yardımcıyı onarın."
-          }
-        }
-      }
-    },
     "macOS could not put the display to sleep.": {
       "extractionState": "manual",
       "localizations": {
@@ -3401,23 +3262,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS ekranı uyutamadı."
-          }
-        }
-      }
-    },
-    "Lost the power helper connection. Keep Awake has stopped.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lost the power helper connection. Keep Awake has stopped."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısıyla bağlantı kesildi. Uyanık Tut durduruldu."
           }
         }
       }
