@@ -35,9 +35,9 @@ enum TourStep: Int, CaseIterable {
         case .profiles:
             String(localized: "AI Focus, Long Build, Overnight and Presentation combine a mode with a time limit. They keep your protection settings. AI Focus is a timer; it does not detect when an AI task finishes.")
         case .protection:
-            String(localized: "Turn this on to end Keep Awake at your chosen battery level. It allows normal sleep; it does not shut down the Mac. Battery warnings and the optional adapter-disconnect warning are here too.")
+            String(localized: "Turn this on to end Keep Awake at a battery level you choose. It allows normal sleep; it does not shut down the Mac. Low-battery warnings below are on by default.")
         case .automation:
-            String(localized: "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration are in this section.")
+            String(localized: "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on.")
         case .notifications:
             String(localized: "Choose low-charge and temperature alerts. macOS may ask for notification permission when an alert first arrives. Keep Awake also shows an in-app warning.")
         case .history:

@@ -15,6 +15,7 @@ struct KeepAwakeSessionCard: View {
                         .font(.callout.weight(.semibold)).lineLimit(2)
                     Spacer(minLength: 8)
                     Button("Stop") { awake.stop() }.controlSize(.small)
+                        .accessibilityLabel(String(localized: "Stop Keep Awake"))
                 }
                 HStack {
                     Text(origin)

@@ -5470,17 +5470,6 @@
         }
       }
     },
-    "Choose a Keep Awake mode and duration here. Closed-lid mode needs the power helper. Scroll to Session Protection to choose a battery stop level; automatic stopping starts off.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buradan Uyanık Tut modunu ve süresini seçin. Kapak kapalı modu güç yardımcısını gerektirir. Pil durdurma seviyesini seçmek için Oturum Koruması’na kaydırın; otomatik durdurma başlangıçta kapalıdır."
-          }
-        }
-      }
-    },
     "Choose low-charge and temperature alerts. macOS may ask for notification permission when an alert first arrives. Keep Awake also shows an in-app warning.": {
       "extractionState": "manual",
       "localizations": {
@@ -5767,17 +5756,6 @@
         }
       }
     },
-    "Open Battistics from the menu bar to see charge, health, and power use. Overview brings those readings together; click a battery detail to learn more.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarjı, pil sağlığını ve güç kullanımını görmek için menü çubuğundan Battistics’i açın. Genel Bakış bu bilgileri bir araya getirir; daha fazlası için pil ayrıntılarına tıklayın."
-          }
-        }
-      }
-    },
     "Protection works while Battistics is running. A sudden charge drop may skip the warning level. Keep power connected for work that cannot be interrupted.": {
       "extractionState": "manual",
       "localizations": {
@@ -5818,17 +5796,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yardımda arayın veya bir soru sorun"
-          }
-        }
-      }
-    },
-    "Search the built-in answers, or ask the on-device assistant when Apple Intelligence is available. Replay this tour anytime from Help. The tour never changes your power settings.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hazır yanıtlarda arayın veya Apple Intelligence kullanılabiliyorsa cihaz içi asistana sorun. Bu tanıtımı Yardım’dan istediğiniz zaman yeniden başlatabilirsiniz. Tanıtım güç ayarlarınızı değiştirmez."
           }
         }
       }
@@ -6230,57 +6197,6 @@
         }
       }
     },
-    "Local MCP automation": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local MCP automation"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yerel MCP otomasyonu"
-          }
-        }
-      }
-    },
-    "Allow AI clients to start Keep Awake tasks": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow AI clients to start Keep Awake tasks"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yapay zekâ istemcileri Uyanık Tut görevleri başlatabilsin"
-          }
-        }
-      }
-    },
-    "AI clients can start a named task for up to 12 hours and stop their own task when finished. Your battery and thermal protections still apply.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI clients can start a named task for up to 12 hours and stop their own task when finished. Your battery and thermal protections still apply."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yapay zekâ istemcileri en fazla 12 saatlik adlandırılmış bir görev başlatabilir ve işleri bitince kendi görevlerini durdurabilir. Pil ve ısıl korumalarınız geçerli kalır."
-          }
-        }
-      }
-    },
     "Ready for local clients": {
       "extractionState": "manual",
       "localizations": {
@@ -6362,23 +6278,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yapay zekâ görevi"
-          }
-        }
-      }
-    },
-    "Stop AI task": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stop AI task"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yapay zekâ görevini durdur"
           }
         }
       }
@@ -6485,23 +6384,6 @@
         }
       }
     },
-    "Next session duration": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next session duration"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sonraki oturum süresi"
-          }
-        }
-      }
-    },
     "Warn when the power adapter disconnects": {
       "localizations": {
         "en": {
@@ -6594,38 +6476,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Terminal komutları ve yapay zekâ istemcileri en fazla 12 saatlik adlandırılmış bir görev başlatabilir. Pil ve ısı korumalarınız geçerli olmaya devam eder."
-          }
-        }
-      }
-    },
-    "Automation task": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automation task"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Otomasyon görevi"
-          }
-        }
-      }
-    },
-    "Stop task": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stop task"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görevi durdur"
           }
         }
       }
@@ -7153,7 +7003,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu anahtar Uyanık Tut’u başlatır. Altından ekranın açık kalıp kalmayacağını ve süreyi seçin. Kapak kapalı modu güç yardımcısını gerektirir. Bu tur sırasında oturum başlatılmaz."
+            "value": "Bu anahtar Uyanık Tut’u başlatır. Altından ekranın açık kalıp kalmayacağını ve süreyi seçin. Kapak kapalı modu güç yardımcısını gerektirir. Tanıtım sırasında oturum başlatılmaz."
           }
         }
       }
@@ -7174,38 +7024,6 @@
         }
       }
     },
-    "Turn this on to end Keep Awake at your chosen battery level. It allows normal sleep; it does not shut down the Mac. Battery warnings and the optional adapter-disconnect warning are here too.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn this on to end Keep Awake at your chosen battery level. It allows normal sleep; it does not shut down the Mac. Battery warnings and the optional adapter-disconnect warning are here too."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seçtiğiniz pil seviyesinde Uyanık Tut’u bitirmek için bunu açın. Mac’i kapatmaz; normal uykuya izin verir. Pil uyarıları ve isteğe bağlı adaptör çıkarılma uyarısı da burada."
-          }
-        }
-      }
-    },
-    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration are in this section.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration are in this section."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Terminal kurulumu ve MCP yapılandırması bu bölümde."
-          }
-        }
-      }
-    },
     "Search here for built-in answers. On supported Macs, the on-device assistant can help find an answer. Replay this tour from Help anytime. Your settings have not changed.": {
       "localizations": {
         "en": {
@@ -7217,7 +7035,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yerleşik yanıtları buradan arayın. Desteklenen Mac’lerde cihaz içi asistan yanıt bulmanıza yardımcı olabilir. Turu Yardım’dan tekrar açabilirsiniz. Ayarlarınız değiştirilmedi."
+            "value": "Hazır yardım içeriklerini buradan arayın. Desteklenen Mac’lerde cihaz içi asistan yanıt bulmanıza yardımcı olabilir. Tanıtımı Yardım’dan tekrar açabilirsiniz. Ayarlarınız değiştirilmedi."
           }
         }
       }
@@ -7234,6 +7052,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geliştirme görevleri boyunca uyanık tutun"
+          }
+        }
+      }
+    },
+    "Stop on Low Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop on Low Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük pilde durdur"
+          }
+        }
+      }
+    },
+    "Turn this on to end Keep Awake at a battery level you choose. It allows normal sleep; it does not shut down the Mac. Low-battery warnings below are on by default.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn this on to end Keep Awake at a battery level you choose. It allows normal sleep; it does not shut down the Mac. Low-battery warnings below are on by default."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u seçtiğiniz pil seviyesinde bitirmek için bunu açın. Mac’i kapatmaz; normal uykuya izin verir. Aşağıdaki düşük pil uyarıları varsayılan olarak açıktır."
+          }
+        }
+      }
+    },
+    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Bunu açınca terminal kurulumu ve MCP yapılandırması aşağıda görünür."
+          }
+        }
+      }
+    },
+    "Stop Keep Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop Keep Awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u durdur"
           }
         }
       }

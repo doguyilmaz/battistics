@@ -29,7 +29,7 @@ distinguished from a user's anecdote alone.
 
 ## Help
 
-The tour visits Overview, Power, Notifications, History, and Help, highlights the
+The eight-step tour visits Overview, Power (Keep Awake, profiles, protection, automation), Notifications, History, and Help, highlights the
 current pane, supports Back/Next/Skip, and never enables settings. Finishing or
 skipping persists locally; Help can replay it.
 
@@ -80,7 +80,7 @@ also passed; see [MCP verification](mcp.md#verification).
 
 Manual release checks on a signed app:
 
-1. On first launch, walk all five tour steps; verify Back, Skip, Done, replay,
+1. On first launch, walk all eight tour steps; verify Back, Skip, Done, replay,
    and both languages without changing any power settings.
 2. Enable a battery stop above the current charge while unplugged. Confirm the
    session ends and cannot restart until conditions permit it. Repeat after

@@ -170,6 +170,15 @@ enum Prefs {
     static let alertDurationHours = "alertDurationHours"
     static let alertHealthDropEnabled = "alertHealthDropEnabled"
 
+    /// Installs from before the tour have saved preferences; only a first
+    /// launch should open it unasked. Sparkle's own keys do not count.
+    static func markTourSeenForExistingInstall(_ defaults: UserDefaults = .standard) {
+        guard defaults.object(forKey: hasSeenTour) == nil,
+              let domain = Bundle.main.bundleIdentifier.flatMap(defaults.persistentDomain(forName:)),
+              domain.keys.contains(where: { !$0.hasPrefix("SU") }) else { return }
+        defaults.set(true, forKey: hasSeenTour)
+    }
+
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
             showMenuBarIcon: true,

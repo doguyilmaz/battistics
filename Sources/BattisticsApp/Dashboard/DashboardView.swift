@@ -168,7 +168,10 @@ struct DashboardView: View {
                 model.tourRequested = true
             }
         }
-        .onChange(of: model.tourRequested, initial: true) {
+        .onChange(of: model.tourRequested, initial: true) { wasRequested, _ in
+            if wasRequested, !model.tourRequested {
+                UserDefaults.standard.set(true, forKey: Prefs.hasSeenTour)
+            }
             if model.tourRequested {
                 sidebarVisible = true
                 showingDetails = false

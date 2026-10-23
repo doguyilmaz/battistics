@@ -53,7 +53,6 @@ struct GuidedTourView: View {
     }
 
     private func finish() {
-        UserDefaults.standard.set(true, forKey: Prefs.hasSeenTour)
         model.tourRequested = false
     }
 }

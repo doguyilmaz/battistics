@@ -70,6 +70,7 @@ struct BattisticsApp: App {
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
 
     init() {
+        Prefs.markTourSeenForExistingInstall()
         Prefs.registerDefaults()
         let helper = PowerHelperClient()
         let awake = KeepAwakeModel(helper: helper)
