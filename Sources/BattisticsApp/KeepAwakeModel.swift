@@ -1,5 +1,6 @@
 import AppKit
 import BattisticsCore
+import BattisticsRemote
 import Foundation
 import Observation
 import SwiftUI
@@ -13,6 +14,8 @@ final class KeepAwakeModel {
     let safety = KeepAwakeSafetyMonitor()
     private(set) var session: KeepAwakeSession?
     private(set) var sessionName: String?
+    private(set) var sessionOrigin: RemoteStatus.Origin = .manual
+    private(set) var lastEnd: RemoteStatus.LastEnd?
 
     @ObservationIgnored private let assertion = WakeAssertion()
     @ObservationIgnored private var expiryTask: Task<Void, Never>?
@@ -78,7 +81,7 @@ final class KeepAwakeModel {
         safety.onStop = { [weak self] event in
             guard let self else { return }
             let id = self.sessionID ?? UUID().uuidString
-            self.stop()
+            self.stop(reason: event == .thermalStop ? .thermal : .battery)
             self.showSafetyReason(event, id: id)
         }
         activationObserver = NotificationCenter.default.addObserver(
@@ -96,12 +99,13 @@ final class KeepAwakeModel {
     @discardableResult
     func start(profile: KeepAwakeProfile) -> Task<Void, Never>? {
         guard !isActive, !isChanging, !isAwaitingHelperApproval else { return nil }
-        return start(mode: profile.mode, duration: profile.duration, name: profile.title)
+        return start(mode: profile.mode, duration: profile.duration, name: profile.title, origin: .profile)
     }
 
     @discardableResult
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
-               id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil) -> Task<Void, Never>? {
+               id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
+               origin: RemoteStatus.Origin = .manual) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
         if let event = safety.blockingEvent() {
             let wasActive = isActive
@@ -169,6 +173,7 @@ final class KeepAwakeModel {
                 }
                 session = new
                 sessionName = name
+                sessionOrigin = origin
                 scheduleExpiry(for: new, now: Date())
                 if mode == .lidClosed {
                     renewalActivity = ProcessInfo.processInfo.beginActivity(
@@ -263,7 +268,8 @@ final class KeepAwakeModel {
         approvalTask = nil
     }
 
-    func stop() {
+    func stop(reason: RemoteStatus.EndReason = .user) {
+        if session != nil { lastEnd = .init(reason: reason, at: Date()) }
         let leaseID = session?.mode == .lidClosed ? sessionID : nil
         if approvalTask != nil {
             cancelApprovalWait()
@@ -315,6 +321,7 @@ final class KeepAwakeModel {
         assertion.release()
         session = nil
         sessionName = nil
+        sessionOrigin = .manual
         if let endedID { onSessionEnded?(endedID) }
     }
 
@@ -356,7 +363,7 @@ final class KeepAwakeModel {
         safety.refresh()
         guard let session else { return }
         if session.hasExpired(at: Date()) {
-            stop()
+            stop(reason: .timer)
         } else if session.mode == .lidClosed, let id = sessionID {
             Task { await reconcileLease(sessionID: id) }
         }
@@ -383,6 +390,7 @@ final class KeepAwakeModel {
         _ result: LidSleepLeaseResult?, sessionID id: String, releaseFailed: Bool = false
     ) {
         guard sessionID == id else { return }
+        if session != nil { lastEnd = .init(reason: .failure, at: Date()) }
         clearLocalSession()
         // Ownership was lost: no release/rollback RPC and no automatic restart.
         showStoppedReason(result, sessionID: id, releaseFailed: releaseFailed)
@@ -427,14 +435,18 @@ final class KeepAwakeModel {
         let now = Date()
         let new = KeepAwakeSession(mode: current.mode, duration: duration, startedAt: now)
         guard assertion.take(mode: new.mode, until: new.deadline, now: now) else {
-            stop()
+            stop(reason: .failure)
             isStoppedReasonInformational = false
             errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
             return
         }
         session = new
         scheduleExpiry(for: new, now: now)
-        // A duration the user picks takes the session over from automation.
+        // A duration picked on this Mac takes the session over from automation or a phone.
+        if sessionOrigin != .profile {
+            sessionOrigin = .manual
+            sessionName = nil
+        }
         if let sessionID { onSessionEnded?(sessionID) }
     }
 
@@ -450,7 +462,7 @@ final class KeepAwakeModel {
         expiryTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(interval))
             guard !Task.isCancelled else { return }
-            self?.stop()
+            self?.stop(reason: .timer)
         }
     }
 }

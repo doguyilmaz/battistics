@@ -148,6 +148,9 @@ enum Prefs {
     static let hasSeenTour = "hasSeenTour"
     static let automationEnabled = "automationEnabled"
     static let automationClosedLidAllowed = "automationClosedLidAllowed"
+    static let remoteEnabled = "remoteEnabled"
+    static let remoteClosedLidAllowed = "remoteClosedLidAllowed"
+    static let remoteDevices = "remoteDevices"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 

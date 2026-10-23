@@ -42,7 +42,7 @@ struct TourHarness {
         let probe = Probe()
         let host = NSHostingView(rootView: DashboardView()
             .environment(model).environment(awake).environment(helper).environment(automation)
-            .environment(PowerSettingsModel()).environment(PowerAuthorization())
+            .environment(PowerSettingsModel()).environment(PowerAuthorization()).environment(NetworkMonitor())
             .background(Color(nsColor: .windowBackgroundColor))
             .overlayPreferenceValue(TourTargetPreference.self) { anchors in
                 GeometryReader { geometry in

@@ -1,9 +1,12 @@
 import BattisticsCore
+import BattisticsRemote
 import SwiftUI
 
 struct KeepAwakeSessionCard: View {
     @Environment(KeepAwakeModel.self) private var awake
     @Environment(AutomationModel.self) private var automation
+    @Environment(NetworkMonitor.self) private var network
+    @Environment(AppModel.self) private var model
     @State private var windowVisible = false
 
     var body: some View {
@@ -32,7 +35,11 @@ struct KeepAwakeSessionCard: View {
                     .monospacedDigit()
                 }
                 .font(.caption).foregroundStyle(.secondary)
-                Text(session.mode.label).font(.caption).foregroundStyle(.secondary)
+                Text(conditions(session)).font(.caption).foregroundStyle(.secondary)
+                if let warning = runtimeWarning(session) {
+                    Label(warning, systemImage: "battery.25percent")
+                        .font(.caption).foregroundStyle(.orange)
+                }
                 if awake.safety.configuration.stopOnLowBattery {
                     Text("Stops at \(awake.safety.configuration.effectiveStopPercent)% battery")
                         .font(.caption).foregroundStyle(.secondary)
@@ -50,11 +57,26 @@ struct KeepAwakeSessionCard: View {
     }
 
     private var origin: String {
-        switch automation.activeSource {
-        case .command: String(localized: "Terminal command")
-        case .mcp: String(localized: "AI task · MCP")
-        case nil: awake.sessionName == nil ? String(localized: "Started manually") : String(localized: "Profile")
+        switch awake.sessionOrigin {
+        case .manual: String(localized: "Started manually")
+        case .profile: String(localized: "Profile")
+        case .terminal: String(localized: "Terminal command")
+        case .ai: String(localized: "AI task · MCP")
+        case .phone: String(localized: "Started from iPhone")
         }
+    }
+
+    private func conditions(_ session: KeepAwakeSession) -> String {
+        var parts = [session.mode.label, network.state.label]
+        if Clamshell.read()?.isClosed == true { parts.append(String(localized: "Lid closed")) }
+        return parts.joined(separator: " · ")
+    }
+
+    private func runtimeWarning(_ session: KeepAwakeSession) -> String? {
+        guard let snapshot = model.snapshot, snapshot.batteryInstalled, let minutes = snapshot.timeRemainingMin,
+              RemoteStatus.batteryRunsOutFirst(minutesLeft: minutes, onAdapter: snapshot.externalConnected,
+                                               deadline: session.deadline, now: Date()) else { return nil }
+        return String(localized: "Battery lasts about \(Formatting.duration(minutes: minutes))")
     }
 
     private func remainingText(at date: Date) -> String {

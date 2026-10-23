@@ -3,9 +3,10 @@ import PackageDescription
 
 let package = Package(
     name: "BattisticsCore",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v14), .iOS(.v17)],
     products: [
         .library(name: "BattisticsCore", targets: ["BattisticsCore"]),
+        .library(name: "BattisticsRemote", targets: ["BattisticsRemote"]),
         .executable(name: "battistics", targets: ["BattisticsCLI"]),
         .executable(name: "battistics-mcp", targets: ["BattisticsMCP"])
     ],
@@ -23,6 +24,8 @@ let package = Package(
             name: "BattisticsMCP",
             dependencies: ["BattisticsCore", .product(name: "MCP", package: "swift-sdk")]
         ),
+        .target(name: "BattisticsRemote"),
+        .testTarget(name: "BattisticsRemoteTests", dependencies: ["BattisticsRemote"]),
         .testTarget(
             name: "BattisticsCoreTests",
             dependencies: ["BattisticsCore"]

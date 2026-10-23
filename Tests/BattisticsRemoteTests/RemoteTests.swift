@@ -1,0 +1,80 @@
+import Foundation
+import Testing
+@testable import BattisticsRemote
+
+@Suite("Remote companion contract")
+struct RemoteTests {
+    @Test func pairingSurvivesItsURLAndRejectsTampering() throws {
+        let pairing = RemotePairing(name: "Doğu’s MacBook Pro", host: "100.101.102.103", port: 47_616,
+                                    token: RemotePairing.makeToken())
+        #expect(RemotePairing(url: pairing.url) == pairing)
+        var short = URLComponents(url: pairing.url, resolvingAgainstBaseURL: false)!
+        short.queryItems = short.queryItems!.map { $0.name == "t" ? .init(name: "t", value: "abc") : $0 }
+        #expect(RemotePairing(url: short.url!) == nil)
+        var badHost = URLComponents(url: pairing.url, resolvingAgainstBaseURL: false)!
+        badHost.queryItems = badHost.queryItems!.map { $0.name == "h" ? .init(name: "h", value: "a b/c") : $0 }
+        #expect(RemotePairing(url: badHost.url!) == nil)
+        #expect(RemotePairing(url: URL(string: "https://pair?n=x")!) == nil)
+    }
+
+    @Test func tokensAreUniqueAndOnlyTheirHashMatches() {
+        let token = RemotePairing.makeToken(), other = RemotePairing.makeToken()
+        #expect(token != other && token.count == 43)
+        let hash = RemotePairing.hash(token)
+        #expect(RemotePairing.matches(token, hash: hash))
+        #expect(!RemotePairing.matches(other, hash: hash))
+        #expect(!RemotePairing.matches(token, hash: String(hash.dropLast())))
+    }
+
+    @Test func batteryRunsOutFirstOnlyOnBattery() {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        var status = RemoteStatus(
+            machineName: "Mac", readAt: now,
+            battery: .init(percent: 30, isCharging: false, onAdapter: false, minutesRemaining: 60),
+            session: .init(mode: .lidClosed, origin: .phone, startedAt: now, deadline: now.addingTimeInterval(7200)))
+        #expect(status.batteryRunsOutFirst)
+        status.session?.deadline = now.addingTimeInterval(1800)
+        #expect(!status.batteryRunsOutFirst)
+        status.session?.deadline = nil
+        #expect(status.batteryRunsOutFirst)
+        status.session?.deadline = now.addingTimeInterval(7200)
+        status.battery?.onAdapter = true
+        #expect(!status.batteryRunsOutFirst)
+    }
+
+    @Test func wireRoundTripsAndRejectsGarbage() throws {
+        let request = RemoteRequest(token: RemotePairing.makeToken(), operation: .start,
+                                    mode: .displayMaySleep, durationMinutes: 60, deviceName: "iPhone")
+        let data = try RemoteWire.encode(request)
+        #expect(data.last == 10)
+        #expect(try RemoteWire.decode(RemoteRequest.self, from: data) == request)
+        #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}\n".utf8)) }
+    }
+
+    @Test func serverAnswersOnlyOnItsAddressAndLimitsFailedAttempts() async throws {
+        let port = UInt16.random(in: 50_000...60_000)
+        let token = RemotePairing.makeToken(), hash = RemotePairing.hash(token)
+        let server = RemoteServer(port: port) { request in
+            guard RemotePairing.matches(request.token, hash: hash) else { return .init(.unauthorized, "Pair again.") }
+            return .init(status: .init(machineName: "Test Mac", readAt: Date()))
+        }
+        let listening = await server.listen(on: ["127.0.0.1"])
+        #expect(listening == ["127.0.0.1"])
+        let good = RemotePairing(name: "Test Mac", host: "127.0.0.1", port: port, token: token)
+        let reply = try await RemoteClient.send(.init(token: token, operation: .status), to: good)
+        #expect(reply.status?.machineName == "Test Mac")
+
+        let wrong = RemotePairing(name: "Test Mac", host: "127.0.0.1", port: port, token: RemotePairing.makeToken())
+        for _ in 0..<5 {
+            let denied = try await RemoteClient.send(.init(token: wrong.token, operation: .status), to: wrong)
+            #expect(denied.error?.code == .unauthorized)
+        }
+        let limited = try await RemoteClient.send(.init(token: token, operation: .status), to: good)
+        #expect(limited.error?.code == .rateLimited)
+
+        await server.stop()
+        await #expect(throws: (any Error).self) {
+            try await RemoteClient.send(.init(token: token, operation: .status), to: good, timeout: .seconds(2))
+        }
+    }
+}

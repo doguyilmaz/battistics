@@ -103,7 +103,7 @@ final class LidSleepController: @unchecked Sendable {
     /// an external display and power is left alone.
     private func sleepIfLidClosed(attempt: Int) {
         // A session acquired since then owns the lid again.
-        guard lease.expirationDate == nil, Self.lidClosedWantsSleep(),
+        guard lease.expirationDate == nil, Clamshell.read().map { $0.isClosed && $0.closingSleeps } == true,
               (try? Self.readSleepDisabled()) == false else { return }
         // Refused while powerd is still applying the setting. Retry briefly
         // rather than leave the Mac awake on a race.
@@ -127,19 +127,6 @@ final class LidSleepController: @unchecked Sendable {
     /// `kIOReturnNotPermitted`, which Swift cannot import: it is built from
     /// function-like macros.
     private static let notPermitted = IOReturn(bitPattern: 0xE000_02E2)
-
-    private static func lidClosedWantsSleep() -> Bool {
-        let root = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPMrootDomain"))
-        guard root != IO_OBJECT_NULL else { return false }
-        defer { IOObjectRelease(root) }
-        func flag(_ key: String) -> Bool {
-            let value = IORegistryEntryCreateCFProperty(root, key as CFString, kCFAllocatorDefault, 0)?
-                .takeRetainedValue()
-            return (value as? Bool) == true
-        }
-        // CausesSleep is false in clamshell mode with a display and power.
-        return flag("AppleClamshellState") && flag("AppleClamshellCausesSleep")
-    }
 
     private static func requestSleep() -> IOReturn? {
         let connection = IOPMFindPowerManagement(kIOMainPortDefault)

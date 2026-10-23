@@ -1,4 +1,5 @@
 import BattisticsCore
+import BattisticsRemote
 import Foundation
 import Observation
 
@@ -50,7 +51,7 @@ final class AutomationModel {
     func stopOwnedSession() {
         let id = lease?.id.uuidString
         clearOwnership()
-        if let id, awake.sessionIdentifier == id { awake.stop() }
+        if let id, awake.sessionIdentifier == id { awake.stop(reason: .client) }
     }
 
     private func clearOwnership() {
@@ -133,7 +134,8 @@ final class AutomationModel {
             ownedMode = arguments.mode
             startWatchdog()
             let start = awake.start(mode: arguments.mode, duration: arguments.duration, now: now,
-                                    id: id.uuidString, allowHelperSetup: false)
+                                    id: id.uuidString, allowHelperSetup: false,
+                                    origin: request.source == .command ? .terminal : .ai)
             await start?.value
             guard enabled, connections.contains(owner), lease?.id == id,
                   awake.sessionIdentifier == id.uuidString, awake.isActive else {

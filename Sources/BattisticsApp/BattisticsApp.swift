@@ -61,6 +61,8 @@ struct BattisticsApp: App {
     @State private var updater = UpdaterModel()
     @State private var keepAwake: KeepAwakeModel
     @State private var automation: AutomationModel
+    @State private var network: NetworkMonitor
+    @State private var remote: RemoteAccessModel
     @State private var powerAuth = PowerAuthorization()
     @State private var powerSettings = PowerSettingsModel()
     @State private var powerHelper: PowerHelperClient
@@ -76,7 +78,11 @@ struct BattisticsApp: App {
         let awake = KeepAwakeModel(helper: helper)
         _powerHelper = State(initialValue: helper)
         _keepAwake = State(initialValue: awake)
-        _automation = State(initialValue: AutomationModel(awake: awake, helper: helper))
+        let automation = AutomationModel(awake: awake, helper: helper)
+        let network = NetworkMonitor()
+        _automation = State(initialValue: automation)
+        _network = State(initialValue: network)
+        _remote = State(initialValue: RemoteAccessModel(awake: awake, automation: automation, helper: helper, network: network))
         _model = State(initialValue: AppModel(
             onBatteryReading: { [weak awake] in awake?.safety.update($0) },
             suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true }))
@@ -93,6 +99,8 @@ struct BattisticsApp: App {
                 .environment(updater)
                 .environment(keepAwake)
                 .environment(automation)
+                .environment(network)
+                .environment(remote)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
@@ -109,6 +117,8 @@ struct BattisticsApp: App {
                 .environment(updater)
                 .environment(keepAwake)
                 .environment(automation)
+                .environment(network)
+                .environment(remote)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)
@@ -125,6 +135,8 @@ struct BattisticsApp: App {
                 .environment(updater)
                 .environment(keepAwake)
                 .environment(automation)
+                .environment(network)
+                .environment(remote)
                 .environment(powerAuth)
                 .environment(powerSettings)
                 .environment(powerHelper)

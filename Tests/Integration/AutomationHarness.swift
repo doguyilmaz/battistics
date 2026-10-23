@@ -147,13 +147,18 @@ struct AutomationHarness {
     private static func capture(_ automation: AutomationModel, awake: KeepAwakeModel) async throws {
         try await render(Form { AutomationSettings() }.formStyle(.grouped).environment(automation),
                          name: "automation", width: 680, height: 760)
+        let directory = URL(fileURLWithPath: "/private/tmp/battistics-automation-\(UUID())")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let model = AppModel(historyDirectory: directory)
+        let network = NetworkMonitor()
         try await render(Form {
             Section("Current session") { KeepAwakeSessionCard() }
             KeepAwakeProfiles()
             KeepAwakeSafetySettings()
-        }.formStyle(.grouped).environment(automation).environment(awake),
+        }.formStyle(.grouped).environment(automation).environment(awake).environment(model).environment(network),
                          name: "profiles", width: 680, height: 850)
-        try await render(KeepAwakeSessionCard().padding(14).environment(automation).environment(awake),
+        try await render(KeepAwakeSessionCard().padding(14).environment(automation).environment(awake)
+                            .environment(model).environment(network),
                          name: "session-card", width: 340, height: 160)
     }
 

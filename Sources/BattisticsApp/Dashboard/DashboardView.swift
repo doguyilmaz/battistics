@@ -8,6 +8,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
     case peripherals
     case energy
     case system
+    case phone
     case general
     case appearance
     case notifications
@@ -19,7 +20,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     // Not in the sidebar; kept for battistics://dashboard/details.
     static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
-    static let controlPanes: [DashboardPane] = [.system]
+    static let controlPanes: [DashboardPane] = [.system, .phone]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]
     static let helpPanes: [DashboardPane] = [.help, .about]
 
@@ -32,6 +33,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .energy: String(localized: "Energy")
         // Raw values are persisted and used in links: never rename them.
         case .system: String(localized: "Power")
+        case .phone: String(localized: "iPhone")
         case .general: String(localized: "General")
         case .appearance: String(localized: "Menu Bar")
         case .notifications: String(localized: "Notifications")
@@ -49,6 +51,7 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .peripherals: "keyboard"
         case .energy: "bolt.circle"
         case .system: "switch.2"
+        case .phone: "iphone"
         case .general: "gearshape"
         case .appearance: "menubar.rectangle"
         case .notifications: "bell.badge"
@@ -240,6 +243,7 @@ struct DashboardView: View {
         case .peripherals: PeripheralsPane()
         case .energy: EnergyPane(isVisible: windowVisible)
         case .system: SystemPane()
+        case .phone: RemotePane()
         case .general: GeneralSettings()
         case .appearance: AppearanceSettings()
         case .notifications: NotificationSettings()

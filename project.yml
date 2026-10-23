@@ -95,6 +95,8 @@ targets:
             subpath: Contents/Library/LaunchDaemons
     dependencies:
       - package: BattisticsCore
+      - package: BattisticsCore
+        product: BattisticsRemote
       - package: Sparkle
       - target: BattisticsCLI
         codeSign: true
