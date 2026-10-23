@@ -71,6 +71,7 @@ AI clients use the bundled MCP server to start and stop a named task. See the
 
 Battistics Remote shows the Mac's battery, how long it lasts, its connection,
 lid and heat, and starts or stops Keep Awake, even with the lid closed in a bag.
+Widgets and a Lock Screen countdown come with it.
 Turn on **iPhone** in Battistics, pair by scanning its code, and run Tailscale
 on both devices; nothing is exposed beyond your tailnet. With no Wi‑Fi, a Mac
 set to join hotspots automatically uses the iPhone's hotspot. See

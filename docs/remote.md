@@ -46,6 +46,11 @@ mid-session. iOS schedules background refresh, so alerts can be late.
 Siri and Shortcuts get Keep Mac Awake, Let Mac Sleep and Check Mac; all require
 an unlocked iPhone.
 
+Widgets (Home Screen and Lock Screen) show the selected Mac's battery and Keep
+Awake state from the app's last reading, shared through an App Group. A timed
+session also gets a Lock Screen and Dynamic Island countdown that ends when the
+app sees the session end.
+
 ## Hotspot
 
 iOS gives apps no way to turn Personal Hotspot on, and its settings page has no
@@ -60,7 +65,6 @@ The iPhone pane on the Mac and the phone's settings both explain this.
 - Bluetooth LE between phone and Mac in the same bag, for status and "join the
   hotspot" with no network at all.
 - CloudKit push for prompt alerts, which needs an iCloud container on both apps.
-- A widget or Live Activity.
 - Device builds need the team set in `project.yml`; the scheme builds for the
   Simulator as is.
 
