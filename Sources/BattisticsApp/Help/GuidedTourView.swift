@@ -15,7 +15,9 @@ struct GuidedTourView: View {
                     .font(.caption).monospacedDigit().foregroundStyle(.secondary)
             }
             Text(step.title).font(.headline).accessibilityAddTraits(.isHeader)
-            Text(step.detail).font(.callout).fixedSize(horizontal: false, vertical: true)
+            Text(step == .overview && model.snapshot?.batteryInstalled != true
+                 ? String(localized: "No battery was found on this Mac, so there are no charge gauges here. Keep Awake and help still work.")
+                 : step.detail).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack {
                 Button("Skip Tour") { finish() }

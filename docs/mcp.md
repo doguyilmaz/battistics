@@ -42,7 +42,7 @@ thermal protection, and disabling automation are final: a heartbeat never
 restarts a session. Closed-lid automation needs a separate opt-in and an
 already installed power helper; MCP does not install or repair the helper.
 
-The endpoint lives in `/private/tmp/battistics-<uid>/control.sock`, inside an
+The endpoint lives in `battistics/control.sock` under the per-user temporary folder (`getconf DARWIN_USER_TEMP_DIR`), inside an
 owner-only directory. Both ends verify the peer's user ID. A file lock prevents
 two app copies from taking over the same endpoint. This trusts applications
 running as the same macOS user once enabled; it is not a sandbox between AI

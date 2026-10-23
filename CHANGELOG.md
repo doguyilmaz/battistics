@@ -10,6 +10,8 @@
 - `battistics run` no longer sends a second Ctrl-C to the command, and exits
   by the command's signal so shell loops stop; closed-lid starts get time to
   finish; the MCP SDK is pinned to an exact version.
+- The automation socket lives in the per-user temporary folder, Sparkle is
+  pinned, and the tour's first step reads correctly on Macs without a battery.
 
 - Finite Keep Awake profiles and a live task card showing origin, remaining time
   and enabled stop protections. Profiles and terminal setup live in Power,

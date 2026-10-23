@@ -2,7 +2,13 @@ import Darwin
 import Foundation
 
 public struct LocalAutomationEndpoint: Sendable {
-    public static var standard: Self { .init(directory: "/private/tmp/battistics-\(geteuid())") }
+    /// The per-user temporary folder, which other users cannot pre-create.
+    public static var standard: Self {
+        var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
+        let length = confstr(_CS_DARWIN_USER_TEMP_DIR, &buffer, buffer.count)
+        guard length > 0, length <= buffer.count else { return .init(directory: "/private/tmp/battistics-\(geteuid())") }
+        return .init(directory: String(cString: buffer) + "battistics")
+    }
     public let directory: String
     public var socketPath: String { directory + "/control.sock" }
     var lockPath: String { directory + "/control.lock" }

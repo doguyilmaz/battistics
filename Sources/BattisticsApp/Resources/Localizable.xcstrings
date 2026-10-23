@@ -7121,6 +7121,23 @@
           }
         }
       }
+    },
+    "No battery was found on this Mac, so there are no charge gauges here. Keep Awake and help still work.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No battery was found on this Mac, so there are no charge gauges here. Keep Awake and help still work."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te pil bulunamadı, bu yüzden burada şarj göstergesi yok. Uyanık Tut ve yardım yine de çalışır."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
