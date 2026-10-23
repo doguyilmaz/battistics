@@ -33,8 +33,9 @@ struct MacProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<MacEntry>) -> Void) {
         let entry = MacEntry(date: .now, snapshot: .load())
         // Ending sessions change the view without new data; refresh at the deadline.
-        let next = entry.snapshot?.status?.session?.deadline ?? .now.addingTimeInterval(30 * 60)
-        completion(Timeline(entries: [entry], policy: .after(max(next, .now.addingTimeInterval(60)))))
+        let deadline = entry.snapshot?.status?.session?.deadline
+        let next = deadline.flatMap { $0 > .now ? $0 : nil } ?? .now.addingTimeInterval(30 * 60)
+        completion(Timeline(entries: [entry], policy: .after(next)))
     }
 }
 
@@ -131,7 +132,7 @@ struct MacWidgetView: View {
     private func awakeLine(_ status: RemoteStatus) -> some View {
         if let deadline = status.session?.deadline, deadline > entry.date {
             Text("Awake · \(deadline, style: .timer)")
-        } else if status.session != nil {
+        } else if let session = status.session, session.deadline == nil {
             Text("Kept awake")
         } else {
             Text("Can sleep")

@@ -10,9 +10,10 @@ public final class RemoteServer: @unchecked Sendable {
     private let port: NWEndpoint.Port
     private let handler: Handler
     private var listeners: [String: NWListener] = [:]
-    private var open = 0
+    private var open: [String: Int] = [:]
     private var failures: [String: [Date]] = [:]
-    private static let maximumConnections = 4
+    private static let maximumConnections = 8
+    private static let connectionsPerPeer = 2
     private static let failureLimit = 5
     private static let failureWindow: TimeInterval = 60
 
@@ -42,6 +43,7 @@ public final class RemoteServer: @unchecked Sendable {
                             pending.leave(group)
                         case .failed, .cancelled:
                             pending.leave(group)
+                            listener.cancel()
                             if self?.listeners[host] === listener { self?.listeners[host] = nil }
                         default: break
                         }
@@ -58,7 +60,6 @@ public final class RemoteServer: @unchecked Sendable {
     private func makeListener(host: String) -> NWListener? {
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host: .init(host), port: port)
-        parameters.allowLocalEndpointReuse = true
         guard let listener = try? NWListener(using: parameters) else { return nil }
         listener.newConnectionHandler = { [weak self] connection in self?.accept(connection) }
         return listener
@@ -66,30 +67,48 @@ public final class RemoteServer: @unchecked Sendable {
 
     private func accept(_ connection: NWConnection) {
         let peer = Self.peerHost(connection)
-        guard open < Self.maximumConnections else { connection.cancel(); return }
-        open += 1
+        // A packet for the Tailscale address can still arrive on another
+        // interface; only tailnet and local peers get as far as the parser.
+        guard Self.isAllowedPeer(peer), open.values.reduce(0, +) < Self.maximumConnections,
+              open[peer, default: 0] < Self.connectionsPerPeer else { connection.cancel(); return }
+        open[peer, default: 0] += 1
         connection.stateUpdateHandler = { [weak self] state in
             switch state {
             case .failed: connection.cancel()
-            case .cancelled: self?.open -= 1
+            case .cancelled:
+                guard let self else { return }
+                self.open[peer, default: 1] -= 1
+                if self.open[peer] == 0 { self.open[peer] = nil }
             default: break
             }
         }
         connection.start(queue: queue)
-        queue.asyncAfter(deadline: .now() + 10) { connection.cancel() }
+        let exchange = Exchange()
+        queue.asyncAfter(deadline: .now() + 3) { if !exchange.received { connection.cancel() } }
+        queue.asyncAfter(deadline: .now() + 30) { connection.cancel() }
         if isRateLimited(peer) {
             reply(.init(.rateLimited, "Too many failed attempts. Try again in a minute."), on: connection)
             return
         }
-        read(connection, peer: peer, buffer: Data())
+        read(connection, peer: peer, buffer: Data(), exchange: exchange)
     }
 
-    private func read(_ connection: NWConnection, peer: String, buffer: Data) {
+    /// A request line has to arrive quickly; answering may take longer.
+    private final class Exchange: @unchecked Sendable {
+        var received = false
+    }
+
+    static func isAllowedPeer(_ host: String) -> Bool {
+        host == "127.0.0.1" || host == "::1" || TailscaleAddress.contains(host)
+    }
+
+    private func read(_ connection: NWConnection, peer: String, buffer: Data, exchange: Exchange) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: RemoteWire.maximumBytes) { [weak self] data, _, complete, error in
             guard let self else { return }
             var buffer = buffer
             if let data { buffer.append(data) }
             if buffer.contains(10) {
+                exchange.received = true
                 guard let request = try? RemoteWire.decode(RemoteRequest.self, from: buffer) else {
                     self.reply(.init(.invalidRequest, "The request could not be read."), on: connection)
                     return
@@ -104,7 +123,7 @@ public final class RemoteServer: @unchecked Sendable {
             } else if complete || error != nil || buffer.count >= RemoteWire.maximumBytes {
                 connection.cancel()
             } else {
-                self.read(connection, peer: peer, buffer: buffer)
+                self.read(connection, peer: peer, buffer: buffer, exchange: exchange)
             }
         }
     }

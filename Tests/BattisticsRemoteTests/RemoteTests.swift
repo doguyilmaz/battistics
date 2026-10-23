@@ -131,3 +131,18 @@ struct PairingHostTests {
         #expect(!pairing("evil.example.com").isTailscaleHost)
     }
 }
+
+@Suite("Tailscale range")
+struct TailscaleRangeTests {
+    @Test func onlyDottedAddressesInTheRangeMatch() {
+        #expect(TailscaleAddress.contains("100.64.0.0"))
+        #expect(TailscaleAddress.contains("100.127.255.255"))
+        #expect(!TailscaleAddress.contains("100.63.255.255"))
+        #expect(!TailscaleAddress.contains("100.128.0.0"))
+        #expect(!TailscaleAddress.contains("100.64.1"))
+        #expect(!TailscaleAddress.contains("100.64.0.256"))
+        #expect(!TailscaleAddress.contains("100.64..1"))
+        #expect(RemoteServer.isAllowedPeer("127.0.0.1") && RemoteServer.isAllowedPeer("100.100.1.2"))
+        #expect(!RemoteServer.isAllowedPeer("192.168.1.20"))
+    }
+}

@@ -56,7 +56,7 @@ final class MacStore {
         do { reply = try await RemoteClient.send(request(pairing, .status), to: pairing) }
         catch { throw PairingFailure.unreachable }
         guard let status = reply.status else {
-            throw PairingFailure.rejected(reply.error?.message ?? String(localized: "The Mac did not accept this iPhone."))
+            throw PairingFailure.rejected(reply.error.map(Self.message) ?? String(localized: "The Mac did not accept this iPhone."))
         }
         var pairing = pairing
         pairing.name = status.machineName
@@ -86,6 +86,8 @@ final class MacStore {
         defer { refreshing.remove(mac.id) }
         let previous: RemoteStatus?? = readings[mac.id].map { $0.reachable ? $0.status : nil }
         let reply = try? await RemoteClient.send(request(mac, .status), to: mac)
+        // A cancelled refresh says nothing about the Mac.
+        guard !Task.isCancelled else { return [] }
         if let status = reply?.status {
             record(status, for: mac)
             return RemoteAlert.alerts(from: previous, to: status)
@@ -95,9 +97,12 @@ final class MacStore {
     }
 
     func refreshAll() async -> [(RemotePairing, [RemoteAlert])] {
-        var result: [(RemotePairing, [RemoteAlert])] = []
-        for mac in macs { result.append((mac, await refresh(mac))) }
-        return result
+        await withTaskGroup(of: (RemotePairing, [RemoteAlert]).self) { group in
+            for mac in macs { group.addTask { (mac, await self.refresh(mac)) } }
+            var results: [(RemotePairing, [RemoteAlert])] = []
+            for await result in group { results.append(result) }
+            return results
+        }
     }
 
     /// Returns a message to show when the Mac refused or could not be reached.
@@ -115,10 +120,24 @@ final class MacStore {
         do {
             let reply = try await RemoteClient.send(request, to: mac)
             if let status = reply.status { record(status, for: mac) }
-            return reply.error?.message
+            return reply.error.map(Self.message)
         } catch {
             markUnreachable(mac)
             return String(localized: "Could not reach \(mac.name). Check that Tailscale is on for both devices.")
+        }
+    }
+
+    /// In this iPhone's language; the Mac's own text may be in another.
+    private static func message(_ failure: RemoteReply.Failure) -> String {
+        switch failure.code {
+        case .unauthorized: String(localized: "This iPhone is no longer paired with the Mac. Pair it again.")
+        case .invalidRequest: String(localized: "Update Battistics on the Mac or this app.")
+        case .busy: String(localized: "Keep Awake is already running or changing on the Mac.")
+        case .closedLidNotAllowed: String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac.")
+        case .helperUnavailable: String(localized: "Start closed-lid Keep Awake on the Mac once to set up its helper.")
+        case .protection, .startFailed: failure.message
+        case .rateLimited: String(localized: "Too many failed attempts. Try again in a minute.")
+        case .unavailable: String(localized: "iPhone access is off on the Mac.")
         }
     }
 

@@ -15,7 +15,10 @@ struct PhoneApp: App {
                 .environment(store)
                 .environment(pairing)
                 .onOpenURL { pairing.open($0) }
-                .sheet(item: Binding(get: { pairing.candidate }, set: { pairing.candidate = $0 })) { candidate in
+                .sheet(item: Binding(get: { pairing.candidate }, set: {
+                    if $0 == nil { pairing.failure = nil }
+                    pairing.candidate = $0
+                })) { candidate in
                     PairingSheet(pairing: candidate)
                         .environment(store)
                         .environment(pairing)

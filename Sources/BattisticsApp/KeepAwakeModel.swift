@@ -112,7 +112,7 @@ final class KeepAwakeModel {
         guard !isChanging else { return nil }
         if let event = safety.blockingEvent() {
             let wasActive = isActive
-            if wasActive { stop() }
+            if wasActive { stop(reason: event == .thermalStop ? .thermal : .battery) }
             showSafetyReason(event, id: UUID().uuidString, starting: !wasActive)
             return nil
         }

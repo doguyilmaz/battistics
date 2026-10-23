@@ -130,7 +130,10 @@ struct PairingSheet: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(flow.isPairing)
-            Button("Cancel") { flow.candidate = nil }
+            Button("Cancel") {
+                flow.failure = nil
+                flow.candidate = nil
+            }
                 .disabled(flow.isPairing)
         }
         .padding(24)

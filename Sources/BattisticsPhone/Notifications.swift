@@ -20,7 +20,7 @@ enum Notifications {
             schedule()
             let work = Task { @MainActor in
                 await deliver(MacStore.shared.refreshAll())
-                refresh.setTaskCompleted(success: true)
+                refresh.setTaskCompleted(success: !Task.isCancelled)
             }
             refresh.expirationHandler = { work.cancel() }
         }

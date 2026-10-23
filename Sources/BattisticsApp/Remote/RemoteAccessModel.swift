@@ -1,3 +1,4 @@
+import AppKit
 import BattisticsCore
 import BattisticsRemote
 import Foundation
@@ -26,7 +27,7 @@ final class RemoteAccessModel {
     var enabled: Bool {
         didSet {
             UserDefaults.standard.set(enabled, forKey: Prefs.remoteEnabled)
-            if !enabled { invite = nil }
+            if !enabled { cancelPairing() }
             Task { await rebind() }
         }
     }
@@ -41,7 +42,12 @@ final class RemoteAccessModel {
     @ObservationIgnored private let automation: AutomationModel
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored let network: NetworkMonitor
-    @ObservationIgnored private var server: RemoteServer?
+    @ObservationIgnored private lazy var server = RemoteServer(port: port) { [weak self] request in
+        guard let self else { return .init(.unavailable, "Battistics has closed.") }
+        return await self.handle(request)
+    }
+    /// Only the newest bind may publish its addresses.
+    @ObservationIgnored private var bindGeneration = 0
     @ObservationIgnored private var inviteExpiry: Task<Void, Never>?
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private let port: UInt16
@@ -61,13 +67,13 @@ final class RemoteAccessModel {
         #endif
         enabled = UserDefaults.standard.bool(forKey: Prefs.remoteEnabled)
         closedLidAllowed = UserDefaults.standard.bool(forKey: Prefs.remoteClosedLidAllowed)
+        // An invite never used before the app quit has no expiry left to run.
         devices = (UserDefaults.standard.data(forKey: Prefs.remoteDevices))
-            .flatMap { try? JSONDecoder().decode([Device].self, from: $0) } ?? []
+            .flatMap { try? JSONDecoder().decode([Device].self, from: $0) }?
+            .filter { $0.lastSeen != nil } ?? []
         network.onChange = { [weak self] in Task { await self?.rebind() } }
         Task { await rebind() }
     }
-
-    var isTailscaleConnected: Bool { !TailscaleAddress.current().isEmpty }
 
     /// The address a new phone should use: Tailscale first.
     private var pairingHost: String? {
@@ -85,18 +91,10 @@ final class RemoteAccessModel {
             }
         }
         let wanted = enabled ? TailscaleAddress.current().union(extraHosts) : []
-        if wanted.isEmpty {
-            await server?.stop()
-            server = nil
-            addresses = []
-            return
-        }
-        let server = self.server ?? RemoteServer(port: port) { [weak self] request in
-            guard let self else { return .init(.unavailable, "Battistics has closed.") }
-            return await self.handle(request)
-        }
-        self.server = server
-        addresses = await server.listen(on: wanted)
+        bindGeneration += 1
+        let generation = bindGeneration
+        let listening = await server.listen(on: wanted)
+        if generation == bindGeneration { addresses = listening }
     }
 
     func startPairing() {
@@ -119,6 +117,9 @@ final class RemoteAccessModel {
 
     func cancelPairing() {
         removeUnusedInvite()
+        if let invite, NSPasteboard.general.string(forType: .string) == invite.pairing.url.absoluteString {
+            NSPasteboard.general.clearContents()
+        }
         invite = nil
         inviteExpiry?.cancel()
     }
@@ -147,18 +148,18 @@ final class RemoteAccessModel {
         }
         let name = request.deviceName.map { String($0.prefix(64)) }
         if let name, !name.isEmpty { devices[index].name = name }
-        let firstUse = devices[index].lastSeen == nil
+        let previous = devices[index]
         devices[index].lastSeen = Date()
-        if firstUse {
+        if previous.lastSeen == nil, invite?.deviceID == previous.id { invite = nil; inviteExpiry?.cancel() }
+        if previous.name != devices[index].name || previous.lastSeen.map({ -$0.timeIntervalSinceNow > 300 }) ?? true {
             save()
-            if invite?.deviceID == devices[index].id { invite = nil; inviteExpiry?.cancel() }
         }
 
         switch request.operation {
         case .status:
             return .init(status: status())
         case .stop:
-            if awake.isActive { awake.stop(reason: .phone) }
+            if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
             return .init(status: status())
         case .start:
             return await start(request, deviceName: devices[index].name)

@@ -273,6 +273,23 @@
         }
       }
     },
+    "Allow closed-lid sessions from iPhone in Battistics on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow closed-lid sessions from iPhone in Battistics on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin verin."
+          }
+        }
+      }
+    },
     "At %lld%%": {
       "extractionState": "manual",
       "localizations": {
@@ -898,6 +915,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ Uyanık Tut"
+          }
+        }
+      }
+    },
+    "Keep Awake is already running or changing on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake is already running or changing on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut Mac’te zaten çalışıyor veya değişiyor."
           }
         }
       }
@@ -1548,6 +1582,23 @@
         }
       }
     },
+    "Start closed-lid Keep Awake on the Mac once to set up its helper.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start closed-lid Keep Awake on the Mac once to set up its helper."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yardımcıyı kurmak için Mac’te kapak kapalı Uyanık Tut’u bir kez başlatın."
+          }
+        }
+      }
+    },
     "Started from iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -1854,6 +1905,23 @@
         }
       }
     },
+    "This iPhone is no longer paired with the Mac. Pair it again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone is no longer paired with the Mac. Pair it again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone artık Mac ile eşleştirilmiş değil. Yeniden eşleştirin."
+          }
+        }
+      }
+    },
     "This iPhone will see its battery and connection, and can start or stop Keep Awake.": {
       "extractionState": "manual",
       "localizations": {
@@ -1922,6 +1990,23 @@
         }
       }
     },
+    "Too many failed attempts. Try again in a minute.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many failed attempts. Try again in a minute."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok fazla başarısız deneme. Bir dakika sonra tekrar deneyin."
+          }
+        }
+      }
+    },
     "Until turned off": {
       "extractionState": "manual",
       "localizations": {
@@ -1935,6 +2020,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapatılana kadar"
+          }
+        }
+      }
+    },
+    "Update Battistics on the Mac or this app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Battistics on the Mac or this app."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’teki Battistics’i veya bu uygulamayı güncelleyin."
           }
         }
       }
@@ -2037,6 +2139,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’iniz cebinizde"
+          }
+        }
+      }
+    },
+    "iPhone access is off on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone access is off on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te iPhone erişimi kapalı."
           }
         }
       }

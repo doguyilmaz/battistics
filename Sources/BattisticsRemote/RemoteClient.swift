@@ -9,9 +9,7 @@ public enum RemoteClient {
                             timeout: Duration = .seconds(8)) async throws -> RemoteReply {
         guard let port = NWEndpoint.Port(rawValue: pairing.port) else { throw Failure.unreachable }
         let payload = try RemoteWire.encode(request)
-        let parameters = NWParameters.tcp
-        parameters.prohibitedInterfaceTypes = [.cellular]
-        let connection = NWConnection(host: .init(pairing.host), port: port, using: parameters)
+        let connection = NWConnection(host: .init(pairing.host), port: port, using: .tcp)
         let exchange = Exchange()
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
@@ -59,16 +57,21 @@ public enum RemoteClient {
         private let lock = NSLock()
         private var continuation: CheckedContinuation<RemoteReply, Error>?
         private var connection: NWConnection?
+        /// Cancellation can arrive before `begin`.
+        private var early: Result<RemoteReply, Error>?
 
         func begin(_ continuation: CheckedContinuation<RemoteReply, Error>, connection: NWConnection) {
-            lock.withLock {
+            let early = lock.withLock {
                 self.continuation = continuation
                 self.connection = connection
+                return self.early
             }
+            if let early { finish(early) }
         }
 
         func finish(_ result: Result<RemoteReply, Error>) {
             let (continuation, connection) = lock.withLock {
+                if self.continuation == nil, self.early == nil { self.early = result }
                 defer { self.continuation = nil; self.connection = nil }
                 return (self.continuation, self.connection)
             }

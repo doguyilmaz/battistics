@@ -84,6 +84,8 @@ private struct PairingInvite: View {
                     Button(copied ? String(localized: "Copied") : String(localized: "Copy Link")) {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(invite.pairing.url.absoluteString, forType: .string)
+                        // Keeps clipboard managers and history from storing the token.
+                        NSPasteboard.general.setString("", forType: .init("org.nspasteboard.ConcealedType"))
                         copied = true
                     }
                     Button("Cancel", role: .cancel) { remote.cancelPairing() }

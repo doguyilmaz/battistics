@@ -4,7 +4,8 @@ import Foundation
 /// What the Mac's QR code carries. The phone keeps it in its Keychain; the Mac
 /// keeps only the token's hash.
 public struct RemotePairing: Codable, Sendable, Equatable, Identifiable {
-    public var id: String { token }
+    /// Stable and safe to store outside the Keychain, unlike the token.
+    public var id: String { String(Self.hash(token).prefix(16)) }
     public var name: String
     public var host: String
     public var port: UInt16
@@ -67,9 +68,7 @@ public struct RemotePairing: Codable, Sendable, Equatable, Identifiable {
     /// A Tailscale address or MagicDNS name. Anything else did not come from
     /// a Mac's pairing screen and deserves a warning.
     public var isTailscaleHost: Bool {
-        if host.hasSuffix(".ts.net") { return true }
-        let parts = host.split(separator: ".").compactMap { UInt8($0) }
-        return parts.count == 4 && parts[0] == 100 && (64...127).contains(parts[1])
+        host.hasSuffix(".ts.net") || TailscaleAddress.contains(host)
     }
 
     static func isValidHost(_ host: String) -> Bool {
