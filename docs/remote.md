@@ -15,8 +15,10 @@ Keep Awake.
   SHA-256 hash and compares in constant time. Removing the iPhone on the Mac
   revokes it. A link with a non-Tailscale address shows a warning.
 - **Protocol.** One newline-terminated JSON request and reply per TCP
-  connection, 16 KB at most, four connections at once; five failed tokens from
-  one address lock it out for a minute. Tailscale encrypts the link.
+  connection, 16 KB at most. Peers outside the tailnet are dropped on accept,
+  each peer gets two connections and three seconds to send its request, and
+  five failed tokens from one address lock it out for a minute. Tailscale
+  encrypts the link.
 - **Same rules.** Phone sessions are finite (15 minutes to 12 hours), never
   replace a running session, follow battery and heat protection, and need a
   separate switch plus an installed helper for closed-lid mode. The phone can
@@ -65,8 +67,10 @@ The iPhone pane on the Mac and the phone's settings both explain this.
 - Bluetooth LE between phone and Mac in the same bag, for status and "join the
   hotspot" with no network at all.
 - CloudKit push for prompt alerts, which needs an iCloud container on both apps.
+- Turkish Siri phrases (`AppShortcuts.xcstrings`).
 - Device builds need the team set in `project.yml`; the scheme builds for the
-  Simulator as is.
+  Simulator as is. The widget was checked only for registration, not placed
+  on a Home Screen.
 
 ## Developing
 
