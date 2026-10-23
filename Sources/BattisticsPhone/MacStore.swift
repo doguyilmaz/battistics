@@ -23,7 +23,10 @@ final class MacStore {
     private(set) var refreshing: Set<String> = []
     private(set) var pending: Set<String> = []
     var selectedID: String? {
-        didSet { UserDefaults.standard.set(selectedID, forKey: "selectedMac") }
+        didSet {
+            UserDefaults.standard.set(selectedID, forKey: "selectedMac")
+            WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+        }
     }
 
     private init() {
@@ -147,5 +150,6 @@ final class MacStore {
 
     private func saveReadings() {
         UserDefaults.standard.set(try? RemoteWire.encode(readings), forKey: "readings")
+        WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
     }
 }

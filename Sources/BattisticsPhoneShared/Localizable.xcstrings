@@ -52,6 +52,23 @@
         }
       }
     },
+    "%lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%lld"
+          }
+        }
+      }
+    },
     "%lldh": {
       "extractionState": "manual",
       "localizations": {
@@ -273,6 +290,40 @@
         }
       }
     },
+    "Awake · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awake · %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık · %@"
+          }
+        }
+      }
+    },
+    "Battery %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %%%lld"
+          }
+        }
+      }
+    },
     "Battery %lld%%.": {
       "extractionState": "manual",
       "localizations": {
@@ -286,6 +337,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil %%%lld."
+          }
+        }
+      }
+    },
+    "Battery and Keep Awake for your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery and Keep Awake for your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inizin pili ve Uyanık Tut durumu."
           }
         }
       }
@@ -354,6 +422,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Battistics"
+          }
+        }
+      }
+    },
+    "Can sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyuyabilir"
           }
         }
       }
@@ -936,6 +1021,23 @@
         }
       }
     },
+    "Kept awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kept awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık tutuluyor"
+          }
+        }
+      }
+    },
     "Last seen %@": {
       "extractionState": "manual",
       "localizations": {
@@ -1017,6 +1119,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı"
+          }
+        }
+      }
+    },
+    "Lid open": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lid open"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak açık"
           }
         }
       }
@@ -1289,6 +1408,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleştir"
+          }
+        }
+      }
+    },
+    "Pair a Mac in Battistics Remote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pair a Mac in Battistics Remote"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote’ta bir Mac eşleştirin"
           }
         }
       }

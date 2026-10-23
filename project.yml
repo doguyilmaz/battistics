@@ -150,10 +150,16 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: Sources/BattisticsPhone
+      - path: Sources/BattisticsPhoneShared
       - path: Sources/BattisticsApp/Resources/AppIcon.icon
     dependencies:
       - package: BattisticsCore
         product: BattisticsRemote
+      - target: BattisticsPhoneWidgets
+    entitlements:
+      path: Sources/BattisticsPhone/BattisticsPhone.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.doguyilmaz.Battistics.Remote]
     info:
       path: Sources/BattisticsPhone/Info.plist
       properties:
@@ -166,6 +172,7 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UIBackgroundModes: [fetch]
+        NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers: [com.doguyilmaz.Battistics.Remote.refresh]
         CFBundleURLTypes:
           - CFBundleURLName: com.doguyilmaz.Battistics.Remote
@@ -178,6 +185,35 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote
         PRODUCT_NAME: Battistics Remote
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_EMIT_LOC_STRINGS: YES
+
+  BattisticsPhoneWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources/BattisticsPhoneWidgets
+      - path: Sources/BattisticsPhoneShared
+    dependencies:
+      - package: BattisticsCore
+        product: BattisticsRemote
+    entitlements:
+      path: Sources/BattisticsPhoneWidgets/BattisticsPhoneWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.doguyilmaz.Battistics.Remote]
+    info:
+      path: Sources/BattisticsPhoneWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Battistics Remote
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote.Widgets
+        PRODUCT_NAME: BattisticsRemoteWidgets
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_EMIT_LOC_STRINGS: YES
 
