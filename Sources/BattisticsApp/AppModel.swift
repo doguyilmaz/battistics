@@ -31,7 +31,7 @@ final class AppModel {
     let history: HistoryStore
 
     @ObservationIgnored private let monitor = PowerSourceMonitor()
-    @ObservationIgnored private let alertDispatcher = AlertDispatcher()
+    @ObservationIgnored private let alertDispatcher = AlertDispatcher.shared
     @ObservationIgnored private var alertState = AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
     @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?

@@ -281,7 +281,7 @@ struct PopoverView: View {
             if let current = powerModel.settings?.lowPowerMode {
                 Picker("Low Power Mode", selection: lowPowerBinding(current)) {
                     ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
-                        Text(lowPowerLabel(option)).tag(option)
+                        Text(option.label).tag(option)
                     }
                 }
                 .pickerStyle(.inline)
@@ -310,15 +310,6 @@ struct PopoverView: View {
                     await powerModel.apply(.lowPowerMode(option), using: auth, helper: helper)
                 }
             })
-    }
-
-    private func lowPowerLabel(_ mode: LowPowerModeSetting) -> String {
-        switch mode {
-        case .never: String(localized: "Never")
-        case .always: String(localized: "Always")
-        case .onlyOnBattery: String(localized: "Only on battery")
-        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
-        }
     }
 
     private var keepAwakeMenu: some View {

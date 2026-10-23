@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 final class KeepAwakeModel {
     private enum StartFailure: Error { case protection(KeepAwakeSafetyPolicy.Event) }
-    let safety = KeepAwakeSafetyMonitor()
+    let safety: KeepAwakeSafetyMonitor
     private(set) var session: KeepAwakeSession?
     private(set) var sessionName: String?
     private(set) var sessionOrigin: RemoteStatus.Origin = .manual
@@ -28,7 +28,7 @@ final class KeepAwakeModel {
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored private var leaseTask: Task<Void, Never>?
     @ObservationIgnored private var sessionID: String?
-    @ObservationIgnored var onSessionEnded: ((String) -> Void)?
+    @ObservationIgnored var onOwnershipReleased: ((String) -> Void)?
     var sessionIdentifier: String? { sessionID }
     var isAwaitingHelperApproval: Bool { approvalTask != nil }
     @ObservationIgnored private var reconcilingSessionID: String?
@@ -37,7 +37,7 @@ final class KeepAwakeModel {
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     /// Waits, bounded, for the user to allow the helper in Login Items, then
     /// starts the closed-lid session they asked for.
-    @ObservationIgnored private var approvalTask: Task<Void, Never>?
+    private var approvalTask: Task<Void, Never>?
     /// Keeps App Nap from stretching the renewal timer past the helper's
     /// 45-second lease while the lid is shut and nothing of ours is visible.
     @ObservationIgnored private var renewalActivity: NSObjectProtocol?
@@ -46,7 +46,9 @@ final class KeepAwakeModel {
         didSet {
             UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
             if let session, session.mode != mode {
-                start(mode: mode, duration: session.duration, now: session.startedAt)
+                let profile = sessionOrigin == .profile ? sessionName : nil
+                start(mode: mode, duration: session.duration, now: session.startedAt,
+                      name: profile, origin: profile == nil ? .manual : .profile)
             } else if mode != .lidClosed, approvalTask != nil {
                 // Nothing left to wait for once closed-lid is no longer wanted.
                 cancelApprovalWait()
@@ -76,6 +78,7 @@ final class KeepAwakeModel {
 
     init(helper: PowerHelperClient) {
         self.helper = helper
+        safety = KeepAwakeSafetyMonitor(notice: notice)
         mode = KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "") ?? .displayOn
         duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
         safety.onStop = { [weak self] event in
@@ -322,7 +325,7 @@ final class KeepAwakeModel {
         session = nil
         sessionName = nil
         sessionOrigin = .manual
-        if let endedID { onSessionEnded?(endedID) }
+        if let endedID { onOwnershipReleased?(endedID) }
     }
 
     func toggle() {
@@ -447,7 +450,7 @@ final class KeepAwakeModel {
             sessionOrigin = .manual
             sessionName = nil
         }
-        if let sessionID { onSessionEnded?(sessionID) }
+        if let sessionID { onOwnershipReleased?(sessionID) }
     }
 
     /// One-shot, not a poll. The kernel releases the assertion on its own
@@ -499,20 +502,6 @@ extension KeepAwakeDuration {
         case .sixHours: String(localized: "6 hours")
         case .twelveHours: String(localized: "12 hours")
         case .indefinite: String(localized: "Until I turn it off")
-        }
-    }
-
-    /// Compact form for the popover strip and the duration chips.
-    var shortLabel: String {
-        switch self {
-        case .fifteenMinutes: "15m"
-        case .thirtyMinutes: "30m"
-        case .oneHour: "1h"
-        case .twoHours: "2h"
-        case .fourHours: "4h"
-        case .sixHours: "6h"
-        case .twelveHours: "12h"
-        case .indefinite: "∞"
         }
     }
 }

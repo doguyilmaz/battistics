@@ -18,12 +18,13 @@ final class KeepAwakeSafetyMonitor {
     @ObservationIgnored private var policy = KeepAwakeSafetyPolicy()
     @ObservationIgnored private var active = false
     @ObservationIgnored private var thermalObserver: NSObjectProtocol?
-    @ObservationIgnored private let dispatcher = AlertDispatcher()
-    @ObservationIgnored private let notice = KeepAwakeNoticeController()
+    @ObservationIgnored private let dispatcher = AlertDispatcher.shared
+    @ObservationIgnored private let notice: KeepAwakeNoticeController
     @ObservationIgnored private var lastNotice: KeepAwakeSafetyPolicy.Event?
     @ObservationIgnored private var adapterWarningActive = false
 
-    init() {
+    init(notice: KeepAwakeNoticeController) {
+        self.notice = notice
         configuration = Prefs.safetyConfiguration()
         thermalObserver = NotificationCenter.default.addObserver(
             forName: ProcessInfo.thermalStateDidChangeNotification, object: nil, queue: .main
@@ -55,7 +56,11 @@ final class KeepAwakeSafetyMonitor {
             configuration: configuration)
     }
 
-    func refresh() { update(BatteryReader.read()) }
+    func refresh() {
+        thermalState = ProcessInfo.processInfo.thermalState
+        guard active else { return }
+        update(BatteryReader.read())
+    }
 
     /// Fed by AppModel even with every window closed and history disabled.
     func update(_ snapshot: BatterySnapshot?) {

@@ -5602,17 +5602,6 @@
         }
       }
     },
-    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. The duration applies when a session starts; changing it does not extend a running session. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Süre oturum başlarken uygulanır; sonradan değiştirmek çalışan oturumu uzatmaz. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
-          }
-        }
-      }
-    },
     "Keep Awake cannot start at %lld%% with battery protection enabled. Connect power before starting a session.": {
       "extractionState": "manual",
       "localizations": {
@@ -7917,6 +7906,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "·"
+          }
+        }
+      }
+    },
+    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
           }
         }
       }

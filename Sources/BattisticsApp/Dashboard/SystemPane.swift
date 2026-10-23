@@ -83,7 +83,7 @@ struct SystemPane: View {
                     if let mode = power.lowPowerMode {
                         Picker("Low Power Mode", selection: lowPowerBinding(mode)) {
                             ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
-                                Text(label(for: option)).tag(option)
+                                Text(option.label).tag(option)
                             }
                         }
                     }
@@ -385,15 +385,6 @@ struct SystemPane: View {
         }
     }
 
-    private func label(for mode: LowPowerModeSetting) -> String {
-        switch mode {
-        case .never: String(localized: "Never")
-        case .always: String(localized: "Always")
-        case .onlyOnBattery: String(localized: "Only on battery")
-        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
-        }
-    }
-
     private func label(for mode: EnergyMode) -> String {
         switch mode {
         case .automatic: String(localized: "Automatic")
@@ -402,4 +393,15 @@ struct SystemPane: View {
         }
     }
 
+}
+
+extension LowPowerModeSetting {
+    var label: String {
+        switch self {
+        case .never: String(localized: "Never")
+        case .always: String(localized: "Always")
+        case .onlyOnBattery: String(localized: "Only on battery")
+        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
+        }
+    }
 }

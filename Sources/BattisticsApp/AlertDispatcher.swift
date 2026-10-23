@@ -6,6 +6,9 @@ import UserNotifications
 /// requested lazily on the first alert, never at launch.
 @MainActor
 final class AlertDispatcher {
+    static let shared = AlertDispatcher()
+    private init() {}
+
     /// Single shared authorization request so alerts arriving while the
     /// permission prompt is still open wait for its outcome instead of
     /// reading .notDetermined and getting dropped.

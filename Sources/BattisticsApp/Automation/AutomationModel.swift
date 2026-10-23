@@ -41,7 +41,7 @@ final class AutomationModel {
         self.endpoint = endpoint
         enabled = initiallyEnabled ?? UserDefaults.standard.bool(forKey: Prefs.automationEnabled)
         closedLidAllowed = UserDefaults.standard.bool(forKey: Prefs.automationClosedLidAllowed)
-        awake.onSessionEnded = { [weak self] id in
+        awake.onOwnershipReleased = { [weak self] id in
             guard let self, self.lease?.id.uuidString == id else { return }
             self.clearOwnership()
         }

@@ -25,7 +25,7 @@ struct KeepAwakeSessionCard: View {
                     Spacer()
                     Group {
                         if windowVisible, session.deadline != nil {
-                            TimelineView(.periodic(from: session.startedAt, by: 1)) { context in
+                            TimelineView(.periodic(from: session.startedAt, by: 60)) { context in
                                 Text(remainingText(at: context.date))
                             }
                         } else {
