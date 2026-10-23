@@ -34,8 +34,9 @@ public struct KeepAwakeSafetyPolicy: Sendable {
                 if newValue > 0 { stopPercent = newValue }
             }
         }
+        public var minimumWarningPercent: Int { stopOnLowBattery ? effectiveStopPercent + 5 : 10 }
         public var effectiveWarningPercent: Int {
-            max(min(max(warningPercent, 10), 80), stopOnLowBattery ? effectiveStopPercent + 5 : 10)
+            max(min(max(warningPercent, 10), 80), minimumWarningPercent)
         }
     }
 

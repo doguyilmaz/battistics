@@ -21,7 +21,7 @@ struct KeepAwakeSafetySettings: View {
             }
             Toggle("Warn me before the battery runs low", isOn: $safety.configuration.warnOnLowBattery)
             if safety.configuration.warnOnLowBattery {
-                Stepper(value: warningPercent, in: minimumWarning...80, step: 5) {
+                Stepper(value: warningPercent, in: safety.configuration.minimumWarningPercent...80, step: 5) {
                     LabeledContent("Warn at", value: Formatting.percent(Double(safety.configuration.effectiveWarningPercent)))
                 }
             }
@@ -38,11 +38,6 @@ struct KeepAwakeSafetySettings: View {
             Text("Warns when macOS reports serious or critical thermal pressure. The optional stop applies on battery and power adapter. Battistics does not change fan speeds; keep vents clear and never run a closed Mac in a bag.")
                 .font(.caption).foregroundStyle(.secondary)
         }
-    }
-
-    private var minimumWarning: Int {
-        keepAwake.safety.configuration.stopOnLowBattery
-            ? keepAwake.safety.configuration.effectiveStopPercent + 5 : 10
     }
 
     private var stopPercent: Binding<Int> {
