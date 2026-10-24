@@ -8,13 +8,17 @@ public enum RemoteAlert: Equatable, Sendable {
     case batteryRunsOut(minutesLeft: Int)
     case unreachable
 
-    /// A reading, or nil when the Mac did not answer.
+    /// `current` is nil when the Mac did not answer; `previous` is nil before
+    /// the first reading and `.some(nil)` after an unanswered one.
     public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?) -> [RemoteAlert] {
-        guard let previous else { return [] }
-        guard let current else {
-            return previous?.session != nil ? [.unreachable] : []
+        switch (previous, current) {
+        case (.some(.some(let previous)), .some(let current)): changes(from: previous, to: current)
+        case (.some(.some(let previous)), .none): previous.session != nil ? [.unreachable] : []
+        default: []
         }
-        guard let previous else { return [] }
+    }
+
+    private static func changes(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
         var alerts: [RemoteAlert] = []
         if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
             alerts.append(.sessionEnded(current.lastEnd?.reason))
