@@ -208,10 +208,6 @@ public enum PowerSettingsWriter {
     ) -> [String] {
         [source.rawValue, timer.rawValue, String(interval.rawValue)]
     }
-
-    public static func command(_ arguments: [String]) -> String {
-        ([executable] + arguments).joined(separator: " ")
-    }
 }
 
 /// One power setting change, as a value.

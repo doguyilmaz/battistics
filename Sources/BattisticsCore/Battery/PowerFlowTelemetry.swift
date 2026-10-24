@@ -41,8 +41,6 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// Missing context alone does not imply inconsistent readings.
     public let hasInconsistentReadings: Bool
 
-    public var source: String { "AppleSmartBattery.PowerTelemetryData" }
-
     /// Parses only the dictionary already obtained by BatteryReader.
     /// Estimates are explicitly sourced; adapter ratings never substitute for
     /// measured input and missing operands never become assumed zeros.

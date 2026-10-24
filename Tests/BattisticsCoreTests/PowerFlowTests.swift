@@ -36,7 +36,6 @@ struct PowerFlowTests {
         #expect(flow.batteryPowerWatts == 0)
         #expect(flow.batteryDirection == .idle)
         #expect(flow.readAt == readAt)
-        #expect(flow.source == "AppleSmartBattery.PowerTelemetryData")
         #expect(enabled.watts == before.watts)
         #expect(enabled.adapter == before.adapter)
         #expect(enabled.isCharging == before.isCharging)
