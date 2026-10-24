@@ -354,3 +354,23 @@ struct LidSleepLeaseTests {
         }
     }
 }
+
+@Suite("Lid sleep lease memory")
+struct LidSleepLeaseMemoryTests {
+    @Test func oldEndedSessionsAreForgottenButRecentOnesStillAnswer() {
+        final class Setting: @unchecked Sendable { var disabled = false }
+        let setting = Setting()
+        let lease = LidSleepLease(read: { setting.disabled }, write: { setting.disabled = $0 },
+                                  save: { _ in }, clear: {})
+        let owner = UUID()
+        var sessions: [UUID] = []
+        for _ in 0..<300 {
+            let session = UUID()
+            sessions.append(session)
+            #expect(lease.acquire(owner: owner, session: session) == .success)
+            _ = lease.release(owner: owner, session: session)
+        }
+        #expect(lease.acquire(owner: owner, session: sessions.last!) == .inactive)
+        #expect(lease.acquire(owner: owner, session: sessions.first!) == .success)
+    }
+}
