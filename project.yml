@@ -44,6 +44,7 @@ targets:
       base:
         PRODUCT_NAME: battistics
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.CLI
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
         SKIP_INSTALL: YES
 
   BattisticsMCP:
@@ -58,6 +59,7 @@ targets:
       base:
         PRODUCT_NAME: battistics-mcp
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.MCP
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
         SKIP_INSTALL: YES
 
   # Privileged helper. A separate root process by necessity: setting power
@@ -74,6 +76,7 @@ targets:
       base:
         PRODUCT_NAME: BattisticsPowerHelper
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.PowerHelper
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
         ENABLE_HARDENED_RUNTIME: YES
         SKIP_INSTALL: YES
         # A command line tool has no bundle, so its identity has to live in a

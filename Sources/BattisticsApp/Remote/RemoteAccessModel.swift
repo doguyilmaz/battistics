@@ -24,6 +24,9 @@ final class RemoteAccessModel {
     var closedLidAllowed: Bool {
         didSet {
             UserDefaults.standard.set(closedLidAllowed, forKey: Prefs.remoteClosedLidAllowed)
+            if closedLidAllowed, cloud != nil {
+                Task { try? await helper.prepareForLidSleep() }
+            }
             publishSoon()
         }
     }
@@ -78,6 +81,9 @@ final class RemoteAccessModel {
         startTicker()
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
+            if closedLidAllowed {
+                Task { try? await helper.prepareForLidSleep() }
+            }
             Task { await sync() }
         }
     }
@@ -215,8 +221,9 @@ final class RemoteAccessModel {
             guard closedLidAllowed else {
                 return .init(.closedLidNotAllowed, String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac."))
             }
-            helper.refreshStatusIfChanged()
-            guard helper.isInstalled else {
+            do {
+                try await helper.prepareForLidSleep()
+            } catch {
                 return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
             }
         }
