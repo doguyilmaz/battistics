@@ -10,7 +10,7 @@ struct TourSpotlight: View {
                 if reduceTransparency {
                     Color(nsColor: .windowBackgroundColor).opacity(0.2)
                 } else {
-                    Rectangle().fill(.ultraThinMaterial).opacity(0.35)
+                    WithinWindowBlur().opacity(0.5)
                 }
             }
             .mask {
@@ -29,4 +29,18 @@ struct TourSpotlight: View {
         }
         .accessibilityHidden(true)
     }
+}
+
+/// SwiftUI materials on macOS blur what is behind the window; the tour needs
+/// the window's own content softened instead.
+private struct WithinWindowBlur: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.blendingMode = .withinWindow
+        view.material = .hudWindow
+        view.state = .active
+        return view
+    }
+
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {}
 }
