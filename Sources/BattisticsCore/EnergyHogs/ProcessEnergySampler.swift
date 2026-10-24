@@ -160,7 +160,7 @@ public enum ProcessEnergySampler {
         return ticks * UInt64(timebase.numer) / UInt64(timebase.denom)
     }
 
-    private static func processName(for pid: Int32) -> String {
+    public static func processName(for pid: Int32) -> String {
         var buffer = [CChar](repeating: 0, count: 4096)
         let length = proc_pidpath(pid, &buffer, UInt32(buffer.count))
         if let path = string(from: buffer, length: length) {
