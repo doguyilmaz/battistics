@@ -47,6 +47,9 @@ public enum KeepAwakeDuration: Int, Sendable, CaseIterable, Identifiable {
     public var minutes: Int? {
         self == .indefinite ? nil : rawValue
     }
+
+    /// What automation and the iPhone may ask for: never open-ended.
+    public static let finite = allCases.filter { $0 != .indefinite }
 }
 
 /// An active keep-awake session. Pure: the deadline is derived, never

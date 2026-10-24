@@ -38,7 +38,7 @@ struct RunOptions {
 
     static let usage = """
     Usage: battistics run [--minutes N] [--name NAME] [--mode MODE] -- COMMAND [ARG...]
-      N: 15, 30, 60, 120, 240, 360, 720 (default: 720)
+      N: \(KeepAwakeDuration.finite.map { String($0.rawValue) }.joined(separator: ", ")) (default: 720)
       MODE: displayMaySleep (default), displayOn, lidClosed
     Open Battistics and enable Local automation in Power first.
     Keep Awake ends when the direct child exits, or earlier at the time limit,

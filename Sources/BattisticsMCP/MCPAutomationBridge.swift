@@ -18,8 +18,8 @@ actor MCPAutomationBridge {
         Tool(name: "battistics_start", description: "Start a named, finite Keep Awake task. Call battistics_stop with the returned session ID when the work finishes, fails, or is cancelled. Cannot replace an existing session or bypass battery/thermal protections. Connection loss ends the task. Closed-lid mode requires explicit permission and a preinstalled helper in Battistics.",
              inputSchema: schema(properties: [
                 "name": .object(["type": "string", "minLength": 1, "maxLength": 80]),
-                "duration_minutes": .object(["type": "integer", "enum": .array([15, 30, 60, 120, 240, 360, 720])]),
-                "mode": .object(["type": "string", "enum": .array(["displayMaySleep", "displayOn", "lidClosed"]), "default": "displayMaySleep"])
+                "duration_minutes": .object(["type": "integer", "enum": .array(KeepAwakeDuration.finite.map { .int($0.rawValue) })]),
+                "mode": .object(["type": "string", "enum": .array(KeepAwakeMode.allCases.map { .string($0.rawValue) }), "default": "displayMaySleep"])
              ], required: ["name", "duration_minutes"]),
              annotations: .init(readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false)),
         Tool(name: "battistics_stop", description: "End only the session started by this client connection. Normal macOS sleep is allowed again; a closed lid may cause immediate sleep. Does not shut down the Mac. Cannot stop manual sessions or sessions belonging to other clients.",
