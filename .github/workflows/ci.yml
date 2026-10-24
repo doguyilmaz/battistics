@@ -11,7 +11,7 @@ jobs:
     # the current system appearance (Liquid Glass) instead of compatibility mode.
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Core and MCP tests
