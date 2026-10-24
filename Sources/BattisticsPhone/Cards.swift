@@ -1,4 +1,5 @@
 import BattisticsRemote
+import Charts
 import SwiftUI
 
 struct BatteryCard: View {
@@ -6,6 +7,7 @@ struct BatteryCard: View {
 
     var body: some View {
         if let battery = status.battery {
+            VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 18) {
                 Gauge(value: Double(battery.percent), in: 0...100) {
                     Image(systemName: battery.isCharging ? "bolt.fill" : "battery.100")
@@ -29,8 +31,12 @@ struct BatteryCard: View {
                 }
                 Spacer(minLength: 0)
             }
-            .card()
             .accessibilityElement(children: .combine)
+            if let history = status.chargeHistory, history.count > 1 {
+                ChargeSparkline(points: history, tint: tint(battery))
+            }
+            }
+            .card()
         } else {
             Label("This Mac has no battery", systemImage: "powerplug")
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -216,5 +222,29 @@ struct ConditionsGrid: View {
             .card()
             .accessibilityElement(children: .combine)
         }
+    }
+}
+
+/// The Mac's charge over the last day, for a glance at the trend.
+struct ChargeSparkline: View {
+    let points: [RemoteStatus.ChargePoint]
+    let tint: Color
+
+    var body: some View {
+        Chart(points, id: \.at) { point in
+            AreaMark(x: .value("Time", point.at), y: .value("Charge", point.percent))
+                .foregroundStyle(tint.opacity(0.15))
+                .interpolationMethod(.monotone)
+            LineMark(x: .value("Time", point.at), y: .value("Charge", point.percent))
+                .foregroundStyle(tint)
+                .interpolationMethod(.monotone)
+        }
+        .chartYScale(domain: 0...100)
+        .chartXAxis(.hidden)
+        .chartYAxis(.hidden)
+        .frame(height: 44)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Charge over the last 24 hours"))
+        .accessibilityValue(Text("From \(Int(points.first?.percent ?? 0))% to \(Int(points.last?.percent ?? 0))%"))
     }
 }

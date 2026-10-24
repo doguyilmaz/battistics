@@ -494,6 +494,40 @@
         }
       }
     },
+    "Charge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charge"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj"
+          }
+        }
+      }
+    },
+    "Charge over the last 24 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charge over the last 24 hours"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son 24 saatteki şarj"
+          }
+        }
+      }
+    },
     "Charging": {
       "extractionState": "manual",
       "localizations": {
@@ -728,6 +762,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ethernet"
+          }
+        }
+      }
+    },
+    "From %lld%% to %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From %lld%% to %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%1$lld’den %%%2$lld’e"
           }
         }
       }
@@ -1952,6 +2003,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu bir Battistics eşleştirme bağlantısı değil. Mac’te yenisini oluşturun."
+          }
+        }
+      }
+    },
+    "Time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat"
           }
         }
       }

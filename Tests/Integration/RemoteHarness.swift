@@ -28,8 +28,16 @@ struct RemoteHarness {
                                          initiallyEnabled: false)
         let network = NetworkMonitor()
         let port = UInt16.random(in: 50_000...60_000)
-        let remote = RemoteAccessModel(awake: awake, automation: automation, helper: helper, network: network,
-                                       port: port, extraHosts: ["127.0.0.1"])
+        let remote = RemoteAccessModel(
+            awake: awake, automation: automation, helper: helper, network: network,
+            port: port, extraHosts: ["127.0.0.1"],
+            chargeHistory: {
+                let now = Date()
+                return (0..<48).map { step in
+                    .init(at: now.addingTimeInterval(Double(step - 47) * 1800),
+                          percent: 40 + 45 * abs(sin(Double(step) / 9)))
+                }
+            })
         try await eventually { remote.addresses.contains("127.0.0.1") }
         if let path = ProcessInfo.processInfo.environment["BATTISTICS_REMOTE_SERVE"] {
             try await serve(remote, awake: awake, pairingFile: path)
@@ -48,6 +56,7 @@ struct RemoteHarness {
 
         let first = try await send(.status)
         precondition(first.status?.session == nil && remote.invite == nil)
+        precondition(first.status?.chargeHistory?.count == 48)
         precondition(remote.devices.first?.name == "Test iPhone" && remote.devices.first?.lastSeen != nil)
 
         let unbounded = try await send(.start, mode: .displayMaySleep, minutes: 0)

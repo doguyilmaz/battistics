@@ -44,6 +44,12 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         }
     }
 
+    public struct ChargePoint: Codable, Sendable, Equatable {
+        public var at: Date
+        public var percent: Double
+        public init(at: Date, percent: Double) { self.at = at; self.percent = percent }
+    }
+
     public enum EndReason: String, Codable, Sendable {
         case timer, user, phone, battery, thermal, client, failure
     }
@@ -86,6 +92,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var lidClosed: Bool?
     public var thermal: Thermal
     public var protection: Protection
+    /// The last 24 hours of charge, oldest first; nil when history is off.
+    public var chargeHistory: [ChargePoint]?
 
     public init(machineName: String, readAt: Date, battery: Battery? = nil, session: Session? = nil,
                 lastEnd: LastEnd? = nil, network: Network = .other, lidClosed: Bool? = nil,

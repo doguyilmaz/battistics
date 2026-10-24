@@ -82,10 +82,18 @@ struct BattisticsApp: App {
         let network = NetworkMonitor()
         _automation = State(initialValue: automation)
         _network = State(initialValue: network)
-        _remote = State(initialValue: RemoteAccessModel(awake: awake, automation: automation, helper: helper, network: network))
-        _model = State(initialValue: AppModel(
+        let model = AppModel(
             onBatteryReading: { [weak awake] in awake?.safety.update($0) },
-            suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true }))
+            suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true })
+        _model = State(initialValue: model)
+        let history = model.history
+        _remote = State(initialValue: RemoteAccessModel(
+            awake: awake, automation: automation, helper: helper, network: network,
+            chargeHistory: {
+                let now = Date()
+                return await history.chargeSeries(from: now.addingTimeInterval(-86_400), to: now, bucketSeconds: 1800)
+                    .map { .init(at: $0.date, percent: $0.value) }
+            }))
     }
 
     private var colorScheme: ColorScheme? {

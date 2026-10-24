@@ -52,9 +52,12 @@ final class RemoteAccessModel {
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private let port: UInt16
     @ObservationIgnored private let extraHosts: Set<String>
+    @ObservationIgnored private let chargeHistory: @Sendable () async -> [RemoteStatus.ChargePoint]
 
     init(awake: KeepAwakeModel, automation: AutomationModel, helper: PowerHelperClient,
-         network: NetworkMonitor, port: UInt16 = RemoteWire.defaultPort, extraHosts: Set<String>? = nil) {
+         network: NetworkMonitor, port: UInt16 = RemoteWire.defaultPort, extraHosts: Set<String>? = nil,
+         chargeHistory: @escaping @Sendable () async -> [RemoteStatus.ChargePoint] = { [] }) {
+        self.chargeHistory = chargeHistory
         self.awake = awake
         self.automation = automation
         self.helper = helper
@@ -157,10 +160,10 @@ final class RemoteAccessModel {
 
         switch request.operation {
         case .status:
-            return .init(status: status())
+            return .init(status: await fullStatus())
         case .stop:
             if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
-            return .init(status: status())
+            return .init(status: await fullStatus())
         case .start:
             return await start(request, deviceName: devices[index].name)
         }
@@ -173,15 +176,15 @@ final class RemoteAccessModel {
             return .init(.invalidRequest, String(localized: "Choose a supported mode and duration."))
         }
         guard !awake.isActive, !awake.isChanging, !awake.isAwaitingHelperApproval else {
-            return .init(.busy, String(localized: "Keep Awake is already running or changing. Stop it first."), status: status())
+            return .init(.busy, String(localized: "Keep Awake is already running or changing. Stop it first."), status: await fullStatus())
         }
         if mode == .lidClosed {
             guard closedLidAllowed else {
-                return .init(.closedLidNotAllowed, String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac."), status: status())
+                return .init(.closedLidNotAllowed, String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac."), status: await fullStatus())
             }
             helper.refreshStatusIfChanged()
             guard helper.isInstalled else {
-                return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."), status: status())
+                return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."), status: await fullStatus())
             }
         }
         let id = UUID().uuidString
@@ -191,9 +194,16 @@ final class RemoteAccessModel {
         guard awake.sessionIdentifier == id, awake.isActive else {
             let message = awake.errorMessage ?? String(localized: "Keep Awake could not start.")
             let code: RemoteReply.Code = awake.safety.blockingEvent() == nil ? .startFailed : .protection
-            return .init(code, message, status: status())
+            return .init(code, message, status: await fullStatus())
         }
-        return .init(status: status())
+        return .init(status: await fullStatus())
+    }
+
+    private func fullStatus() async -> RemoteStatus {
+        var status = status()
+        let history = await chargeHistory()
+        status.chargeHistory = history.isEmpty ? nil : history
+        return status
     }
 
     func status(at now: Date = Date()) -> RemoteStatus {
