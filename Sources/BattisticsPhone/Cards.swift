@@ -4,7 +4,8 @@ import SwiftUI
 import UIKit
 
 /// Always-present bottom dock card that morphs between Unreachable, Hotspot Paired
-/// (Pocket Mode), and Desk/Wi‑Fi states without shifting the layout vertically.
+/// (Pocket Mode), and Desk/Wi-Fi states without shifting the layout vertically.
+/// When on Wi-Fi, tapping the text cycles through practical mobility tips.
 struct PocketModeDock: View {
     @Environment(MacStore.self) private var store
     @Environment(\.openURL) private var openURL
@@ -12,6 +13,10 @@ struct PocketModeDock: View {
     let reading: MacStore.Reading?
     let status: RemoteStatus
     @Binding var message: String?
+
+    @AppStorage("lastDuration") private var minutes = 60
+    @AppStorage("lastMode") private var mode = RemoteStatus.Mode.displayMaySleep
+    @State private var tipIndex = 0
 
     var body: some View {
         let reachable = reading?.reachable == true
@@ -23,44 +28,57 @@ struct PocketModeDock: View {
         let accent: Color = !reachable ? .orange : (isHotspot ? PowerPalette.hotspot : Color.accentColor)
 
         HStack(spacing: 12) {
-            Image(systemName: !reachable
-                  ? "antenna.radiowaves.left.and.right.slash"
-                  : (isHotspot ? "personalhotspot" : "laptopcomputer.and.iphone"))
+            Image(systemName: iconName(reachable: reachable, isHotspot: isHotspot))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(accent)
                 .symbolEffect(.variableColor.iterative.reversing, isActive: isHotspot)
                 .frame(width: 38, height: 38)
                 .background(accent.opacity(0.15), in: Circle())
 
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text(titleText(reachable: reachable, isHotspot: isHotspot, isPocketMode: isPocketMode))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(!reachable || isHotspot ? accent : .primary)
-                        .lineLimit(1)
-                    if isHotspot, let hotspotName {
-                        Text("· \(hotspotName)")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+            Button {
+                guard reachable, !isHotspot else { return }
+                withAnimation(.snappy(duration: 0.25)) {
+                    tipIndex = (tipIndex + 1) % 4
                 }
-                Text(subtitleText(reachable: reachable, isHotspot: isHotspot, isPocketMode: isPocketMode))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+            } label: {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text(titleText(reachable: reachable, isHotspot: isHotspot, isPocketMode: isPocketMode))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(!reachable || isHotspot ? accent : .primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        if isHotspot, let hotspotName {
+                            Text("· \(hotspotName)")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    Text(subtitleText(reachable: reachable, isHotspot: isHotspot, isPocketMode: isPocketMode))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
-
-            Spacer(minLength: 4)
+            .buttonStyle(.plain)
 
             if canQuickStartClosedLid && isHotspot {
                 Button {
+                    withAnimation(.snappy(duration: 0.22)) {
+                        mode = .lidClosed
+                        minutes = 60
+                        message = nil
+                    }
                     Task {
                         let failure = await store.start(mac, mode: .lidClosed, minutes: 60)
                         withAnimation { message = failure }
                     }
                 } label: {
-                    Label("Bag 1h", systemImage: "Briefcase.fill".lowercased() == "briefcase.fill" ? "handbag.fill" : "laptopcomputer")
+                    Label("Bag 1h", systemImage: "handbag.fill")
                         .font(.caption.weight(.semibold))
                 }
                 .buttonStyle(.borderedProminent)
@@ -99,6 +117,12 @@ struct PocketModeDock: View {
         )
     }
 
+    private func iconName(reachable: Bool, isHotspot: Bool) -> String {
+        if !reachable { return "antenna.radiowaves.left.and.right.slash" }
+        if isHotspot { return "personalhotspot" }
+        return tipIndex == 0 ? "laptopcomputer.and.iphone" : "lightbulb.fill"
+    }
+
     private func titleText(reachable: Bool, isHotspot: Bool, isPocketMode: Bool) -> String {
         if !reachable {
             return String(localized: "Can’t reach \(mac.name)")
@@ -109,22 +133,32 @@ struct PocketModeDock: View {
         if isHotspot {
             return String(localized: "Hotspot Paired")
         }
-        return String(localized: "Hotspot & Pocket Mode")
+        switch tipIndex {
+        case 1: return String(localized: "Tip · Auto-Join Hotspot")
+        case 2: return String(localized: "Tip · Closed Bag Heat")
+        case 3: return String(localized: "Tip · Until Turned Off")
+        default: return String(localized: "Pocket Mode Needs Hotspot")
+        }
     }
 
     private func subtitleText(reachable: Bool, isHotspot: Bool, isPocketMode: Bool) -> String {
         if !reachable {
             return status.session != nil
                 ? String(localized: "Keep Awake was running when last seen.")
-                : String(localized: "Offline — open Hotspot if away from Wi‑Fi.")
+                : String(localized: "Offline. Open Hotspot if away from Wi‑Fi.")
         }
         if isPocketMode {
-            return String(localized: "Lid closed & awake on your hotspot.")
+            return String(localized: "Lid closed and awake on your hotspot.")
         }
         if isHotspot {
-            return String(localized: "Linked to iPhone — ready for bag mode")
+            return String(localized: "Connected to iPhone, ready for bag mode.")
         }
-        return String(localized: "Ready for closed-lid bag mode")
+        switch tipIndex {
+        case 1: return String(localized: "Set Mac Wi‑Fi › Ask to Join Hotspots to Automatic.")
+        case 2: return String(localized: "Enable Thermal Care on Mac to pause if bag warms.")
+        case 3: return String(localized: "Tap the selected duration pill again for ∞ mode.")
+        default: return String(localized: "Wi‑Fi drops when you leave. Turn on Hotspot first.")
+        }
     }
 }
 
@@ -192,13 +226,13 @@ struct BatteryCard: View {
                     )
                     MetricPill(
                         label: String(localized: "Health"),
-                        value: battery.healthPercent.map { "\($0)%" } ?? "—",
+                        value: battery.healthPercent.map { "\($0)%" } ?? "-",
                         symbol: "heart.fill",
                         tint: .secondary
                     )
                     MetricPill(
                         label: String(localized: "Temp"),
-                        value: battery.temperatureC.map { "\(Int($0.rounded()))°C" } ?? "—",
+                        value: battery.temperatureC.map { "\(Int($0.rounded()))°C" } ?? "-",
                         symbol: "thermometer.medium",
                         tint: status.thermal == .nominal ? .secondary : status.thermal.tint
                     )
@@ -299,6 +333,7 @@ struct BatteryCard: View {
 /// any layout shift or scroll jump.
 struct KeepAwakeCard: View {
     @Environment(MacStore.self) private var store
+    @Environment(\.openURL) private var openURL
     let mac: MacStore.Mac
     let status: RemoteStatus
     let enabled: Bool
@@ -307,6 +342,7 @@ struct KeepAwakeCard: View {
     @AppStorage("lastDuration") private var minutes = 60
     @AppStorage("lastMode") private var mode = RemoteStatus.Mode.displayMaySleep
     @State private var changed = 0
+    @State private var showingWiFiLidConfirmation = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -335,7 +371,25 @@ struct KeepAwakeCard: View {
         .disabled(!enabled || store.pending.contains(mac.id))
         .sensoryFeedback(.success, trigger: changed)
         .animation(.spring(duration: 0.35, bounce: 0.15), value: status.session != nil)
-        .onChange(of: status.session == nil) { message = nil }
+        .onChange(of: status.session) { message = nil }
+        .onChange(of: mode) { message = nil }
+        .onChange(of: minutes) { message = nil }
+        .confirmationDialog(
+            String(localized: "Mac is on Wi‑Fi, not Hotspot"),
+            isPresented: $showingWiFiLidConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "Start & Open Hotspot Settings")) {
+                HotspotOpener.open(using: openURL)
+                Task { await run { await store.start(mac, mode: .lidClosed, minutes: minutes) } }
+            }
+            Button(String(localized: "Start on Current Wi‑Fi")) {
+                Task { await run { await store.start(mac, mode: .lidClosed, minutes: minutes) } }
+            }
+            Button(String(localized: "Cancel"), role: .cancel) {}
+        } message: {
+            Text("If you put your Mac in a bag and leave Wi‑Fi range, internet and remote control will drop unless you use Personal Hotspot or a mobile router.")
+        }
     }
 
     @ViewBuilder
@@ -480,16 +534,36 @@ struct KeepAwakeCard: View {
                 .foregroundStyle(.orange)
                 .lineLimit(1)
         } else if let session = status.session {
-            let distinctName = (session.name == "iPhone") ? nil : session.name
-            Text([distinctName, session.origin.label].compactMap { $0 }.joined(separator: " · "))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+            if session.mode == .lidClosed && status.network != .hotspot {
+                Label("On Wi‑Fi. Use Hotspot if putting Mac in a bag.", systemImage: "personalhotspot")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            } else if session.deadline == nil {
+                Text("\(session.mode.subtitle) · \(session.origin.label)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            } else {
+                Text(session.mode.subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
         } else {
-            Text((modes.contains(mode) ? mode : .displayMaySleep).subtitle)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+            let chosen = modes.contains(mode) ? mode : .displayMaySleep
+            if chosen == .lidClosed && status.network != .hotspot {
+                Label("On Wi‑Fi. Use Hotspot if putting Mac in a bag.", systemImage: "personalhotspot")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            } else {
+                Text(chosen.subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
         }
     }
 
@@ -515,7 +589,11 @@ struct KeepAwakeCard: View {
         } else {
             Button {
                 let chosen = modes.contains(mode) ? mode : .displayMaySleep
-                Task { await run { await store.start(mac, mode: chosen, minutes: minutes) } }
+                if chosen == .lidClosed && status.network != .hotspot {
+                    showingWiFiLidConfirmation = true
+                } else {
+                    Task { await run { await store.start(mac, mode: chosen, minutes: minutes) } }
+                }
             } label: {
                 HStack(spacing: 6) {
                     if store.pending.contains(mac.id) {
@@ -539,6 +617,7 @@ struct KeepAwakeCard: View {
     }
 
     private func run(_ action: () async -> String?) async {
+        withAnimation { message = nil }
         let failure = await action()
         withAnimation { message = failure }
         if failure == nil { changed += 1 }
@@ -568,7 +647,7 @@ struct ConditionsGrid: View {
             .buttonStyle(.plain)
 
             Tile(
-                title: status.protection.closedLidAllowed ? String(localized: "Lid · Bag ready") : String(localized: "Lid"),
+                title: lidSubtitle(isHotspot: isHotspot),
                 value: (status.lidClosed ?? false) ? String(localized: "Closed") : String(localized: "Open"),
                 symbol: (status.lidClosed ?? false) ? "laptopcomputer.slash" : "laptopcomputer",
                 tint: .secondary
@@ -588,6 +667,20 @@ struct ConditionsGrid: View {
                 tint: .secondary
             )
         }
+    }
+
+    /// Only reports "Bag ready" when tethered to Personal Hotspot with closed-lid allowed.
+    private func lidSubtitle(isHotspot: Bool) -> String {
+        if isHotspot && status.protection.closedLidAllowed {
+            return String(localized: "Lid · Bag ready")
+        }
+        if status.lidClosed == true {
+            if status.battery?.onAdapter == true {
+                return String(localized: "Lid · Clamshell")
+            }
+            return String(localized: "Lid · On Wi‑Fi")
+        }
+        return String(localized: "Lid")
     }
 
     private struct Tile: View {

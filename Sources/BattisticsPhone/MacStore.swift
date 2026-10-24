@@ -88,12 +88,22 @@ final class MacStore {
         for (id, status) in snapshot.statuses {
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
-            readings[id] = Reading(status: status, lastSeen: status.readAt, reachable: fresh)
-            alerts.append((Mac(id: id, name: status.machineName), RemoteAlert.alerts(from: previous, to: fresh ? status : nil)))
+            let reading = Reading(status: status, lastSeen: status.readAt, reachable: fresh)
+            readings[id] = reading
+            let mac = Mac(id: id, name: status.machineName)
+            let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil)
+            alerts.append((mac, macAlerts))
+            Notifications.syncWatchdog(for: mac, reading: reading)
         }
         // A Mac that stopped sharing is gone, not silent.
-        for id in readings.keys where snapshot.statuses[id] == nil { readings[id] = nil }
+        for id in readings.keys where snapshot.statuses[id] == nil {
+            readings[id] = nil
+            Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
+        }
         save()
+        if !alerts.isEmpty {
+            Task { await Notifications.deliver(alerts) }
+        }
         return alerts
     }
 

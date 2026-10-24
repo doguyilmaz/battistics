@@ -92,5 +92,24 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)
         #expect(RemoteAlert.alerts(from: .some(nil), to: nil).isEmpty)
     }
+
+    @Test func unplugOrClosingLidOnWiFiDuringSessionAlertsForHotspot() {
+        var pluggedWiFi = status(percent: 80, adapter: true, session: true)
+        pluggedWiFi.network = .wifi
+        pluggedWiFi.lidClosed = false
+
+        var unpluggedWiFi = status(percent: 80, adapter: false, session: true)
+        unpluggedWiFi.network = .wifi
+        unpluggedWiFi.lidClosed = false
+        #expect(RemoteAlert.alerts(from: pluggedWiFi, to: unpluggedWiFi) == [.unpluggedWithoutHotspot])
+
+        var closedOnWiFi = unpluggedWiFi
+        closedOnWiFi.lidClosed = true
+        #expect(RemoteAlert.alerts(from: unpluggedWiFi, to: closedOnWiFi) == [.closedLidWithoutHotspot])
+
+        var unpluggedHotspot = unpluggedWiFi
+        unpluggedHotspot.network = .hotspot
+        #expect(RemoteAlert.alerts(from: pluggedWiFi, to: unpluggedHotspot).isEmpty)
+    }
 }
 

@@ -715,6 +715,23 @@
         }
       }
     },
+    "Charging on adapter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charging on adapter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptörde şarj oluyor"
+          }
+        }
+      }
+    },
     "Check Mac": {
       "extractionState": "manual",
       "localizations": {
@@ -766,6 +783,23 @@
         }
       }
     },
+    "Connected to iPhone, ready for bag mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected to iPhone, ready for bag mode."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’a bağlı, çanta moduna hazır."
+          }
+        }
+      }
+    },
     "Connecting…": {
       "extractionState": "manual",
       "localizations": {
@@ -796,6 +830,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bağlantı"
+          }
+        }
+      }
+    },
+    "Connection lost while Keep Awake was running. If you have an active task on your Mac, turn on Personal Hotspot or check Wi‑Fi.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection lost while Keep Awake was running. If you have an active task on your Mac, turn on Personal Hotspot or check Wi‑Fi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut çalışırken bağlantı koptu. Mac’te devam eden bir işiniz varsa Kişisel Erişim Noktası’nı açın veya Wi‑Fi’yi kontrol edin."
           }
         }
       }
@@ -949,6 +1000,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süre"
+          }
+        }
+      }
+    },
+    "Enable Thermal Care on Mac to pause if bag warms.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Thermal Care on Mac to pause if bag warms."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çanta ısınırsa durması için Mac’te Sıcaklık Koruması’nı açın."
           }
         }
       }
@@ -1119,6 +1187,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hotspot Eşleşti"
+          }
+        }
+      }
+    },
+    "If you put your Mac in a bag and leave Wi‑Fi range, internet and remote control will drop unless you use Personal Hotspot or a mobile router.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If you put your Mac in a bag and leave Wi‑Fi range, internet and remote control will drop unless you use Personal Hotspot or a mobile router."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i çantaya koyup Wi‑Fi menzilinden çıkarsanız, Kişisel Erişim Noktası veya taşınabilir modem kullanmadığınız sürece internet ve uzaktan kontrol kopar."
           }
         }
       }
@@ -1378,6 +1463,23 @@
         }
       }
     },
+    "Keeping Mac awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeping Mac awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uyanık tutuluyor"
+          }
+        }
+      }
+    },
     "Keeping awake": {
       "extractionState": "manual",
       "localizations": {
@@ -1531,6 +1633,40 @@
         }
       }
     },
+    "Lid closed and awake on your hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lid closed and awake on your hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hotspot’ta kapak kapalı ve uyanık."
+          }
+        }
+      }
+    },
+    "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hotspot olmadan pilde kapak kapatıldı. Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
+          }
+        }
+      }
+    },
     "Lid open": {
       "extractionState": "manual",
       "localizations": {
@@ -1565,19 +1701,36 @@
         }
       }
     },
-    "Linked to iPhone — ready for bag mode": {
+    "Lid · Clamshell": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linked to iPhone — ready for bag mode"
+            "value": "Lid · Clamshell"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone’a bağlı — çanta moduna hazır"
+            "value": "Kapak · Masaüstü"
+          }
+        }
+      }
+    },
+    "Lid · On Wi‑Fi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lid · On Wi‑Fi"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak · Wi‑Fi’de"
           }
         }
       }
@@ -1646,6 +1799,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac ve ekran uyanık kalır"
+          }
+        }
+      }
+    },
+    "Mac is on Wi‑Fi, not Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac is on Wi‑Fi, not Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Hotspot’ta değil, Wi‑Fi’de"
           }
         }
       }
@@ -1731,6 +1901,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’in olduğu yerde Wi‑Fi yok mu? Ayarlar › Kişisel Erişim Noktası’nda Başkalarının Katılmasına İzin Ver’i açın; hotspot’lara otomatik katılan bir Mac kendisi bağlanır."
+          }
+        }
+      }
+    },
+    "No response during Keep Awake. Check if your Mac is still within Personal Hotspot range.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No response during Keep Awake. Check if your Mac is still within Personal Hotspot range."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut sırasında yanıt alınamadı. Mac’in Kişisel Erişim Noktası menzilinde olduğundan emin olun."
           }
         }
       }
@@ -1854,19 +2041,36 @@
         }
       }
     },
-    "Offline — open Hotspot if away from Wi‑Fi.": {
+    "Offline. Open Hotspot if away from Wi‑Fi.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Offline — open Hotspot if away from Wi‑Fi."
+            "value": "Offline. Open Hotspot if away from Wi‑Fi."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Çevrimdışı — Wi‑Fi yoksa Hotspot’u açın."
+            "value": "Çevrimdışı. Wi‑Fi yoksa Hotspot’u açın."
+          }
+        }
+      }
+    },
+    "On Wi‑Fi. Use Hotspot if putting Mac in a bag.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On Wi‑Fi. Use Hotspot if putting Mac in a bag."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi’de. Çantaya koyacaksanız Hotspot kullanın."
           }
         }
       }
@@ -2092,6 +2296,23 @@
         }
       }
     },
+    "Pocket Mode Needs Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Mode Needs Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çanta Modu İçin Hotspot Gerekli"
+          }
+        }
+      }
+    },
     "Power": {
       "extractionState": "manual",
       "localizations": {
@@ -2139,6 +2360,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı çanta moduna hazır"
+          }
+        }
+      }
+    },
+    "Remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remaining"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan"
           }
         }
       }
@@ -2211,6 +2449,23 @@
         }
       }
     },
+    "Set Mac Wi‑Fi › Ask to Join Hotspots to Automatic.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Mac Wi‑Fi › Ask to Join Hotspots to Automatic."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Wi‑Fi › Erişim Noktalarına Katıl’ı Otomatik yapın."
+          }
+        }
+      }
+    },
     "Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -2245,6 +2500,23 @@
         }
       }
     },
+    "Start & Open Hotspot Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start & Open Hotspot Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlat ve Hotspot Ayarlarını Aç"
+          }
+        }
+      }
+    },
     "Start closed-lid Keep Awake on the Mac once to set up its helper.": {
       "extractionState": "manual",
       "localizations": {
@@ -2258,6 +2530,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yardımcıyı kurmak için Mac’te kapak kapalı Uyanık Tut’u bir kez başlatın."
+          }
+        }
+      }
+    },
+    "Start on Current Wi‑Fi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start on Current Wi‑Fi"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevcut Wi‑Fi ile Başlat"
           }
         }
       }
@@ -2381,6 +2670,23 @@
         }
       }
     },
+    "Stopped answering while Keep Awake was on. Connect to Personal Hotspot or check Wi‑Fi if a task is running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stopped answering while Keep Awake was on. Connect to Personal Hotspot or check Wi‑Fi if a task is running."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açıkken yanıt vermeyi bıraktı. Devam eden bir iş varsa Kişisel Erişim Noktası’na bağlayın veya Wi‑Fi’yi kontrol edin."
+          }
+        }
+      }
+    },
     "Stopped answering while Keep Awake was on. It may be offline or asleep.": {
       "extractionState": "manual",
       "localizations": {
@@ -2479,6 +2785,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "∞ için seçili süreye dokun"
+          }
+        }
+      }
+    },
+    "Tap the selected duration pill again for ∞ mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the selected duration pill again for ∞ mode."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "∞ modu için seçili süreye tekrar dokunun."
           }
         }
       }
@@ -2704,6 +3027,57 @@
         }
       }
     },
+    "Tip · Auto-Join Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip · Auto-Join Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İpucu · Otomatik Hotspot"
+          }
+        }
+      }
+    },
+    "Tip · Closed Bag Heat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip · Closed Bag Heat"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İpucu · Kapalı Çanta Isısı"
+          }
+        }
+      }
+    },
+    "Tip · Until Turned Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip · Until Turned Off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İpucu · Kapatılana Kadar"
+          }
+        }
+      }
+    },
     "Too many failed attempts. Try again in a minute.": {
       "extractionState": "manual",
       "localizations": {
@@ -2717,6 +3091,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çok fazla başarısız deneme. Bir dakika sonra tekrar deneyin."
+          }
+        }
+      }
+    },
+    "Unplugged on Wi‑Fi while Keep Awake is active. Turn on Personal Hotspot before putting your Mac in a bag so your tasks stay online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unplugged on Wi‑Fi while Keep Awake is active. Turn on Personal Hotspot before putting your Mac in a bag so your tasks stay online."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinizin çevrimiçi kalması için Kişisel Erişim Noktası’nı açın."
+          }
+        }
+      }
+    },
+    "Until stopped": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Until stopped"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durdurulana dek"
           }
         }
       }
@@ -2853,6 +3261,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wi‑Fi"
+          }
+        }
+      }
+    },
+    "Wi‑Fi drops when you leave. Turn on Hotspot first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi drops when you leave. Turn on Hotspot first."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayrıldığınızda Wi‑Fi kopar. Önce Hotspot’u açın."
           }
         }
       }

@@ -6,6 +6,8 @@ public enum RemoteAlert: Equatable, Sendable {
     case sessionEnded(RemoteStatus.EndReason?)
     case batteryLow(percent: Int)
     case batteryRunsOut(minutesLeft: Int)
+    case unpluggedWithoutHotspot
+    case closedLidWithoutHotspot
     case unreachable
 
     /// `current` is nil when the Mac did not answer; `previous` is nil before
@@ -29,6 +31,14 @@ public enum RemoteAlert: Equatable, Sendable {
             if battery.percent <= threshold, wasAbove { alerts.append(.batteryLow(percent: battery.percent)) }
             if current.batteryRunsOutFirst, !previous.batteryRunsOutFirst, let minutes = battery.minutesRemaining {
                 alerts.append(.batteryRunsOut(minutesLeft: minutes))
+            }
+            if alerts.isEmpty, current.session != nil, current.network == .wifi {
+                if previous.battery?.onAdapter == true,
+                   current.session?.mode == .lidClosed || current.lidClosed == true {
+                    alerts.append(.unpluggedWithoutHotspot)
+                } else if current.lidClosed == true, previous.lidClosed == false {
+                    alerts.append(.closedLidWithoutHotspot)
+                }
             }
         }
         return alerts
