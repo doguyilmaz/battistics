@@ -90,12 +90,14 @@ struct MacWidgetView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func small(_ snapshot: SharedSnapshot, _ status: RemoteStatus) -> some View {
+    private func small(_ snapshot: SharedSnapshot, _ status: RemoteStatus, showsNetwork: Bool = true) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(snapshot.macName).font(.caption.weight(.semibold)).lineLimit(1)
                 Spacer(minLength: 0)
-                Image(systemName: status.network.symbol).font(.caption).foregroundStyle(.secondary)
+                if showsNetwork {
+                    Image(systemName: status.network.symbol).font(.caption).foregroundStyle(.secondary)
+                }
             }
             Spacer(minLength: 0)
             if let battery = status.battery {
@@ -113,7 +115,7 @@ struct MacWidgetView: View {
 
     private func medium(_ snapshot: SharedSnapshot, _ status: RemoteStatus) -> some View {
         HStack(spacing: 16) {
-            small(snapshot, status)
+            small(snapshot, status, showsNetwork: false)
             VStack(alignment: .leading, spacing: 8) {
                 Label(status.network.label, systemImage: status.network.symbol)
                 if let closed = status.lidClosed {

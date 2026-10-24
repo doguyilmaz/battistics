@@ -68,8 +68,7 @@ The iPhone pane on the Mac and the phone's settings both explain this.
   hotspot" with no network at all.
 - CloudKit push for prompt alerts, which needs an iCloud container on both apps.
 - Device builds need the team set in `project.yml`; the scheme builds for the
-  Simulator as is. The widget was checked only for registration, not placed
-  on a Home Screen.
+  Simulator as is.
 
 ## Developing
 
