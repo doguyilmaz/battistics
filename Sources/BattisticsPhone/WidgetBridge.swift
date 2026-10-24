@@ -1,6 +1,7 @@
 import ActivityKit
 import BattisticsRemote
 import Foundation
+import UIKit
 import WidgetKit
 
 /// Hands the selected Mac's reading to the widgets and keeps the lock-screen
@@ -15,7 +16,11 @@ enum WidgetBridge {
             endActivities()
             return
         }
-        let snapshot = SharedSnapshot(macName: mac.name, status: reading?.status,
+        var adjustedStatus = reading?.status
+        if adjustedStatus?.network == .hotspot, adjustedStatus?.networkName == nil {
+            adjustedStatus?.networkName = UIDevice.current.name
+        }
+        let snapshot = SharedSnapshot(macName: mac.name, status: adjustedStatus,
                                       lastSeen: reading?.lastSeen, reachable: reading?.reachable ?? false)
         if snapshot != SharedSnapshot.load() {
             snapshot.save()
@@ -28,15 +33,29 @@ enum WidgetBridge {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         // A silent Mac keeps its countdown; it ends on its own at the deadline.
         guard reading?.reachable == true else { return }
-        guard let status = reading?.status, let session = status.session, let deadline = session.deadline,
-              deadline > .now else {
+        guard let status = reading?.status, let session = status.session else {
+            endActivities()
+            return
+        }
+        if let deadline = session.deadline, deadline <= .now {
             endActivities()
             return
         }
         let state = KeepAwakeActivityAttributes.ContentState(
-            mode: session.mode, startedAt: session.startedAt, deadline: deadline,
-            batteryPercent: status.battery?.percent)
-        let content = ActivityContent(state: state, staleDate: deadline)
+            mode: session.mode,
+            startedAt: session.startedAt,
+            deadline: session.deadline,
+            sessionName: session.name ?? session.origin.label,
+            batteryPercent: status.battery?.percent,
+            isCharging: status.battery?.isCharging ?? false,
+            onAdapter: status.battery?.onAdapter ?? false,
+            lowPowerMode: status.battery?.lowPowerMode ?? false,
+            watts: status.battery?.watts,
+            lidClosed: status.lidClosed,
+            network: status.network,
+            networkName: status.resolvedNetworkName(fallbackHotspot: UIDevice.current.name)
+        )
+        let content = ActivityContent(state: state, staleDate: session.deadline)
         let current = Activity<KeepAwakeActivityAttributes>.activities
         if let activity = current.first(where: { $0.attributes.macName == mac.name }) {
             let id = activity.id

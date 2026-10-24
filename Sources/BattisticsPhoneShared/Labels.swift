@@ -4,16 +4,24 @@ import SwiftUI
 extension RemoteStatus.Mode {
     var label: String {
         switch self {
-        case .displayMaySleep: String(localized: "Display may sleep")
-        case .displayOn: String(localized: "Display on")
-        case .lidClosed: String(localized: "Lid closed")
+        case .displayMaySleep: String(localized: "Screen Off")
+        case .displayOn: String(localized: "Screen On")
+        case .lidClosed: String(localized: "Lid Closed")
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .displayMaySleep: String(localized: "Mac stays awake, display may sleep")
+        case .displayOn: String(localized: "Both Mac and display stay awake")
+        case .lidClosed: String(localized: "Stays awake with lid closed in your bag")
         }
     }
 
     var symbol: String {
         switch self {
-        case .displayMaySleep: "moon"
-        case .displayOn: "sun.max"
+        case .displayMaySleep: "moon.fill"
+        case .displayOn: "sun.max.fill"
         case .lidClosed: "laptopcomputer"
         }
     }
@@ -22,9 +30,9 @@ extension RemoteStatus.Mode {
 extension RemoteStatus.Origin {
     var label: String {
         switch self {
-        case .manual: String(localized: "Started on the Mac")
+        case .manual: String(localized: "Started on Mac")
         case .profile: String(localized: "Profile")
-        case .terminal: String(localized: "Terminal command")
+        case .terminal: String(localized: "Terminal")
         case .ai: String(localized: "AI task")
         case .phone: String(localized: "Started from iPhone")
         }
@@ -35,7 +43,7 @@ extension RemoteStatus.EndReason {
     var label: String {
         switch self {
         case .timer: String(localized: "Time ran out")
-        case .user: String(localized: "Stopped on the Mac")
+        case .user: String(localized: "Stopped on Mac")
         case .phone: String(localized: "Stopped from iPhone")
         case .battery: String(localized: "Battery protection")
         case .thermal: String(localized: "Heat protection")
@@ -67,6 +75,27 @@ extension RemoteStatus.Network {
     }
 }
 
+extension RemoteStatus {
+    /// Returns the SSID / network name when available, falling back to the
+    /// phone's own name when the Mac is on a Personal Hotspot.
+    func resolvedNetworkName(fallbackHotspot: String? = nil) -> String? {
+        if let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
+            return name
+        }
+        if network == .hotspot, let fallback = fallbackHotspot?.trimmingCharacters(in: .whitespacesAndNewlines), !fallback.isEmpty {
+            return fallback
+        }
+        return nil
+    }
+
+    func networkDisplayLabel(fallbackHotspot: String? = nil) -> String {
+        if let name = resolvedNetworkName(fallbackHotspot: fallbackHotspot) {
+            return "\(network.label) · \(name)"
+        }
+        return network.label
+    }
+}
+
 extension RemoteStatus.Thermal {
     var label: String {
         switch self {
@@ -86,16 +115,33 @@ extension RemoteStatus.Thermal {
     }
 }
 
+enum PowerPalette {
+    static let charging = Color(red: 0.16, green: 0.80, blue: 0.44)
+    static let lowPower = Color(red: 0.95, green: 0.72, blue: 0.08)
+    static let hotspot = Color(red: 0.05, green: 0.72, blue: 0.96)
+
+    static func batteryTint(_ battery: RemoteStatus.Battery) -> Color {
+        if battery.lowPowerMode == true { return lowPower }
+        if battery.isCharging || battery.onAdapter { return charging }
+        if battery.percent <= 10 { return .red }
+        if battery.percent <= 20 { return .orange }
+        return .accentColor
+    }
+}
+
 enum DurationLabel {
     static func short(_ minutes: Int) -> String {
-        minutes < 60 ? String(localized: "\(minutes)m") : String(localized: "\(minutes / 60)h")
+        if minutes <= 0 { return "∞" }
+        return minutes < 60 ? String(localized: "\(minutes)m") : String(localized: "\(minutes / 60)h")
     }
 
     static func long(minutes: Int) -> String {
-        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        if minutes <= 0 { return String(localized: "Until stopped") }
+        return Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
     }
 
     static func spoken(minutes: Int) -> String {
-        Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .wide))
+        if minutes <= 0 { return String(localized: "Until turned off") }
+        return Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .wide))
     }
 }

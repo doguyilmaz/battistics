@@ -41,6 +41,15 @@ final class MacStore {
         readings = UserDefaults.standard.data(forKey: "readings")
             .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
+        RemoteIntentBridge.startOneHour = { [weak self] in
+            guard let self, let mac = self.selected else { return }
+            _ = await self.start(mac, mode: .displayMaySleep, minutes: 60)
+        }
+        RemoteIntentBridge.stop = { [weak self] in
+            guard let self, let mac = self.selected else { return }
+            _ = await self.stop(mac)
+        }
+        WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
     }
 
     var macs: [Mac] {

@@ -1,5 +1,6 @@
 import BattisticsRemote
 import SwiftUI
+import UIKit
 import UserNotifications
 
 struct SettingsView: View {
@@ -13,19 +14,105 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section {
-                    ForEach(store.macs) { mac in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(mac.name)
-                            if let seen = store.reading(for: mac)?.lastSeen {
-                                Text("Last seen \(seen.formatted(.relative(presentation: .named)))")
-                                    .font(.caption).foregroundStyle(.secondary)
+                    if store.macs.isEmpty {
+                        Label("No Macs sharing right now", systemImage: "laptopcomputer.slash")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(store.macs) { mac in
+                            let reading = store.reading(for: mac)
+                            let status = reading?.status
+                            let isSelected = store.selected?.id == mac.id
+                            Button {
+                                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                                    store.selectedID = mac.id
+                                }
+                                dismiss()
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: status?.network == .hotspot ? "personalhotspot" : "laptopcomputer")
+                                        .font(.title3)
+                                        .foregroundStyle(status?.network == .hotspot ? PowerPalette.hotspot : Color.accentColor)
+                                        .frame(width: 28)
+
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        HStack(spacing: 6) {
+                                            Text(mac.name)
+                                                .font(.body.weight(.semibold))
+                                                .foregroundStyle(.primary)
+                                            if status?.session != nil {
+                                                Image(systemName: "cup.and.saucer.fill")
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.orange)
+                                            }
+                                        }
+                                        HStack(spacing: 6) {
+                                            if let status {
+                                                Text(status.networkDisplayLabel(fallbackHotspot: UIDevice.current.name))
+                                            }
+                                            if let seen = reading?.lastSeen {
+                                                Text("·")
+                                                Text(reading?.reachable == true
+                                                     ? String(localized: "Updated \(seen.formatted(.relative(presentation: .named)))")
+                                                     : String(localized: "Last seen \(seen.formatted(.relative(presentation: .named)))"))
+                                            }
+                                        }
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    if let battery = status?.battery {
+                                        HStack(spacing: 3) {
+                                            if battery.lowPowerMode == true {
+                                                Image(systemName: "leaf.fill")
+                                                    .font(.caption2)
+                                                    .foregroundStyle(PowerPalette.lowPower)
+                                            } else if battery.isCharging {
+                                                Image(systemName: "bolt.fill")
+                                                    .font(.caption2)
+                                                    .foregroundStyle(PowerPalette.charging)
+                                            }
+                                            Text("\(battery.percent)%")
+                                                .font(.subheadline.weight(.semibold).monospacedDigit())
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+
+                                    if isSelected {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(Color.accentColor)
+                                    }
+                                }
                             }
+                            .buttonStyle(.plain)
                         }
                     }
+
+                    LabeledContent {
+                        Text(UIDevice.current.name)
+                            .foregroundStyle(.secondary)
+                    } label: {
+                        Label("This iPhone", systemImage: "iphone")
+                    }
                 } header: {
-                    Text("Macs")
+                    Text("Devices on Your Apple ID")
                 } footer: {
-                    Text("Macs on this Apple ID appear here when Battistics › iPhone is on. Turn it off on a Mac to remove it.")
+                    Text("Every Mac with Battistics › iPhone enabled on your Apple ID appears here automatically. Tap a Mac to switch to it.")
+                }
+
+                Section {
+                    Button {
+                        HotspotOpener.open(using: openURL)
+                    } label: {
+                        Label("Open Personal Hotspot Settings", systemImage: "personalhotspot")
+                            .foregroundStyle(PowerPalette.hotspot)
+                    }
+                    Text("With no Wi‑Fi nearby, turn on Settings › Personal Hotspot › Allow Others to Join. A Mac with Ask to join hotspots set to Automatic connects by itself, and Keep Awake keeps it connected with the lid closed.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Personal Hotspot & Closed-Lid")
                 }
 
                 Section {
@@ -38,15 +125,10 @@ struct SettingsView: View {
                 } header: {
                     Text("Notifications")
                 } footer: {
-                    Text("When Keep Awake ends, the battery runs low or will not last the session, or a Mac stops answering mid-session. iOS decides how often it checks in the background, so alerts can arrive late.")
-                }
-
-                Section("Stay online with the lid closed") {
-                    Text("With no Wi‑Fi nearby, turn on Settings › Personal Hotspot › Allow Others to Join. A Mac with Ask to join hotspots set to Automatic connects by itself, and Keep Awake keeps it connected.")
-                        .font(.subheadline)
+                    Text("Alerts you when Keep Awake ends, the battery runs low or will not last the session, or a Mac stops answering mid-session.")
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Devices & Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }

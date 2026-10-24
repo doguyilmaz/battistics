@@ -61,7 +61,7 @@ struct MacStatusIntent: AppIntent {
 
 enum IntentFailure: Error, CustomLocalizedStringResourceConvertible {
     case notPaired
-    var localizedStringResource: LocalizedStringResource { "Pair a Mac in Battistics Remote first." }
+    var localizedStringResource: LocalizedStringResource { "Open Battistics Remote to connect to your Mac first." }
 }
 
 struct Shortcuts: AppShortcutsProvider {
