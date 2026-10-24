@@ -140,6 +140,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics
         PRODUCT_NAME: Battistics
+        # Empty for ad-hoc builds: iCloud entitlements need a provisioning
+        # profile, without which macOS refuses to launch the app.
+        CODE_SIGN_ENTITLEMENTS: $(BATTISTICS_ENTITLEMENTS)
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         SWIFT_EMIT_LOC_STRINGS: YES
@@ -160,6 +163,9 @@ targets:
       path: Sources/BattisticsPhone/BattisticsPhone.entitlements
       properties:
         com.apple.security.application-groups: [group.com.doguyilmaz.Battistics.Remote]
+        com.apple.developer.icloud-container-identifiers: [iCloud.com.doguyilmaz.Battistics]
+        com.apple.developer.icloud-services: [CloudKit]
+        aps-environment: development
     info:
       path: Sources/BattisticsPhone/Info.plist
       properties:
@@ -171,15 +177,9 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UIBackgroundModes: [fetch]
+        UIBackgroundModes: [fetch, remote-notification]
         NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers: [com.doguyilmaz.Battistics.Remote.refresh]
-        CFBundleURLTypes:
-          - CFBundleURLName: com.doguyilmaz.Battistics.Remote
-            CFBundleURLSchemes: [battistics-remote]
-        NSLocalNetworkUsageDescription: >-
-          Battistics Remote connects to your Mac over Tailscale to read its
-          battery and Keep Awake state.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote

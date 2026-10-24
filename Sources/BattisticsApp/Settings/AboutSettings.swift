@@ -68,7 +68,7 @@ struct AboutSettings: View {
                 }
             }
             Section {
-                Text("Updates are the only network traffic Battistics starts. iPhone access, when you turn it on, answers only paired iPhones over Tailscale. No analytics, no tracking.")
+                Text("Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

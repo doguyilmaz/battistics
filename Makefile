@@ -4,7 +4,7 @@ SPARKLE_BIN = $(DERIVED)/SourcePackages/artifacts/sparkle/Sparkle/bin
 SIGN_IDENTITY ?= -
 VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 
-.PHONY: gen build test app run install dmg appcast release tap metrics clean
+.PHONY: gen build test app run run-icloud install dmg appcast release tap metrics clean
 
 gen:
 	xcodegen generate
@@ -31,6 +31,16 @@ app: gen
 	SIGN_IDENTITY="$(SIGN_IDENTITY)" bash scripts/sign-app.sh $(APP)
 
 run: build
+	open $(DERIVED)/Build/Products/Debug/Battistics.app
+
+# Debug build signed for iCloud, for the iPhone companion. Xcode creates the
+# development profile; quit any other copy of Battistics first.
+TEAM ?= 5MYT4VYJFC
+run-icloud: gen
+	xcodebuild -project Battistics.xcodeproj -scheme Battistics -configuration Debug \
+		-derivedDataPath $(DERIVED) -allowProvisioningUpdates build \
+		DEVELOPMENT_TEAM=$(TEAM) CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" \
+		BATTISTICS_ENTITLEMENTS=Sources/BattisticsApp/Support/Battistics.entitlements
 	open $(DERIVED)/Build/Products/Debug/Battistics.app
 
 install: app

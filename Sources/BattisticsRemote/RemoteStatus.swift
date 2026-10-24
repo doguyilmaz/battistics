@@ -94,6 +94,22 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var protection: Protection
     /// The last 24 hours of charge, oldest first; nil when history is off.
     public var chargeHistory: [ChargePoint]?
+    /// The outcome of the newest phone command the Mac handled.
+    public var lastCommand: CommandResult?
+
+    public struct CommandResult: Codable, Sendable, Equatable {
+        public var id: String
+        public var failure: RemoteFailure?
+        public init(id: String, failure: RemoteFailure?) { self.id = id; self.failure = failure }
+    }
+
+    /// The Mac writes at least this often while it is awake and sharing.
+    public static let heartbeat: TimeInterval = 600
+
+    /// Whether this reading is recent enough to call the Mac reachable.
+    public func isFresh(at now: Date = Date()) -> Bool {
+        now.timeIntervalSince(readAt) < Self.heartbeat * 2
+    }
 
     public init(machineName: String, readAt: Date, battery: Battery? = nil, session: Session? = nil,
                 lastEnd: LastEnd? = nil, network: Network = .other, lidClosed: Bool? = nil,

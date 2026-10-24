@@ -16,15 +16,16 @@ struct SettingsView: View {
                     ForEach(store.macs) { mac in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(mac.name)
-                            Text(mac.host).font(.caption).foregroundStyle(.secondary).monospaced()
+                            if let seen = store.reading(for: mac)?.lastSeen {
+                                Text("Last seen \(seen.formatted(.relative(presentation: .named)))")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
                         }
                     }
-                    .onDelete { offsets in offsets.map { store.macs[$0] }.forEach(store.remove) }
-                    PasteLinkButton()
                 } header: {
                     Text("Macs")
                 } footer: {
-                    Text("To add a Mac, scan its pairing code with the Camera or paste its link. Swipe to remove one; remove this iPhone on the Mac too.")
+                    Text("Macs on this Apple ID appear here when Battistics › iPhone is on. Turn it off on a Mac to remove it.")
                 }
 
                 Section {

@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ did not answer. It may be asleep or offline.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ did not answer. It may be asleep or offline."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yanıt vermedi. Uykuda veya çevrimdışı olabilir."
+          }
+        }
+      }
+    },
     "%@ is not answering.": {
       "extractionState": "manual",
       "localizations": {
@@ -443,6 +460,23 @@
         }
       }
     },
+    "Battistics has to be running on the Mac, with iPhone access on.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics has to be running on the Mac, with iPhone access on."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te Battistics açık ve iPhone erişimi açık olmalı."
+          }
+        }
+      }
+    },
     "Can sleep": {
       "extractionState": "manual",
       "localizations": {
@@ -558,23 +592,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’i Kontrol Et"
-          }
-        }
-      }
-    },
-    "Check that Tailscale is on, here and on the Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check that Tailscale is on, here and on the Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tailscale’in burada ve Mac’te açık olduğunu kontrol edin."
           }
         }
       }
@@ -864,23 +881,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hotspot"
-          }
-        }
-      }
-    },
-    "Install Tailscale on this iPhone and on your Mac, signed in to the same account.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Install Tailscale on this iPhone and on your Mac, signed in to the same account."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tailscale’i bu iPhone’a ve Mac’inize kurup aynı hesapla giriş yapın."
           }
         }
       }
@@ -1225,6 +1225,23 @@
         }
       }
     },
+    "Look for my Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Look for my Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’imi bul"
+          }
+        }
+      }
+    },
     "Mac": {
       "extractionState": "manual",
       "localizations": {
@@ -1255,6 +1272,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’ler"
+          }
+        }
+      }
+    },
+    "Macs on this Apple ID appear here when Battistics › iPhone is on. Turn it off on a Mac to remove it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macs on this Apple ID appear here when Battistics › iPhone is on. Turn it off on a Mac to remove it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Apple ID’deki Mac’ler, Battistics › iPhone açıkken burada görünür. Kaldırmak için Mac’te kapatın."
           }
         }
       }
@@ -1429,19 +1463,19 @@
         }
       }
     },
-    "On the Mac, open Battistics › iPhone, turn on access and choose Pair an iPhone.": {
+    "On the Mac, open Battistics › iPhone and turn on Show this Mac in Battistics Remote.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "On the Mac, open Battistics › iPhone, turn on access and choose Pair an iPhone."
+            "value": "On the Mac, open Battistics › iPhone and turn on Show this Mac in Battistics Remote."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’te Battistics › iPhone’u açın, erişimi açıp iPhone Eşleştir’i seçin."
+            "value": "Mac’te Battistics › iPhone’u açın ve Bu Mac’i Battistics Remote’ta göster’i açın."
           }
         }
       }
@@ -1629,6 +1663,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ayarlar"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud on this iPhone with the same Apple ID as your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to iCloud on this iPhone with the same Apple ID as your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone’da Mac’inizle aynı Apple ID ile iCloud’a giriş yapın."
           }
         }
       }
@@ -1939,36 +1990,19 @@
         }
       }
     },
-    "This address is not on Tailscale. Pair only with a code shown by Battistics on your own Mac.": {
+    "This iPhone is offline.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This address is not on Tailscale. Pair only with a code shown by Battistics on your own Mac."
+            "value": "This iPhone is offline."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu adres Tailscale üzerinde değil. Yalnızca kendi Mac’inizdeki Battistics’in gösterdiği kodla eşleştirin."
-          }
-        }
-      }
-    },
-    "This iPhone is no longer paired with the Mac. Pair it again.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This iPhone is no longer paired with the Mac. Pair it again."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone artık Mac ile eşleştirilmiş değil. Yeniden eşleştirin."
+            "value": "Bu iPhone çevrimdışı."
           }
         }
       }
@@ -1986,23 +2020,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu iPhone Mac’in pilini ve bağlantısını görür, Uyanık Tut’u başlatıp durdurabilir."
-          }
-        }
-      }
-    },
-    "This is not a Battistics pairing link. Create a new one on the Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This is not a Battistics pairing link. Create a new one on the Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu bir Battistics eşleştirme bağlantısı değil. Mac’te yenisini oluşturun."
           }
         }
       }
@@ -2037,23 +2054,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süre doldu"
-          }
-        }
-      }
-    },
-    "To add a Mac, scan its pairing code with the Camera or paste its link. Swipe to remove one; remove this iPhone on the Mac too.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To add a Mac, scan its pairing code with the Camera or paste its link. Swipe to remove one; remove this iPhone on the Mac too."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac eklemek için eşleştirme kodunu Kamera ile tarayın veya bağlantısını yapıştırın. Kaldırmak için kaydırın; bu iPhone’u Mac’ten de kaldırın."
           }
         }
       }
@@ -2122,6 +2122,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güncellendi: %@"
+          }
+        }
+      }
+    },
+    "Use the same Apple ID with iCloud on this iPhone and on the Mac. There is nothing to pair.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use the same Apple ID with iCloud on this iPhone and on the Mac. There is nothing to pair."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone’da ve Mac’te aynı Apple ID ile iCloud kullanın. Eşleştirilecek bir şey yok."
           }
         }
       }
@@ -2207,6 +2224,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’iniz cebinizde"
+          }
+        }
+      }
+    },
+    "iCloud could not be reached. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud could not be reached. Try again in a moment."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud’a ulaşılamadı. Birazdan tekrar deneyin."
           }
         }
       }

@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-- Battistics Remote for iPhone: battery and time left, connection, lid, heat
-  and Keep Awake for a Mac on your Tailscale network, with start and stop,
-  local notifications and Siri shortcuts. Off by default on the Mac; pair by
-  QR code.
+- Battistics Remote for iPhone: battery and its last day, time left,
+  connection, lid, heat and Keep Awake for the Macs on your Apple ID, with
+  start and stop, push alerts, Siri shortcuts, widgets and a Lock Screen
+  countdown. Off by default on the Mac; everything goes through your private
+  iCloud, with nothing to pair.
 - The Keep Awake card shows the connection, a closed lid and, on battery,
   when the charge will not last the session.
 - Optional Keep Awake stop at a battery level, also in the menu bar's Keep

@@ -6996,23 +6996,6 @@
         }
       }
     },
-    "A paired iPhone sees battery, connection and Keep Awake, and can start or stop it. Only paired iPhones on your Tailscale network can connect; nothing is opened to your local network or the internet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A paired iPhone sees battery, connection and Keep Awake, and can start or stop it. Only paired iPhones on your Tailscale network can connect; nothing is opened to your local network or the internet."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşleştirilen iPhone pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. Yalnızca Tailscale ağınızdaki eşleştirilmiş iPhone’lar bağlanabilir; yerel ağınıza veya internete hiçbir şey açılmaz."
-          }
-        }
-      }
-    },
     "Allow closed-lid sessions from iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -7043,23 +7026,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin verin."
-          }
-        }
-      }
-    },
-    "Allow iPhone access over Tailscale": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow iPhone access over Tailscale"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tailscale üzerinden iPhone erişimine izin ver"
           }
         }
       }
@@ -7200,23 +7166,6 @@
         }
       }
     },
-    "Get Tailscale": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Tailscale"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tailscale’i İndir"
-          }
-        }
-      }
-    },
     "Keep Awake could not start.": {
       "extractionState": "manual",
       "localizations": {
@@ -7353,23 +7302,6 @@
         }
       }
     },
-    "Open the Camera, point it at the code and tap the Battistics Remote link. Tailscale must be on for both devices.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open the Camera, point it at the code and tap the Battistics Remote link. Tailscale must be on for both devices."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kamera’yı açıp koda tutun ve Battistics Remote bağlantısına dokunun. Tailscale iki cihazda da açık olmalı."
-          }
-        }
-      }
-    },
     "PID %d": {
       "extractionState": "manual",
       "localizations": {
@@ -7383,57 +7315,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "PID %d"
-          }
-        }
-      }
-    },
-    "Pair an iPhone…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pair an iPhone…"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Eşleştir…"
-          }
-        }
-      }
-    },
-    "Paired iPhones": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paired iPhones"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşleştirilen iPhone’lar"
-          }
-        }
-      }
-    },
-    "Pairing code": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pairing code"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşleştirme kodu"
           }
         }
       }
@@ -7591,40 +7472,6 @@
         }
       }
     },
-    "Tailscale is not connected on this Mac": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tailscale is not connected on this Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu Mac’te Tailscale bağlı değil"
-          }
-        }
-      }
-    },
-    "This iPhone is no longer paired. Pair it again from Battistics on the Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This iPhone is no longer paired. Pair it again from Battistics on the Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone artık eşleştirilmiş değil. Mac’teki Battistics’ten yeniden eşleştirin."
-          }
-        }
-      }
-    },
     "Time": {
       "extractionState": "manual",
       "localizations": {
@@ -7772,23 +7619,6 @@
         }
       }
     },
-    "Yes, with Battistics Remote and Tailscale on both devices. In Battistics › iPhone, allow access and choose Pair an iPhone, then scan the code with the iPhone Camera. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Nothing is opened beyond your Tailscale network, and only paired iPhones can connect. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yes, with Battistics Remote and Tailscale on both devices. In Battistics › iPhone, allow access and choose Pair an iPhone, then scan the code with the iPhone Camera. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Nothing is opened beyond your Tailscale network, and only paired iPhones can connect. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Evet, Battistics Remote ve iki cihazda da Tailscale ile. Battistics › iPhone’da erişime izin verip iPhone Eşleştir’i seçin, sonra kodu iPhone Kamera’sıyla tarayın. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı ve Uyanık Tut’u gösterir; 12 saate kadar oturum başlatabilir veya durdurabilir. Tailscale ağınızın dışına hiçbir şey açılmaz ve yalnızca eşleştirilmiş iPhone’lar bağlanabilir. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
-          }
-        }
-      }
-    },
     "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.": {
       "extractionState": "manual",
       "localizations": {
@@ -7823,12 +7653,199 @@
         }
       }
     },
-    "Updates are the only network traffic Battistics starts. iPhone access, when you turn it on, answers only paired iPhones over Tailscale. No analytics, no tracking.": {
+    "Connecting to iCloud…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting to iCloud…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud’a bağlanıyor…"
+          }
+        }
+      }
+    },
+    "Shared %@ ago": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared %@ ago"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ önce paylaşıldı"
+          }
+        }
+      }
+    },
+    "Show this Mac in Battistics Remote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show this Mac in Battistics Remote"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’i Battistics Remote’ta göster"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud on this Mac to share it with your iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to iCloud on this Mac to share it with your iPhone."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’unuzla paylaşmak için bu Mac’te iCloud’a giriş yapın."
+          }
+        }
+      }
+    },
+    "This Mac is offline. Sharing resumes when it reconnects.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Mac is offline. Sharing resumes when it reconnects."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac çevrimdışı. Bağlanınca paylaşım devam eder."
+          }
+        }
+      }
+    },
+    "This copy of Battistics is not signed for iCloud.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This copy of Battistics is not signed for iCloud."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’in bu kopyası iCloud için imzalanmamış."
+          }
+        }
+      }
+    },
+    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple ID’yi kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
+          }
+        }
+      }
+    },
+    "iCloud did not accept the update. Battistics will try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud did not accept the update. Battistics will try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud güncellemeyi kabul etmedi. Battistics tekrar deneyecek."
+          }
+        }
+      }
+    },
+    "iCloud storage is full.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud storage is full."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud depolama alanı dolu."
+          }
+        }
+      }
+    },
+    "iPhone access is off on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone access is off on this Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te iPhone erişimi kapalı."
+          }
+        }
+      }
+    },
+    "Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics’in başlattığı tek ağ trafiği güncellemelerdir. iPhone erişimini açarsanız yalnızca Tailscale üzerinden eşleştirilmiş iPhone’lara yanıt verir. Analiz yok, takip yok."
+            "value": "Battistics’in başlattığı tek ağ trafiği güncellemelerdir. Bu Mac’i iPhone’unuzla paylaşırsanız durumu şifreli olarak özel iCloud’unuzdan geçer. Analiz yok, takip yok."
+          }
+        }
+      }
+    },
+    "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat and Keep Awake, and can start a session of up to 12 hours or stop one. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet, aynı Apple ID’yi kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı ve Uyanık Tut’u gösterir; 12 saate kadar oturum başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
           }
         }
       }

@@ -49,7 +49,7 @@ struct MacStatusIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
-        await MacStore.shared.refresh(mac)
+        await MacStore.shared.refreshAll()
         guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status else {
             return .result(dialog: "\(mac.name) is not answering.")
         }

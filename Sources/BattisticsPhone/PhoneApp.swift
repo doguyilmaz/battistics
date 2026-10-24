@@ -1,38 +1,37 @@
 import BattisticsRemote
 import SwiftUI
+import UIKit
 
 @main
 struct PhoneApp: App {
+    @UIApplicationDelegateAdaptor private var delegate: PhoneAppDelegate
     @State private var store = MacStore.shared
-    @State private var pairing = PairingFlow()
     @Environment(\.scenePhase) private var scenePhase
-
-    init() { Notifications.register() }
 
     var body: some Scene {
         WindowGroup {
             HomeView()
                 .environment(store)
-                .environment(pairing)
-                .onOpenURL { pairing.open($0) }
-                .sheet(item: Binding(get: { pairing.candidate }, set: {
-                    if $0 == nil { pairing.failure = nil }
-                    pairing.candidate = $0
-                })) { candidate in
-                    PairingSheet(pairing: candidate)
-                        .environment(store)
-                        .environment(pairing)
-                }
-                .alert("Pairing", isPresented: Binding(
-                    get: { pairing.failure != nil && pairing.candidate == nil },
-                    set: { if !$0 { pairing.failure = nil } })) {
-                    Button("OK", role: .cancel) {}
-                } message: {
-                    Text(pairing.failure ?? "")
-                }
         }
         .onChange(of: scenePhase) {
-            if scenePhase == .background, !store.macs.isEmpty { Notifications.schedule() }
+            if scenePhase == .background { Notifications.schedule() }
         }
+    }
+}
+
+/// iCloud wakes the app with a silent push when a Mac's record changes.
+final class PhoneAppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Notifications.register()
+        application.registerForRemoteNotifications()
+        return true
+    }
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
+        -> UIBackgroundFetchResult {
+        let results = await MacStore.shared.refreshAll()
+        if application.applicationState != .active { await Notifications.deliver(results) }
+        return .newData
     }
 }

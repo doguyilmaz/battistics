@@ -13,7 +13,7 @@ struct HomeView: View {
                 if let mac = store.selected {
                     MacDashboard(mac: mac)
                 } else {
-                    PairingIntro()
+                    SetupIntro()
                 }
             }
             .navigationTitle(store.selected?.name ?? String(localized: "Battistics"))
@@ -39,11 +39,11 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingSettings) { SettingsView() }
         }
-        .task(id: scenePhase == .active ? store.selected?.id : nil) {
-            guard scenePhase == .active, let mac = store.selected else { return }
+        .task(id: scenePhase == .active) {
+            guard scenePhase == .active else { return }
             while !Task.isCancelled {
-                await store.refresh(mac)
-                try? await Task.sleep(for: .seconds(10))
+                await store.refreshAll()
+                try? await Task.sleep(for: .seconds(15))
             }
         }
     }
@@ -51,14 +51,14 @@ struct HomeView: View {
 
 struct MacDashboard: View {
     @Environment(MacStore.self) private var store
-    let mac: RemotePairing
+    let mac: MacStore.Mac
     @State private var message: String?
 
     var body: some View {
         let reading = store.reading(for: mac)
         ScrollView {
             VStack(spacing: 16) {
-                StatusLine(reading: reading, refreshing: store.refreshing.contains(mac.id))
+                StatusLine(reading: reading, refreshing: store.refreshing)
                 if let reading, !reading.reachable {
                     UnreachableCard(reading: reading)
                 }
@@ -79,7 +79,8 @@ struct MacDashboard: View {
             .animation(.smooth, value: reading)
         }
         .background(Color(.systemGroupedBackground))
-        .refreshable { await store.refresh(mac) }
+        .refreshable { await store.refreshAll() }
+        .task { await Notifications.requestPermission() }
     }
 }
 
@@ -122,7 +123,7 @@ private struct UnreachableCard: View {
                  : "It may be asleep or offline.")
                 .font(.subheadline).foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 6) {
-                Tip(symbol: "lock.shield", text: String(localized: "Check that Tailscale is on, here and on the Mac."))
+                Tip(symbol: "macbook", text: String(localized: "Battistics has to be running on the Mac, with iPhone access on."))
                 Tip(symbol: "personalhotspot", text: String(localized: "No Wi‑Fi where the Mac is? Open Settings › Personal Hotspot and turn on Allow Others to Join; a Mac set to join hotspots automatically connects by itself."))
             }
         }

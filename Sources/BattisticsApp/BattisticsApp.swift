@@ -8,6 +8,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
+    /// iCloud's silent push for the iPhone companion's zone.
+    func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
+        NotificationCenter.default.post(name: .battisticsRemotePush, object: nil)
+    }
+
     /// Opens the dashboard at launch through the app's own URL scheme.
     /// This works in every icon configuration; a view-based approach only
     /// runs when the menu bar label happens to exist.

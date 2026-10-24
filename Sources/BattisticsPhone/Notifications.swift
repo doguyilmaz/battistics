@@ -33,7 +33,7 @@ enum Notifications {
     }
 
     @MainActor
-    static func deliver(_ results: [(RemotePairing, [RemoteAlert])]) async {
+    static func deliver(_ results: [(MacStore.Mac, [RemoteAlert])]) async {
         guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true else { return }
         for (mac, alerts) in results {
             for alert in alerts {

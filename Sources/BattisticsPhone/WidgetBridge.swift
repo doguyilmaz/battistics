@@ -8,7 +8,7 @@ import WidgetKit
 /// background refresh runs; the countdown itself runs on the system clock.
 @MainActor
 enum WidgetBridge {
-    static func publish(_ mac: RemotePairing?, reading: MacStore.Reading?) {
+    static func publish(_ mac: MacStore.Mac?, reading: MacStore.Reading?) {
         guard let mac else {
             SharedSnapshot.clear()
             WidgetCenter.shared.reloadAllTimelines()
@@ -24,7 +24,7 @@ enum WidgetBridge {
         syncActivity(mac, reading: reading)
     }
 
-    private static func syncActivity(_ mac: RemotePairing, reading: MacStore.Reading?) {
+    private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         // A silent Mac keeps its countdown; it ends on its own at the deadline.
         guard reading?.reachable == true else { return }

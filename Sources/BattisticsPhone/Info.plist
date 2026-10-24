@@ -27,28 +27,16 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.1.0</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.doguyilmaz.Battistics.Remote</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>battistics-remote</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Battistics Remote connects to your Mac over Tailscale to read its battery and Keep Awake state.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>

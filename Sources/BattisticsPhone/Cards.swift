@@ -66,7 +66,7 @@ struct BatteryCard: View {
 
 struct KeepAwakeCard: View {
     @Environment(MacStore.self) private var store
-    let mac: RemotePairing
+    let mac: MacStore.Mac
     let status: RemoteStatus
     let enabled: Bool
     @Binding var message: String?

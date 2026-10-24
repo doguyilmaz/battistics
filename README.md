@@ -25,7 +25,7 @@ macOS 14+ · Apple Silicon</p>
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed, with ready-made profiles
 - Optional stop at a battery level or under heat, low-battery and unplug warnings
 - Keep Awake for terminal commands and AI tasks through a bundled CLI and local MCP server
-- Battistics Remote for iPhone: battery, connection and Keep Awake over Tailscale
+- Battistics Remote for iPhone: battery, connection and Keep Awake through your iCloud
 - A short tour and searchable help, with optional on-device answers on macOS 26
 - CSV export and import of the full history
 - English and Turkish
@@ -69,12 +69,12 @@ AI clients use the bundled MCP server to start and stop a named task. See the
 
 ### iPhone
 
-Battistics Remote shows the Mac's battery, how long it lasts, its connection,
-lid and heat, and starts or stops Keep Awake, even with the lid closed in a bag.
-Widgets and a Lock Screen countdown come with it.
-Turn on **iPhone** in Battistics, pair by scanning its code, and run Tailscale
-on both devices; nothing is exposed beyond your tailnet. With no Wi‑Fi, a Mac
-set to join hotspots automatically uses the iPhone's hotspot. See
+Battistics Remote shows the Mac's battery and its last day, how long it lasts,
+its connection, lid and heat, and starts or stops Keep Awake, even with the lid
+closed in a bag. Widgets and a Lock Screen countdown come with it. Turn on
+**iPhone** in Battistics; any iPhone on the same Apple ID finds the Mac through
+your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
+to join hotspots automatically uses the iPhone's hotspot. See
 [remote companion](docs/remote.md).
 
 ## Light by design
@@ -108,8 +108,8 @@ The iPhone app is the `BattisticsPhone` scheme.
 ## Privacy
 
 Runs entirely on your Mac. The only network request is the optional update
-check. iPhone access is off by default; when on, it listens only on the
-Tailscale interface and answers only paired iPhones.
+check. Sharing with your iPhone is off by default; when on, the Mac's status
+goes through your private iCloud, encrypted, and no port is opened.
 
 ## License
 

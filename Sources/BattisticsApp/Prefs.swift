@@ -151,7 +151,7 @@ enum Prefs {
     static let alertHealthLastAlerted = "alertHealthLastAlerted"
     static let remoteEnabled = "remoteEnabled"
     static let remoteClosedLidAllowed = "remoteClosedLidAllowed"
-    static let remoteDevices = "remoteDevices"
+    static let remoteMacID = "remoteMacID"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 
