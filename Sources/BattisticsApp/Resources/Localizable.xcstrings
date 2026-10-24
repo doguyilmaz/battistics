@@ -2913,16 +2913,6 @@
         }
       }
     },
-    "Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güncellemeler Battistics'in yaptığı tek ağ trafiğidir. Analitik yok, izleme yok, bu Mac'ten başka hiçbir şey çıkmaz."
-          }
-        }
-      }
-    },
     "Version": {
       "localizations": {
         "tr": {
@@ -7829,6 +7819,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bilinmeyen cihaz"
+          }
+        }
+      }
+    },
+    "Updates are the only network traffic Battistics starts. iPhone access, when you turn it on, answers only paired iPhones over Tailscale. No analytics, no tracking.": {
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’in başlattığı tek ağ trafiği güncellemelerdir. iPhone erişimini açarsanız yalnızca Tailscale üzerinden eşleştirilmiş iPhone’lara yanıt verir. Analiz yok, takip yok."
           }
         }
       }

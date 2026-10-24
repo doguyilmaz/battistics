@@ -63,6 +63,10 @@ final class PowerSettingsModel {
             do {
                 try await helper.apply(change)
                 helperHandledIt = true
+            } catch PowerHelperClient.Failure.rejected {
+                // It answered and pmset refused; a password will not change that.
+                helperHandledIt = true
+                outcome = .failed
             } catch {
                 // Registered but not answering — launchd refuses to spawn an
                 // unnotarized binary, for one. Fall through to asking for a
