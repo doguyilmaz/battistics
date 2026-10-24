@@ -150,6 +150,14 @@ private final class UpdateNotificationHandler: NSObject, UNUserNotificationCente
         else { return }
         await open()
     }
+
+    /// A menu bar app counts as frontmost while its popover or dashboard is
+    /// open; without this, alerts would arrive silently then.
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter, willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
+    }
 }
 
 struct CheckForUpdatesButton: View {

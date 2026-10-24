@@ -254,6 +254,10 @@ struct HistoryStoreTests {
         "hourly,1700000000,8,10,invalid",
         "health,2023-11-14,1700000000,nan,5900,,6075,10",
         "health,2023-11-14,1700000000,98,5900,invalid,6075,10",
+        "health,yesterday,1700000000,98,5900,,6075,10",
+        "health,2023-11-14,1700000000,980,5900,,6075,10",
+        "health,2023-11-14,1700000000,98,0,,6075,10",
+        "health,2023-11-14,1700000000,98,5900,,-1,10",
     ])
     func csvRejectsInvalidNumericValues(row: String) {
         #expect(throws: HistoryError.self) { try CSVPort.parse(row) }

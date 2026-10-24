@@ -3,10 +3,16 @@ import SQLite3
 
 private let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
-public enum HistoryError: Error {
+public enum HistoryError: LocalizedError {
     case cannotOpen(String)
     case statementFailed(String)
     case importFailed(String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .cannotOpen(let detail), .statementFailed(let detail), .importFailed(let detail): detail
+        }
+    }
 }
 
 /// SQLite-backed history. An actor so all database work stays off the main

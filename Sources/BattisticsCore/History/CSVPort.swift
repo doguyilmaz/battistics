@@ -116,7 +116,9 @@ public enum CSVPort {
                     let ts = timestamp(fields[2]), let health = finiteDouble(fields[3]),
                     let rawMax = Int64(fields[4]), let design = Int64(fields[6]),
                     let cycles = Int64(fields[7]),
-                    fields[5].isEmpty || Int64(fields[5]) != nil
+                    fields[5].isEmpty || Int64(fields[5]).map({ $0 > 0 }) == true,
+                    fields[1].wholeMatch(of: /\d{4}-\d{2}-\d{2}/) != nil,
+                    (0...200).contains(health), rawMax > 0, design > 0, cycles >= 0
                 else { throw HistoryError.importFailed("Bad health row: \(line)") }
                 parsed.healthRows.append(
                     HealthRow(
