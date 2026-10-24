@@ -778,7 +778,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%%%1$lld’den %%%2$lld’e"
+            "value": "%%%1$lld → %%%2$lld"
           }
         }
       }
