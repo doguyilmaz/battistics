@@ -43,10 +43,16 @@ struct RemoteHarness {
         let initial = await remote.fullStatus()
         precondition(initial.session == nil && initial.chargeHistory?.count == 48)
 
-        let unbounded = await command(.start, mode: .displayMaySleep, minutes: 0)
+        let invalidDuration = await command(.start, mode: .displayMaySleep, minutes: -5)
         let closedLid = await command(.start, mode: .lidClosed, minutes: 15)
-        precondition(unbounded?.code == .invalidRequest && closedLid?.code == .closedLidNotAllowed)
+        precondition(invalidDuration?.code == .invalidRequest && closedLid?.code == .closedLidNotAllowed)
         precondition(!awake.isActive)
+
+        let startedIndefinite = await command(.start, mode: .displayMaySleep, minutes: 0)
+        precondition(startedIndefinite == nil)
+        let indefiniteSession = try require(await remote.fullStatus().session)
+        precondition(indefiniteSession.origin == .phone && indefiniteSession.deadline == nil)
+        _ = await command(.stop)
 
         let started = await command(.start, mode: .displayMaySleep, minutes: 15)
         precondition(started == nil)

@@ -27,6 +27,27 @@ struct RemoteTests {
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 
+    @Test func allowedDurationsIncludeUntilTurnedOffAndTelemetryRoundTrips() throws {
+        #expect(RemoteRequest.allowedDurations.contains(0))
+        #expect(RemoteRequest.allowedDurations == [0, 15, 30, 60, 120, 240, 360, 720])
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        let status = RemoteStatus(
+            machineName: "Mac", readAt: now,
+            battery: .init(percent: 82, isCharging: true, onAdapter: true, minutesRemaining: 45,
+                           healthPercent: 96, lowPowerMode: true, watts: 42.5, adapterWatts: 67,
+                           temperatureC: 34.2, cycleCount: 118),
+            session: .init(mode: .lidClosed, origin: .phone, name: "Dogu’s iPhone 16e", startedAt: now, deadline: nil),
+            network: .hotspot, networkName: "Dogu’s iPhone 16e", lidClosed: true,
+            protection: .init(closedLidAllowed: true))
+        let decoded = try RemoteWire.decode(RemoteStatus.self, from: RemoteWire.encode(status))
+        #expect(decoded == status)
+        #expect(decoded.battery?.lowPowerMode == true)
+        #expect(decoded.battery?.watts == 42.5)
+        #expect(decoded.battery?.adapterWatts == 67)
+        #expect(decoded.networkName == "Dogu’s iPhone 16e")
+        #expect(decoded.session?.deadline == nil)
+    }
+
     @Test func freshnessFollowsTheHeartbeat() {
         let status = RemoteStatus(machineName: "Mac", readAt: Date(timeIntervalSince1970: 1_000_000))
         #expect(status.isFresh(at: status.readAt.addingTimeInterval(RemoteStatus.heartbeat)))

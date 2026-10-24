@@ -34,7 +34,24 @@ struct RemotePane: View {
             }
 
             Section("Stay online with the lid closed") {
-                LabeledContent("Connection", value: network.state.label)
+                LabeledContent("Connection") {
+                    if let ssid = network.ssid {
+                        Text("\(network.state.label) · \(ssid)")
+                    } else {
+                        Text(network.state.label)
+                    }
+                }
+                if !network.canReadSSID && (network.state == .wifi || network.state == .hotspot) {
+                    HStack {
+                        Text("Allow Location access so Battistics Remote can display your Wi‑Fi or Personal Hotspot name.")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Show Network Name") {
+                            network.requestSSIDPermission()
+                        }
+                        .controlSize(.small)
+                    }
+                }
                 Text("With no known Wi‑Fi nearby, this Mac can join your iPhone’s hotspot by itself. In Wi‑Fi settings, set Ask to join hotspots to Automatic. Keep Awake keeps the Mac, and so the connection, awake.")
                     .font(.caption).foregroundStyle(.secondary)
                 Button("Open Wi‑Fi Settings") {

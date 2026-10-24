@@ -9,14 +9,39 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         /// Minutes to empty on battery, to full while charging.
         public var minutesRemaining: Int?
         public var healthPercent: Int?
+        /// Whether macOS Low Power Mode is currently active for the current power source.
+        public var lowPowerMode: Bool?
+        /// Signed instantaneous power in watts (positive charging, negative discharging).
+        public var watts: Double?
+        /// Connected power adapter rating in watts (e.g. 67, 96, 140).
+        public var adapterWatts: Int?
+        /// Battery temperature in Celsius.
+        public var temperatureC: Double?
+        /// Battery cycle count.
+        public var cycleCount: Int?
 
-        public init(percent: Int, isCharging: Bool, onAdapter: Bool,
-                    minutesRemaining: Int? = nil, healthPercent: Int? = nil) {
+        public init(
+            percent: Int,
+            isCharging: Bool,
+            onAdapter: Bool,
+            minutesRemaining: Int? = nil,
+            healthPercent: Int? = nil,
+            lowPowerMode: Bool? = nil,
+            watts: Double? = nil,
+            adapterWatts: Int? = nil,
+            temperatureC: Double? = nil,
+            cycleCount: Int? = nil
+        ) {
             self.percent = percent
             self.isCharging = isCharging
             self.onAdapter = onAdapter
             self.minutesRemaining = minutesRemaining
             self.healthPercent = healthPercent
+            self.lowPowerMode = lowPowerMode
+            self.watts = watts
+            self.adapterWatts = adapterWatts
+            self.temperatureC = temperatureC
+            self.cycleCount = cycleCount
         }
     }
 
@@ -89,6 +114,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var session: Session?
     public var lastEnd: LastEnd?
     public var network: Network
+    /// Wi-Fi or Personal Hotspot SSID when available.
+    public var networkName: String?
     public var lidClosed: Bool?
     public var thermal: Thermal
     public var protection: Protection
@@ -111,25 +138,35 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         now.timeIntervalSince(readAt) < Self.heartbeat * 2
     }
 
-    public init(machineName: String, readAt: Date, battery: Battery? = nil, session: Session? = nil,
-                lastEnd: LastEnd? = nil, network: Network = .other, lidClosed: Bool? = nil,
-                thermal: Thermal = .nominal, protection: Protection = .init()) {
+    public init(
+        machineName: String,
+        readAt: Date,
+        battery: Battery? = nil,
+        session: Session? = nil,
+        lastEnd: LastEnd? = nil,
+        network: Network = .other,
+        networkName: String? = nil,
+        lidClosed: Bool? = nil,
+        thermal: Thermal = .nominal,
+        protection: Protection = .init()
+    ) {
         self.machineName = machineName
         self.readAt = readAt
         self.battery = battery
         self.session = session
         self.lastEnd = lastEnd
         self.network = network
+        self.networkName = networkName
         self.lidClosed = lidClosed
         self.thermal = thermal
         self.protection = protection
     }
 
     /// On battery, whether the charge runs out before the session ends; an
-    /// open-ended session always does.
+    /// open-ended session only warns when remaining battery time is under 2 hours.
     public static func batteryRunsOutFirst(minutesLeft: Int?, onAdapter: Bool, deadline: Date?, now: Date) -> Bool {
         guard !onAdapter, let minutesLeft else { return false }
-        guard let deadline else { return true }
+        guard let deadline else { return minutesLeft < 120 }
         return now.addingTimeInterval(TimeInterval(minutesLeft) * 60) < deadline
     }
 

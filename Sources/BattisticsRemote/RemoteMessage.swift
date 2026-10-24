@@ -7,6 +7,7 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
     public var id: String
     public var operation: Operation
     public var mode: RemoteStatus.Mode?
+    /// Duration in minutes; `0` or `nil` means "until turned off" (indefinite).
     public var durationMinutes: Int?
     /// Shown on the Mac next to the session, e.g. the phone's name.
     public var deviceName: String?
@@ -22,9 +23,11 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         self.sentAt = sentAt
     }
 
-    /// The same finite choices the Mac offers: open-ended sessions cannot be
-    /// started from a phone that may lose its connection.
+    /// Finite duration presets offered on the phone (tapping the active pill deselects it for "Until turned off", rawValue 0).
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
+
+    /// All valid duration values including 0 (indefinite / until turned off).
+    public static let allowedDurations: Set<Int> = Set(durations + [0])
 
     /// A command older than this is dropped unread: the phone has given up.
     public static let lifetime: TimeInterval = 120

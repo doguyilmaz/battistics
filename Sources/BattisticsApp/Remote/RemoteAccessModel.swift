@@ -43,6 +43,7 @@ final class RemoteAccessModel {
     @ObservationIgnored private var pendingPublish: Task<Void, Never>?
     @ObservationIgnored private var ticker: Task<Void, Never>?
     @ObservationIgnored private var pushObserver: NSObjectProtocol?
+    @ObservationIgnored private var powerStateObserver: NSObjectProtocol?
     @ObservationIgnored let macID: String
 
     init(awake: KeepAwakeModel, automation: AutomationModel, helper: PowerHelperClient,
@@ -67,6 +68,11 @@ final class RemoteAccessModel {
             forName: .battisticsRemotePush, object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated { _ = Task { await self?.sync() } }
+        }
+        powerStateObserver = NotificationCenter.default.addObserver(
+            forName: .NSProcessInfoPowerStateDidChange, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.publishSoon() }
         }
         observeSession()
         startTicker()
@@ -109,6 +115,8 @@ final class RemoteAccessModel {
             var compared = status
             compared.readAt = lastSent.readAt
             compared.chargeHistory = lastSent.chargeHistory
+            compared.battery?.watts = lastSent.battery?.watts
+            compared.battery?.temperatureC = lastSent.battery?.temperatureC
             if compared == lastSent { return }
         }
         try await cloud.publish(status, macID: macID)
@@ -153,17 +161,15 @@ final class RemoteAccessModel {
         }
     }
 
-    /// Battery and heat change without an event: a local check each minute
-    /// writes only when something differs, and a fetch every five minutes
-    /// picks up a command whose push was lost.
+    /// Polls the CloudKit zone every few seconds while awake so phone commands
+    /// execute within seconds even when macOS throttles silent push delivery,
+    /// and publishes local battery/thermal changes whenever they differ.
     private func startTicker() {
         ticker = Task { [weak self] in
-            var minute = 0
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(60))
+                try? await Task.sleep(for: .seconds(4))
                 guard let self, !Task.isCancelled else { return }
-                minute += 1
-                if minute % 5 == 0 { await self.sync() } else { self.publishSoon() }
+                await self.sync()
             }
         }
     }
@@ -196,7 +202,8 @@ final class RemoteAccessModel {
     }
 
     private func start(_ request: RemoteRequest) async -> RemoteFailure? {
-        guard let minutes = request.durationMinutes, RemoteRequest.durations.contains(minutes),
+        let minutes = request.durationMinutes ?? 0
+        guard RemoteRequest.allowedDurations.contains(minutes),
               let duration = KeepAwakeDuration(rawValue: minutes),
               let mode = request.mode.flatMap({ KeepAwakeMode(rawValue: $0.rawValue) }) else {
             return .init(.invalidRequest, String(localized: "Choose a supported mode and duration."))
@@ -236,11 +243,23 @@ final class RemoteAccessModel {
 
     func status(at now: Date = Date()) -> RemoteStatus {
         let snapshot = BatteryReader.read()
+        let lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
         let battery = snapshot.flatMap { snapshot -> RemoteStatus.Battery? in
             guard snapshot.batteryInstalled else { return nil }
-            return .init(percent: snapshot.percent, isCharging: snapshot.isCharging,
-                         onAdapter: snapshot.externalConnected, minutesRemaining: snapshot.timeRemainingMin,
-                         healthPercent: Int(snapshot.healthPercent.rounded()))
+            let roundedWatts = snapshot.watts.map { ($0 * 10).rounded() / 10 }
+            let roundedTemp = snapshot.temperatureC.map { ($0 * 10).rounded() / 10 }
+            return .init(
+                percent: snapshot.percent,
+                isCharging: snapshot.isCharging,
+                onAdapter: snapshot.externalConnected,
+                minutesRemaining: snapshot.timeRemainingMin,
+                healthPercent: Int(snapshot.displayHealthPercent.rounded()),
+                lowPowerMode: lowPower,
+                watts: roundedWatts,
+                adapterWatts: snapshot.adapter?.watts,
+                temperatureC: roundedTemp,
+                cycleCount: snapshot.cycleCount
+            )
         }
         let session = awake.session.map { session in
             RemoteStatus.Session(
@@ -250,14 +269,22 @@ final class RemoteAccessModel {
         }
         let protection = awake.safety.configuration
         return RemoteStatus(
-            machineName: Host.current().localizedName ?? "Mac", readAt: now,
-            battery: battery, session: session, lastEnd: awake.lastEnd,
-            network: network.state, lidClosed: Clamshell.read()?.isClosed,
+            machineName: Host.current().localizedName ?? "Mac",
+            readAt: now,
+            battery: battery,
+            session: session,
+            lastEnd: awake.lastEnd,
+            network: network.state,
+            networkName: network.ssid,
+            lidClosed: Clamshell.read()?.isClosed,
             thermal: Self.thermal(ProcessInfo.processInfo.thermalState),
             protection: .init(
                 stopAtPercent: protection.stopOnLowBattery ? protection.effectiveStopPercent : nil,
                 warnAtPercent: protection.warnOnLowBattery ? protection.effectiveWarningPercent : nil,
-                stopOnThermal: protection.stopOnThermalPressure, closedLidAllowed: closedLidAllowed))
+                stopOnThermal: protection.stopOnThermalPressure,
+                closedLidAllowed: closedLidAllowed
+            )
+        )
     }
 
     private static func thermal(_ state: ProcessInfo.ThermalState) -> RemoteStatus.Thermal {
