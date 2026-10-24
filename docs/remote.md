@@ -67,7 +67,6 @@ The iPhone pane on the Mac and the phone's settings both explain this.
 - Bluetooth LE between phone and Mac in the same bag, for status and "join the
   hotspot" with no network at all.
 - CloudKit push for prompt alerts, which needs an iCloud container on both apps.
-- Turkish Siri phrases (`AppShortcuts.xcstrings`).
 - Device builds need the team set in `project.yml`; the scheme builds for the
   Simulator as is. The widget was checked only for registration, not placed
   on a Home Screen.
