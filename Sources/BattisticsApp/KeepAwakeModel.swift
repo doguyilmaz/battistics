@@ -136,11 +136,7 @@ final class KeepAwakeModel {
                 if let previousLeaseID {
                     let result = try await helper.releaseLidSleepLease(previousLeaseID)
                     guard result == .success || result == .inactive else {
-                        if sessionID == id {
-                            stopAfterLeaseFailure(result, sessionID: id, releaseFailed: true)
-                        } else {
-                            showStoppedReason(result, sessionID: id, releaseFailed: true)
-                        }
+                        stopAfterLeaseFailure(result, sessionID: id, releaseFailed: true)
                         return
                     }
                     guard sessionID == id else { return }
@@ -186,18 +182,10 @@ final class KeepAwakeModel {
                 }
             } catch PowerHelperClient.Failure.unknownLeaseStatus {
                 // An unrecognized wire result does not authorize rollback.
-                if sessionID == id {
-                    stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: releasingPrevious)
-                } else {
-                    showStoppedReason(nil, sessionID: id, releaseFailed: releasingPrevious)
-                }
+                stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: releasingPrevious)
             } catch {
                 if releasingPrevious {
-                    if sessionID == id {
-                        stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: true)
-                    } else {
-                        showStoppedReason(nil, sessionID: id, releaseFailed: true)
-                    }
+                    stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: true)
                     return
                 }
                 // Only an acquisition that reached the helper can have mutated
@@ -262,7 +250,12 @@ final class KeepAwakeModel {
                     return
                 }
             }
-            self?.approvalTask = nil
+            guard let self, !Task.isCancelled else { return }
+            self.approvalTask = nil
+            if self.session == nil, self.mode == .lidClosed {
+                self.isStoppedReasonInformational = false
+                self.errorMessage = String(localized: "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.")
+            }
         }
     }
 
@@ -287,9 +280,7 @@ final class KeepAwakeModel {
             defer { isChanging = false }
             do {
                 let result = try await helper.releaseLidSleepLease(leaseID)
-                if result == .ownershipLost {
-                    showStoppedReason(result, sessionID: leaseID, releaseFailed: true)
-                } else if result != .success && result != .inactive {
+                if result != .success && result != .inactive {
                     showStoppedReason(result, sessionID: leaseID, releaseFailed: true)
                 }
             } catch {
@@ -389,12 +380,15 @@ final class KeepAwakeModel {
         }
     }
 
+    /// Ends the session if it is still the current one; a superseded start
+    /// only reports why it failed.
     private func stopAfterLeaseFailure(
         _ result: LidSleepLeaseResult?, sessionID id: String, releaseFailed: Bool = false
     ) {
-        guard sessionID == id else { return }
-        if session != nil { lastEnd = .init(reason: .failure, at: Date()) }
-        clearLocalSession()
+        if sessionID == id {
+            if session != nil { lastEnd = .init(reason: .failure, at: Date()) }
+            clearLocalSession()
+        }
         // Ownership was lost: no release/rollback RPC and no automatic restart.
         showStoppedReason(result, sessionID: id, releaseFailed: releaseFailed)
     }

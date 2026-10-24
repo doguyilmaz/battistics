@@ -7798,6 +7798,23 @@
           }
         }
       }
+    },
+    "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics’e Giriş Öğeleri’nde zamanında izin verilmedi. Orada izin verip Uyanık Tut’u yeniden açın."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
