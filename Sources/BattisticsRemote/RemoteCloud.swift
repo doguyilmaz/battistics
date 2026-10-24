@@ -23,6 +23,7 @@ public actor RemoteCloud {
 
     private let database: CKDatabase
     private var prepared = false
+    private var statusRecords: [String: CKRecord] = [:]
 
     public init() {
         database = CKContainer(identifier: Self.containerID).privateCloudDatabase
@@ -50,17 +51,19 @@ public actor RemoteCloud {
     /// saves the same one.
     public func prepare() async throws {
         guard !prepared else { return }
-        _ = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Self.zoneID)], deleting: [])
+        let zones = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Self.zoneID)], deleting: [])
+        for result in zones.saveResults.values { _ = try result.get() }
         let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: "remote-zone")
         let info = CKSubscription.NotificationInfo()
         info.shouldSendContentAvailable = true
         subscription.notificationInfo = info
-        _ = try await database.modifySubscriptions(saving: [subscription], deleting: [])
+        _ = try? await database.modifySubscriptions(saving: [subscription], deleting: [])
         prepared = true
     }
 
     /// The whole zone is a handful of small records, so it is read in full.
     public func fetch() async throws -> Snapshot {
+        try await prepare()
         var snapshot = Snapshot()
         var token: CKServerChangeToken?
         repeat {
@@ -70,6 +73,7 @@ public actor RemoteCloud {
                 guard let payload = record.encryptedValues["payload"] as? Data else { continue }
                 switch record.recordType {
                 case Self.statusType:
+                    statusRecords[record.recordID.recordName] = record
                     if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
                         snapshot.statuses[record.recordID.recordName] = status
                     }
@@ -88,21 +92,36 @@ public actor RemoteCloud {
     }
 
     public func publish(_ status: RemoteStatus, macID: String) async throws {
-        let record = CKRecord(recordType: Self.statusType, recordID: .init(recordName: macID, zoneID: Self.zoneID))
+        try await prepare()
+        let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
+        let record: CKRecord
+        if let cached = statusRecords[macID] {
+            record = cached
+        } else if let existing = try? await database.record(for: id) {
+            record = existing
+        } else {
+            record = CKRecord(recordType: Self.statusType, recordID: id)
+        }
         record.encryptedValues["payload"] = try RemoteWire.encode(status)
-        _ = try await database.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys)
+        let saved = try await database.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys)
+        for result in saved.saveResults.values {
+            statusRecords[macID] = try result.get()
+        }
     }
 
     public func send(_ request: RemoteRequest, to macID: String) async throws -> String {
+        try await prepare()
         let record = CKRecord(recordType: Self.commandType, recordID: .init(recordName: request.id, zoneID: Self.zoneID))
         record["mac"] = macID
         record.encryptedValues["payload"] = try RemoteWire.encode(request)
-        _ = try await database.modifyRecords(saving: [record], deleting: [])
+        let saved = try await database.modifyRecords(saving: [record], deleting: [])
+        for result in saved.saveResults.values { _ = try result.get() }
         return record.recordID.recordName
     }
 
     public func delete(_ recordNames: [String]) async throws {
         guard !recordNames.isEmpty else { return }
+        for name in recordNames { statusRecords[name] = nil }
         _ = try await database.modifyRecords(
             saving: [], deleting: recordNames.map { .init(recordName: $0, zoneID: Self.zoneID) })
     }

@@ -128,6 +128,9 @@ targets:
           Battistics reads the battery level that connected keyboards, mice and
           headphones publish over Bluetooth. It is only used to show those levels
           in the Peripherals view, and nothing leaves this Mac.
+        NSLocationUsageDescription: >-
+          Battistics reads the current Wi‑Fi or Personal Hotspot network name so
+          Battistics Remote on your iPhone can show which network your Mac is on.
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "© 2026 Dogu Yilmaz · MIT License"
         CFBundleURLTypes:
@@ -136,13 +139,25 @@ targets:
         SUFeedURL: https://github.com/doguyilmaz/battistics/releases/latest/download/appcast-2.xml
         SUEnableAutomaticChecks: true
         SUPublicEDKey: j6ODlGaJePRaQypW8ezxZQBAwj2+TkAo0Sg/51fPN8o=
+    entitlements:
+      path: Sources/BattisticsApp/Support/Battistics.entitlements
+      properties:
+        com.apple.developer.aps-environment: development
+        com.apple.developer.icloud-container-environment: Development
+        com.apple.developer.icloud-container-identifiers: [iCloud.com.doguyilmaz.Battistics]
+        com.apple.developer.icloud-services: [CloudKit]
+    attributes:
+      SystemCapabilities:
+        com.apple.iCloud:
+          enabled: 1
+        com.apple.Push:
+          enabled: 1
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics
         PRODUCT_NAME: Battistics
-        # Empty for ad-hoc builds: iCloud entitlements need a provisioning
-        # profile, without which macOS refuses to launch the app.
-        CODE_SIGN_ENTITLEMENTS: $(BATTISTICS_ENTITLEMENTS)
+        DEVELOPMENT_TEAM: 5MYT4VYJFC
+        CODE_SIGN_IDENTITY: "Apple Development"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         SWIFT_EMIT_LOC_STRINGS: YES
@@ -163,6 +178,7 @@ targets:
       path: Sources/BattisticsPhone/BattisticsPhone.entitlements
       properties:
         com.apple.security.application-groups: [group.com.doguyilmaz.Battistics.Remote]
+        com.apple.developer.icloud-container-environment: Development
         com.apple.developer.icloud-container-identifiers: [iCloud.com.doguyilmaz.Battistics]
         com.apple.developer.icloud-services: [CloudKit]
         aps-environment: development
