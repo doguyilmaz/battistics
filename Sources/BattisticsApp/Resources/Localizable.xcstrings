@@ -7815,6 +7815,23 @@
           }
         }
       }
+    },
+    "Unknown device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown device"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmeyen cihaz"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

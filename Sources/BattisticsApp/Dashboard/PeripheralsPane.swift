@@ -39,12 +39,13 @@ struct PeripheralsPane: View {
                                         .foregroundStyle(.secondary)
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack(spacing: 5) {
-                                            Text(peripheral.name)
+                                            Text(peripheral.name == PeripheralBattery.unknownName
+                                                 ? String(localized: "Unknown device") : peripheral.name)
                                                 .fontWeight(.medium)
                                             // Earpieces report several cells;
                                             // the name alone cannot say which.
                                             if let detail = peripheral.detail {
-                                                Text(detail)
+                                                Text(LocalizedStringKey(detail))
                                                     .font(.caption)
                                                     .foregroundStyle(.secondary)
                                             }

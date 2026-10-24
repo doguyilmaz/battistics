@@ -8,6 +8,8 @@ public struct PeripheralBattery: Sendable, Equatable, Identifiable {
     /// Which cell, for devices that report more than one: Left, Right, Case.
     /// nil when the device has a single battery and the name says it all.
     public let detail: String?
+    /// Stored when a device has no product name; the app shows it localized.
+    public static let unknownName = "Unknown device"
 
     public init(id: String, name: String, percent: Int, detail: String? = nil) {
         self.id = id
@@ -44,7 +46,7 @@ public enum PeripheralBatteryReader {
             guard let percent = property("BatteryPercent") as? Int, (0...100).contains(percent) else {
                 continue
             }
-            let name = (property("Product") as? String) ?? "Unknown device"
+            let name = (property("Product") as? String) ?? PeripheralBattery.unknownName
             let address = (property("DeviceAddress") as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: "-", with: ":")
