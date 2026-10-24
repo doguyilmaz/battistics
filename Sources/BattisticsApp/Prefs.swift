@@ -182,6 +182,8 @@ enum Prefs {
         defaults.set(true, forKey: hasSeenTour)
     }
 
+    private static let safetyDefaults = KeepAwakeSafetyPolicy.Configuration()
+
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
             showMenuBarIcon: true,
@@ -205,12 +207,12 @@ enum Prefs {
             keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
             keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
             keepAwakeMenuBarIcon: true,
-            keepAwakeStopOnLowBattery: false,
-            keepAwakeStopPercent: 10,
-            keepAwakeWarnOnLowBattery: true,
-            keepAwakeWarningPercent: 20,
-            keepAwakeStopOnThermalPressure: false,
-            keepAwakeWarnOnAdapterDisconnect: false,
+            keepAwakeStopOnLowBattery: safetyDefaults.stopOnLowBattery,
+            keepAwakeStopPercent: safetyDefaults.stopPercent,
+            keepAwakeWarnOnLowBattery: safetyDefaults.warnOnLowBattery,
+            keepAwakeWarningPercent: safetyDefaults.warningPercent,
+            keepAwakeStopOnThermalPressure: safetyDefaults.stopOnThermalPressure,
+            keepAwakeWarnOnAdapterDisconnect: safetyDefaults.warnOnAdapterDisconnect,
             automationEnabled: false,
             automationClosedLidAllowed: false,
             readBluetoothBatteries: false,

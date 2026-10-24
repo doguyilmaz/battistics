@@ -76,6 +76,13 @@ public struct KeepAwakeSafetyPolicy: Sendable {
         return nil
     }
 
+    /// On battery at or below the warning level, with warnings on.
+    public static func isBatteryLow(_ snapshot: BatterySnapshot?, configuration: Configuration) -> Bool {
+        guard let snapshot, configuration.warnOnLowBattery, snapshot.batteryInstalled,
+              !snapshot.externalConnected, (0...100).contains(snapshot.percent) else { return false }
+        return snapshot.percent <= configuration.effectiveWarningPercent
+    }
+
     public mutating func evaluate(
         snapshot: BatterySnapshot?, thermalPressure: Bool, configuration: Configuration
     ) -> [Event] {
@@ -92,8 +99,7 @@ public struct KeepAwakeSafetyPolicy: Sendable {
             if snapshot.externalConnected
                 || snapshot.percent > configuration.effectiveWarningPercent + 2 {
                 batteryWarningSent = false
-            } else if configuration.warnOnLowBattery, !snapshot.externalConnected,
-                snapshot.percent <= configuration.effectiveWarningPercent, !batteryWarningSent {
+            } else if Self.isBatteryLow(snapshot, configuration: configuration), !batteryWarningSent {
                 batteryWarningSent = true
                 events.append(.batteryWarning(
                     percent: snapshot.percent,

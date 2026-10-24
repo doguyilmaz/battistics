@@ -74,10 +74,7 @@ final class KeepAwakeSafetyMonitor {
         if events.contains(.adapterDisconnected) { adapterWarningActive = true }
         var messages: [String] = []
         if adapterWarningActive { messages.append(Self.message(for: .adapterDisconnected)) }
-        batteryWarningActive = snapshot.map {
-            $0.batteryInstalled && !$0.externalConnected && (0...100).contains($0.percent)
-                && $0.percent <= configuration.effectiveWarningPercent && configuration.warnOnLowBattery
-        } ?? false
+        batteryWarningActive = KeepAwakeSafetyPolicy.isBatteryLow(snapshot, configuration: configuration)
         if batteryWarningActive, let snapshot {
             messages.append(Self.message(for: .batteryWarning(
                 percent: snapshot.percent,
