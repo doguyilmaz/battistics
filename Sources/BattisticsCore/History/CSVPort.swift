@@ -70,10 +70,6 @@ public enum CSVPort {
         public var healthRows: [HealthRow] = []
 
         public init() {}
-
-        public var rowCount: Int {
-            chargeSamples.count + powerRows.count + hourlyRows.count + healthRows.count
-        }
     }
 
     public static func parse(_ text: String) throws -> Parsed {

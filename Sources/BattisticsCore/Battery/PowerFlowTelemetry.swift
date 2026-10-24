@@ -72,13 +72,6 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
         )
     }
 
-    public func isStale(at now: Date, maximumAge: TimeInterval = 30) -> Bool {
-        let age = now.timeIntervalSince(readAt)
-        guard age.isFinite, maximumAge.isFinite, maximumAge >= 0 else { return true }
-        // Clock changes cannot make a future-dated read indefinitely fresh.
-        return age < 0 || age > maximumAge
-    }
-
     public func hasSameReadings(as other: Self) -> Bool {
         var reading = self
         // Source metadata changes remain observable even if watts stay equal.

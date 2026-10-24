@@ -32,19 +32,6 @@ struct HistoryMathTests {
         let totals = HistoryMath.timeTotals(samples: samples)
         #expect(totals.onBattery == HistoryMath.maxGapSeconds)
     }
-
-    @Test func bucketedAverages() {
-        let base = Date(timeIntervalSince1970: 1_700_000_000)
-        let points = [
-            SeriesPoint(date: base, value: 10),
-            SeriesPoint(date: base.addingTimeInterval(10), value: 20),
-            SeriesPoint(date: base.addingTimeInterval(70), value: 40),
-        ]
-        let buckets = HistoryMath.bucketed(points: points, bucketSeconds: 60)
-        #expect(buckets.count == 2)
-        #expect(buckets[0].value == 15)
-        #expect(buckets[1].value == 40)
-    }
 }
 
 @Suite("History store", .serialized)

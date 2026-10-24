@@ -48,13 +48,6 @@ struct KeepAwakeTests {
         #expect(timed == [15, 30, 60, 120, 240, 360, 720])
     }
 
-    @Test func modesSupportBatteryAndWallPower() {
-        // The closed-lid helper lease is independent of the power source.
-        #expect(!KeepAwakeMode.lidClosed.requiresExternalPower)
-        #expect(!KeepAwakeMode.displayOn.requiresExternalPower)
-        #expect(!KeepAwakeMode.displayMaySleep.requiresExternalPower)
-    }
-
     @Test func displayAndSystemSleepUseSeparateAssertions() {
         #expect(KeepAwakeMode.displayOn.assertionType == "PreventUserIdleDisplaySleep")
         #expect(KeepAwakeMode.displayMaySleep.assertionType == "PreventUserIdleSystemSleep")

@@ -23,11 +23,6 @@ public enum KeepAwakeMode: String, Sendable, CaseIterable, Identifiable {
         case .lidClosed: "PreventUserIdleSystemSleep"
         }
     }
-
-    /// Closed-lid mode uses a helper lease and works on either source.
-    public var requiresExternalPower: Bool {
-        false
-    }
 }
 
 /// How long to stay awake. The raw value is the duration in minutes, which
