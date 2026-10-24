@@ -91,6 +91,7 @@ final class HelpAssistantModel {
                     guard !Task.isCancelled, self?.requestID == id else { return }
                     let index = response.content.articleNumber - 1
                     guard candidates.indices.contains(index) else {
+                        if matches.isEmpty { self?.sources = [] }
                         self?.errorMessage = String(localized: "No matching guide article. Try asking about Keep Awake, battery protection, heat, history, or privacy.")
                         return
                     }
@@ -99,6 +100,7 @@ final class HelpAssistantModel {
                     self?.sources = [article]
                 } catch {
                     guard !Task.isCancelled, self?.requestID == id else { return }
+                    if matches.isEmpty { self?.sources = [] }
                     self?.errorMessage = String(localized: "The assistant could not answer this question. Read the source articles below or try a shorter question.")
                     self?.refreshAvailability()
                 }

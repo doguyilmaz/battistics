@@ -37,7 +37,7 @@ private struct WithinWindowBlur: NSViewRepresentable {
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
         view.blendingMode = .withinWindow
-        view.material = .hudWindow
+        view.material = .popover
         view.state = .active
         return view
     }
