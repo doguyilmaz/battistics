@@ -24,6 +24,12 @@ struct RemoteTests {
         let request = RemoteRequest(operation: .start, mode: .displayMaySleep, durationMinutes: 60, deviceName: "iPhone",
                                     sentAt: Date(timeIntervalSince1970: 1_000_000))
         #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(request)) == request)
+        let lpmRequest = RemoteRequest(operation: .setLowPower, lowPowerPolicy: .onlyOnBattery, deviceName: "iPhone",
+                                       sentAt: Date(timeIntervalSince1970: 1_000_000))
+        #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(lpmRequest)) == lpmRequest)
+        let sleepRequest = RemoteRequest(operation: .sleepDisplay, deviceName: "iPhone",
+                                         sentAt: Date(timeIntervalSince1970: 1_000_000))
+        #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(sleepRequest)) == sleepRequest)
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 
@@ -34,14 +40,15 @@ struct RemoteTests {
         let status = RemoteStatus(
             machineName: "Mac", readAt: now,
             battery: .init(percent: 82, isCharging: true, onAdapter: true, minutesRemaining: 45,
-                           healthPercent: 96, lowPowerMode: true, watts: 42.5, adapterWatts: 67,
-                           temperatureC: 34.2, cycleCount: 118),
+                           healthPercent: 96, lowPowerMode: true, lowPowerPolicy: .onlyOnBattery,
+                           watts: 42.5, adapterWatts: 67, temperatureC: 34.2, cycleCount: 118),
             session: .init(mode: .lidClosed, origin: .phone, name: "Dogu’s iPhone 16e", startedAt: now, deadline: nil),
             network: .hotspot, networkName: "Dogu’s iPhone 16e", lidClosed: true,
             protection: .init(closedLidAllowed: true))
         let decoded = try RemoteWire.decode(RemoteStatus.self, from: RemoteWire.encode(status))
         #expect(decoded == status)
         #expect(decoded.battery?.lowPowerMode == true)
+        #expect(decoded.battery?.lowPowerPolicy == .onlyOnBattery)
         #expect(decoded.battery?.watts == 42.5)
         #expect(decoded.battery?.adapterWatts == 67)
         #expect(decoded.networkName == "Dogu’s iPhone 16e")

@@ -10,7 +10,14 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let mac = store.selected {
+                if store.isLocalPhoneSelected {
+                    LocalPhoneDashboard()
+                        .id(MacStore.localPhoneID)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 0.98)),
+                            removal: .opacity
+                        ))
+                } else if let mac = store.selected {
                     MacDashboard(mac: mac, showingSettings: $showingSettings)
                         .id(mac.id)
                         .transition(.asymmetric(
@@ -21,8 +28,8 @@ struct HomeView: View {
                     SetupIntro()
                 }
             }
-            .animation(.spring(duration: 0.35, bounce: 0.12), value: store.selected?.id)
-            .navigationTitle(store.selected?.name ?? String(localized: "Battistics"))
+            .animation(.spring(duration: 0.35, bounce: 0.12), value: store.selectedID)
+            .navigationTitle(store.isLocalPhoneSelected ? UIDevice.current.name : (store.selected?.name ?? String(localized: "Battistics")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -52,12 +59,14 @@ struct HomeView: View {
 
 private struct MacHeaderPicker: View {
     @Environment(MacStore.self) private var store
+    @State private var phone = LocalPhoneMonitor.shared
     let selected: MacStore.Mac
     @Binding var showingSettings: Bool
 
     var body: some View {
+        let isPhone = store.isLocalPhoneSelected
         let reading = store.reading(for: selected)
-        let isHotspot = reading?.status?.network == .hotspot && reading?.reachable == true
+        let isHotspot = !isPhone && reading?.status?.network == .hotspot && reading?.reachable == true
         Menu {
             Section("Your Macs") {
                 ForEach(store.macs) { mac in
@@ -67,13 +76,29 @@ private struct MacHeaderPicker: View {
                         }
                     } label: {
                         HStack {
-                            Text(mac.name)
+                            Label(mac.name, systemImage: "laptopcomputer")
                             if let pct = store.reading(for: mac)?.status?.battery?.percent {
                                 Text("\(pct)%")
                             }
-                            if mac.id == selected.id {
+                            if !isPhone && mac.id == selected.id {
                                 Image(systemName: "checkmark")
                             }
+                        }
+                    }
+                }
+            }
+            Section("This iPhone") {
+                Button {
+                    phone.refresh()
+                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        store.selectedID = MacStore.localPhoneID
+                    }
+                } label: {
+                    HStack {
+                        Label("\(UIDevice.current.name) (\(phone.modelName))", systemImage: "iphone")
+                        Text("\(phone.percent)%")
+                        if isPhone {
+                            Image(systemName: "checkmark")
                         }
                     }
                 }
@@ -86,14 +111,14 @@ private struct MacHeaderPicker: View {
             }
         } label: {
             HStack(spacing: 6) {
-                Image(systemName: isHotspot ? "personalhotspot" : "laptopcomputer")
+                Image(systemName: isPhone ? "iphone" : (isHotspot ? "personalhotspot" : "laptopcomputer"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(isHotspot ? PowerPalette.hotspot : Color.accentColor)
-                Text(selected.name)
+                Text(isPhone ? "\(UIDevice.current.name) · \(phone.modelName)" : selected.name)
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                if store.macs.count > 1 {
+                if store.macs.count > 1 && !isPhone {
                     Text("\(store.macs.count)")
                         .font(.caption2.weight(.bold))
                         .padding(.horizontal, 5)
@@ -138,7 +163,7 @@ struct MacDashboard: View {
                         StatusLine(reading: reading, refreshing: store.refreshing)
 
                         if let status {
-                            BatteryCard(status: status)
+                            BatteryCard(mac: mac, status: status, enabled: reachable, message: $message)
                                 .opacity(reachable ? 1 : 0.65)
 
                             KeepAwakeCard(mac: mac, status: status, enabled: reachable, message: $message)

@@ -1,24 +1,33 @@
 import Foundation
 
-/// A Start or Stop sent from a phone through iCloud.
+/// A command sent from a phone through iCloud.
 public struct RemoteRequest: Codable, Sendable, Equatable {
-    public enum Operation: String, Codable, Sendable { case start, stop }
+    public enum Operation: String, Codable, Sendable {
+        case start
+        case stop
+        case setLowPower
+        case sleepDisplay
+    }
 
     public var id: String
     public var operation: Operation
     public var mode: RemoteStatus.Mode?
     /// Duration in minutes; `0` or `nil` means "until turned off" (indefinite).
     public var durationMinutes: Int?
+    /// Desired Low Power Mode policy when `operation == .setLowPower`.
+    public var lowPowerPolicy: RemoteStatus.LowPowerPolicy?
     /// Shown on the Mac next to the session, e.g. the phone's name.
     public var deviceName: String?
     public var sentAt: Date
 
     public init(id: String = UUID().uuidString, operation: Operation, mode: RemoteStatus.Mode? = nil,
-                durationMinutes: Int? = nil, deviceName: String? = nil, sentAt: Date = Date()) {
+                durationMinutes: Int? = nil, lowPowerPolicy: RemoteStatus.LowPowerPolicy? = nil,
+                deviceName: String? = nil, sentAt: Date = Date()) {
         self.id = id
         self.operation = operation
         self.mode = mode
         self.durationMinutes = durationMinutes
+        self.lowPowerPolicy = lowPowerPolicy
         self.deviceName = deviceName
         self.sentAt = sentAt
     }

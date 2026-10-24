@@ -9,6 +9,7 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @AppStorage(Notifications.enabledKey) private var notify = true
     @State private var permission: UNAuthorizationStatus = .notDetermined
+    @State private var phone = LocalPhoneMonitor.shared
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,7 @@ struct SettingsView: View {
                         ForEach(store.macs) { mac in
                             let reading = store.reading(for: mac)
                             let status = reading?.status
-                            let isSelected = store.selected?.id == mac.id
+                            let isSelected = !store.isLocalPhoneSelected && store.selected?.id == mac.id
                             Button {
                                 withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
                                     store.selectedID = mac.id
@@ -89,12 +90,52 @@ struct SettingsView: View {
                         }
                     }
 
-                    LabeledContent {
-                        Text(UIDevice.current.name)
-                            .foregroundStyle(.secondary)
+                    Button {
+                        phone.refresh()
+                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                            store.selectedID = MacStore.localPhoneID
+                        }
+                        dismiss()
                     } label: {
-                        Label("This iPhone", systemImage: "iphone")
+                        HStack(spacing: 12) {
+                            Image(systemName: "iphone")
+                                .font(.title3)
+                                .foregroundStyle(Color.accentColor)
+                                .frame(width: 28)
+
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(UIDevice.current.name)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                Text("\(phone.modelName) · iOS \(UIDevice.current.systemVersion)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            HStack(spacing: 3) {
+                                if phone.lowPowerMode {
+                                    Image(systemName: "leaf.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(PowerPalette.lowPower)
+                                } else if phone.isCharging {
+                                    Image(systemName: "bolt.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(PowerPalette.charging)
+                                }
+                                Text("\(phone.percent)%")
+                                    .font(.subheadline.weight(.semibold).monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            if store.isLocalPhoneSelected {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(Color.accentColor)
+                            }
+                        }
                     }
+                    .buttonStyle(.plain)
                 } header: {
                     Text("Devices on Your Apple ID")
                 } footer: {

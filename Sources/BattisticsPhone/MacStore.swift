@@ -10,6 +10,7 @@ import UIKit
 @Observable
 final class MacStore {
     static let shared = MacStore()
+    static let localPhoneID = "__this_iphone__"
 
     struct Mac: Identifiable, Equatable {
         let id: String
@@ -31,8 +32,13 @@ final class MacStore {
     var selectedID: String? {
         didSet {
             UserDefaults.standard.set(selectedID, forKey: "selectedMac")
-            WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+            let widgetMac = selected ?? macs.first
+            WidgetBridge.publish(widgetMac, reading: widgetMac.flatMap { readings[$0.id] })
         }
+    }
+
+    var isLocalPhoneSelected: Bool {
+        selectedID == Self.localPhoneID
     }
 
     @ObservationIgnored private let cloud = RemoteCloud()
@@ -116,6 +122,14 @@ final class MacStore {
 
     func stop(_ mac: Mac) async -> String? {
         await send(.init(operation: .stop, deviceName: UIDevice.current.name), to: mac)
+    }
+
+    func setLowPower(_ mac: Mac, policy: RemoteStatus.LowPowerPolicy) async -> String? {
+        await send(.init(operation: .setLowPower, lowPowerPolicy: policy, deviceName: UIDevice.current.name), to: mac)
+    }
+
+    func sleepDisplay(_ mac: Mac) async -> String? {
+        await send(.init(operation: .sleepDisplay, deviceName: UIDevice.current.name), to: mac)
     }
 
     /// Writes the command, then watches the Mac's record for its answer.

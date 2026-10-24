@@ -204,6 +204,47 @@ final class RemoteAccessModel {
             return nil
         case .start:
             return await start(request)
+        case .setLowPower:
+            return await setLowPower(request)
+        case .sleepDisplay:
+            return await sleepDisplay()
+        }
+    }
+
+    private func setLowPower(_ request: RemoteRequest) async -> RemoteFailure? {
+        guard let policy = request.lowPowerPolicy else {
+            return .init(.invalidRequest, String(localized: "Choose a supported Low Power Mode setting."))
+        }
+        let setting: LowPowerModeSetting = switch policy {
+        case .never: .never
+        case .onlyOnBattery: .onlyOnBattery
+        case .onlyOnAdapter: .onlyOnPowerAdapter
+        case .always: .always
+        }
+        do {
+            try await helper.prepareForLidSleep()
+            try await helper.apply(.lowPowerMode(setting))
+        } catch {
+            return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
+        }
+        let verified = await PowerSettingsReader.fetch()
+        guard PowerChange.lowPowerMode(setting).isReflected(in: verified) else {
+            return .init(.startFailed, String(localized: "macOS did not apply the Low Power Mode change."))
+        }
+        return nil
+    }
+
+    private func sleepDisplay() async -> RemoteFailure? {
+        do {
+            _ = try await BoundedCommand.run(
+                executable: "/usr/bin/pmset",
+                arguments: ["displaysleepnow"],
+                timeout: 5,
+                maximumOutputBytes: 16_384
+            )
+            return nil
+        } catch {
+            return .init(.startFailed, String(localized: "macOS could not put the display to sleep."))
         }
     }
 
@@ -243,8 +284,23 @@ final class RemoteAccessModel {
 
     func fullStatus() async -> RemoteStatus {
         var status = status()
-        let history = await chargeHistory()
+        async let historyTask = chargeHistory()
+        async let powerTask = PowerSettingsReader.fetch()
+        let (history, power) = await (historyTask, powerTask)
         status.chargeHistory = history.isEmpty ? nil : history
+        if let power, var battery = status.battery {
+            battery.lowPowerPolicy = switch power.lowPowerMode {
+            case .never: .never
+            case .onlyOnBattery: .onlyOnBattery
+            case .onlyOnPowerAdapter: .onlyOnAdapter
+            case .always: .always
+            case nil: nil
+            }
+            if let sourceActive = battery.onAdapter ? power.ac?.lowPowerMode : power.battery?.lowPowerMode {
+                battery.lowPowerMode = sourceActive
+            }
+            status.battery = battery
+        }
         return status
     }
 

@@ -163,7 +163,12 @@ struct PocketModeDock: View {
 }
 
 struct BatteryCard: View {
+    @Environment(MacStore.self) private var store
+    let mac: MacStore.Mac
     let status: RemoteStatus
+    var enabled: Bool = true
+    @Binding var message: String?
+    @State private var showCyclesPrimary = false
 
     var body: some View {
         if let battery = status.battery {
@@ -171,7 +176,7 @@ struct BatteryCard: View {
             let showEnergyBorder = battery.lowPowerMode == true || battery.isCharging || battery.onAdapter
 
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 14) {
+                HStack(spacing: 12) {
                     Gauge(value: Double(battery.percent), in: 0...100) {
                         Image(systemName: gaugeSymbol(battery))
                             .foregroundStyle(tintColor)
@@ -190,14 +195,9 @@ struct BatteryCard: View {
                         HStack(spacing: 6) {
                             Text(headline(battery))
                                 .font(.headline)
-                            if battery.lowPowerMode == true {
-                                Label("Low Power", systemImage: "leaf.fill")
-                                    .font(.caption2.weight(.semibold))
-                                    .padding(.horizontal, 7)
-                                    .padding(.vertical, 2)
-                                    .background(PowerPalette.lowPower.opacity(0.18), in: Capsule())
-                                    .foregroundStyle(PowerPalette.lowPower)
-                            } else if battery.isCharging {
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                            if battery.isCharging {
                                 Image(systemName: "bolt.fill")
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(PowerPalette.charging)
@@ -209,14 +209,18 @@ struct BatteryCard: View {
                             Text(detail)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
                                 .contentTransition(.numericText())
                         }
                     }
-                    Spacer(minLength: 0)
-                }
-                .accessibilityElement(children: .combine)
 
-                // 3-pillar telemetry strip (Power Flow · Health · Pack Temp)
+                    Spacer(minLength: 0)
+
+                    powerModeMenu(battery)
+                }
+
+                // 3-pillar telemetry strip (Power Flow · Health & Cycles · Pack Temp)
                 HStack(spacing: 8) {
                     MetricPill(
                         label: String(localized: "Power"),
@@ -224,12 +228,19 @@ struct BatteryCard: View {
                         symbol: battery.isCharging || battery.onAdapter ? "bolt.fill" : "battery.75percent",
                         tint: battery.isCharging ? PowerPalette.charging : .secondary
                     )
-                    MetricPill(
-                        label: String(localized: "Health"),
-                        value: battery.healthPercent.map { "\($0)%" } ?? "-",
-                        symbol: "heart.fill",
-                        tint: .secondary
-                    )
+                    Button {
+                        withAnimation(.snappy(duration: 0.2)) {
+                            showCyclesPrimary.toggle()
+                        }
+                    } label: {
+                        MetricPill(
+                            label: healthSubtitle(battery),
+                            value: healthPrimaryValue(battery),
+                            symbol: showCyclesPrimary ? "arrow.2.circlepath" : "heart.fill",
+                            tint: .secondary
+                        )
+                    }
+                    .buttonStyle(.plain)
                     MetricPill(
                         label: String(localized: "Temp"),
                         value: battery.temperatureC.map { "\(Int($0.rounded()))°C" } ?? "-",
@@ -259,6 +270,83 @@ struct BatteryCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .card()
         }
+    }
+
+    @ViewBuilder
+    private func powerModeMenu(_ battery: RemoteStatus.Battery) -> some View {
+        let isLPM = battery.lowPowerMode == true
+        let policy = battery.lowPowerPolicy
+        Menu {
+            Section("Mac Low Power Mode") {
+                ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { option in
+                    Button {
+                        Task {
+                            withAnimation { message = nil }
+                            let failure = await store.setLowPower(mac, policy: option)
+                            withAnimation { message = failure }
+                        }
+                    } label: {
+                        HStack {
+                            Label(option.label, systemImage: option.symbol)
+                            if policy == option {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            }
+            Section("Quick Action") {
+                Button {
+                    Task {
+                        withAnimation { message = nil }
+                        let failure = await store.sleepDisplay(mac)
+                        withAnimation { message = failure }
+                    }
+                } label: {
+                    Label("Sleep Mac Display Now", systemImage: "moon.zzz.fill")
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: isLPM ? "leaf.fill" : (policy?.symbol ?? "leaf"))
+                    .font(.caption2.weight(.semibold))
+                Text(isLPM ? String(localized: "Low Power") : (policy?.shortBadge ?? String(localized: "Power Mode")))
+                    .font(.caption2.weight(.semibold))
+                    .lineLimit(1)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 9, weight: .bold))
+                    .opacity(0.75)
+            }
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .background(
+                isLPM ? PowerPalette.lowPower.opacity(0.20) : Color(.tertiarySystemFill),
+                in: Capsule()
+            )
+            .foregroundStyle(isLPM ? PowerPalette.lowPower : Color.primary)
+        }
+        .disabled(!enabled || store.pending.contains(mac.id))
+        .accessibilityLabel(String(localized: "Mac Power Mode"))
+    }
+
+    private func healthPrimaryValue(_ battery: RemoteStatus.Battery) -> String {
+        if showCyclesPrimary, let cycles = battery.cycleCount {
+            return "\(cycles)"
+        }
+        return battery.healthPercent.map { "\($0)%" } ?? "-"
+    }
+
+    private func healthSubtitle(_ battery: RemoteStatus.Battery) -> String {
+        if showCyclesPrimary, battery.cycleCount != nil {
+            if let health = battery.healthPercent {
+                return String(localized: "Cycles · \(health)%")
+            }
+            return String(localized: "Cycles")
+        }
+        if let cycles = battery.cycleCount {
+            return String(localized: "Health · \(cycles)c")
+        }
+        return String(localized: "Health")
     }
 
     private struct MetricPill: View {

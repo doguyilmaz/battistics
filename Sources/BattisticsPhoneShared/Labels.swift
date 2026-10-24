@@ -115,6 +115,35 @@ extension RemoteStatus.Thermal {
     }
 }
 
+extension RemoteStatus.LowPowerPolicy {
+    var label: String {
+        switch self {
+        case .never: String(localized: "Never")
+        case .onlyOnBattery: String(localized: "Only on Battery")
+        case .onlyOnAdapter: String(localized: "Only on Power Adapter")
+        case .always: String(localized: "Always")
+        }
+    }
+
+    var shortBadge: String {
+        switch self {
+        case .never: String(localized: "LPM Off")
+        case .onlyOnBattery: String(localized: "LPM Battery")
+        case .onlyOnAdapter: String(localized: "LPM Adapter")
+        case .always: String(localized: "LPM On")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .never: "bolt.circle"
+        case .onlyOnBattery: "leaf"
+        case .onlyOnAdapter: "powerplug"
+        case .always: "leaf.fill"
+        }
+    }
+}
+
 enum PowerPalette {
     static let charging = Color(red: 0.16, green: 0.80, blue: 0.44)
     static let lowPower = Color(red: 0.95, green: 0.72, blue: 0.08)

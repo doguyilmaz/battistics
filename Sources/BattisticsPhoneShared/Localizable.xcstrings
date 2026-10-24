@@ -18,6 +18,23 @@
         }
       }
     },
+    "%@ free": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ free"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ boş"
+          }
+        }
+      }
+    },
     "%@ is not answering.": {
       "extractionState": "manual",
       "localizations": {
@@ -69,6 +86,23 @@
         }
       }
     },
+    "%lld Macs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Macs"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Mac"
+          }
+        }
+      }
+    },
     "%lld%%": {
       "extractionState": "manual",
       "localizations": {
@@ -82,6 +116,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%%%lld"
+          }
+        }
+      }
+    },
+    "%lld%% · Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld%% · Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%lld · Mac"
           }
         }
       }
@@ -392,6 +443,23 @@
         }
       }
     },
+    "Always": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Always"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her Zaman"
+          }
+        }
+      }
+    },
     "At %lld%%": {
       "extractionState": "manual",
       "localizations": {
@@ -405,6 +473,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%%%lld’de"
+          }
+        }
+      }
+    },
+    "Attention": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attention"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dikkat"
           }
         }
       }
@@ -766,6 +851,23 @@
         }
       }
     },
+    "Connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı"
+          }
+        }
+      }
+    },
     "Connected to %@": {
       "extractionState": "manual",
       "localizations": {
@@ -902,6 +1004,40 @@
         }
       }
     },
+    "Cycles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycles"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Döngü"
+          }
+        }
+      }
+    },
+    "Cycles · %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycles · %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Döngü · %%%lld"
+          }
+        }
+      }
+    },
     "Devices & Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -1021,6 +1157,23 @@
         }
       }
     },
+    "Enable iPhone access in Battistics on your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable iPhone access in Battistics on your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inizdeki Battistics’te iPhone erişimini açın."
+          }
+        }
+      }
+    },
     "Ethernet": {
       "extractionState": "manual",
       "localizations": {
@@ -1085,6 +1238,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sağlık %%%lld"
+          }
+        }
+      }
+    },
+    "Health · %lldc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health · %lldc"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık · %lldd"
           }
         }
       }
@@ -1514,6 +1684,74 @@
         }
       }
     },
+    "LPM Adapter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LPM Adapter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DGM Adaptör"
+          }
+        }
+      }
+    },
+    "LPM Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LPM Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DGM Pilde"
+          }
+        }
+      }
+    },
+    "LPM Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LPM Off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DGM Kapalı"
+          }
+        }
+      }
+    },
+    "LPM On": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LPM On"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DGM Açık"
+          }
+        }
+      }
+    },
     "Last seen %@": {
       "extractionState": "manual",
       "localizations": {
@@ -1735,6 +1973,23 @@
         }
       }
     },
+    "Live on this iPhone · iOS %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live on this iPhone · iOS %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone’da canlı · iOS %@"
+          }
+        }
+      }
+    },
     "Look for my Mac": {
       "extractionState": "manual",
       "localizations": {
@@ -1782,6 +2037,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac"
+          }
+        }
+      }
+    },
+    "Mac Low Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Low Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Düşük Güç Modu"
+          }
+        }
+      }
+    },
+    "Mac Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Güç Modu"
           }
         }
       }
@@ -1884,6 +2173,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mod"
+          }
+        }
+      }
+    },
+    "Never": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asla"
+          }
+        }
+      }
+    },
+    "No Mac Connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Mac Connected"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı Mac Yok"
           }
         }
       }
@@ -2143,6 +2466,40 @@
         }
       }
     },
+    "Only on Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca Pilde"
+          }
+        }
+      }
+    },
+    "Only on Power Adapter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only on Power Adapter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca Adaptörde"
+          }
+        }
+      }
+    },
     "Open": {
       "extractionState": "manual",
       "localizations": {
@@ -2173,6 +2530,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kişisel Erişim Noktası Ayarlarını Aç"
+          }
+        }
+      }
+    },
+    "Open iOS Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open iOS Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS Ayarları’nı Aç"
           }
         }
       }
@@ -2279,6 +2653,40 @@
         }
       }
     },
+    "Physical Memory": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Physical Memory"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fiziksel Bellek"
+          }
+        }
+      }
+    },
+    "Plugged in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plugged in"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prize takılı"
+          }
+        }
+      }
+    },
     "Pocket Mode Active": {
       "extractionState": "manual",
       "localizations": {
@@ -2330,6 +2738,23 @@
         }
       }
     },
+    "Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç Modu"
+          }
+        }
+      }
+    },
     "Profile": {
       "extractionState": "manual",
       "localizations": {
@@ -2343,6 +2768,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Profil"
+          }
+        }
+      }
+    },
+    "Quick Action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick Action"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hızlı İşlem"
           }
         }
       }
@@ -2496,6 +2938,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu iPhone’da Mac’inizle aynı Apple ID ile iCloud’a giriş yapın."
+          }
+        }
+      }
+    },
+    "Sleep Mac Display Now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep Mac Display Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Ekranını Şimdi Uyut"
+          }
+        }
+      }
+    },
+    "Standard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standart"
           }
         }
       }
@@ -2772,6 +3248,23 @@
         }
       }
     },
+    "System & Storage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System & Storage"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem ve Depolama"
+          }
+        }
+      }
+    },
     "Tap selected time for ∞": {
       "extractionState": "manual",
       "localizations": {
@@ -2874,6 +3367,23 @@
         }
       }
     },
+    "Tethered": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tethered"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bağlı"
+          }
+        }
+      }
+    },
     "The Mac did not accept this iPhone.": {
       "extractionState": "manual",
       "localizations": {
@@ -2921,6 +3431,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil yaklaşık %@ dayanır; bu oturumdan az"
+          }
+        }
+      }
+    },
+    "Thermal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thermal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Termal"
           }
         }
       }
@@ -3180,6 +3707,23 @@
         }
       }
     },
+    "Uptime": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uptime"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çalışma Süresi"
+          }
+        }
+      }
+    },
     "Use the same Apple ID with iCloud on this iPhone and on the Mac. There is nothing to pair.": {
       "extractionState": "manual",
       "localizations": {
@@ -3193,6 +3737,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu iPhone’da ve Mac’te aynı Apple ID ile iCloud kullanın. Eşleştirilecek bir şey yok."
+          }
+        }
+      }
+    },
+    "View Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i Gör"
           }
         }
       }
@@ -3316,6 +3877,23 @@
         }
       }
     },
+    "iCloud Companion": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Companion"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Eşlikçi"
+          }
+        }
+      }
+    },
     "iCloud could not be reached. Try again in a moment.": {
       "extractionState": "manual",
       "localizations": {
@@ -3329,6 +3907,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud’a ulaşılamadı. Birazdan tekrar deneyin."
+          }
+        }
+      }
+    },
+    "iOS restricts battery cycle & health APIs; open iOS Battery Settings for Apple's health readout.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS restricts battery cycle & health APIs; open iOS Battery Settings for Apple's health readout."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS pil döngüsü ve sağlık API’lerini kısıtlar; Apple sağlık verisi için iOS Ayarları’nı açın."
           }
         }
       }

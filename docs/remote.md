@@ -47,6 +47,16 @@ Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose 
 - **Interactive Rotating Mobility Tips:**
   - When on Wi‑Fi, tapping the text area of the bottom `PocketModeDock` cycles through practical tips (`Auto-Join Hotspot`, `Closed Bag Heat / Thermal Care`, and `2-Tap ∞ Until Turned Off`).
 
+### Remote Mac Power Mode, Display Sleep & Cycle Count (`BatteryCard`)
+- **Power Mode Menu:** Top-right capsule inside `BatteryCard` displays the Mac's active Low Power Mode state or configured policy (`LPM Battery`, `LPM Off`, `Low Power`). Tapping opens a menu to set macOS Low Power Mode (`Never`, `Only on Battery`, `Only on Power Adapter`, `Always`) via `BattisticsPowerHelper` without password prompts, or trigger **`Sleep Mac Display Now`** (`pmset displaysleepnow`).
+- **Interactive Health & Cycle Count Pill:** Displays `86%` with `Health · <N>c` subtitle; tapping toggles between health percentage and cycle count as the primary metric.
+
+### Local iPhone Dashboard (`LocalPhoneDashboard` / `This iPhone`)
+- Selecting **This iPhone (`iPhone 16e`)** from the top device switcher or `Devices & Settings` sheet opens a dedicated single-page dashboard for the phone itself:
+  - Live battery percentage, charging/adapter state, iPhone Low Power Mode status, and a locally recorded 24-hour iPhone charge sparkline.
+  - Exact hardware marketing model (`iPhone 16e` / `iPhone17,5`), CPU core count, physical RAM (`8 GB`), thermal state, system uptime, and live disk storage usage (`used / total GB` + `free GB`).
+  - Quick one-tap switch back to the paired Mac from either the 2x2 grid or the bottom companion dock.
+
 ### Ambient Energy & Connection Themes (`PowerPalette` & `AmbientEnergyBackdrop`)
 1. **Charging / Adapter (`PowerPalette.charging`, Emerald Green):** Radial light rays, green border glow, pulsing `bolt.fill`, and live wattage (`+42W`, `65W`).
 2. **Low Power Mode (`PowerPalette.lowPower`, Warm Amber):** Amber light rays, amber battery tint, and `leaf.fill` `Low Power` capsule badge.

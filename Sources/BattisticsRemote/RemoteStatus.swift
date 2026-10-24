@@ -2,6 +2,14 @@ import Foundation
 
 /// Everything the phone shows about one Mac, read on the Mac in one pass.
 public struct RemoteStatus: Codable, Sendable, Equatable {
+    /// How macOS is configured to apply Low Power Mode across battery and adapter.
+    public enum LowPowerPolicy: String, Codable, Sendable, CaseIterable {
+        case never
+        case onlyOnBattery
+        case onlyOnAdapter
+        case always
+    }
+
     public struct Battery: Codable, Sendable, Equatable {
         public var percent: Int
         public var isCharging: Bool
@@ -11,6 +19,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public var healthPercent: Int?
         /// Whether macOS Low Power Mode is currently active for the current power source.
         public var lowPowerMode: Bool?
+        /// System-wide Low Power Mode policy (Never, Only on Battery, Only on Adapter, Always).
+        public var lowPowerPolicy: LowPowerPolicy?
         /// Signed instantaneous power in watts (positive charging, negative discharging).
         public var watts: Double?
         /// Connected power adapter rating in watts (e.g. 67, 96, 140).
@@ -27,6 +37,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             minutesRemaining: Int? = nil,
             healthPercent: Int? = nil,
             lowPowerMode: Bool? = nil,
+            lowPowerPolicy: LowPowerPolicy? = nil,
             watts: Double? = nil,
             adapterWatts: Int? = nil,
             temperatureC: Double? = nil,
@@ -38,6 +49,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.minutesRemaining = minutesRemaining
             self.healthPercent = healthPercent
             self.lowPowerMode = lowPowerMode
+            self.lowPowerPolicy = lowPowerPolicy
             self.watts = watts
             self.adapterWatts = adapterWatts
             self.temperatureC = temperatureC
