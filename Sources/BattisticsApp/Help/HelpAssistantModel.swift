@@ -51,13 +51,13 @@ final class HelpAssistantModel {
         guard available, !question.isEmpty, question.count <= 600 else { return }
         answer = nil
         errorMessage = nil
-        sources = Array(HelpArticle.matching(question).prefix(3))
-        guard !sources.isEmpty else {
-            errorMessage = String(localized: "No matching guide article. Try asking about Keep Awake, battery protection, heat, history, or privacy.")
-            return
-        }
+        let matches = Array(HelpArticle.matching(question).prefix(3))
+        sources = matches
         #if canImport(FoundationModels)
         if #available(macOS 26.0, *) {
+            // Without a keyword match, the model chooses among every title, so
+            // a question in other words can still find its article.
+            if matches.isEmpty { sources = HelpArticle.allCases }
             let id = UUID()
             requestID = id
             isResponding = true
@@ -66,7 +66,8 @@ final class HelpAssistantModel {
             // model is prone to inventing controls or diagnoses.
             let candidates = sources
             let context = candidates.enumerated().map { index, article in
-                "Article \(index + 1): \(article.title)\n\(article.answer)"
+                matches.isEmpty ? "Article \(index + 1): \(article.title)"
+                    : "Article \(index + 1): \(article.title)\n\(article.answer)"
             }.joined(separator: "\n\n")
             responseTask = Task { [weak self] in
                 defer {
@@ -102,8 +103,12 @@ final class HelpAssistantModel {
                     self?.refreshAvailability()
                 }
             }
+            return
         }
         #endif
+        if matches.isEmpty {
+            errorMessage = String(localized: "No matching guide article. Try asking about Keep Awake, battery protection, heat, history, or privacy.")
+        }
     }
 
     func cancel() {

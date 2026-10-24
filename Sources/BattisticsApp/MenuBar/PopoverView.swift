@@ -27,7 +27,7 @@ struct PopoverView: View {
     var body: some View {
         VStack(spacing: 12) {
             header
-            if keepAwake.isActive { KeepAwakeSessionCard() }
+            if keepAwake.isActive { KeepAwakeSessionCard(compact: true) }
             if let snapshot = model.snapshot, snapshot.batteryInstalled {
                 HStack(spacing: 28) {
                     GaugeRing(
