@@ -412,6 +412,7 @@ struct KeepAwakeCard: View {
                     Text(session.startedAt, style: .timer)
                         .font(.title3.weight(.bold).monospacedDigit())
                         .foregroundStyle(.primary)
+                        .multilineTextAlignment(.trailing)
                 }
                 ProgressView(value: 1.0)
                     .tint(.orange)

@@ -146,21 +146,24 @@ struct MacWidgetView: View {
             if let session = status.session, let deadline = session.deadline, deadline > entry.date {
                 let range = min(session.startedAt, deadline)...deadline
                 HStack(spacing: 4) {
-                    Text(session.mode.label).lineLimit(1)
+                    Text(session.mode.label).lineLimit(1).layoutPriority(1)
                     Spacer(minLength: 4)
                     Text(timerInterval: range, countsDown: true)
                         .font(.subheadline.weight(.semibold).monospacedDigit())
                         .multilineTextAlignment(.trailing)
+                        .frame(maxWidth: 64, alignment: .trailing)
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
             } else if let session = status.session, session.deadline == nil {
                 HStack(spacing: 4) {
-                    Text("Awake ∞ · \(session.mode.label)").lineLimit(1)
+                    Text("∞ · \(session.mode.label)").lineLimit(1).layoutPriority(1)
                     Spacer(minLength: 4)
                     Text(session.startedAt, style: .timer)
                         .font(.caption.weight(.semibold).monospacedDigit())
+                        .multilineTextAlignment(.trailing)
+                        .frame(maxWidth: 58, alignment: .trailing)
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -237,11 +240,13 @@ struct MacWidgetView: View {
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.orange)
                             .lineLimit(1)
+                            .layoutPriority(1)
                         Spacer(minLength: 0)
                         Text(timerInterval: range, countsDown: true)
                             .font(.caption.weight(.bold).monospacedDigit())
                             .foregroundStyle(.orange)
                             .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 58, alignment: .trailing)
                     }
                     ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                         .tint(.orange)
@@ -251,10 +256,14 @@ struct MacWidgetView: View {
                     Label("Awake ∞", systemImage: "cup.and.saucer.fill")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.orange)
+                        .lineLimit(1)
+                        .layoutPriority(1)
                     Spacer(minLength: 0)
                     Text(session.startedAt, style: .timer)
                         .font(.caption2.weight(.bold).monospacedDigit())
                         .foregroundStyle(.orange)
+                        .multilineTextAlignment(.trailing)
+                        .frame(maxWidth: 54, alignment: .trailing)
                 }
             } else if showsControls && snapshot.reachable {
                 Button(intent: StartKeepAwakeLiveIntent()) {
@@ -445,30 +454,21 @@ struct KeepAwakeActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: KeepAwakeActivityAttributes.self) { context in
             LockScreenLiveActivityView(context: context)
-                .activityBackgroundTint(Color.black.opacity(0.82))
+                .activityBackgroundTint(Color.black.opacity(0.84))
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    HStack(spacing: 6) {
-                        Image(systemName: context.state.network == .hotspot ? "personalhotspot" : "cup.and.saucer.fill")
-                            .foregroundStyle(context.state.network == .hotspot ? PowerPalette.hotspot : .orange)
-                            .symbolEffect(.pulse, isActive: true)
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(context.attributes.macName)
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 5) {
+                            Image(systemName: context.state.network == .hotspot ? "personalhotspot" : "laptopcomputer")
                                 .font(.caption.weight(.semibold))
+                                .foregroundStyle(context.state.network == .hotspot ? PowerPalette.hotspot : .orange)
+                            Text(context.attributes.macName)
+                                .font(.caption.weight(.bold))
                                 .lineLimit(1)
-                            HStack(spacing: 4) {
-                                Text(context.state.mode.label)
-                                if let closed = context.state.lidClosed {
-                                    Text("·")
-                                    Text(closed ? String(localized: "Closed") : String(localized: "Open"))
-                                }
-                            }
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
                         }
+                        LivePowerBadge(state: context.state)
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -480,17 +480,25 @@ struct KeepAwakeActivityWidget: Widget {
                                 .monospacedDigit()
                                 .foregroundStyle(.orange)
                                 .multilineTextAlignment(.trailing)
+                                .frame(width: 78, alignment: .trailing)
+                            Text("Remaining")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.secondary)
                         } else {
+                            Text(context.state.startedAt, style: .timer)
+                                .font(.system(.subheadline, design: .rounded, weight: .bold))
+                                .monospacedDigit()
+                                .foregroundStyle(.orange)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 78, alignment: .trailing)
                             HStack(spacing: 3) {
-                                Image(systemName: "infinity").font(.caption2)
-                                Text(context.state.startedAt, style: .timer)
+                                Image(systemName: "infinity")
+                                    .font(.system(size: 9, weight: .bold))
+                                Text("Until stopped")
+                                    .font(.system(size: 10, weight: .medium))
                             }
-                            .font(.system(.subheadline, design: .rounded, weight: .bold))
-                            .monospacedDigit()
-                            .foregroundStyle(.orange)
-                            .multilineTextAlignment(.trailing)
+                            .foregroundStyle(.secondary)
                         }
-                        LivePowerBadge(state: context.state)
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
@@ -500,16 +508,19 @@ struct KeepAwakeActivityWidget: Widget {
                             ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                                 .tint(context.state.lowPowerMode ? PowerPalette.lowPower : (context.state.isCharging ? PowerPalette.charging : .orange))
                         }
-                        HStack {
-                            HStack(spacing: 6) {
-                                Image(systemName: context.state.network.symbol)
-                                    .foregroundStyle(context.state.network == .hotspot ? PowerPalette.hotspot : .secondary)
-                                Text(context.state.networkName ?? context.state.network.label)
+                        HStack(spacing: 6) {
+                            Label(context.state.mode.label, systemImage: context.state.mode.symbol)
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                            if let closed = context.state.lidClosed {
+                                Text("·").foregroundStyle(.secondary)
+                                Text(closed ? String(localized: "Lid closed") : String(localized: "Lid open"))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             }
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            Spacer()
+                            Spacer(minLength: 6)
                             Button(intent: StopKeepAwakeLiveIntent()) {
                                 Label("Stop", systemImage: "stop.fill")
                                     .font(.caption.weight(.semibold))
@@ -536,12 +547,14 @@ struct KeepAwakeActivityWidget: Widget {
                     Text(timerInterval: range, countsDown: true)
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.orange)
-                        .frame(maxWidth: 54)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 52, alignment: .trailing)
                 } else {
                     Text(context.state.startedAt, style: .timer)
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.orange)
-                        .frame(maxWidth: 54)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 46, alignment: .trailing)
                 }
             } minimal: {
                 Image(systemName: context.state.isCharging ? "bolt.fill" : "cup.and.saucer.fill")
@@ -556,19 +569,22 @@ private struct LivePowerBadge: View {
 
     var body: some View {
         if let percent = state.batteryPercent {
-            let color: Color = state.lowPowerMode ? PowerPalette.lowPower : (state.isCharging || state.onAdapter ? PowerPalette.charging : .secondary)
-            HStack(spacing: 3) {
+            let color: Color = state.lowPowerMode ? PowerPalette.lowPower : (state.isCharging || state.onAdapter ? PowerPalette.charging : .white.opacity(0.85))
+            HStack(spacing: 4) {
                 Image(systemName: state.lowPowerMode ? "leaf.fill" : (state.isCharging ? "bolt.fill" : (state.onAdapter ? "powerplug.fill" : "battery.100")))
-                    .font(.caption2)
+                    .font(.caption2.weight(.bold))
                     .symbolEffect(.pulse, isActive: state.isCharging)
                 Text("\(percent)%")
-                    .font(.caption2.weight(.semibold).monospacedDigit())
+                    .font(.caption.weight(.bold).monospacedDigit())
                 if let watts = state.watts, abs(watts) >= 1 {
                     Text(watts > 0 ? "+\(Int(watts.rounded()))W" : "\(Int(watts.rounded()))W")
-                        .font(.caption2.monospacedDigit())
+                        .font(.caption2.weight(.medium).monospacedDigit())
                 }
             }
             .foregroundStyle(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(color.opacity(0.16), in: Capsule())
         }
     }
 }
@@ -584,63 +600,81 @@ private struct LockScreenLiveActivityView: View {
             : (state.isCharging || state.onAdapter ? PowerPalette.charging : .orange)
 
         VStack(alignment: .leading, spacing: 10) {
+            // Row 1: Full Mac Name on Left + Power/Battery Capsule on Right (never truncates Mac name)
+            HStack(alignment: .center, spacing: 8) {
+                Image(systemName: isHotspot ? "personalhotspot" : "laptopcomputer")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(isHotspot ? PowerPalette.hotspot : powerColor)
+                Text(context.attributes.macName)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .layoutPriority(1)
+                Spacer(minLength: 6)
+                LivePowerBadge(state: state)
+            }
+
+            // Row 2: Keep Awake Mode & Lid State on Left + Right-Aligned Timer on Right
             HStack(alignment: .center, spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(powerColor.opacity(0.20))
+                        .fill(Color.orange.opacity(0.20))
                         .frame(width: 36, height: 36)
-                    Image(systemName: state.isCharging ? "bolt.fill" : (state.lowPowerMode ? "leaf.fill" : (isHotspot ? "personalhotspot" : "cup.and.saucer.fill")))
+                    Image(systemName: state.mode.symbol)
                         .font(.callout.weight(.bold))
-                        .foregroundStyle(powerColor)
-                        .symbolEffect(.pulse, isActive: state.isCharging)
+                        .foregroundStyle(.orange)
+                        .symbolEffect(.pulse, isActive: true)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(context.attributes.macName)
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                        LivePowerBadge(state: state)
-                    }
+                    Text(state.mode.label)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
                     HStack(spacing: 5) {
-                        Label(state.mode.label, systemImage: state.mode.symbol)
                         if let closed = state.lidClosed {
-                            Text("·")
                             Text(closed ? String(localized: "Lid closed") : String(localized: "Lid open"))
                         }
-                        if isHotspot {
-                            Text("·")
-                            Text(state.networkName ?? String(localized: "Hotspot"))
-                                .foregroundStyle(PowerPalette.hotspot)
-                        }
+                        Text("·")
+                        Text(state.networkName ?? state.network.label)
+                            .foregroundStyle(isHotspot ? PowerPalette.hotspot : .white.opacity(0.72))
                     }
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.72))
                     .lineLimit(1)
                 }
+                .layoutPriority(1)
 
-                Spacer(minLength: 8)
+                Spacer(minLength: 6)
 
                 if let deadline = state.deadline {
                     let range = min(state.startedAt, deadline)...deadline
-                    Text(timerInterval: range, countsDown: true)
-                        .font(.system(.title2, design: .rounded, weight: .bold))
-                        .monospacedDigit()
-                        .foregroundStyle(powerColor)
-                        .multilineTextAlignment(.trailing)
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(timerInterval: range, countsDown: true)
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .monospacedDigit()
+                            .foregroundStyle(.orange)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 90, alignment: .trailing)
+                        Text("Remaining")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.65))
+                    }
                 } else {
-                    VStack(alignment: .trailing, spacing: 1) {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(state.startedAt, style: .timer)
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .monospacedDigit()
+                            .foregroundStyle(.orange)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 90, alignment: .trailing)
                         HStack(spacing: 3) {
-                            Image(systemName: "infinity").font(.caption.weight(.bold))
-                            Text(state.startedAt, style: .timer)
-                                .font(.system(.title3, design: .rounded, weight: .bold))
-                                .monospacedDigit()
+                            Image(systemName: "infinity")
+                                .font(.system(size: 10, weight: .bold))
+                            Text("Until stopped")
+                                .font(.caption2.weight(.medium))
                         }
-                        .foregroundStyle(powerColor)
-                        Text("Until stopped")
-                            .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.white.opacity(0.65))
                     }
                 }
             }
@@ -651,16 +685,15 @@ private struct LockScreenLiveActivityView: View {
                     .tint(powerColor)
             }
 
+            // Row 3: Session Origin on Left + Interactive Orange Stop Button on Right
             HStack(spacing: 8) {
-                Label(state.networkName ?? state.network.label, systemImage: state.network.symbol)
-                    .font(.caption)
-                    .foregroundStyle(isHotspot ? PowerPalette.hotspot : .white.opacity(0.72))
-                    .lineLimit(1)
-                if let name = state.sessionName, !name.isEmpty {
-                    Text("·")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.5))
-                    Text(name)
+                HStack(spacing: 5) {
+                    Image(systemName: state.isCharging ? "bolt.fill" : "cup.and.saucer.fill")
+                        .font(.caption2)
+                        .foregroundStyle(powerColor)
+                    Text(state.isCharging
+                         ? String(localized: "Charging on adapter")
+                         : (state.onAdapter ? String(localized: "On power adapter") : String(localized: "Keeping Mac awake")))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.72))
                         .lineLimit(1)
@@ -669,12 +702,14 @@ private struct LockScreenLiveActivityView: View {
                 Button(intent: StopKeepAwakeLiveIntent()) {
                     Label("Stop", systemImage: "stop.fill")
                         .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 4)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(powerColor)
+                .tint(.orange)
                 .controlSize(.small)
             }
         }
-        .padding(14)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 }
