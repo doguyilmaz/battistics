@@ -180,9 +180,12 @@ final class AutomationModel {
     private func startWatchdog() {
         activity = ProcessInfo.processInfo.beginActivity(options: .userInitiatedAllowingIdleSystemSleep,
                                                         reason: "Monitoring a bounded automation Keep Awake session")
+        // Wakes once per heartbeat window rather than polling.
         watchdog = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(5))
+                guard let lease = self?.lease else { return }
+                let wait = min(lease.deadline, lease.heartbeatDeadline).timeIntervalSinceNow
+                try? await Task.sleep(for: .seconds(max(wait, 0) + 0.5))
                 guard !Task.isCancelled, let self else { return }
                 if self.lease?.isExpired(at: Date()) == true { self.stopOwnedSession(); return }
             }
