@@ -304,8 +304,16 @@ final class AppModel {
             guard await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) else { return }
             self.recordedHealthDay = day
             let enabled = UserDefaults.standard.bool(forKey: Prefs.alertHealthDropEnabled)
+            let defaults = UserDefaults.standard
+            var lastAlerted = defaults.object(forKey: Prefs.alertHealthLastAlerted) as? Double
+            // A recovered or replaced battery starts over.
+            if let last = lastAlerted, BatteryHealth.display(snapshot.healthPercent) > last + AlertRules.healthDeclineMargin {
+                lastAlerted = nil
+                defaults.removeObject(forKey: Prefs.alertHealthLastAlerted)
+            }
             if let alert = AlertRules.healthDropAlert(
-                baseline: baseline, current: snapshot.healthPercent, enabled: enabled) {
+                baseline: baseline, current: snapshot.healthPercent, enabled: enabled, lastAlerted: lastAlerted) {
+                if case .healthDropped(_, let to) = alert { defaults.set(to, forKey: Prefs.alertHealthLastAlerted) }
                 self.alertDispatcher.deliver(alert)
             }
         }

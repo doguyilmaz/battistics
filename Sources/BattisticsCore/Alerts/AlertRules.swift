@@ -157,11 +157,14 @@ public enum AlertRules {
     /// mean something; day-over-day comparison made it noise.
     public static let healthDeclineMargin = 3.0
 
-    public static func healthDropAlert(baseline: [Double], current: Double, enabled: Bool) -> BatteryAlert? {
+    /// `lastAlerted` is the health of the previous alert: the baseline median
+    /// lags a real drop by weeks, so the same drop must not alert every day.
+    public static func healthDropAlert(baseline: [Double], current: Double, enabled: Bool,
+                                       lastAlerted: Double? = nil) -> BatteryAlert? {
         guard enabled, let rawBaseline = BatteryHealth.median(baseline) else { return nil }
         let from = BatteryHealth.display(rawBaseline)
         let to = BatteryHealth.display(current)
-        guard to < from - healthDeclineMargin else { return nil }
+        guard to < from - healthDeclineMargin, lastAlerted.map({ to < $0 }) ?? true else { return nil }
         return .healthDropped(from: from, to: to)
     }
 }

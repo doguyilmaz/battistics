@@ -159,6 +159,14 @@ struct AlertRulesTests {
         #expect(AlertRules.healthDropAlert(baseline: observed, current: 85.5, enabled: true) == nil)
     }
 
+    @Test func healthDropAlertsOnceUntilItDropsFurther() {
+        let baseline = [90.0, 90, 90]
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 85, enabled: true, lastAlerted: 85) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 85.4, enabled: true, lastAlerted: 85) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 83, enabled: true, lastAlerted: 85)
+                == .healthDropped(from: 90, to: 83))
+    }
+
     @Test func healthDropFiresOnADeclineBeyondTheSwing() {
         let observed = [89.37, 87.97, 87.11, 86.12]
         let alert = AlertRules.healthDropAlert(baseline: observed, current: 83.5, enabled: true)
