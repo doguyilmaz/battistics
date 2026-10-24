@@ -35,6 +35,7 @@ final class PowerAuthorization {
     // Retain this even after relocking: an uninterruptible security call
     // must not allow another unlock to accumulate another blocked worker.
     @ObservationIgnored private var pendingAuthorization: PowerAuthorizationSession?
+    @ObservationIgnored private var isUnlocking = false
     @ObservationIgnored private var idleTask: Task<Void, Never>?
 
     /// Whether privileged changes are possible at all on this system. False
@@ -44,34 +45,41 @@ final class PowerAuthorization {
 
     // MARK: - Lock state
 
-    func unlock() throws {
-        guard pendingAuthorization == nil else { throw Failure.busy }
+    func unlock() async throws {
+        guard pendingAuthorization == nil, !isUnlocking else { throw Failure.busy }
         guard authorization == nil else {
             startIdleTimer()
             return
         }
         guard isSupported else { throw Failure.unsupported }
+        isUnlocking = true
+        defer { isUnlocking = false }
 
-        var reference: AuthorizationRef?
-        guard AuthorizationCreate(nil, nil, [], &reference) == errAuthorizationSuccess,
-            let reference
-        else { throw Failure.failed(errAuthorizationInternal) }
-
-        // Both the name buffer and the item have to outlive the call, so they
-        // are nested inside closures that keep them alive rather than passed
-        // as `&`-expressions whose lifetime ends at the argument.
-        let status = kAuthorizationRightExecute.withCString { name in
-            var item = AuthorizationItem(name: name, valueLength: 0, value: nil, flags: 0)
-            return withUnsafeMutablePointer(to: &item) { items in
-                var rights = AuthorizationRights(count: 1, items: items)
-                return AuthorizationCopyRights(
-                    reference, &rights, nil,
-                    [.interactionAllowed, .preAuthorize, .extendRights], nil)
+        // The password dialog blocks its thread until answered; keep it off
+        // the main actor so the menu bar and windows stay responsive.
+        let (status, address) = await Task.detached { () -> (OSStatus, UInt) in
+            var reference: AuthorizationRef?
+            guard AuthorizationCreate(nil, nil, [], &reference) == errAuthorizationSuccess,
+                let reference
+            else { return (errAuthorizationInternal, 0) }
+            // Both the name buffer and the item have to outlive the call, so
+            // they are nested inside closures that keep them alive rather than
+            // passed as `&`-expressions whose lifetime ends at the argument.
+            let status = kAuthorizationRightExecute.withCString { name in
+                var item = AuthorizationItem(name: name, valueLength: 0, value: nil, flags: 0)
+                return withUnsafeMutablePointer(to: &item) { items in
+                    var rights = AuthorizationRights(count: 1, items: items)
+                    return AuthorizationCopyRights(
+                        reference, &rights, nil,
+                        [.interactionAllowed, .preAuthorize, .extendRights], nil)
+                }
             }
-        }
+            if status != errAuthorizationSuccess { AuthorizationFree(reference, []) }
+            return (status, UInt(bitPattern: reference))
+        }.value
 
-        guard status == errAuthorizationSuccess else {
-            AuthorizationFree(reference, [])
+        guard status == errAuthorizationSuccess,
+              let reference = AuthorizationRef(bitPattern: address) else {
             throw status == errAuthorizationCanceled ? Failure.cancelled : Failure.failed(status)
         }
         authorization = PowerAuthorizationSession(takingOwnershipOf: reference)

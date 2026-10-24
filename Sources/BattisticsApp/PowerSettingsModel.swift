@@ -77,7 +77,7 @@ final class PowerSettingsModel {
         if !helperHandledIt {
             if !auth.isUnlocked {
                 do {
-                    try auth.unlock()
+                    try await auth.unlock()
                 } catch PowerAuthorization.Failure.cancelled {
                     return .cancelled
                 } catch {
