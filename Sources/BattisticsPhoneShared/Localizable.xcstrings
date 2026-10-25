@@ -1293,23 +1293,6 @@
         }
       }
     },
-    "On battery": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "On battery"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilde"
-          }
-        }
-      }
-    },
     "Online": {
       "extractionState": "manual",
       "localizations": {
@@ -1374,23 +1357,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Açık"
-          }
-        }
-      }
-    },
-    "Plugged in": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plugged in"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prize takılı"
           }
         }
       }
@@ -1667,23 +1633,6 @@
         }
       }
     },
-    "Temp": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temp"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık"
-          }
-        }
-      }
-    },
     "The battery lasts about %@, less than the Keep Awake session.": {
       "extractionState": "manual",
       "localizations": {
@@ -1782,23 +1731,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinizin çevrimiçi kalması için Kişisel Erişim Noktası’nı açın."
-          }
-        }
-      }
-    },
-    "Until stopped": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Until stopped"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durdurulana dek"
           }
         }
       }
@@ -1973,23 +1905,6 @@
         }
       }
     },
-    "%@ · Awake ∞": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ · Awake ∞"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ · Uyanık ∞"
-          }
-        }
-      }
-    },
     "%@ · Lid closed": {
       "extractionState": "manual",
       "localizations": {
@@ -2071,23 +1986,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lldW"
-          }
-        }
-      }
-    },
-    "%lldW adapter": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW adapter"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW adaptör"
           }
         }
       }
@@ -2190,23 +2088,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "1sa Uyanık"
-          }
-        }
-      }
-    },
-    "Awake ∞": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Awake ∞"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık ∞"
           }
         }
       }
@@ -2466,23 +2347,6 @@
         }
       }
     },
-    "Full in %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Full in %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ içinde dolar"
-          }
-        }
-      }
-    },
     "Gauge": {
       "extractionState": "manual",
       "localizations": {
@@ -2585,23 +2449,6 @@
         }
       }
     },
-    "Last 24 hours": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last 24 hours"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son 24 saat"
-          }
-        }
-      }
-    },
     "Let my Mac sleep with ${applicationName}": {
       "extractionState": "manual",
       "localizations": {
@@ -2615,23 +2462,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "${applicationName} ile Mac'imi uyut"
-          }
-        }
-      }
-    },
-    "Lid Open": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lid Open"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapak Açık"
           }
         }
       }
@@ -2666,23 +2496,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Düşük Güç · %@"
-          }
-        }
-      }
-    },
-    "Mac %@ · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac %@ · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac %1$@ · %2$@"
           }
         }
       }
@@ -2972,23 +2785,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pilde"
-          }
-        }
-      }
-    },
-    "On Hotspot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "On Hotspot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hotspot'ta"
           }
         }
       }
@@ -5165,6 +4961,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS 14 veya sonrası."
+          }
+        }
+      }
+    },
+    "%@ %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %lld"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$lld"
+          }
+        }
+      }
+    },
+    "%@ %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %%%2$lld"
+          }
+        }
+      }
+    },
+    "Health %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık %%%lld"
+          }
+        }
+      }
+    },
+    "Lid open": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lid open"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak açık"
           }
         }
       }
