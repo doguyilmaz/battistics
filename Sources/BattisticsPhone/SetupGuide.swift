@@ -6,7 +6,7 @@ struct SetupGuide: View {
     @Environment(MacStore.self) private var store
     @Environment(LocalPhoneMonitor.self) private var phone
 
-    private static let download = URL(string: "https://github.com/doguyilmaz/battistics/releases/latest")!
+    private static let download = URL(string: "https://battistics.apps.doguyilmaz.com/#download")!
 
     var body: some View {
         DashboardPage(refresh: { await store.refreshAll() }) {

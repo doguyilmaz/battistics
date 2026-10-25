@@ -7063,6 +7063,23 @@
         }
       }
     },
+    "Website": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Website"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web Sitesi"
+          }
+        }
+      }
+    },
     "Week": {
       "localizations": {
         "tr": {
