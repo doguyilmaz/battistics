@@ -163,5 +163,6 @@ private struct BatteryHealthSheet: View {
                 cycles = phone.enteredCycles.map(String.init) ?? ""
             }
         }
+        .softScrollEdge()
     }
 }

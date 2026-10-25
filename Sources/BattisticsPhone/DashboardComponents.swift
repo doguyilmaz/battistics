@@ -13,6 +13,16 @@ extension View {
             }
     }
 
+    /// The blurred edge under the navigation bar from iOS 26; iOS 27 draws a hard line by default.
+    @ViewBuilder
+    func softScrollEdge() -> some View {
+        if #available(iOS 26, *) {
+            scrollEdgeEffectStyle(.soft, for: .top)
+        } else {
+            self
+        }
+    }
+
     /// iOS has no public link to Personal Hotspot settings, so this explains the path instead.
     func hotspotHelp(isPresented: Binding<Bool>) -> some View {
         alert("Turn On Personal Hotspot", isPresented: isPresented) {

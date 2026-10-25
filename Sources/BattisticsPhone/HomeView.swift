@@ -53,8 +53,10 @@ struct HomeView: View {
                             ToolbarItem(placement: .confirmationAction) { Button("Done") { showingSetup = false } }
                         }
                 }
+                .softScrollEdge()
             }
         }
+        .softScrollEdge()
         .task(id: scenePhase == .active) {
             guard scenePhase == .active else { return }
             while !Task.isCancelled {

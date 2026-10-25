@@ -62,6 +62,7 @@ struct SettingsView: View {
             }
             .task { await readPermission() }
         }
+        .softScrollEdge()
     }
 
     private func readPermission() async {
