@@ -13,6 +13,7 @@ export default defineConfig({
       head: [
         { tag: "link", attrs: { rel: "apple-touch-icon", href: "/apple-touch-icon.png" } },
         { tag: "link", attrs: { rel: "preload", href: "/fonts/bricolage-latin.woff2", as: "font", type: "font/woff2", crossorigin: "" } },
+        { tag: "script", attrs: { src: "/zoom.js", defer: true } },
       ],
       social: [{ icon: "github", label: "Battistics on GitHub", href: "https://github.com/doguyilmaz/battistics" }],
       editLink: { baseUrl: "https://github.com/doguyilmaz/battistics/edit/main/site/" },

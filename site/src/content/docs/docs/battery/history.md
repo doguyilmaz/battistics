@@ -5,6 +5,8 @@ description: Charts of charge, power, temperature and health, and how the data i
 
 **History** charts charge, power, temperature and health by day, week, month and year, and adds up the time on battery, charging and fully charged.
 
+![History showing a day of charge, with time on battery, charging and fully charged.](../../../../assets/panes/history.png)
+
 ## What is recorded
 
 - A charge sample whenever the level or power source changes, and every ten minutes otherwise.

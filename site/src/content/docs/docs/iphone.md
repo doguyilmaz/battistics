@@ -5,6 +5,8 @@ description: See your Mac's battery and control Keep Awake from your iPhone.
 
 Battistics Remote shows the battery of each Mac on your Apple Account: charge and its last day, time left, power, health and temperature, the connection, the lid and the busiest apps and accessory batteries on request. It starts and stops Keep Awake, including with the lid closed, and changes Low Power Mode.
 
+![The Lock Screen Live Activity for a MacBook Air kept awake with its lid closed.](../../../assets/shots/live-activity.png)
+
 :::note
 Battistics Remote is not on the App Store yet.
 :::

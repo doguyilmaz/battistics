@@ -5,6 +5,8 @@ description: Battery alerts and their defaults.
 
 Turn each one on or off in **Settings › Notifications**.
 
+![Settings › Notifications with each alert and its threshold.](../../../../assets/panes/notifications.png)
+
 | Alert | Default |
 | --- | --- |
 | Low battery | On, at 20% |

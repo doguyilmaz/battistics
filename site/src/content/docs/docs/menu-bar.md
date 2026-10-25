@@ -5,6 +5,8 @@ description: The menu bar icon, the popover and the dashboard window.
 
 ## The icon
 
+![Settings › Menu Bar: the five icon styles, a preview of each state and what the item shows.](../../../assets/panes/appearance.png)
+
 The icon shows the charge at a glance in one of five styles: **Bat**, **Classic**, **Gauge**, **Stats** and **Wings**. Pick one in **Settings › Menu Bar**, where you can also:
 
 - show the percentage next to the icon or inside it,

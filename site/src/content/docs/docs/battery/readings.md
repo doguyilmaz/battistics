@@ -5,6 +5,8 @@ description: What each number in Battistics means and where it comes from.
 
 Battistics reads the battery from macOS when the power state changes, with a slow refresh in between. Nothing is estimated that macOS does not report; a value macOS has not reported shows a dash.
 
+![The Overview window: charge, health and cycles, then capacity, live readings and the adapter.](../../../../assets/panes/overview.png)
+
 | Reading | What it means |
 | --- | --- |
 | Charge | The level macOS shows, in percent. |
