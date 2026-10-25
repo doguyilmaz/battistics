@@ -26,6 +26,19 @@ public struct KeepAwakeSafetyPolicy: Sendable {
 
         public var effectiveStopPercent: Int { min(max(stopPercent, 5), 50) }
 
+        /// For a session nobody may be around to stop, such as an open-ended
+        /// closed-lid session started from a phone: it always ends on low
+        /// battery and under thermal pressure, whatever the user chose.
+        public var unattended: Configuration {
+            var configuration = self
+            if !configuration.stopOnLowBattery {
+                configuration.stopOnLowBattery = true
+                configuration.stopPercent = 10
+            }
+            configuration.stopOnThermalPressure = true
+            return configuration
+        }
+
         /// The stop as one value for a single picker; 0 means off.
         public var batteryStopLevel: Int {
             get { stopOnLowBattery ? effectiveStopPercent : 0 }

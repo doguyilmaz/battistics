@@ -142,4 +142,15 @@ struct KeepAwakeSafetyTests {
             #expect(policy.evaluate(snapshot: battery(8), thermalPressure: false, configuration: enabled) == [.batteryStop(percent: 8)])
         }
     }
+
+    @Test func unattendedSessionsAlwaysStopOnLowBatteryAndHeat() {
+        let off = KeepAwakeSafetyPolicy.Configuration()
+        #expect(KeepAwakeSafetyPolicy.stopReason(snapshot: battery(8), thermalPressure: false, configuration: off) == nil)
+        #expect(KeepAwakeSafetyPolicy.stopReason(snapshot: battery(8), thermalPressure: false, configuration: off.unattended)
+                == .batteryStop(percent: 8))
+        #expect(KeepAwakeSafetyPolicy.stopReason(snapshot: battery(50), thermalPressure: true, configuration: off.unattended)
+                == .thermalStop)
+        let stricter = KeepAwakeSafetyPolicy.Configuration(stopOnLowBattery: true, stopPercent: 30)
+        #expect(stricter.unattended.effectiveStopPercent == 30)
+    }
 }

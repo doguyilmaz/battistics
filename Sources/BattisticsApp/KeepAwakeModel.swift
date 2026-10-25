@@ -81,6 +81,10 @@ final class KeepAwakeModel {
         safety = KeepAwakeSafetyMonitor(notice: notice)
         mode = KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "") ?? .displayOn
         duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
+        safety.isUnattended = { [weak self] in
+            guard let self, let session = self.session else { return false }
+            return self.sessionOrigin == .phone && session.mode == .lidClosed && session.duration == .indefinite
+        }
         safety.onStop = { [weak self] event in
             guard let self else { return }
             let id = self.sessionID ?? UUID().uuidString

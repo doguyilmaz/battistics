@@ -15,6 +15,7 @@ final class KeepAwakeSafetyMonitor {
     private(set) var warningMessage: String?
     private(set) var batteryWarningActive = false
     @ObservationIgnored var onStop: ((KeepAwakeSafetyPolicy.Event) -> Void)?
+    @ObservationIgnored var isUnattended: () -> Bool = { false }
     @ObservationIgnored private var policy = KeepAwakeSafetyPolicy()
     @ObservationIgnored private var active = false
     @ObservationIgnored private var thermalObserver: NSObjectProtocol?
@@ -53,7 +54,7 @@ final class KeepAwakeSafetyMonitor {
         thermalState = ProcessInfo.processInfo.thermalState
         return KeepAwakeSafetyPolicy.stopReason(
             snapshot: BatteryReader.read(), thermalPressure: hasThermalPressure,
-            configuration: configuration)
+            configuration: effectiveConfiguration)
     }
 
     func refresh() {
@@ -66,6 +67,7 @@ final class KeepAwakeSafetyMonitor {
     func update(_ snapshot: BatterySnapshot?) {
         thermalState = ProcessInfo.processInfo.thermalState
         guard active else { return }
+        let configuration = effectiveConfiguration
         let events = policy.evaluate(
             snapshot: snapshot, thermalPressure: hasThermalPressure, configuration: configuration)
         if !configuration.warnOnAdapterDisconnect || snapshot?.externalConnected == true {
@@ -102,6 +104,11 @@ final class KeepAwakeSafetyMonitor {
             dispatcher.deliverNotice(identifier: "battistics.keepAwake.\(category)",
                                      title: String(localized: "Keep Awake needs attention"), body: message)
         }
+    }
+
+    /// What the running session is held to, which may be stricter than the settings.
+    var effectiveConfiguration: KeepAwakeSafetyPolicy.Configuration {
+        isUnattended() ? configuration.unattended : configuration
     }
 
     private var hasThermalPressure: Bool { thermalState == .serious || thermalState == .critical }
