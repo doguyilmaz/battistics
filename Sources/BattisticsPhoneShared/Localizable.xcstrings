@@ -5577,23 +5577,6 @@
         }
       }
     },
-    "iOS": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS"
-          }
-        }
-      }
-    },
     "of %@": {
       "extractionState": "manual",
       "localizations": {

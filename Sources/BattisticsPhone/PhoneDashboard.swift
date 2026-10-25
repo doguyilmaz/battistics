@@ -38,7 +38,6 @@ struct PhoneDashboard: View {
                                                                                  width: .narrow, maximumUnitCount: 2)),
                          symbol: "clock.arrow.circlepath")
             }
-            deviceCard
             if !store.macs.isEmpty { macsCard }
         }
         .sheet(isPresented: $editingHealth) {
@@ -141,54 +140,33 @@ struct PhoneDashboard: View {
                     .labelStyle(TightLabel())
                 }
             }
+            Divider()
+            Button {
+                editingHealth = true
+            } label: {
+                HStack(spacing: 6) {
+                    Label("Battery Health", systemImage: "heart.fill")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    if let health = phone.enteredHealth {
+                        Text(health.percentText)
+                            .foregroundStyle(health < 80 ? Color.orange : .primary)
+                        if let cycles = phone.enteredCycles {
+                            Text("· \(cycles) cycles").foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text("Add from Settings").foregroundStyle(Color.accentColor)
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .font(.subheadline)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
         }
         .card(border: phone.isCharging || phone.lowPowerMode ? tint.opacity(0.35) : nil)
-    }
-
-    /// What iOS shares about the hardware, plus the battery health only Settings shows.
-    private var deviceCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(phone.modelName)
-                .font(.headline)
-            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
-                row(String(localized: "iOS"), UIDevice.current.systemVersion)
-                row(String(localized: "Memory"), "\(phone.memoryGB) GB")
-                row(String(localized: "Processor Cores"), "\(phone.processorCount)")
-                GridRow {
-                    Text("Battery Health").foregroundStyle(.secondary)
-                    Button {
-                        editingHealth = true
-                    } label: {
-                        HStack(spacing: 4) {
-                            if let health = phone.enteredHealth {
-                                Text(health.percentText)
-                                if let cycles = phone.enteredCycles {
-                                    Text("· \(cycles) cycles").foregroundStyle(.secondary)
-                                }
-                            } else {
-                                Text("Add from Settings")
-                            }
-                            Image(systemName: "chevron.right")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.tertiary)
-                        }
-                        .foregroundStyle(phone.enteredHealth.map { $0 < 80 ? Color.orange : .primary } ?? .accentColor)
-                    }
-                    .buttonStyle(.plain)
-                    .gridColumnAlignment(.trailing)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-            }
-            .font(.subheadline)
-        }
-        .card()
-    }
-
-    private func row(_ label: String, _ value: String) -> some View {
-        GridRow {
-            Text(label).foregroundStyle(.secondary)
-            Text(value).monospacedDigit().frame(maxWidth: .infinity, alignment: .trailing)
-        }
     }
 
     private var macsCard: some View {
