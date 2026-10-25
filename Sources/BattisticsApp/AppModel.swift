@@ -32,7 +32,9 @@ final class AppModel {
 
     @ObservationIgnored private let monitor = PowerSourceMonitor()
     @ObservationIgnored private let alertDispatcher = AlertDispatcher.shared
-    @ObservationIgnored private var alertState = AlertState()
+    /// Kept across launches, or a relaunch at 100% would announce the full charge again.
+    @ObservationIgnored private var alertState = UserDefaults.standard.data(forKey: Prefs.alertState)
+        .flatMap { try? JSONDecoder().decode(AlertState.self, from: $0) } ?? AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
     @ObservationIgnored private var lastPowerSampleAt: Date?
     @ObservationIgnored private var visibleSamplingTask: Task<Void, Never>?
@@ -85,7 +87,7 @@ final class AppModel {
             if let launchUnplugDate,
                 self.snapshot?.externalConnected == false,
                 self.lastUnplugDate == launchUnplugDate,
-                let storedUnplug = await self.history.lastUnplugDate(),
+                let storedUnplug = await self.history.lastUnplugDate(currentPercent: self.snapshot?.percent),
                 self.snapshot?.externalConnected == false,
                 self.lastUnplugDate == launchUnplugDate {
                 // Restore the real unplug moment across relaunches, both for
@@ -167,8 +169,13 @@ final class AppModel {
         maybeRecordDailyHealth(current)
         maybeRecordPowerSample(current)
 
+        // A steady state still gets a sample before the history's sleep cap,
+        // or hours at 100% would count as minutes.
+        let heartbeatDue = previous.map {
+            current.timestamp.timeIntervalSince($0.timestamp) >= HistoryMath.maxGapSeconds * 2 / 3
+        } ?? true
         let changed =
-            previous == nil
+            heartbeatDue
             || previous?.percent != current.percent
             || previous?.externalConnected != current.externalConnected
             || previous?.isCharging != current.isCharging
@@ -228,7 +235,8 @@ final class AppModel {
     private func trackUnplug(previous: BatterySnapshot?, current: BatterySnapshot) {
         if current.externalConnected {
             lastUnplugDate = nil
-        } else if previous?.externalConnected != false {
+        } else if previous?.externalConnected != false || current.percent > (previous?.percent ?? 100) + 2 {
+            // A clear rise on battery means it charged while asleep: a new session.
             lastUnplugDate = Date()
         }
     }
@@ -262,8 +270,12 @@ final class AppModel {
     // MARK: - Alerts and health snapshots
 
     private func evaluateAlerts(for snapshot: BatterySnapshot) {
+        let before = alertState
         let alerts = AlertRules.evaluate(
             snapshot: snapshot, config: Prefs.alertConfig(), state: &alertState)
+        if alertState != before {
+            UserDefaults.standard.set(try? JSONEncoder().encode(alertState), forKey: Prefs.alertState)
+        }
         for alert in alerts {
             // The session-specific notice already explains the upcoming stop.
             // Keep evaluating general alert state without sending two banners.

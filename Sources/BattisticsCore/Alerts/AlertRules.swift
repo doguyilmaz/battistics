@@ -52,7 +52,7 @@ public struct AlertConfig: Sendable, Equatable {
 
 /// Mutable evaluation state carried between snapshots so alerts fire once
 /// per crossing instead of repeating on every sample.
-public struct AlertState: Sendable, Equatable {
+public struct AlertState: Sendable, Equatable, Codable {
     public var lowBatteryFired = false
     public var lastDropNotifiedPercent: Int?
     public var chargeLimitFired = false
@@ -62,6 +62,12 @@ public struct AlertState: Sendable, Equatable {
     public var onBatteryDurationFired = false
 
     public init() {}
+
+    /// The unplug session is rebuilt from history at launch; a stored one
+    /// could predate a charge that happened while the app was not running.
+    private enum CodingKeys: String, CodingKey {
+        case lowBatteryFired, lastDropNotifiedPercent, chargeLimitFired, fullChargeFired, highTemperatureFired
+    }
 }
 
 /// Pure alert evaluation: (snapshot, config, state) in, alerts out.

@@ -56,6 +56,17 @@ struct AlertRulesTests {
         #expect(alerts == [.lowBattery(percent: 20)])
     }
 
+    @Test func savedStateKeepsAFullChargeFromAlertingAgainAfterRelaunch() throws {
+        var state = AlertState()
+        let config = AlertConfig()
+        let full = snapshot(percent: 100, external: true, fullyCharged: true)
+        #expect(AlertRules.evaluate(snapshot: full, config: config, state: &state) == [.fullyCharged])
+
+        var restored = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        #expect(AlertRules.evaluate(snapshot: full, config: config, state: &restored).isEmpty)
+        #expect(restored.unpluggedAt == nil)
+    }
+
     @Test func significantDropRemindsEveryStep() {
         var state = AlertState()
         let config = AlertConfig(significantDropStep: 5)

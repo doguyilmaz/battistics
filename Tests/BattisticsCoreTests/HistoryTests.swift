@@ -96,6 +96,16 @@ struct HistoryStoreTests {
         #expect(unplug == base.addingTimeInterval(600))
     }
 
+    @Test func lastUnplugDateIgnoresAChargeNobodyRecorded() async {
+        let store = makeStore()
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        await store.recordChargeSample(ChargeSample(date: base, percent: 100, externalConnected: true, isCharging: false))
+        await store.recordChargeSample(
+            ChargeSample(date: base.addingTimeInterval(600), percent: 40, externalConnected: false, isCharging: false))
+        #expect(await store.lastUnplugDate(currentPercent: 40) == base.addingTimeInterval(600))
+        #expect(await store.lastUnplugDate(currentPercent: 95) == nil)
+    }
+
     @Test func lastUnplugDateNilWhilePlugged() async {
         let store = makeStore()
         let base = Date(timeIntervalSince1970: 1_700_000_000)

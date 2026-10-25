@@ -173,6 +173,7 @@ enum Prefs {
     static let alertDurationEnabled = "alertDurationEnabled"
     static let alertDurationHours = "alertDurationHours"
     static let alertHealthDropEnabled = "alertHealthDropEnabled"
+    static let alertState = "alertState"
 
     /// Installs from before the tour have saved preferences; only a first
     /// launch should open it unasked. Sparkle's own keys do not count.

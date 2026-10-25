@@ -233,17 +233,22 @@ public actor HistoryStore {
     }
 
     /// The moment the machine last switched from AC to battery, if it is
-    /// currently on battery according to the recorded samples.
-    public func lastUnplugDate() -> Date? {
+    /// currently on battery according to the recorded samples. A charge
+    /// above the last recorded one means it was charged while nothing was
+    /// recording, so that unplug no longer applies.
+    public func lastUnplugDate(currentPercent: Int? = nil) -> Date? {
         guard ensureOpen() else { return nil }
         var lastPluggedTs: Int64?
         var latestTs: Int64?
         var latestExternal = true
-        query("SELECT ts, external FROM charge_samples ORDER BY ts DESC LIMIT 1") { statement in
+        var latestPercent = 0
+        query("SELECT ts, external, percent FROM charge_samples ORDER BY ts DESC LIMIT 1") { statement in
             latestTs = sqlite3_column_int64(statement, 0)
             latestExternal = sqlite3_column_int64(statement, 1) != 0
+            latestPercent = Int(sqlite3_column_int64(statement, 2))
         }
         guard latestTs != nil, !latestExternal else { return nil }
+        if let currentPercent, currentPercent > latestPercent { return nil }
         query("SELECT MAX(ts) FROM charge_samples WHERE external = 1") { statement in
             if sqlite3_column_type(statement, 0) != SQLITE_NULL {
                 lastPluggedTs = sqlite3_column_int64(statement, 0)
