@@ -46,13 +46,19 @@ struct MacExtrasCard: View {
                 }
                 if !extras.apps.isEmpty {
                     Divider()
-                    Text("Using the most energy")
-                        .font(.subheadline.weight(.semibold))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Using the most energy")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Share of the energy used over 3 seconds")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     ForEach(Array(extras.apps.enumerated()), id: \.offset) { _, app in
                         HStack {
                             Text(app.name).lineLimit(1)
                             Spacer()
-                            Text(app.cpuPercent.formatted(.number.precision(.fractionLength(0))) + "% CPU")
+                            Text(app.energyShare.map { Int(($0 * 100).rounded()).percentText }
+                                 ?? app.cpuPercent.formatted(.number.precision(.fractionLength(0))) + "% CPU")
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)
                         }

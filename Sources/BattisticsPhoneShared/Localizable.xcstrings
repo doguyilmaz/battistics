@@ -5134,6 +5134,23 @@
           }
         }
       }
+    },
+    "Share of the energy used over 3 seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share of the energy used over 3 seconds"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 saniyede kullanılan enerjideki pay"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
