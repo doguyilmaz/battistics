@@ -80,7 +80,7 @@ final class AutomationModel {
                             if self.lease?.owner == id { self.stopOwnedSession() }
                         },
                         handler: { [weak self] id, request in
-                            guard let self else { return .init(code: "unavailable", message: "Battistics has closed.") }
+                            guard let self else { return .init(code: .unavailable, message: "Battistics has closed.") }
                             return await self.handle(request, from: id)
                         })
                     do {
@@ -106,24 +106,24 @@ final class AutomationModel {
     }
 
     private func handle(_ request: AutomationRequest, from owner: UUID) async -> AutomationReply {
-        guard enabled else { return .init(code: "disabled", message: "Enable Local automation in Battistics > Power.") }
-        guard connections.contains(owner) else { return .init(code: "unavailable", message: "The client disconnected.") }
-        guard request.version == 1 else { return .init(code: "invalid_request", message: "Unsupported IPC version.") }
+        guard enabled else { return .init(code: .disabled, message: "Enable Local automation in Battistics > Power.") }
+        guard connections.contains(owner) else { return .init(code: .unavailable, message: "The client disconnected.") }
+        guard request.version == 1 else { return .init(code: .invalidRequest, message: "Unsupported IPC version.") }
         if lease?.isExpired(at: Date()) == true { stopOwnedSession() }
         switch request.operation {
         case .status:
             return .init(status: status(for: owner))
         case .start:
             guard let arguments = request.validatedStart() else {
-                return .init(code: "invalid_request", message: "Provide a name of 1–80 visible characters, a supported mode, and a finite duration.")
+                return .init(code: .invalidRequest, message: "Provide a name of 1–80 visible characters, a supported mode, and a finite duration.")
             }
             guard lease == nil, awake.sessionIdentifier == nil, !awake.isChanging, !awake.isAwaitingHelperApproval else {
-                return .init(code: "busy", message: "A Keep Awake session or helper setup is already in progress. It was left unchanged.")
+                return .init(code: .busy, message: "A Keep Awake session or helper setup is already in progress. It was left unchanged.")
             }
             if arguments.mode == .lidClosed {
-                guard closedLidAllowed else { return .init(code: "closed_lid_not_allowed", message: "Enable closed-lid automation in Battistics > Power first.") }
+                guard closedLidAllowed else { return .init(code: .closedLidNotAllowed, message: "Enable closed-lid automation in Battistics > Power first.") }
                 helper.refreshStatusIfChanged()
-                guard helper.isInstalled else { return .init(code: "helper_unavailable", message: "Set up the power helper in Battistics before using closed-lid automation.") }
+                guard helper.isInstalled else { return .init(code: .helperUnavailable, message: "Set up the power helper in Battistics before using closed-lid automation.") }
             }
             let now = Date()
             let id = UUID()
@@ -140,17 +140,17 @@ final class AutomationModel {
             guard enabled, connections.contains(owner), lease?.id == id,
                   awake.sessionIdentifier == id.uuidString, awake.isActive else {
                 if lease?.id == id { stopOwnedSession() }
-                return .init(code: "start_failed", message: awake.errorMessage ?? "The session was stopped or could not start. Check Battistics before retrying.")
+                return .init(code: .startFailed, message: awake.errorMessage ?? "The session was stopped or could not start. Check Battistics before retrying.")
             }
             return .init(status: status(for: owner))
         case .stop, .heartbeat:
-            guard let id = request.sessionID else { return .init(code: "invalid_request", message: "A session_id is required.") }
-            guard let current = lease else { return .init(code: "inactive", message: "The automation session has ended. It will not be restarted.") }
-            guard current.id == id, current.owner == owner else { return .init(code: "not_owner", message: "This connection does not own that session.") }
+            guard let id = request.sessionID else { return .init(code: .invalidRequest, message: "A session_id is required.") }
+            guard let current = lease else { return .init(code: .inactive, message: "The automation session has ended. It will not be restarted.") }
+            guard current.id == id, current.owner == owner else { return .init(code: .notOwner, message: "This connection does not own that session.") }
             if request.operation == .stop { stopOwnedSession() }
             else if lease?.renew(id: id, owner: owner, now: Date()) != true {
                 stopOwnedSession()
-                return .init(code: "inactive", message: "The automation session expired.")
+                return .init(code: .inactive, message: "The automation session expired.")
             }
             return .init(status: status(for: owner))
         }

@@ -28,9 +28,9 @@ struct AutomationHarness {
         let first = LocalAutomationClient(endpoint: endpoint), other = LocalAutomationClient(endpoint: endpoint)
 
         let invalid = try await first.request(.init(.start, name: "Unbounded", durationMinutes: 0))
-        precondition(invalid.error?.code == "invalid_request" && !awake.isActive)
+        precondition(invalid.error?.code == .invalidRequest && !awake.isActive)
         let closedLid = try await first.request(.init(.start, name: "Closed lid", mode: "lidClosed", durationMinutes: 15))
-        precondition(closedLid.error?.code == "closed_lid_not_allowed" && !awake.isActive)
+        precondition(closedLid.error?.code == .closedLidNotAllowed && !awake.isActive)
 
         let start = try await first.request(.init(.start, name: "Build the project", durationMinutes: 15))
         let id = try require(start.status?.sessionID)
@@ -44,13 +44,13 @@ struct AutomationHarness {
         let foreignStatus = try await other.request(.init(.status))
         precondition(foreignStatus.status?.owner == .anotherClient && foreignStatus.status?.sessionID == nil)
         let foreignStop = try await other.request(.init(.stop, sessionID: id))
-        precondition(foreignStop.error?.code == "not_owner" && awake.isActive)
+        precondition(foreignStop.error?.code == .notOwner && awake.isActive)
         let conflict = try await other.request(.init(.start, name: "Another build", durationMinutes: 15))
-        precondition(conflict.error?.code == "busy" && awake.session?.deadline == deadline)
+        precondition(conflict.error?.code == .busy && awake.session?.deadline == deadline)
         awake.stop()
         precondition(automation.activeTaskName == nil && automation.activeSource == nil)
         let lateHeartbeat = try await first.request(.init(.heartbeat, sessionID: id))
-        precondition(lateHeartbeat.error?.code == "inactive" && !awake.isActive)
+        precondition(lateHeartbeat.error?.code == .inactive && !awake.isActive)
 
         let savedMode = awake.mode, savedDuration = awake.duration
         let protection = awake.safety.configuration
@@ -78,7 +78,7 @@ struct AutomationHarness {
         let manualID = awake.sessionIdentifier
         let manualConflict = try await first.request(.init(.start, name: "Replace manual", durationMinutes: 15))
         let manualStop = try await first.request(.init(.stop, sessionID: id))
-        precondition(manualConflict.error?.code == "busy" && manualStop.error?.code == "inactive")
+        precondition(manualConflict.error?.code == .busy && manualStop.error?.code == .inactive)
         automation.enabled = false
         try await eventually { !automation.isListening }
         precondition(awake.isActive && awake.sessionIdentifier == manualID)
@@ -102,7 +102,7 @@ struct AutomationHarness {
         try await eventually { !awake.isChanging }
         precondition(awake.session?.mode == .displayOn && automation.activeTaskName == nil)
         let staleStop = try await newClient.request(.init(.stop, sessionID: takeoverID))
-        precondition(staleStop.error?.code == "inactive" && awake.isActive)
+        precondition(staleStop.error?.code == .inactive && awake.isActive)
         awake.stop()
 
         let retimeTakeover = try await newClient.request(.init(.start, name: "User duration takeover", durationMinutes: 15))
@@ -110,7 +110,7 @@ struct AutomationHarness {
         awake.displayedDuration = .oneHour
         precondition(awake.session?.duration == .oneHour && automation.activeTaskName == nil)
         let retimedStop = try await newClient.request(.init(.stop, sessionID: retimeTakeoverID))
-        precondition(retimedStop.error?.code == "inactive" && awake.isActive)
+        precondition(retimedStop.error?.code == .inactive && awake.isActive)
         awake.stop()
         awake.duration = savedDuration
 

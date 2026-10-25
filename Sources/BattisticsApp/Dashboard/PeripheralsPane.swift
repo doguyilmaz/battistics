@@ -14,7 +14,7 @@ struct PeripheralsPane: View {
         for battery in peripherals + bluetooth.batteries {
             merged[battery.id] = battery
         }
-        return merged.values.sorted { ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id) }
+        return merged.values.sorted(by: PeripheralBattery.displayOrder)
     }
 
     var body: some View {
@@ -86,9 +86,7 @@ struct PeripheralsPane: View {
                     // Same device and cell from both readers is one row.
                     merged[battery.id] = battery
                 }
-                let refreshed = merged.values.sorted {
-                    ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id)
-                }
+                let refreshed = merged.values.sorted(by: PeripheralBattery.displayOrder)
                 if peripherals != refreshed { peripherals = refreshed }
                 hasLoaded = true
                 bluetooth.refresh()

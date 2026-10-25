@@ -170,7 +170,7 @@ final class LidSleepController: @unchecked Sendable {
 
     private static func pmset(_ arguments: [String]) throws -> String {
         let data = try BoundedCommand.runSynchronously(
-            executable: "/usr/bin/pmset", arguments: arguments,
+            executable: PowerSettingsWriter.executable, arguments: arguments,
             timeout: 5, maximumOutputBytes: 16_384)
         return String(decoding: data, as: UTF8.self)
     }

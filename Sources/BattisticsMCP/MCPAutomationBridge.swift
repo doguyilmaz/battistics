@@ -32,8 +32,8 @@ actor MCPAutomationBridge {
     }
 
     func call(_ parameters: CallTool.Parameters) async -> CallTool.Result {
-        guard !closed else { return result(.init(code: "unavailable", message: "The MCP connection has closed.")) }
-        guard !calling else { return result(.init(code: "busy", message: "Wait for the previous tool call to finish.")) }
+        guard !closed else { return result(.init(code: .unavailable, message: "The MCP connection has closed.")) }
+        guard !calling else { return result(.init(code: .busy, message: "Wait for the previous tool call to finish.")) }
         let args = parameters.arguments ?? [:]
         let request: AutomationRequest
         switch parameters.name {
@@ -52,17 +52,17 @@ actor MCPAutomationBridge {
                   let id = UUID(uuidString: raw) else { return invalidArguments() }
             request = .init(.stop, sessionID: id)
         default:
-            return result(.init(code: "invalid_request", message: "Unknown tool. Use tools/list to discover supported tools."))
+            return result(.init(code: .invalidRequest, message: "Unknown tool. Use tools/list to discover supported tools."))
         }
         calling = true
         defer { calling = false }
         do {
             let reply = try await client.request(request)
-            guard !closed else { return result(.init(code: "unavailable", message: "The MCP connection has closed.")) }
+            guard !closed else { return result(.init(code: .unavailable, message: "The MCP connection has closed.")) }
             if request.operation == .start, let id = reply.status?.sessionID {
                 ownedID = id
                 startHeartbeat(id)
-            } else if reply.status?.active == false || reply.error?.code == "inactive" {
+            } else if reply.status?.active == false || reply.error?.code == .inactive {
                 ownedID = nil
                 heartbeat?.cancel()
                 heartbeat = nil
@@ -75,7 +75,7 @@ actor MCPAutomationBridge {
             ownedID = nil
             heartbeat?.cancel()
             heartbeat = nil
-            return result(.init(code: "unavailable", message: "Could not reach Battistics. Open the app and enable Local automation in Power. The connection was closed; inspect status before retrying a start."))
+            return result(.init(code: .unavailable, message: "Could not reach Battistics. Open the app and enable Local automation in Power. The connection was closed; inspect status before retrying a start."))
         }
     }
 
@@ -110,7 +110,7 @@ actor MCPAutomationBridge {
     }
 
     private func invalidArguments() -> CallTool.Result {
-        result(.init(code: "invalid_request", message: "Arguments do not match the tool schema. Use a finite supported duration and a name of 1–80 visible characters; unknown fields are rejected."))
+        result(.init(code: .invalidRequest, message: "Arguments do not match the tool schema. Use a finite supported duration and a name of 1–80 visible characters; unknown fields are rejected."))
     }
 
     private func result(_ reply: AutomationReply) -> CallTool.Result {

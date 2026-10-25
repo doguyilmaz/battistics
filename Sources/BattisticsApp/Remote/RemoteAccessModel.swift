@@ -298,7 +298,7 @@ final class RemoteAccessModel {
         return .init(
             sampledAt: .now,
             accessories: accessories.values
-                .sorted { ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "") }
+                .sorted(by: PeripheralBattery.displayOrder)
                 .map { .init(name: $0.name == PeripheralBattery.unknownName ? String(localized: "Accessory") : $0.name,
                              percent: $0.percent, detail: $0.detail) },
             apps: await samples.map { .init(name: $0.name, cpuPercent: ($0.cpuPercent * 10).rounded() / 10,
@@ -309,12 +309,7 @@ final class RemoteAccessModel {
         guard let policy = request.lowPowerPolicy else {
             return .init(.invalidRequest, String(localized: "Choose a supported Low Power Mode setting."))
         }
-        let setting: LowPowerModeSetting = switch policy {
-        case .never: .never
-        case .onlyOnBattery: .onlyOnBattery
-        case .onlyOnAdapter: .onlyOnPowerAdapter
-        case .always: .always
-        }
+        let setting = policy.setting
         do {
             try await helper.requireCurrent()
             try await helper.apply(.lowPowerMode(setting))
@@ -393,13 +388,7 @@ final class RemoteAccessModel {
         let history = await historyTask
         status.chargeHistory = history.isEmpty ? nil : history
         if let power, var battery = status.battery {
-            battery.lowPowerPolicy = switch power.lowPowerMode {
-            case .never: .never
-            case .onlyOnBattery: .onlyOnBattery
-            case .onlyOnPowerAdapter: .onlyOnAdapter
-            case .always: .always
-            case nil: nil
-            }
+            battery.lowPowerPolicy = power.lowPowerMode.map(RemoteStatus.LowPowerPolicy.init)
             if let sourceActive = battery.onAdapter ? power.ac?.lowPowerMode : power.battery?.lowPowerMode {
                 battery.lowPowerMode = sourceActive
             }
@@ -511,4 +500,24 @@ final class RemoteAccessModel {
 extension Notification.Name {
     /// Posted by the app delegate when iCloud reports a change.
     static let battisticsRemotePush = Notification.Name("battisticsRemotePush")
+}
+
+private extension RemoteStatus.LowPowerPolicy {
+    init(_ setting: LowPowerModeSetting) {
+        self = switch setting {
+        case .never: .never
+        case .onlyOnBattery: .onlyOnBattery
+        case .onlyOnPowerAdapter: .onlyOnAdapter
+        case .always: .always
+        }
+    }
+
+    var setting: LowPowerModeSetting {
+        switch self {
+        case .never: .never
+        case .onlyOnBattery: .onlyOnBattery
+        case .onlyOnAdapter: .onlyOnPowerAdapter
+        case .always: .always
+        }
+    }
 }

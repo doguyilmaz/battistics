@@ -48,10 +48,7 @@ public enum BluetoothBatteryReader {
             for wrapper in connected {
                 for (name, value) in wrapper {
                     guard let device = value as? [String: Any] else { continue }
-                    let address = (device["device_address"] as? String)?
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
-                        .replacingOccurrences(of: "-", with: ":")
-                        .lowercased()
+                    let address = PeripheralBattery.normalizedAddress(device["device_address"] as? String)
                     let identity = address.flatMap { $0.isEmpty ? nil : $0 } ?? "name:\(name)"
                     for slot in slots {
                         guard let percent = percentage(device[slot.key]) else { continue }
@@ -62,9 +59,7 @@ public enum BluetoothBatteryReader {
                 }
             }
         }
-        return found.values.sorted {
-            ($0.name, $0.detail ?? "", $0.id) < ($1.name, $1.detail ?? "", $1.id)
-        }
+        return found.values.sorted(by: PeripheralBattery.displayOrder)
     }
 
     /// Values arrive as strings with the percent sign attached, and its side

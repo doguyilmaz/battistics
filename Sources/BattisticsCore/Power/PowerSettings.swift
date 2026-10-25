@@ -101,7 +101,7 @@ public struct PowerSettings: Sendable, Equatable {
 public enum PowerSettingsReader {
     public static func fetch() async -> PowerSettings? {
         guard let data = try? await BoundedCommand.run(
-            executable: "/usr/bin/pmset", arguments: ["-g", "custom"],
+            executable: PowerSettingsWriter.executable, arguments: ["-g", "custom"],
             timeout: 5, maximumOutputBytes: 65_536
         ), !Task.isCancelled else { return nil }
         return parse(String(decoding: data, as: UTF8.self))
