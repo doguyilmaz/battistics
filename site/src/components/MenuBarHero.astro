@@ -14,15 +14,7 @@ import Contours from "./Contours.astro";
 
   <div class="hero">
     <div class="pitch">
-      <div class="title">
-        <h1 id="hero-title">Your Mac’s battery, read properly.</h1>
-        <p class="sticker">
-          <span>No trial.</span>
-          <span>No subscription.</span>
-          <span>No Pro version.</span>
-          <strong>Just free.</strong>
-        </p>
-      </div>
+      <h1 id="hero-title">Your Mac’s battery, read properly.</h1>
       <p class="lede">
         Battistics lives in the menu bar and shows what macOS knows about the battery: charge, health, cycles,
         temperature and every watt going in or out. When the Mac has to stay up, it keeps it awake, even with the lid
@@ -31,6 +23,12 @@ import Contours from "./Contours.astro";
       <div class="actions">
         <DownloadButton />
         <BrewCommand />
+        <p class="sticker">
+          <span>No trial.</span>
+          <span>No subscription.</span>
+          <span>No Pro version.</span>
+          <strong>Just free.</strong>
+        </p>
       </div>
       <p class="fineprint">macOS 14 or later, Apple Silicon. Try the menu bar above: it works.</p>
     </div>
@@ -65,11 +63,11 @@ import Contours from "./Contours.astro";
     padding: clamp(56px, 9vw, 120px) var(--gutter) 0;
   }
   .pitch { min-width: 0; }
-  .title { position: relative; }
   .sticker {
     position: absolute;
-    top: -18px;
-    left: min(30rem, 64%);
+    top: -30px;
+    left: calc(100% + 22px);
+    width: max-content;
     display: grid;
     margin: 0;
     padding: 18px 20px 14px;
@@ -113,11 +111,11 @@ import Contours from "./Contours.astro";
     text-wrap: balance;
   }
   .lede { max-width: 50ch; margin: 28px 0 0; font-size: 1.16rem; line-height: 1.56; color: var(--ink-2); }
-  .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin-top: 36px; }
+  .actions { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin-top: 36px; }
   .fineprint { margin: 16px 0 0; font-size: 0.92rem; color: var(--ink-3); }
 
   @media (max-width: 1100px) {
-    .sticker { position: relative; top: auto; left: auto; display: inline-grid; margin: 26px 0 0 6px; rotate: -3deg; }
+    .sticker { position: relative; top: auto; left: auto; justify-self: start; display: inline-grid; margin: 18px 0 0 6px; rotate: -3deg; }
     @keyframes stamp {
       from { opacity: 0; scale: 1.3; rotate: 6deg; }
       to { opacity: 1; scale: 1; rotate: -3deg; }
