@@ -184,7 +184,7 @@ final class MacStore {
         case .invalidRequest: String(localized: "Update Battistics on the Mac or this app.")
         case .busy: String(localized: "Keep Awake is already running or changing on the Mac.")
         case .closedLidNotAllowed: String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac.")
-        case .helperUnavailable: String(localized: "Start closed-lid Keep Awake on the Mac once to set up its helper.")
+        case .helperUnavailable: String(localized: "Set up or repair the power helper in Battistics › Power on the Mac.")
         case .protection, .startFailed: failure.message
         case .unavailable: String(localized: "iPhone access is off on the Mac.")
         }

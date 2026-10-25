@@ -1378,23 +1378,6 @@
         }
       }
     },
-    "Start closed-lid Keep Awake on the Mac once to set up its helper.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start closed-lid Keep Awake on the Mac once to set up its helper."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yardımcıyı kurmak için Mac’te kapak kapalı Uyanık Tut’u bir kez başlatın."
-          }
-        }
-      }
-    },
     "Started from iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -5216,6 +5199,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac Düşük Güç Modunu ${setting} yap"
+          }
+        }
+      }
+    },
+    "Mac Low Power": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Low Power"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Düşük Güç"
+          }
+        }
+      }
+    },
+    "Set my Mac’s Low Power Mode with ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set my Mac’s Low Power Mode with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imin Düşük Güç Modunu ayarla"
+          }
+        }
+      }
+    },
+    "Set up or repair the power helper in Battistics › Power on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up or repair the power helper in Battistics › Power on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te Battistics › Güç bölümünden güç yardımcısını kur ya da onar."
           }
         }
       }

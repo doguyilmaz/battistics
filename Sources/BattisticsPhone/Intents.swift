@@ -115,6 +115,8 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Let Sleep", systemImageName: "moon.zzz")
         AppShortcut(intent: MacStatusIntent(), phrases: ["Check my Mac with \(.applicationName)"],
                     shortTitle: "Check Mac", systemImageName: "laptopcomputer")
+        AppShortcut(intent: SetMacLowPowerIntent(), phrases: ["Set my Mac’s Low Power Mode with \(.applicationName)"],
+                    shortTitle: "Mac Low Power", systemImageName: "leaf")
         AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my Mac’s display with \(.applicationName)"],
                     shortTitle: "Display Off", systemImageName: "display")
     }

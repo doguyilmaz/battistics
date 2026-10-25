@@ -49,6 +49,22 @@
         }
       }
     },
+    "Set my Mac’s Low Power Mode with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set my Mac’s Low Power Mode with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imin Düşük Güç Modunu ayarla"
+          }
+        }
+      }
+    },
     "Turn off my Mac’s display with ${applicationName}": {
       "localizations": {
         "en": {
