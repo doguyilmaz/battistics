@@ -81,7 +81,10 @@ struct PhoneDashboard: View {
 
     private var lastFullText: String {
         if phone.percent == 100 { return String(localized: "Now") }
-        guard let full = phone.chargeHistory.last(where: { $0.percent >= 99 }) else { return String(localized: "Over a day ago") }
+        guard let full = phone.chargeHistory.last(where: { $0.percent >= 99 }) else {
+            let covered = phone.chargeHistory.first.map { -$0.at.timeIntervalSinceNow > 23 * 3600 } ?? false
+            return covered ? String(localized: "Over a day ago") : String(localized: "Not seen yet")
+        }
         return full.at.formatted(.relative(presentation: .named))
     }
 

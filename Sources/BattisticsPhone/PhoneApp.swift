@@ -20,7 +20,10 @@ struct PhoneApp: App {
                 .onChange(of: theme) { theme.apply() }
         }
         .onChange(of: scenePhase) {
-            if scenePhase == .background { Notifications.schedule() }
+            if scenePhase == .background {
+                Notifications.schedule()
+                QuickActions.update(store.selected.flatMap { store.reading(for: $0) })
+            }
         }
     }
 }
@@ -45,7 +48,6 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
                      options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        if let shortcut = options.shortcutItem { Task { @MainActor in QuickActions.perform(shortcut) } }
         let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         configuration.delegateClass = QuickActionSceneDelegate.self
         return configuration

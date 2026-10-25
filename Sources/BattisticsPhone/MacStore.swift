@@ -33,6 +33,7 @@ final class MacStore {
         didSet {
             UserDefaults.standard.set(selectedID, forKey: "selectedMac")
             WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+            QuickActions.update(selected.flatMap { readings[$0.id] })
         }
     }
 

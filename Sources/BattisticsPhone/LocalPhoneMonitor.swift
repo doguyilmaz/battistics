@@ -56,10 +56,14 @@ final class LocalPhoneMonitor {
         enteredCycles = defaults.object(forKey: Self.cyclesKey) as? Int
         customName = defaults.string(forKey: Self.nameKey) ?? ""
         hotspotName = defaults.string(forKey: Self.hotspotKey)
-        // An unplug from before the last restart may have been followed by a charge this app never saw.
-        let booted = Date.now.addingTimeInterval(-ProcessInfo.processInfo.systemUptime)
-        unpluggedAt = (defaults.object(forKey: Self.unpluggedKey) as? Date).flatMap { $0 > booted ? $0 : nil }
         chargeHistory = Self.loadHistory()
+        // A restart or a charge after the saved unplug, seen while this app was not running, makes it stale.
+        let history = chargeHistory
+        unpluggedAt = (defaults.object(forKey: Self.unpluggedKey) as? Date).flatMap { unplugged in
+            guard unplugged > Self.bootTime else { return nil }
+            let after = history.filter { $0.at > unplugged }
+            return zip(after, after.dropFirst()).contains { $1.percent > $0.percent } ? nil : unplugged
+        }
 
         UIDevice.current.isBatteryMonitoringEnabled = true
         for name in [UIDevice.batteryLevelDidChangeNotification, UIDevice.batteryStateDidChangeNotification,
@@ -100,7 +104,17 @@ final class LocalPhoneMonitor {
         return custom.isEmpty ? hotspotName ?? modelName : custom
     }
 
-    var uptime: TimeInterval { ProcessInfo.processInfo.systemUptime }
+    /// Wall-clock time since restart; `systemUptime` leaves out the hours the iPhone slept.
+    var uptime: TimeInterval { Date.now.timeIntervalSince(Self.bootTime) }
+
+    private static let bootTime: Date = {
+        var time = timeval()
+        var size = MemoryLayout<timeval>.size
+        guard sysctlbyname("kern.boottime", &time, &size, nil, 0) == 0 else {
+            return Date.now.addingTimeInterval(-ProcessInfo.processInfo.systemUptime)
+        }
+        return Date(timeIntervalSince1970: TimeInterval(time.tv_sec) + TimeInterval(time.tv_usec) / 1_000_000)
+    }()
 
     var batteryStatus: RemoteStatus.Battery? {
         percent.map { .init(percent: $0, isCharging: isCharging, onAdapter: onAdapter, lowPowerMode: lowPowerMode) }

@@ -5661,6 +5661,23 @@
           }
         }
       }
+    },
+    "Not seen yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not seen yet"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz görülmedi"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

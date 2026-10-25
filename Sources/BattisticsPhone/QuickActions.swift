@@ -13,7 +13,7 @@ enum QuickActions {
             UIApplication.shared.shortcutItems = []
             return
         }
-        guard let session = status.session else {
+        guard let session = status.session, session.isActive(at: .now) else {
             UIApplication.shared.shortcutItems = [
                 item(.start, String(localized: "Keep Awake for 1 Hour"), "cup.and.saucer.fill"),
             ]
@@ -44,8 +44,12 @@ enum QuickActions {
     }
 }
 
-/// Receives a quick action chosen while the app is already running.
+/// Receives a quick action that launches the app or is chosen while it runs.
 final class QuickActionSceneDelegate: NSObject, UIWindowSceneDelegate {
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
+        if let shortcut = options.shortcutItem { Task { @MainActor in QuickActions.perform(shortcut) } }
+    }
+
     func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem) async -> Bool {
         await QuickActions.perform(shortcutItem)
         return true
