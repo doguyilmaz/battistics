@@ -19,10 +19,12 @@ struct MacDetailsView: View {
                         LabeledContent("Manufactured", value: date.formatted(.dateTime.month(.wide).year()))
                     }
                 }
-                Section("Capacity") {
-                    if let value = battery.currentCapacityMah { LabeledContent("Current Charge", value: "\(value.formatted()) mAh") }
-                    if let value = battery.maxCapacityMah { LabeledContent("Full Charge", value: "\(value.formatted()) mAh") }
-                    if let value = battery.designCapacityMah { LabeledContent("Design Capacity", value: "\(value.formatted()) mAh") }
+                if battery.currentCapacityMah != nil || battery.maxCapacityMah != nil || battery.designCapacityMah != nil {
+                    Section("Capacity") {
+                        if let value = battery.currentCapacityMah { LabeledContent("Current Charge", value: "\(value.formatted()) mAh") }
+                        if let value = battery.maxCapacityMah { LabeledContent("Full Charge", value: "\(value.formatted()) mAh") }
+                        if let value = battery.designCapacityMah { LabeledContent("Design Capacity", value: "\(value.formatted()) mAh") }
+                    }
                 }
                 Section("Electrical") {
                     if let power = battery.powerText { LabeledContent("Power", value: power) }

@@ -69,16 +69,22 @@ struct BatteryCard: View {
     private func powerMenu(_ battery: RemoteStatus.Battery) -> some View {
         let lowPower = battery.lowPowerMode == true
         return Menu {
-            Section("Low Power Mode on the Mac") {
-                Picker("Low Power Mode", selection: Binding(
-                    get: { battery.lowPowerPolicy },
-                    set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
-                )) {
-                    ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
-                        Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
-                    }
+            Picker(selection: Binding(
+                get: { battery.lowPowerPolicy },
+                set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
+            )) {
+                ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
+                    Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
+                }
+            } label: {
+                Label {
+                    Text("Low Power Mode on the Mac")
+                    if let policy = battery.lowPowerPolicy { Text(policy.label) }
+                } icon: {
+                    Image(systemName: "leaf")
                 }
             }
+            .pickerStyle(.menu)
             Button {
                 run { await store.sleepDisplay(mac) }
             } label: {
@@ -92,13 +98,13 @@ struct BatteryCard: View {
                 Image(systemName: lowPower ? "leaf.fill" : (battery.lowPowerPolicy?.symbol ?? "bolt.circle"))
                     .contentTransition(.symbolEffect(.replace))
             }
-                .font(.caption.weight(.semibold))
-                .lineLimit(1)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(lowPower ? PowerPalette.lowPower.opacity(0.18) : Color(.tertiarySystemFill), in: .capsule)
-                .foregroundStyle(lowPower ? PowerPalette.lowPower : .primary)
-                .fixedSize()
+            .font(.caption.weight(.semibold))
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(lowPower ? PowerPalette.lowPower.opacity(0.18) : Color(.tertiarySystemFill), in: .capsule)
+            .foregroundStyle(lowPower ? PowerPalette.lowPower : .primary)
+            .fixedSize()
         }
         .disabled(!reachable || store.pending[mac.id] != nil)
         .accessibilityLabel(Text("Mac power settings"))
