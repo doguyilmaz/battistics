@@ -60,13 +60,12 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Verified on a device
 
-- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later.
+- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later; the Display Off shortcut from the Shortcuts app; switching the app icon to Gauge and back.
 
 ## Verified only in Simulator or tests
 
 - The adaptive watchdog with steady background pushes (only the throttled case ran on a device).
 - Live Activity stale and offline lines (rendered in Simulator) and Home Screen widget buttons.
-- Alternate app icons on the Home Screen.
 
 ## Considered and not built
 
