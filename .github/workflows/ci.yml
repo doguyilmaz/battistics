@@ -28,6 +28,8 @@ jobs:
         run: python3 scripts/test-cli.py
       - name: App automation integration
         run: python3 scripts/test-automation.py
+      - name: Onboarding tour integration
+        run: python3 scripts/test-automation.py --tour
       - name: iPhone remote integration
         run: python3 scripts/test-automation.py --remote
       - name: Build iPhone app

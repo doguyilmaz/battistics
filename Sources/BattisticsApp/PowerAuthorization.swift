@@ -6,12 +6,11 @@ import Security
 /// Holds one admin authorization so the padlock means something: unlock once,
 /// then change settings freely until it relocks.
 ///
-/// Setting power preferences needs root — `IOPMSetPMPreferences` is private
-/// *and* privileged, and `pmset` refuses without it. The alternative is an
-/// `SMAppService` daemon, which buys the same convenience with a permanently
-/// running root process and an XPC surface to keep airtight forever. This
-/// keeps the capability in memory instead: nothing is installed, and it dies
-/// with the process.
+/// Setting power preferences needs root: `IOPMSetPMPreferences` is private
+/// *and* privileged, and `pmset` refuses without it. The power helper handles
+/// changes when it is installed; this is the fallback for Macs without it,
+/// holding the capability in memory so nothing is installed and it dies with
+/// the process.
 @MainActor
 @Observable
 final class PowerAuthorization {

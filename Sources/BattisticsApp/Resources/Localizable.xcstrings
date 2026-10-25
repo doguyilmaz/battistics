@@ -632,16 +632,6 @@
         }
       }
     },
-    "Age": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yaş"
-          }
-        }
-      }
-    },
     "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.": {
       "extractionState": "manual",
       "localizations": {
@@ -2014,23 +2004,6 @@
         }
       }
     },
-    "Copy Link": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy Link"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bağlantıyı Kopyala"
-          }
-        }
-      }
-    },
     "Copy MCP configuration": {
       "extractionState": "manual",
       "localizations": {
@@ -2830,23 +2803,6 @@
         }
       }
     },
-    "Expires %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expires %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ içinde sona erer"
-          }
-        }
-      }
-    },
     "Export CSV…": {
       "localizations": {
         "tr": {
@@ -3623,23 +3579,6 @@
         }
       }
     },
-    "Last seen %@ ago": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last seen %@ ago"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ önce görüldü"
-          }
-        }
-      }
-    },
     "Learn the controls in a short guided tour, or find an answer below.": {
       "extractionState": "manual",
       "localizations": {
@@ -4230,23 +4169,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bağlı değil"
-          }
-        }
-      }
-    },
-    "Not connected yet": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not connected yet"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Henüz bağlanmadı"
           }
         }
       }
@@ -5061,23 +4983,6 @@
         }
       }
     },
-    "Reachable at %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reachable at %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ adresinden erişilebilir"
-          }
-        }
-      }
-    },
     "Reading levels over Bluetooth.": {
       "extractionState": "manual",
       "localizations": {
@@ -5223,23 +5128,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Her %%%lld düşüşte yeniden hatırlat"
-          }
-        }
-      }
-    },
-    "Remote access is off on this Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remote access is off on this Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu Mac’te uzaktan erişim kapalı."
           }
         }
       }
@@ -5419,23 +5307,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Örnekleme aralığı"
-          }
-        }
-      }
-    },
-    "Scan with your iPhone": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scan with your iPhone"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone’unuzla tarayın"
           }
         }
       }
@@ -5663,23 +5534,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç Akışını göster"
-          }
-        }
-      }
-    },
-    "Show Wi‑Fi Network Name": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Wi‑Fi Network Name"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wi‑Fi Ağ Adını Göster"
           }
         }
       }
@@ -7097,23 +6951,6 @@
         }
       }
     },
-    "Update Battistics on this Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Update Battistics on this Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu Mac’teki Battistics’i güncelleyin."
-          }
-        }
-      }
-    },
     "Update time unavailable": {
       "extractionState": "manual",
       "localizations": {
@@ -7829,23 +7666,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS yüksek ısıl baskı bildiriyor. Kapağı açın, havalandırma deliklerini açık tutun ve ağır işleri azaltın. Battistics fan hızlarını değiştirmez."
-          }
-        }
-      }
-    },
-    "macOS requires Location permission to read the connected Wi‑Fi or Personal Hotspot name.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS requires Location permission to read the connected Wi‑Fi or Personal Hotspot name."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS, bağlı Wi‑Fi veya Kişisel Erişim Noktası adını okumak için Konum izni gerektirir."
           }
         }
       }

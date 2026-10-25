@@ -267,6 +267,22 @@ final class PowerHelperClient {
         try await repair()
     }
 
+    /// For requests from another device: uses a helper that is installed and
+    /// current, and never installs or re-registers one. Only someone at the
+    /// Mac may do that.
+    func requireCurrent() async throws {
+        status = service.status
+        if status == .requiresApproval { throw Failure.needsApproval }
+        guard status == .enabled else { throw Failure.unreachable }
+        let build = await askBuild(timeout: Self.replyTimeout)
+        record(build)
+        switch build {
+        case .current: return
+        case .outdated: throw Failure.outdated
+        case .silent: throw Failure.unreachable
+        }
+    }
+
     /// Re-registers the helper and waits for launchd to bring up the new
     /// process, so success means the current build is answering rather than
     /// that a registration call returned.

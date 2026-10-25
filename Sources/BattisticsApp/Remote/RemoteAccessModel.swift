@@ -4,6 +4,7 @@ import BattisticsRemote
 import CloudKit
 import Foundation
 import Observation
+import SystemConfiguration
 
 /// Shares this Mac with the user's iPhones through their private iCloud
 /// database: a status record out, Start and Stop commands in. Off by default.
@@ -38,6 +39,8 @@ final class RemoteAccessModel {
     @ObservationIgnored private let automation: AutomationModel
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored let network: NetworkMonitor
+    /// Updated after a phone changes a setting, so the Mac's own panes show it too.
+    @ObservationIgnored private let powerSettings: PowerSettingsModel?
     @ObservationIgnored private let cloud: RemoteCloud?
     @ObservationIgnored private let chargeHistory: @Sendable () async -> [RemoteStatus.ChargePoint]
     @ObservationIgnored private var lastSent: RemoteStatus?
@@ -56,12 +59,14 @@ final class RemoteAccessModel {
     @ObservationIgnored let macID: String
 
     init(awake: KeepAwakeModel, automation: AutomationModel, helper: PowerHelperClient,
-         network: NetworkMonitor, cloud: RemoteCloud? = RemoteCloud.isEntitled ? RemoteCloud() : nil,
+         network: NetworkMonitor, powerSettings: PowerSettingsModel? = nil,
+         cloud: RemoteCloud? = RemoteCloud.isEntitled ? RemoteCloud() : nil,
          chargeHistory: @escaping @Sendable () async -> [RemoteStatus.ChargePoint] = { [] }) {
         self.awake = awake
         self.automation = automation
         self.helper = helper
         self.network = network
+        self.powerSettings = powerSettings
         self.cloud = cloud
         self.chargeHistory = chargeHistory
         if let saved = UserDefaults.standard.string(forKey: Prefs.remoteMacID) {
@@ -90,9 +95,6 @@ final class RemoteAccessModel {
         startTicker()
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
-            if closedLidAllowed {
-                Task { try? await helper.prepareForLidSleep() }
-            }
             Task { await sync() }
         }
     }
@@ -140,14 +142,18 @@ final class RemoteAccessModel {
         problem = failure.map(Self.describe)
     }
 
+    /// Compares the cheap part of the status first, so a poll that changes
+    /// nothing costs no history query and no `pmset` spawn.
     private func publish(force: Bool) async throws {
         guard enabled, let cloud else { return }
-        var status = await fullStatus()
+        var status = status()
         status.lastCommand = lastCommand
         if !force, let lastSent, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
             var compared = status
             compared.readAt = lastSent.readAt
             compared.chargeHistory = lastSent.chargeHistory
+            compared.battery?.lowPowerPolicy = lastSent.battery?.lowPowerPolicy
+            compared.battery?.lowPowerMode = lastSent.battery?.lowPowerMode
             compared.battery?.watts = lastSent.battery?.watts
             compared.battery?.temperatureC = lastSent.battery?.temperatureC
             compared.battery?.voltageMV = lastSent.battery?.voltageMV
@@ -155,9 +161,14 @@ final class RemoteAccessModel {
             compared.battery?.currentCapacityMah = lastSent.battery?.currentCapacityMah
             if compared == lastSent { return }
         }
-        // Sharing may have been turned off while the status was being read.
+        status = await enriched(status)
         guard enabled else { return }
         try await cloud.publish(status, macID: macID)
+        // Sharing was turned off while the save was in flight: take the record back down.
+        guard enabled else {
+            try? await cloud.delete([macID])
+            return
+        }
         lastSent = status
         lastPublished = Date()
     }
@@ -259,18 +270,14 @@ final class RemoteAccessModel {
         case .onlyOnAdapter: .onlyOnPowerAdapter
         case .always: .always
         }
-        // A phone may change a setting through an installed helper, never install or repair one.
-        helper.refreshStatus()
-        guard helper.canApply, !helper.isOutdated else {
-            return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
-        }
         do {
+            try await helper.requireCurrent()
             try await helper.apply(.lowPowerMode(setting))
-            cachedPower = nil
         } catch {
             return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
         }
-        let verified = await PowerSettingsReader.fetch()
+        let verified = if let powerSettings { await powerSettings.refresh() } else { await PowerSettingsReader.fetch() }
+        cachedPower = (verified, .now)
         guard PowerChange.lowPowerMode(setting).isReflected(in: verified) else {
             return .init(.startFailed, String(localized: "macOS did not apply the Low Power Mode change."))
         }
@@ -306,7 +313,7 @@ final class RemoteAccessModel {
                 return .init(.closedLidNotAllowed, String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac."))
             }
             do {
-                try await helper.prepareForLidSleep()
+                try await helper.requireCurrent()
             } catch {
                 return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
             }
@@ -335,7 +342,11 @@ final class RemoteAccessModel {
     }
 
     func fullStatus() async -> RemoteStatus {
-        var status = status()
+        await enriched(status())
+    }
+
+    private func enriched(_ cheap: RemoteStatus) async -> RemoteStatus {
+        var status = cheap
         async let historyTask = chargeHistory()
         let power = await powerSettings()
         let history = await historyTask
@@ -394,11 +405,9 @@ final class RemoteAccessModel {
                 origin: awake.sessionOrigin, name: automation.activeTaskName ?? awake.sessionName,
                 startedAt: session.startedAt, deadline: session.deadline)
         }
-        let protection = awake.safety.configuration
-        let osVer = ProcessInfo.processInfo.operatingSystemVersion
-        let osString = "macOS \(osVer.majorVersion).\(osVer.minorVersion)\(osVer.patchVersion > 0 ? ".\(osVer.patchVersion)" : "")"
+        let protection = awake.safety.effectiveConfiguration
         return RemoteStatus(
-            machineName: Host.current().localizedName ?? "Mac",
+            machineName: SCDynamicStoreCopyComputerName(nil, nil) as String? ?? "Mac",
             readAt: now,
             battery: battery,
             session: session,
@@ -413,12 +422,19 @@ final class RemoteAccessModel {
                 stopOnThermal: protection.stopOnThermalPressure,
                 closedLidAllowed: closedLidAllowed
             ),
-            macModel: Self.macHardwareModel(),
-            osVersion: osString,
+            macModel: Self.hardwareModel,
+            osVersion: Self.osVersion,
             pairedPhoneName: network.preferredHotspotPhoneName,
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
     }
+
+    private static let osVersion: String = {
+        let version = ProcessInfo.processInfo.operatingSystemVersion
+        return "macOS \(version.majorVersion).\(version.minorVersion)\(version.patchVersion > 0 ? ".\(version.patchVersion)" : "")"
+    }()
+
+    private static let hardwareModel = macHardwareModel()
 
     private static func macHardwareModel() -> String? {
         var size: Int = 0

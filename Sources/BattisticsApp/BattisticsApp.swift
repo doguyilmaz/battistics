@@ -69,7 +69,7 @@ struct BattisticsApp: App {
     @State private var network: NetworkMonitor
     @State private var remote: RemoteAccessModel
     @State private var powerAuth = PowerAuthorization()
-    @State private var powerSettings = PowerSettingsModel()
+    @State private var powerSettings: PowerSettingsModel
     @State private var powerHelper: PowerHelperClient
     @State private var bluetooth = BluetoothGATTReader()
 
@@ -92,8 +92,10 @@ struct BattisticsApp: App {
             suppressLowBatteryNotification: { [weak awake] in awake?.safety.batteryWarningActive == true })
         _model = State(initialValue: model)
         let history = model.history
+        let powerSettings = PowerSettingsModel()
+        _powerSettings = State(initialValue: powerSettings)
         _remote = State(initialValue: RemoteAccessModel(
-            awake: awake, automation: automation, helper: helper, network: network,
+            awake: awake, automation: automation, helper: helper, network: network, powerSettings: powerSettings,
             chargeHistory: {
                 let now = Date()
                 return await history.chargeSeries(from: now.addingTimeInterval(-86_400), to: now, bucketSeconds: 1800)

@@ -44,10 +44,6 @@ public actor RemoteCloud {
         #endif
     }
 
-    public func accountAvailable() async -> Bool {
-        (try? await CKContainer(identifier: Self.containerID).accountStatus()) == .available
-    }
-
     /// Creates the zone and a silent push subscription for changes in it.
     /// Subscriptions belong to the account, not the device, so every device
     /// saves the same one.
