@@ -62,9 +62,6 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 - iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later; the Display Off and Mac Low Power shortcuts from the Shortcuts app; switching the app icon to Gauge and back; the Live Activity's offline state after a fetch found the Mac silent, with the quiet note removed by that fetch; with steady pushes, the alert about 9 minutes after the last reading and no quiet note before it.
 
-## Verified only in Simulator or tests
-
-
 ## Considered and not built
 
 - Visible alerts sent by the Mac through a CloudKit query subscription would arrive without the silent-push throttling. Subscriptions belong to the account, so the Mac app would receive and display the same alerts. Revisit with a record field the subscription can filter on once it can be indexed in CloudKit Console.
