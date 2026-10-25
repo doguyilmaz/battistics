@@ -9,6 +9,7 @@ import DevelopersSection from "../components/DevelopersSection.astro";
 import PrivacySection from "../components/PrivacySection.astro";
 import GetSection from "../components/GetSection.astro";
 import Contours from "../components/Contours.astro";
+import Scribble from "../components/Scribble.astro";
 ---
 
 <Page
@@ -26,7 +27,17 @@ import Contours from "../components/Contours.astro";
           changes and lays it out in plain words. Click through the window; any pane opens larger.
         </p>
       </div>
-      <DashboardWindow />
+      <div class="window-wrap">
+        <Scribble
+          class="hint-window"
+          text="click around, it's the real app"
+          width={150}
+          height={96}
+          path="M22 4 C 8 46, 62 88, 140 84"
+          head="M127 74 L141 84 L126 93"
+        />
+        <DashboardWindow />
+      </div>
     </section>
 
     <section class="band" id="menubar" aria-labelledby="menubar-title">
@@ -37,7 +48,17 @@ import Contours from "../components/Contours.astro";
           colours for low, critical, full and charging. These are the app's own settings.
         </p>
       </div>
-      <MenuBarLab />
+      <div class="lab-wrap">
+        <MenuBarLab />
+        <Scribble
+          class="hint-lab"
+          text="flip, drag, pick: the icon up top follows"
+          width={110}
+          height={70}
+          path="M96 66 C 84 30, 52 10, 16 8"
+          head="M28 0 L15 8 L27 17"
+        />
+      </div>
     </section>
   </main>
 
@@ -71,6 +92,18 @@ import Contours from "../components/Contours.astro";
   }
   main { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
   .band { padding-top: clamp(72px, 10vw, 128px); }
+  .window-wrap, .lab-wrap { position: relative; }
+  .window-wrap { max-width: 870px; margin: 0 auto; }
+  .window-wrap :global(.hint-window) { right: calc(100% + 6px); top: -6px; width: 170px; }
+  .window-wrap :global(.hint-window p) { margin-left: 4px; }
+  .lab-wrap :global(.hint-lab) { right: 3%; bottom: -112px; display: flex; flex-direction: column-reverse; align-items: flex-end; }
+  .lab-wrap :global(.hint-lab svg) { margin-right: 120px; }
+  @media (max-width: 1239px) {
+    .window-wrap :global(.hint-window) { display: none; }
+  }
+  @media (max-width: 920px) {
+    .lab-wrap :global(.hint-lab) { display: none; }
+  }
   .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 56px; align-items: end; margin-bottom: 40px; }
   h2 {
     margin: 0;

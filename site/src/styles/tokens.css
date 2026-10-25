@@ -19,6 +19,14 @@
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+@font-face {
+  font-family: "Gochi Hand";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/gochi-hand-latin.woff2) format("woff2");
+}
+
 @property --accent-a { syntax: "<color>"; inherits: true; initial-value: #a9cf2e; }
 @property --accent-b { syntax: "<color>"; inherits: true; initial-value: #1f9e8e; }
 
@@ -35,6 +43,8 @@
   --accent-a: var(--lime);
   --accent-b: var(--teal);
   --charge: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  /* Controls and highlights under white text, readable in teal and in yellow. */
+  --accent-strong: color-mix(in oklab, var(--accent-b) 82%, #000);
   --sys-green: #34c759;
   --sys-orange: #ff9500;
   --sys-red: #ff3b30;

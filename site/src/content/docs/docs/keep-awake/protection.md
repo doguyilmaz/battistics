@@ -3,7 +3,7 @@ title: Session protection
 description: Stops and warnings for battery level, heat and unplugging.
 ---
 
-Set these in **Power › Session Protection**, or **Stop on Low Battery** in the popover's Keep Awake menu.
+Set these in **Keep Awake › Session Protection**, or **Stop on Low Battery** in the popover's Keep Awake menu.
 
 - **Battery stop.** Ends the session at 5–50% on battery, 10% when first turned on. Off by default.
 - **Low-battery warning.** From 20% by default (10–80%), always at least five points above the stop.

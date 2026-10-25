@@ -123,7 +123,7 @@ const menus = [
   .title.bold { font-weight: 700; }
   .title[aria-expanded="true"],
   .title:hover { background: color-mix(in oklab, var(--ink) 11%, transparent); }
-  .title:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: -2px; }
+  .title:focus-visible { outline: 2px solid var(--accent-b); outline-offset: -2px; }
   .dropdown {
     position: absolute;
     top: calc(100% + 4px);
@@ -150,7 +150,7 @@ const menus = [
   }
   .dropdown small { color: var(--ink-3); font-size: 12px; }
   .dropdown a:hover,
-  .dropdown a:focus-visible { background: var(--sys-blue); color: #fff; outline: none; }
+  .dropdown a:focus-visible { background: var(--accent-strong); color: #fff; outline: none; }
   .dropdown a:hover small,
   .dropdown a:focus-visible small { color: rgb(255 255 255 / 0.75); }
   .dropdown hr { margin: 4px 8px; border: 0; border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent); }
@@ -171,7 +171,7 @@ const menus = [
     cursor: default;
   }
   .status-item[aria-expanded="true"] { background: color-mix(in oklab, var(--ink) 13%, transparent); }
-  .status-item:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 1px; }
+  .status-item:focus-visible { outline: 2px solid var(--accent-b); outline-offset: 1px; }
   .si { display: inline-flex; align-items: center; gap: 4px; font: 500 12.5px/1 var(--text); font-variant-numeric: tabular-nums; }
   .si.tint-orange { color: var(--sys-orange); }
   .si.tint-red { color: var(--sys-red); }

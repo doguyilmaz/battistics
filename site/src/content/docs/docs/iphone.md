@@ -3,7 +3,7 @@ title: Battistics Remote for iPhone
 description: See your Mac's battery and control Keep Awake from your iPhone.
 ---
 
-Battistics Remote shows the battery of each Mac on your Apple Account: charge and its last day, time left, power, health and temperature, the connection, the lid and the busiest apps and accessory batteries on request. It starts and stops Keep Awake, including with the lid closed, and changes Low Power Mode.
+Battistics Remote shows the battery of each Mac on your Apple Account: charge and its last day, time left, power, health and temperature, the connection, the lid and the busiest apps and accessory batteries on request. It starts, extends and stops Keep Awake, including with the lid closed, and changes Low Power Mode.
 
 ![The Lock Screen Live Activity for a MacBook Air kept awake with its lid closed.](../../../assets/shots/live-activity.png)
 
@@ -22,10 +22,10 @@ There is nothing to pair. The Mac and the iPhone talk through your private iClou
 ## On the iPhone
 
 - Home Screen and Lock Screen widgets
-- A Lock Screen and Dynamic Island countdown with a Stop button
+- A Lock Screen and Dynamic Island countdown with buttons to add 30 minutes or stop
 - A Control Center and Action Button control
 - Siri and Shortcuts: Keep Awake, Let Sleep, Check Mac, Mac Low Power and Display Off
-- Alerts when a session ends, the battery runs low, the Mac stops answering or reaches a charge level you pick
+- Alerts when a session ends, the battery runs low, the Mac stops answering or reaches a charge level you pick. The Mac sends the first ones itself through your iCloud, so they arrive at once, even while the app is closed.
 
 ## Without Wi‑Fi
 

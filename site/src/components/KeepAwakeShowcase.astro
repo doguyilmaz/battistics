@@ -1,5 +1,6 @@
 ---
 import { symbolHTML } from "../lib/symbols";
+import Scribble from "./Scribble.astro";
 
 const durations = [
   [15, "15m"], [30, "30m"], [60, "1h"], [120, "2h"], [240, "4h"], [720, "12h"], [0, "∞"],
@@ -27,7 +28,6 @@ const guards = [
           Three modes, 15 minutes to 12 hours or until you stop it, from the menu bar, a profile, the terminal, an AI
           client or your iPhone. Start one here and watch the menu bar above.
         </p>
-        <p class="free-line">No trial, no subscription, no Pro version. It is free, like the rest of Battistics.</p>
       </div>
     </div>
 
@@ -39,6 +39,14 @@ const guards = [
     </div>
 
     <div class="modes">
+      <Scribble
+        class="hint-start"
+        text="pick a time, then hit Start"
+        width={44}
+        height={160}
+        path="M26 4 C 40 56, 8 104, 16 152"
+        head="M7 141 L16 153 L25 142"
+      />
       {modes.map((mode) => (
         <article class="mode" data-ka-mode={mode.id}>
           <div class="art" aria-hidden="true">
@@ -177,7 +185,6 @@ const guards = [
     text-wrap: balance;
   }
   .head p { margin: 0; max-width: 54ch; font-size: 1.06rem; line-height: 1.55; color: var(--n-ink-2); }
-  .head .free-line { margin-top: 12px; color: var(--n-ink); font-weight: 600; }
 
   .durations { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 40px; }
   .durations span { margin-right: 6px; color: var(--n-ink-2); }
@@ -196,7 +203,9 @@ const guards = [
   .durations button[aria-checked="true"] { background: var(--n-ink); color: #0d1311; border-color: transparent; }
   .durations button:focus-visible, .start:focus-visible { outline: 2px solid var(--accent-a); outline-offset: 2px; }
 
-  .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+  .modes { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+  .modes :global(.hint-start) { --hand: var(--accent-a); left: 62%; top: -52px; display: flex; align-items: flex-start; gap: 2px; }
+  .modes :global(.hint-start p) { order: 2; margin-top: -4px; white-space: nowrap; }
   .mode {
     display: grid;
     grid-template-columns: 132px minmax(0, 1fr);
@@ -290,6 +299,7 @@ const guards = [
 
   @media (max-width: 980px) {
     .head, .modes, .guards { grid-template-columns: minmax(0, 1fr); }
+    .modes :global(.hint-start) { display: none; }
   }
 </style>
 

@@ -41,7 +41,8 @@ h1#_top { font-weight: 720; }
 .site-title img { border-radius: 8px; }
 .sl-markdown-content table { font-size: 0.94em; }
 
-.sl-markdown-content img { border-radius: 12px; cursor: zoom-in; box-shadow: 0 18px 40px -20px rgb(0 0 0 / 0.5); }
+.sl-markdown-content img { display: block; width: auto; max-width: min(100%, 540px); height: auto; border-radius: 12px; cursor: zoom-in; box-shadow: 0 18px 40px -20px rgb(0 0 0 / 0.5); }
+.sl-markdown-content img[src*="live-activity"] { max-width: min(100%, 380px); border-radius: 18px; }
 dialog.zoom {
   position: fixed;
   inset: 0;

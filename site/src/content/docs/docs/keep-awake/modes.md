@@ -3,9 +3,9 @@ title: Keep Awake modes
 description: The three ways Battistics keeps your Mac awake, and how long.
 ---
 
-Start Keep Awake from the popover, **Power**, a profile, the terminal, an AI client or your iPhone. Pick a duration from 15 minutes to 12 hours, or until you turn it off. Changing the duration during a session applies it from that moment.
+Start Keep Awake from the popover, the **Keep Awake** pane, a profile, the terminal, an AI client or your iPhone. Pick a duration from 15 minutes to 12 hours, or until you turn it off. Changing the duration during a session applies it from that moment; **Add Time** on the running session adds 15 minutes to 2 hours to what is left.
 
-![Power: Keep Awake with its mode and duration, and the ready-made profiles.](../../../../assets/panes/system.png)
+![Keep Awake with its mode and duration, the ready-made profiles and session protection.](../../../../assets/panes/keep-awake.png)
 
 | | Display on | Display may sleep | Lid closed |
 | --- | --- | --- | --- |

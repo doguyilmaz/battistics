@@ -3,7 +3,7 @@ title: MCP for AI clients
 description: Let an AI client keep the Mac awake from the start to the end of a task.
 ---
 
-Battistics bundles a local MCP server. Turn on **Power › Local automation** and copy the client configuration from that section, or add it yourself:
+Battistics bundles a local MCP server. Turn on **Automation › Local automation** and copy the client configuration from that section, or add it yourself:
 
 ```json
 {"mcpServers": {"battistics": {"command": "/Applications/Battistics.app/Contents/MacOS/battistics-mcp", "args": []}}}

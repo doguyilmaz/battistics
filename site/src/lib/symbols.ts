@@ -2,6 +2,7 @@
 // (public/symbols), used as masks so they take the text colour.
 
 const SIZES: Record<string, [number, number]> = {
+  "bolt.batteryblock": [90, 62], terminal: [90, 66],
   "cup.and.saucer": [98, 69], "cup.and.saucer.fill": [98, 69], leaf: [79, 67], "leaf.fill": [80, 66],
   gearshape: [79, 75], pin: [73, 81], "bolt.fill": [63, 81], wifi: [85, 60], "switch.2": [76, 68],
   "chevron.down": [71, 39], "stop.fill": [67, 59], cellularbars: [96, 63], "battery.100percent": [109, 51],
