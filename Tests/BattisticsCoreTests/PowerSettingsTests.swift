@@ -38,6 +38,14 @@ struct PowerSettingsTests {
          disksleep            10
         """
 
+    @Test func allowSleepClearsTheOverrideAndOnlyAReadOffConfirmsIt() {
+        #expect(PowerChange.allowSleep.arguments == ["-a", "disablesleep", "0"])
+        #expect(PowerChange.allowSleep.isReflected(in: PowerSettings(sleepDisabled: false)))
+        #expect(!PowerChange.allowSleep.isReflected(in: PowerSettings(sleepDisabled: true)))
+        #expect(!PowerChange.allowSleep.isReflected(in: PowerSettings()))
+        #expect(!PowerChange.allowSleep.isReflected(in: nil))
+    }
+
     @Test func bothPowerSourcesAreParsed() {
         let settings = PowerSettingsReader.parse(laptop)
         let battery = try! #require(settings.battery)
