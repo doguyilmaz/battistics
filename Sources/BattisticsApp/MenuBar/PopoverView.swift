@@ -58,11 +58,7 @@ struct PopoverView: View {
                     PowerFlowSummary()
                 }
             } else {
-                ContentUnavailableView(
-                    "No battery found",
-                    systemImage: "minus.plus.batteryblock.exclamationmark",
-                    description: Text("Battistics needs a Mac with a built-in battery.")
-                )
+                NoBatteryView()
                 .frame(height: 200)
             }
             if let warning = keepAwake.safety.warningMessage {

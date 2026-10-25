@@ -669,23 +669,6 @@
         }
       }
     },
-    "Allow closed-lid sessions from iPhone in Battistics on the Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow closed-lid sessions from iPhone in Battistics on the Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin verin."
-          }
-        }
-      }
-    },
     "Allow closed-lid tasks": {
       "extractionState": "manual",
       "localizations": {
@@ -1755,23 +1738,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Her 24 saatte bir otomatik denetlenir"
-          }
-        }
-      }
-    },
-    "Choose a supported mode and duration.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a supported mode and duration."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desteklenen bir mod ve süre seçin."
           }
         }
       }
@@ -3355,23 +3321,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geliştirme görevleri boyunca uyanık tutun"
-          }
-        }
-      }
-    },
-    "Keep Awake is already running or changing. Stop it first.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep Awake is already running or changing. Stop it first."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut zaten çalışıyor veya değişiyor. Önce durdurun."
           }
         }
       }
@@ -5377,23 +5326,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı otomasyonu kullanmadan önce Battistics’te güç yardımcısını kurun."
-          }
-        }
-      }
-    },
-    "Set up the power helper on the Mac first: start closed-lid Keep Awake there once.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Önce Mac’te güç yardımcısını kurun: orada kapak kapalı Uyanık Tut’u bir kez başlatın."
           }
         }
       }
@@ -7437,23 +7369,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone"
-          }
-        }
-      }
-    },
-    "iPhone access is off on this Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone access is off on this Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu Mac’te iPhone erişimi kapalı."
           }
         }
       }

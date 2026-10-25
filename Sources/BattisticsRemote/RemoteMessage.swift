@@ -50,8 +50,10 @@ public struct RemoteFailure: Codable, Sendable, Equatable {
     }
 
     public var code: Code
+    /// The Mac's own words, shown only for `protection` and `startFailed`; the
+    /// phone words every other code itself, in its own language.
     public var message: String
-    public init(_ code: Code, _ message: String) { self.code = code; self.message = message }
+    public init(_ code: Code, _ message: String = "") { self.code = code; self.message = message }
 }
 
 public enum RemoteWire {

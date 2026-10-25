@@ -273,7 +273,7 @@ final class RemoteAccessModel {
 
     /// nil when the command was carried out.
     func handle(_ request: RemoteRequest) async -> RemoteFailure? {
-        guard enabled else { return .init(.unavailable, String(localized: "iPhone access is off on this Mac.")) }
+        guard enabled else { return .init(.unavailable) }
         switch request.operation {
         case .stop:
             if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
@@ -309,14 +309,14 @@ final class RemoteAccessModel {
 
     private func setLowPower(_ request: RemoteRequest) async -> RemoteFailure? {
         guard let policy = request.lowPowerPolicy else {
-            return .init(.invalidRequest, String(localized: "Choose a supported Low Power Mode setting."))
+            return .init(.invalidRequest)
         }
         let setting = policy.setting
         do {
             try await helper.requireCurrent()
             try await helper.apply(.lowPowerMode(setting))
         } catch {
-            return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
+            return .init(.helperUnavailable)
         }
         let verified = if let powerSettings { await powerSettings.refresh() } else { await PowerSettingsReader.fetch() }
         cachedPower = (verified, .now)
@@ -340,19 +340,19 @@ final class RemoteAccessModel {
         guard RemoteRequest.allowedDurations.contains(minutes),
               let duration = KeepAwakeDuration(rawValue: minutes),
               let mode = request.mode.flatMap({ KeepAwakeMode(rawValue: $0.rawValue) }) else {
-            return .init(.invalidRequest, String(localized: "Choose a supported mode and duration."))
+            return .init(.invalidRequest)
         }
         guard !awake.isActive, !awake.isChanging, !awake.isAwaitingHelperApproval else {
-            return .init(.busy, String(localized: "Keep Awake is already running or changing. Stop it first."))
+            return .init(.busy)
         }
         if mode == .lidClosed {
             guard closedLidAllowed else {
-                return .init(.closedLidNotAllowed, String(localized: "Allow closed-lid sessions from iPhone in Battistics on the Mac."))
+                return .init(.closedLidNotAllowed)
             }
             do {
                 try await helper.requireCurrent()
             } catch {
-                return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
+                return .init(.helperUnavailable)
             }
         }
         let id = UUID().uuidString

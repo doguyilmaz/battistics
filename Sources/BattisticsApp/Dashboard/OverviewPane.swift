@@ -31,11 +31,7 @@ struct OverviewPane: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .navigationTitle("Overview")
         } else {
-            ContentUnavailableView(
-                "No battery found",
-                systemImage: "minus.plus.batteryblock.exclamationmark",
-                description: Text("Battistics needs a Mac with a built-in battery.")
-            )
+            NoBatteryView()
             .tourTarget(.overview)
         }
     }

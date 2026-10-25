@@ -278,3 +278,14 @@ extension Color {
         }
     }
 }
+
+/// Shown in place of battery readings on a Mac without a battery.
+struct NoBatteryView: View {
+    var body: some View {
+        ContentUnavailableView(
+            "No battery found",
+            systemImage: "minus.plus.batteryblock.exclamationmark",
+            description: Text("Battistics needs a Mac with a built-in battery.")
+        )
+    }
+}

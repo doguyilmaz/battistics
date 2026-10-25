@@ -118,11 +118,7 @@ struct DetailsPane: View {
                 model.loadAppleHealthIfNeeded()
             }
         } else {
-            ContentUnavailableView(
-                "No battery found",
-                systemImage: "minus.plus.batteryblock.exclamationmark",
-                description: Text("Battistics needs a Mac with a built-in battery.")
-            )
+            NoBatteryView()
         }
     }
 
