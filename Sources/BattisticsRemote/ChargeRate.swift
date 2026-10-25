@@ -20,4 +20,15 @@ public enum ChargeRate {
         guard remaining > 0 else { return nil }
         return Int((remaining / abs(rate) * 60).rounded())
     }
+
+    /// Percentage points gained and spent across the readings, so a day with
+    /// two charges counts both.
+    public static func totals(_ points: [RemoteStatus.ChargePoint]) -> (gained: Int, used: Int) {
+        var gained = 0.0, used = 0.0
+        for (before, after) in zip(points, points.dropFirst()) {
+            let change = after.percent - before.percent
+            if change > 0 { gained += change } else { used -= change }
+        }
+        return (Int(gained.rounded()), Int(used.rounded()))
+    }
 }

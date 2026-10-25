@@ -1,5 +1,6 @@
 import BattisticsRemote
 import Foundation
+import Network
 import Observation
 import UIKit
 
@@ -23,6 +24,10 @@ final class LocalPhoneMonitor {
     private(set) var unpluggedAt: Date?
     /// This iPhone's name as its Personal Hotspot broadcasts it, seen by a Mac on that hotspot.
     private(set) var hotspotName: String?
+    enum Connection { case wifi, cellular, wired, offline }
+    private(set) var connection: Connection = .offline
+    private(set) var lowDataMode = false
+    @ObservationIgnored private let path = NWPathMonitor()
 
     var enteredHealth: Int? { didSet { Self.store(enteredHealth, Self.healthKey) } }
     var enteredCycles: Int? { didSet { Self.store(enteredCycles, Self.cyclesKey) } }
@@ -63,6 +68,17 @@ final class LocalPhoneMonitor {
                 MainActor.assumeIsolated { self?.refresh() }
             }
         }
+        path.pathUpdateHandler = { [weak self] update in
+            let connection: Connection = update.status != .satisfied ? .offline
+                : update.usesInterfaceType(.wifi) ? .wifi
+                : update.usesInterfaceType(.wiredEthernet) ? .wired : .cellular
+            let constrained = update.isConstrained
+            Task { @MainActor in
+                self?.connection = connection
+                self?.lowDataMode = constrained
+            }
+        }
+        path.start(queue: .main)
         refresh()
     }
 

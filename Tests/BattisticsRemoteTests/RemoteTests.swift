@@ -42,6 +42,9 @@ struct RemoteTests {
         #expect(ChargeRate.perHour([point(60, 50), point(0, 50.5)], now: now) == nil)
         #expect(ChargeRate.minutesLeft(percent: 50, rate: -10) == 300)
         #expect(ChargeRate.minutesLeft(percent: 76, rate: 24) == 60)
+        let day = [point(600, 80), point(400, 40), point(300, 90), point(0, 70)]
+        #expect(ChargeRate.totals(day) == (gained: 50, used: 60))
+        #expect(ChargeRate.totals([point(0, 50)]) == (gained: 0, used: 0))
     }
 
     @Test func anOperationFromANewerPhoneDecodesAsUnknown() throws {

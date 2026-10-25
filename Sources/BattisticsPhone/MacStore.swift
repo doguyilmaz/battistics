@@ -241,6 +241,7 @@ final class MacStore {
     private func save() {
         UserDefaults.standard.set(try? RemoteWire.encode(readings), forKey: "readings")
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+        QuickActions.update(selected.flatMap { readings[$0.id] })
     }
 
     /// In this iPhone's language; the Mac's own text may be in another.
