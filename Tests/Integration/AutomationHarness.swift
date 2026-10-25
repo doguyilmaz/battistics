@@ -145,7 +145,7 @@ struct AutomationHarness {
     }
 
     private static func capture(_ automation: AutomationModel, awake: KeepAwakeModel) async throws {
-        try await render(Form { AutomationSettings() }.formStyle(.grouped).environment(automation),
+        try await render(DeveloperPane().environment(automation),
                          name: "automation", width: 680, height: 760)
         let directory = URL(fileURLWithPath: "/private/tmp/battistics-automation-\(UUID())")
         defer { try? FileManager.default.removeItem(at: directory) }

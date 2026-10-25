@@ -446,6 +446,17 @@
         }
       }
     },
+    "AI clients": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ istemcileri"
+          }
+        }
+      }
+    },
     "AI selected this answer from the built-in guide on this Mac. Check the source if it does not answer your question.": {
       "extractionState": "manual",
       "localizations": {
@@ -479,6 +490,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hakkında"
+          }
+        }
+      }
+    },
+    "About %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hakkında"
           }
         }
       }
@@ -823,6 +845,17 @@
         }
       }
     },
+    "Appearance": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görünüm"
+          }
+        }
+      }
+    },
     "Apple Rated Health": {
       "extractionState": "manual",
       "localizations": {
@@ -923,6 +956,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Otomatik"
+          }
+        }
+      }
+    },
+    "Automation": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomasyon"
           }
         }
       }
@@ -1297,13 +1341,24 @@
         }
       }
     },
-    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Power → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.": {
+    "Battistics Remote": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Güç → Isıl Koruma bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl Koruma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
+            "value": "Battistics Remote"
+          }
+        }
+      }
+    },
+    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Keep Awake → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Uyanık Tut → Isıl Koruma bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl Koruma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
           }
         }
       }
@@ -2365,6 +2420,17 @@
         }
       }
     },
+    "Developer": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geliştirici"
+          }
+        }
+      }
+    },
     "Direction unknown": {
       "extractionState": "manual",
       "localizations": {
@@ -2554,18 +2620,18 @@
         }
       }
     },
-    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on.": {
+    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. The Terminal and MCP setup below work once this is on.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on."
+            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. The Terminal and MCP setup below work once this is on."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Bunu açınca terminal kurulumu ve MCP yapılandırması aşağıda görünür."
+            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Aşağıdaki terminal ve MCP kurulumu bu açıkken çalışır."
           }
         }
       }
@@ -2755,6 +2821,17 @@
         }
       }
     },
+    "Experimental. Support varies by Mac and macOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deneysel. Desteği Mac’e ve macOS sürümüne göre değişir."
+          }
+        }
+      }
+    },
     "Experiments": {
       "extractionState": "manual",
       "localizations": {
@@ -2931,6 +3008,17 @@
     },
     "GitHub": {
       "shouldTranslate": false
+    },
+    "Go to Power": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç’e Git"
+          }
+        }
+      }
     },
     "Good": {
       "localizations": {
@@ -3755,6 +3843,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Düşük eşiği: %%%lld"
+          }
+        }
+      }
+    },
+    "MCP guide": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP kılavuzu"
           }
         }
       }
@@ -6096,6 +6195,17 @@
         }
       }
     },
+    "System thermal pressure: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem ısıl baskısı: %@"
+          }
+        }
+      }
+    },
     "System updated: %@": {
       "extractionState": "manual",
       "localizations": {
@@ -6189,6 +6299,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Terminal komutları ve yapay zekâ istemcileri en fazla 12 saatlik adlandırılmış bir görev başlatabilir. Pil ve ısı korumalarınız geçerli olmaya devam eder."
+          }
+        }
+      }
+    },
+    "Terminal guide": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal kılavuzu"
+          }
+        }
+      }
+    },
+    "Text": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metin"
           }
         }
       }
@@ -6376,6 +6508,17 @@
         }
       }
     },
+    "The power helper changes sleep settings without a password and keeps the Mac running with its lid closed. It restores the previous setting when a closed-lid session ends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı uyku ayarlarını parola sormadan değiştirir ve Mac’in kapağı kapalıyken çalışmasını sağlar. Kapak kapalı oturum bitince önceki ayarı geri yükler."
+          }
+        }
+      }
+    },
     "The power helper could not confirm the closed-lid session. Keep Awake has stopped.": {
       "extractionState": "manual",
       "localizations": {
@@ -6406,6 +6549,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç yardımcısı yeniden kaydedildikten sonra bile yanıt vermedi. Güç bölümündeki Onar düğmesini kullanın veya Mac'i yeniden başlatın."
+          }
+        }
+      }
+    },
+    "The power helper needs attention.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı ilgi bekliyor."
           }
         }
       }
@@ -7292,29 +7446,29 @@
         }
       }
     },
-    "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.": {
+    "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open."
+            "value": "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet. Güç bölümünden Yerel otomasyonu açın. Derleme veya betikler için Terminal kurulumunu kopyalayıp battistics run kullanın; komut bitince Uyanık Tut sona erer, üst sınır 12 saattir. Etkileşimli bir yapay zekâ terminali için MCP yapılandırmasını güvendiğiniz istemciye ekleyin ve işe başlamadan görev başlatıp bitince durdurmasını isteyin. Açık kalan bir süreç tek başına işin bittiğini göstermez. Elle durdurma, süre sınırı, bağlantı kesilmesi veya pil ve ısı koruması, komutunuzu sonlandırmadan Uyanık Tut’u daha erken bitirebilir. Kapak kapalı görevler ayrı izin ve kurulu yardımcı gerektirir. Battistics’i açık tutun."
+            "value": "Evet. Otomasyon bölümünden Yerel otomasyonu açın. Derleme veya betikler için Terminal kurulumunu kopyalayıp battistics run kullanın; komut bitince Uyanık Tut sona erer, üst sınır 12 saattir. Etkileşimli bir yapay zekâ terminali için MCP yapılandırmasını güvendiğiniz istemciye ekleyin ve işe başlamadan görev başlatıp bitince durdurmasını isteyin. Açık kalan bir süreç tek başına işin bittiğini göstermez. Elle durdurma, süre sınırı, bağlantı kesilmesi veya pil ve ısı koruması, komutunuzu sonlandırmadan Uyanık Tut’u daha erken bitirebilir. Kapak kapalı görevler ayrı izin ve kurulu yardımcı gerektirir. Battistics’i açık tutun."
           }
         }
       }
     },
-    "Yes. In Power → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.": {
+    "Yes. In Keep Awake → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet. Güç → Oturum Koruması bölümünden Pil azaldığında Uyanık Tut’u durdur seçeneğini açın ve %5–50 arasında bir seviye seçin. Varsayılan olarak kapalıdır; önceden seçilen seviye %10’dur. Pil gücündeyken bu seviyede veya altında Battistics oturumu bitirir ve normal uykuya izin verir. Mac’i kapatmaz veya uygulamaları sonlandırmaz. Kural için Battistics’in çalışması ve geçerli bir pil ölçümü gerekir; ani güç kaybına karşı garanti vermez."
+            "value": "Evet. Uyanık Tut → Oturum Koruması bölümünden Pil azaldığında Uyanık Tut’u durdur seçeneğini açın ve %5–50 arasında bir seviye seçin. Varsayılan olarak kapalıdır; önceden seçilen seviye %10’dur. Pil gücündeyken bu seviyede veya altında Battistics oturumu bitirir ve normal uykuya izin verir. Mac’i kapatmaz veya uygulamaları sonlandırmaz. Kural için Battistics’in çalışması ve geçerli bir pil ölçümü gerekir; ani güç kaybına karşı garanti vermez."
           }
         }
       }

@@ -24,11 +24,11 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .keepAwake:
             String(localized: "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.")
         case .lowBattery:
-            String(localized: "Yes. In Power → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.")
+            String(localized: "Yes. In Keep Awake → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.")
         case .warnings:
             String(localized: "Ending Keep Awake restores normal sleep behavior. With the lid closed, the Mac may sleep immediately. That alone does not prove a shutdown or battery fault. At very low charge, connect power before ending the session and save your work. Session Protection can warn at a chosen percentage, at least 5 points above an enabled stop level. A sudden drop may skip the warning. Notifications need macOS permission; an in-app notice is also shown.")
         case .heat:
-            String(localized: "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Power → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.")
+            String(localized: "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Keep Awake → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.")
         case .helper:
             String(localized: "Closed-lid Keep Awake temporarily changes a privileged system sleep setting. Approve the power helper in System Settings → General → Login Items & Extensions when prompted. The helper restores the setting after the session; if Battistics quits or crashes, its lease expires within about 45 seconds. An external change is left alone. If the helper is unavailable, use Repair in Power. Developer builds without a signing team cannot register the helper.")
         case .health:
@@ -38,7 +38,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .privacy:
             String(localized: "Built-in help works offline on macOS 14 and later. The optional assistant uses Apple's on-device Foundation Models on macOS 26 or later when Apple Intelligence, its model, and the language are available. AI selects a relevant guide article; the answer is the reviewed guide text, not generated instructions. It cannot change settings and has no cloud fallback. Questions and answers are not saved by Battistics. If the selection does not answer your question, browse the source articles. Optional update checks are separate.")
         case .automation:
-            String(localized: "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.")
+            String(localized: "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.")
         case .phone:
             String(localized: "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.")
         }
@@ -46,7 +46,9 @@ enum HelpArticle: String, CaseIterable, Identifiable {
 
     var pane: DashboardPane {
         switch self {
-        case .keepAwake, .lowBattery, .warnings, .heat, .helper, .automation: .system
+        case .keepAwake, .lowBattery, .warnings, .heat: .system
+        case .helper: .power
+        case .automation: .developer
         case .health: .overview
         case .history: .data
         case .privacy: .about

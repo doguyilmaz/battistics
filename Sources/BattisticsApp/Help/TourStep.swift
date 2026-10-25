@@ -6,7 +6,8 @@ enum TourStep: Int, CaseIterable {
     var pane: DashboardPane {
         switch self {
         case .overview: .overview
-        case .power, .profiles, .protection, .automation: .system
+        case .power, .profiles, .protection: .system
+        case .automation: .developer
         case .notifications: .notifications
         case .history: .history
         case .help: .help
@@ -37,7 +38,7 @@ enum TourStep: Int, CaseIterable {
         case .protection:
             String(localized: "Turn this on to end Keep Awake at a battery level you choose. It allows normal sleep; it does not shut down the Mac. Low-battery warnings below are on by default.")
         case .automation:
-            String(localized: "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on.")
+            String(localized: "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. The Terminal and MCP setup below work once this is on.")
         case .notifications:
             String(localized: "Choose low-charge and temperature alerts. macOS may ask for notification permission when an alert first arrives. Keep Awake also shows an in-app warning.")
         case .history:

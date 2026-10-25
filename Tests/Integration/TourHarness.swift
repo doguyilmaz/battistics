@@ -50,7 +50,7 @@ struct TourHarness {
                     Color.clear.onChange(of: frames, initial: true) { probe.frames = frames }
                 }.allowsHitTesting(false)
             })
-        host.frame = NSRect(x: 0, y: 0, width: 860, height: 545)
+        host.frame = NSRect(x: 0, y: 0, width: 860, height: 620)
         let window = NSWindow(contentRect: host.frame, styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = host
@@ -69,16 +69,16 @@ struct TourHarness {
             if step == .power {
                 precondition(target.height > 60, "Power focus must include switch, mode and duration: \(target)")
             }
-            precondition(target.minY >= 0 && target.maxY < 545 - cardFrame.height - 20,
+            precondition(target.minY >= 0 && target.maxY < 620 - cardFrame.height - 20,
                          "Target obscured for \(step): \(target)")
             let button = try find("tour.next", in: host)
             let frame = try require(attribute(button, "accessibilityFrame") as? NSValue).rectValue
             precondition(frame.height > 0 && window.frame.contains(frame), "Next outside window")
-            if let nextFrame { precondition(abs(frame.minY - nextFrame.minY) < 1, "Next moved between steps") }
+            if let nextFrame { precondition(abs(frame.minY - nextFrame.minY) < 1, "Next moved between steps at \(step): \(frame) vs \(nextFrame)") }
             else { nextFrame = frame }
             try capture(host, step: step)
             precondition(!awake.isActive && awake.safety.configuration == protection && !automation.enabled)
-            if step == .power {
+            if step == .help {
                 let scroll = try require(scrollViews(in: host).first {
                     $0.convert($0.bounds, to: host).minX >= 180
                         && ($0.documentView?.frame.height ?? 0) > $0.contentSize.height + 100
@@ -113,7 +113,7 @@ struct TourHarness {
         try sendKey("\u{1b}", code: 53, to: window)
         try await settle()
         precondition(!model.tourRequested, "Escape did not dismiss tour")
-        // The live session card above Keep Awake must not push step 2 out of view.
+        // A running session must not push step 2 out of view.
         await awake.start(mode: .displayMaySleep, duration: .fifteenMinutes)?.value
         defer { awake.stop() }
         precondition(awake.isActive)
@@ -124,8 +124,8 @@ struct TourHarness {
         let activeTarget = try require(probe.frames[.power])
         let activeCard = try find("tour.card", in: host)
         let activeCardHeight = try require(attribute(activeCard, "accessibilityFrame") as? NSValue).rectValue.height
-        precondition(activeTarget.height > 100 && activeTarget.minY >= 0
-                     && activeTarget.maxY < 545 - activeCardHeight - 20,
+        precondition(activeTarget.height > 60 && activeTarget.minY >= 0
+                     && activeTarget.maxY < 620 - activeCardHeight - 20,
                      "Active session obscures Power focus: \(activeTarget)")
         try capture(host, step: .power, suffix: "-active")
         precondition(awake.isActive, "Tour changed the running session")

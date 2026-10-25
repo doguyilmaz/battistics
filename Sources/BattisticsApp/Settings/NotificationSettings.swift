@@ -25,53 +25,27 @@ struct NotificationSettings: View {
 
     var body: some View {
         Form {
-            Section {
-                Toggle("Play sound", isOn: $soundEnabled)
-            }
             Section("On Battery") {
-                Toggle("Low battery", isOn: $lowEnabled)
+                ThresholdToggle("Low battery", isOn: $lowEnabled, percent: $lowThreshold, range: 5...50)
                     .tourTarget(.notifications)
-                if lowEnabled {
-                    LabeledContent("Notify at \(lowThreshold)%") {
-                        Slider(
-                            value: Binding(
-                                get: { Double(lowThreshold) },
-                                set: { lowThreshold = Int($0) }
-                            ), in: 5...50, step: 5)
-                    }
-                    Toggle("Remind on every further \(dropStep)% drop", isOn: $dropEnabled)
-                }
-                Toggle("Long time on battery", isOn: $durationEnabled)
-                if durationEnabled {
-                    LabeledContent("After \(durationHours, format: .number.precision(.fractionLength(0...1))) hours") {
-                        Slider(value: $durationHours, in: 1...12, step: 0.5)
-                    }
-                }
+                Toggle("Remind on every further \(dropStep)% drop", isOn: $dropEnabled)
+                    .disabled(!lowEnabled)
+                ThresholdToggle(title: "Long time on battery", isOn: $durationEnabled, value: $durationHours,
+                                range: 1...12, step: 0.5) { Formatting.duration(minutes: Int($0 * 60)) }
             }
             Section("Charging") {
-                Toggle("Charge limit reached", isOn: $chargeLimitEnabled)
-                if chargeLimitEnabled {
-                    LabeledContent("Notify at \(chargeLimitThreshold)%") {
-                        Slider(
-                            value: Binding(
-                                get: { Double(chargeLimitThreshold) },
-                                set: { chargeLimitThreshold = Int($0) }
-                            ), in: 50...95, step: 5)
-                    }
-                }
+                ThresholdToggle("Charge limit reached", isOn: $chargeLimitEnabled, percent: $chargeLimitThreshold,
+                                range: 50...95)
                 Toggle("Fully charged", isOn: $fullEnabled)
             }
             Section("Health") {
-                Toggle("High battery temperature", isOn: $highTempEnabled)
-                if highTempEnabled {
-                    // Stored in Celsius, shown in the unit chosen in General.
-                    LabeledContent("Above \(thresholdText)") {
-                        Slider(value: $highTempThreshold, in: 35...50, step: 1)
-                    }
-                }
+                // Stored in Celsius, shown in the unit chosen in General.
+                ThresholdToggle(title: "High battery temperature", isOn: $highTempEnabled, value: $highTempThreshold,
+                                range: 35...50, step: 1) { _ in thresholdText }
                 Toggle("Battery health declines", isOn: $healthDropEnabled)
             }
             Section {
+                Toggle("Play sound", isOn: $soundEnabled)
                 Button("Open System Notification Settings…") {
                     if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
                         NSWorkspace.shared.open(url)
