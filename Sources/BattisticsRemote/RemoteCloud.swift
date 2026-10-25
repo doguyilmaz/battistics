@@ -13,6 +13,8 @@ public actor RemoteCloud {
     public struct Snapshot: Sendable {
         public var statuses: [String: RemoteStatus] = [:]
         public var commands: [Command] = []
+        /// Read from the start rather than as changes, so a missing record is really missing.
+        public var isFull = false
     }
 
     public struct Command: Sendable {
@@ -74,6 +76,8 @@ public actor RemoteCloud {
             do {
                 result = try await self.read(since: self.changeToken)
             } catch let error as CKError where error.code == .changeTokenExpired {
+                // Also what another device recreating the zone looks like.
+                self.statusRecords = [:]
                 result = try await self.read(since: nil)
             }
             self.changeToken = result.token
@@ -95,7 +99,7 @@ public actor RemoteCloud {
     }
 
     private func read(since start: CKServerChangeToken?) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
-        var snapshot = Snapshot()
+        var snapshot = Snapshot(isFull: start == nil)
         var token = start
         repeat {
             let changes = try await database.recordZoneChanges(inZoneWith: Self.zoneID, since: token)

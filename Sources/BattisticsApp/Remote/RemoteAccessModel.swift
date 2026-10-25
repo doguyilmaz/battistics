@@ -121,8 +121,10 @@ final class RemoteAccessModel {
         defer { syncing = false }
         var failure: Error?
         var handled = false
+        var recordMissing = false
         do {
             let snapshot = try await cloud.fetchChanges()
+            recordMissing = snapshot.isFull && snapshot.statuses[macID] == nil
             let mine = snapshot.commands
                 .filter { $0.macID == macID && !handledCommands.contains($0.recordName) }
                 .sorted { $0.request.sentAt < $1.request.sentAt }
@@ -140,11 +142,11 @@ final class RemoteAccessModel {
         } catch {
             failure = error
         }
-        // A recreated zone has no status record, however unchanged this Mac is.
+        // A lost or recreated zone has no status record, however unchanged this Mac is.
         let zoneGone = [.zoneNotFound, .userDeletedZone].contains((failure as? CKError)?.code)
         if (failure as? CKError)?.retryAfterSeconds == nil {
             do {
-                try await publish(force: handled || zoneGone)
+                try await publish(force: handled || zoneGone || recordMissing)
             } catch {
                 failure = error
             }

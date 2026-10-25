@@ -11,6 +11,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s during a Keep Awake session or for 2 minutes after a command, every 15 s otherwise. macOS throttles silent pushes, so a push only triggers an extra poll.
 - `publish` builds the cheap status first and compares it with the last one sent. History and `pmset` are read only when something changed or the heartbeat is due. The heartbeat is published even when reading commands fails, and CloudKit's `retryAfter` is honoured.
 - Handled command ids are remembered until their records are deleted, so a failed delete never runs a command twice.
+- A full read without this Mac's record (a lost zone, or one another device recreated) makes the Mac publish at once instead of waiting for the heartbeat.
 
 ## Freshness
 
@@ -59,7 +60,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Verified on a device
 
-- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch.
+- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later.
 
 ## Verified only in Simulator or tests
 
