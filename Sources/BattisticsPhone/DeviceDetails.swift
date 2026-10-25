@@ -60,16 +60,17 @@ struct MacDetailsView: View {
             if store.reading(for: mac)?.reachable != true {
                 Section {
                     Button("Remove Mac", role: .destructive) { confirmingRemoval = true }
+                        .confirmationDialog("Remove \(mac.name) from your iPhones?", isPresented: $confirmingRemoval,
+                                            titleVisibility: .visible) {
+                            Button("Remove Mac", role: .destructive) {
+                                Task {
+                                    removalFailure = await store.forget(mac)
+                                    if removalFailure == nil { dismiss() }
+                                }
+                            }
+                        }
                 } footer: {
                     Text(removalFailure ?? String(localized: "For a Mac you erased or no longer use. A Mac that is still sharing comes back with its next update."))
-                }
-            }
-        }
-        .confirmationDialog("Remove \(mac.name) from your iPhones?", isPresented: $confirmingRemoval, titleVisibility: .visible) {
-            Button("Remove Mac", role: .destructive) {
-                Task {
-                    removalFailure = await store.forget(mac)
-                    if removalFailure == nil { dismiss() }
                 }
             }
         }
