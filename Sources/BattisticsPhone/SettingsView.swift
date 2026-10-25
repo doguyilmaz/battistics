@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @AppStorage(Notifications.enabledKey) private var notify = true
+    @AppStorage(Notifications.chargeTargetKey) private var chargeTarget = 0
     @State private var permission: UNAuthorizationStatus = .notDetermined
 
     var body: some View {
@@ -16,13 +17,19 @@ struct SettingsView: View {
                         .onChange(of: notify) {
                             if notify { Task { await Notifications.requestPermission(); await readPermission() } }
                         }
+                    if notify {
+                        Picker("When Charged To", selection: $chargeTarget) {
+                            Text("Off").tag(0)
+                            ForEach([80, 90, 100], id: \.self) { Text($0.percentText).tag($0) }
+                        }
+                    }
                     if notify, permission == .denied {
                         Button("Allow Notifications in Settings") {
                             openURL(URL(string: UIApplication.openNotificationSettingsURLString)!)
                         }
                     }
                 } footer: {
-                    Text("When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, or the Mac stops answering.")
+                    Text("When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
                 }
 
                 Section {

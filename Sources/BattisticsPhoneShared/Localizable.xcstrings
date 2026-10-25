@@ -1956,40 +1956,6 @@
         }
       }
     },
-    "%lldW": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW"
-          }
-        }
-      }
-    },
-    "+%lldW": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+%lldW"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+%lldW"
-          }
-        }
-      }
-    },
     "A full-width Lock Screen widget with charge bar, power, health, cycles and the Keep Awake timer.": {
       "extractionState": "manual",
       "localizations": {
@@ -4812,23 +4778,6 @@
         }
       }
     },
-    "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, or the Mac stops answering.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, or the Mac stops answering."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında veya Mac yanıt vermeyi bıraktığında."
-          }
-        }
-      }
-    },
     "Wi‑Fi drops once the Mac leaves its range in a bag, and so does remote control. Personal Hotspot keeps it online.": {
       "extractionState": "manual",
       "localizations": {
@@ -5080,6 +5029,91 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’ini bir saat uyanık tutar ya da yeniden uyumasına izin verir."
+          }
+        }
+      }
+    },
+    "%lld W": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld W"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld W"
+          }
+        }
+      }
+    },
+    "+%lld W": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld W"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld W"
+          }
+        }
+      }
+    },
+    "Charged to %@. You can unplug it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charged to %@. You can unplug it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj %@ oldu. Fişten çekebilirsin."
+          }
+        }
+      }
+    },
+    "When Charged To": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When Charged To"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj Seviyesi"
+          }
+        }
+      }
+    },
+    "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
           }
         }
       }

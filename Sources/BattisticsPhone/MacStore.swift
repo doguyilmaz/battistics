@@ -101,7 +101,8 @@ final class MacStore {
             let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
-            let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil)
+            let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil,
+                                               chargeTarget: Notifications.chargeTarget)
             alerts.append((mac, macAlerts))
             Notifications.syncWatchdog(for: mac, reading: reading)
         }

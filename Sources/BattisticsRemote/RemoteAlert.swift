@@ -8,20 +8,27 @@ public enum RemoteAlert: Equatable, Sendable {
     case batteryRunsOut(minutesLeft: Int)
     case unpluggedWithoutHotspot
     case closedLidWithoutHotspot
+    case chargeReached(percent: Int)
     case unreachable
 
     /// `current` is nil when the Mac did not answer; `previous` is nil before
     /// the first reading and `.some(nil)` after an unanswered one.
-    public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?) -> [RemoteAlert] {
+    /// `chargeTarget` is the charge level the user wants to hear about while the Mac charges.
+    public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?,
+                              chargeTarget: Int? = nil) -> [RemoteAlert] {
         switch (previous, current) {
-        case (.some(.some(let previous)), .some(let current)): changes(from: previous, to: current)
+        case (.some(.some(let previous)), .some(let current)): changes(from: previous, to: current, chargeTarget: chargeTarget)
         case (.some(.some(let previous)), .none): previous.session != nil ? [.unreachable] : []
         default: []
         }
     }
 
-    private static func changes(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
+    private static func changes(from previous: RemoteStatus, to current: RemoteStatus, chargeTarget: Int?) -> [RemoteAlert] {
         var alerts: [RemoteAlert] = []
+        if let chargeTarget, let battery = current.battery, battery.onAdapter,
+           battery.percent >= chargeTarget, let before = previous.battery, before.percent < chargeTarget {
+            alerts.append(.chargeReached(percent: battery.percent))
+        }
         if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
             alerts.append(.sessionEnded(current.lastEnd?.reason))
         }

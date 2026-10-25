@@ -141,6 +141,15 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(minutes: 90), to: status(minutes: 80)).isEmpty)
     }
 
+    @Test func chargeTargetAlertsOnceWhileCharging() {
+        let below = status(percent: 79, adapter: true, session: false)
+        let reached = status(percent: 80, adapter: true, session: false)
+        #expect(RemoteAlert.alerts(from: below, to: reached, chargeTarget: 80) == [.chargeReached(percent: 80)])
+        #expect(RemoteAlert.alerts(from: reached, to: status(percent: 81, adapter: true, session: false), chargeTarget: 80).isEmpty)
+        #expect(RemoteAlert.alerts(from: below, to: reached).isEmpty)
+        #expect(RemoteAlert.alerts(from: below, to: status(percent: 80, adapter: false, session: false), chargeTarget: 80).isEmpty)
+    }
+
     @Test func silenceAlertsOnlyWhileASessionRan() {
         #expect(RemoteAlert.alerts(from: status(), to: nil) == [.unreachable])
         #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)

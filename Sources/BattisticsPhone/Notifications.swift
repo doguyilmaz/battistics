@@ -7,6 +7,13 @@ import UserNotifications
 /// timer when Keep Awake is active: no third-party server, no cost.
 enum Notifications {
     static let enabledKey = "notificationsEnabled"
+    /// Charge level to report while a Mac charges; 0 is off.
+    static let chargeTargetKey = "chargeAlertPercent"
+
+    static var chargeTarget: Int? {
+        let value = UserDefaults.standard.integer(forKey: chargeTargetKey)
+        return value > 0 ? value : nil
+    }
     static let refreshTask = "com.doguyilmaz.Battistics.Remote.refresh"
 
     static func requestPermission() async {
@@ -125,6 +132,7 @@ private extension RemoteAlert {
         case .batteryRunsOut: "runtime"
         case .unpluggedWithoutHotspot: "unplugged"
         case .closedLidWithoutHotspot: "closedlid"
+        case .chargeReached: "charged"
         case .unreachable: "silent"
         }
     }
@@ -142,6 +150,8 @@ private extension RemoteAlert {
             String(localized: "Unplugged on Wi‑Fi while Keep Awake is active. Turn on Personal Hotspot before putting your Mac in a bag so your tasks stay online.")
         case .closedLidWithoutHotspot:
             String(localized: "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you.")
+        case .chargeReached(let percent):
+            String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:
             String(localized: "Stopped answering while Keep Awake was on. Connect to Personal Hotspot or check Wi‑Fi if a task is running.")
         }
