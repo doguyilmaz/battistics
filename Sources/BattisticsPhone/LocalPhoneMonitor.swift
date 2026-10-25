@@ -69,6 +69,12 @@ final class LocalPhoneMonitor {
 
     var pickerName: String { "\(displayName) (\(shortModelName))" }
 
+    /// How the Mac labels sessions started here; not localized, since the Mac shows it as a name.
+    var commandName: String {
+        let custom = customName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return custom.isEmpty ? hotspotName ?? modelName : custom
+    }
+
     var uptime: TimeInterval { ProcessInfo.processInfo.systemUptime }
 
     var batteryStatus: RemoteStatus.Battery? {

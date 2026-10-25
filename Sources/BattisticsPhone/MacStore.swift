@@ -122,23 +122,23 @@ final class MacStore {
 
     /// Returns a message to show when the Mac refused or did not answer.
     func start(_ mac: Mac, mode: RemoteStatus.Mode, minutes: Int) async -> String? {
-        await send(.init(operation: .start, mode: mode, durationMinutes: minutes, deviceName: UIDevice.current.name), to: mac)
+        await send(.init(operation: .start, mode: mode, durationMinutes: minutes, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     func stop(_ mac: Mac) async -> String? {
-        await send(.init(operation: .stop, deviceName: UIDevice.current.name), to: mac)
+        await send(.init(operation: .stop, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     func setLowPower(_ mac: Mac, policy: RemoteStatus.LowPowerPolicy) async -> String? {
-        await send(.init(operation: .setLowPower, lowPowerPolicy: policy, deviceName: UIDevice.current.name), to: mac)
+        await send(.init(operation: .setLowPower, lowPowerPolicy: policy, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     func sleepDisplay(_ mac: Mac) async -> String? {
-        await send(.init(operation: .sleepDisplay, deviceName: UIDevice.current.name), to: mac)
+        await send(.init(operation: .sleepDisplay, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     func inspect(_ mac: Mac) async -> String? {
-        await send(.init(operation: .inspect, deviceName: UIDevice.current.name), to: mac)
+        await send(.init(operation: .inspect, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     /// Writes the command, then watches the Mac's record for its answer.
