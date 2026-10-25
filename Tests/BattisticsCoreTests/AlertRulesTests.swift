@@ -56,6 +56,17 @@ struct AlertRulesTests {
         #expect(alerts == [.lowBattery(percent: 20)])
     }
 
+    @Test func savedStateKeepsAFullChargeFromAlertingAgainAfterRelaunch() throws {
+        var state = AlertState()
+        let config = AlertConfig()
+        let full = snapshot(percent: 100, external: true, fullyCharged: true)
+        #expect(AlertRules.evaluate(snapshot: full, config: config, state: &state) == [.fullyCharged])
+
+        var restored = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        #expect(AlertRules.evaluate(snapshot: full, config: config, state: &restored).isEmpty)
+        #expect(restored.unpluggedAt == nil)
+    }
+
     @Test func significantDropRemindsEveryStep() {
         var state = AlertState()
         let config = AlertConfig(significantDropStep: 5)
@@ -131,6 +142,27 @@ struct AlertRulesTests {
         }
     }
 
+    @Test func onBatteryDurationStaysSentAcrossARelaunchForTheSameUnplug() throws {
+        var state = AlertState()
+        let config = AlertConfig(onBatteryDurationEnabled: true, onBatteryDurationHours: 3)
+        let start = Date(timeIntervalSince1970: 1_700_000_000.4)
+        _ = AlertRules.evaluate(snapshot: snapshot(percent: 90), config: config, state: &state, now: start)
+        _ = AlertRules.evaluate(
+            snapshot: snapshot(percent: 60), config: config, state: &state, now: start.addingTimeInterval(3.1 * 3600))
+
+        var relaunched = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        relaunched.restoreUnplug(Date(timeIntervalSince1970: 1_700_000_000))
+        #expect(AlertRules.evaluate(
+            snapshot: snapshot(percent: 55), config: config, state: &relaunched,
+            now: start.addingTimeInterval(3.5 * 3600)).isEmpty)
+
+        var later = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        later.restoreUnplug(start.addingTimeInterval(5 * 3600))
+        #expect(AlertRules.evaluate(
+            snapshot: snapshot(percent: 50), config: config, state: &later,
+            now: start.addingTimeInterval(8.2 * 3600)).count == 1)
+    }
+
     @Test func healthDropDetection() {
         #expect(
             AlertRules.healthDropAlert(baseline: [90, 90, 90], current: 85, enabled: true)
@@ -157,6 +189,14 @@ struct AlertRulesTests {
         #expect(AlertRules.healthDropAlert(baseline: observed, current: 89.73, enabled: true) == nil)
         // A low day inside the normal swing is still noise, not decline.
         #expect(AlertRules.healthDropAlert(baseline: observed, current: 85.5, enabled: true) == nil)
+    }
+
+    @Test func healthDropAlertsOnceUntilItDropsFurther() {
+        let baseline = [90.0, 90, 90]
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 85, enabled: true, lastAlerted: 85) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 85.4, enabled: true, lastAlerted: 85) == nil)
+        #expect(AlertRules.healthDropAlert(baseline: baseline, current: 83, enabled: true, lastAlerted: 85)
+                == .healthDropped(from: 90, to: 83))
     }
 
     @Test func healthDropFiresOnADeclineBeyondTheSwing() {

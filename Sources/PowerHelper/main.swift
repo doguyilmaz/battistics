@@ -101,6 +101,10 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         reply(run(PowerSettingsWriter.arguments(for: timer, interval: interval, source: source)))
     }
 
+    func allowSleep(reply: @escaping @Sendable (Int32) -> Void) {
+        LidSleepController.shared.allowSleep(reply: reply)
+    }
+
     func version(reply: @escaping (String) -> Void) {
         reply(powerHelperBuild)
     }
@@ -126,6 +130,14 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
 }
 
 let lidSleepController = LidSleepController.shared
+// launchd stops the job with SIGTERM when the helper is removed or the app deleted.
+signal(SIGTERM, SIG_IGN)
+let termination = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
+termination.setEventHandler {
+    lidSleepController.shutdown()
+    exit(0)
+}
+termination.resume()
 let helper = PowerHelper()
 let listener = NSXPCListener(machServiceName: powerHelperMachServiceName)
 listener.delegate = helper

@@ -37,10 +37,4 @@ struct PowerSettingsWriterTests {
             #expect(argument.allSatisfy { $0.isLetter || $0.isNumber || $0 == "-" })
         }
     }
-
-    @Test func theCommandIsAbsolutePathed() {
-        let command = PowerSettingsWriter.command(
-            PowerSettingsWriter.arguments(for: LowPowerModeSetting.always))
-        #expect(command == "/usr/bin/pmset -b lowpowermode 1 -c lowpowermode 1")
-    }
 }

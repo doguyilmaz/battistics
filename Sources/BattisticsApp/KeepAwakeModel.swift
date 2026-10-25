@@ -1,16 +1,21 @@
 import AppKit
 import BattisticsCore
+import BattisticsRemote
 import Foundation
 import Observation
 import SwiftUI
 
-/// Owns the live keep-awake session. Separate from `AppModel` because it has
-/// nothing to do with reading the battery; it only holds an assertion and a
-/// deadline.
+/// Owns the live keep-awake assertion, deadline, and protection lifecycle.
+/// AppModel feeds battery readings to the safety monitor independently of UI.
 @MainActor
 @Observable
 final class KeepAwakeModel {
+    private enum StartFailure: Error { case protection(KeepAwakeSafetyPolicy.Event) }
+    let safety: KeepAwakeSafetyMonitor
     private(set) var session: KeepAwakeSession?
+    private(set) var sessionName: String?
+    private(set) var sessionOrigin: RemoteStatus.Origin = .manual
+    private(set) var lastEnd: RemoteStatus.LastEnd?
 
     @ObservationIgnored private let assertion = WakeAssertion()
     @ObservationIgnored private var expiryTask: Task<Void, Never>?
@@ -23,13 +28,16 @@ final class KeepAwakeModel {
     @ObservationIgnored private let helper: PowerHelperClient
     @ObservationIgnored private var leaseTask: Task<Void, Never>?
     @ObservationIgnored private var sessionID: String?
+    @ObservationIgnored var onOwnershipReleased: ((String) -> Void)?
+    var sessionIdentifier: String? { sessionID }
+    var isAwaitingHelperApproval: Bool { approvalTask != nil }
     @ObservationIgnored private var reconcilingSessionID: String?
     @ObservationIgnored private let notice = KeepAwakeNoticeController()
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
     /// Waits, bounded, for the user to allow the helper in Login Items, then
     /// starts the closed-lid session they asked for.
-    @ObservationIgnored private var approvalTask: Task<Void, Never>?
+    private var approvalTask: Task<Void, Never>?
     /// Keeps App Nap from stretching the renewal timer past the helper's
     /// 45-second lease while the lid is shut and nothing of ours is visible.
     @ObservationIgnored private var renewalActivity: NSObjectProtocol?
@@ -37,8 +45,10 @@ final class KeepAwakeModel {
     var mode: KeepAwakeMode {
         didSet {
             UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
-            if let session, oldValue != mode {
-                start(mode: mode, duration: session.duration, now: session.startedAt)
+            if let session, session.mode != mode {
+                let profile = sessionOrigin == .profile ? sessionName : nil
+                start(mode: mode, duration: session.duration, now: session.startedAt,
+                      name: profile, origin: profile == nil ? .manual : .profile)
             } else if mode != .lidClosed, approvalTask != nil {
                 // Nothing left to wait for once closed-lid is no longer wanted.
                 cancelApprovalWait()
@@ -48,13 +58,45 @@ final class KeepAwakeModel {
     }
 
     var duration: KeepAwakeDuration {
-        didSet { UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration) }
+        didSet {
+            UserDefaults.standard.set(duration.rawValue, forKey: Prefs.keepAwakeDuration)
+            if let session, session.duration != duration { retime(session, to: duration) }
+        }
+    }
+
+    /// Automation does not overwrite the user's next-session defaults. Pickers
+    /// still show the actual running mode and let the user take over explicitly.
+    var displayedMode: KeepAwakeMode {
+        get { session?.mode ?? mode }
+        set { mode = newValue }
+    }
+
+    var displayedDuration: KeepAwakeDuration {
+        get { session?.duration ?? duration }
+        set { duration = newValue }
+    }
+
+    /// A closed-lid session started from a phone runs in a bag with nobody
+    /// watching, however long it was set for.
+    static func isUnattended(origin: RemoteStatus.Origin?, mode: KeepAwakeMode) -> Bool {
+        origin == .phone && mode == .lidClosed
     }
 
     init(helper: PowerHelperClient) {
         self.helper = helper
+        safety = KeepAwakeSafetyMonitor(notice: notice)
         mode = KeepAwakeMode(rawValue: UserDefaults.standard.string(forKey: Prefs.keepAwakeMode) ?? "") ?? .displayOn
         duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
+        safety.isUnattended = { [weak self] in
+            guard let self, let session = self.session else { return false }
+            return Self.isUnattended(origin: self.sessionOrigin, mode: session.mode)
+        }
+        safety.onStop = { [weak self] event in
+            guard let self else { return }
+            let id = self.sessionID ?? UUID().uuidString
+            self.stop(reason: event == .thermalStop ? .thermal : .battery)
+            self.showSafetyReason(event, id: id)
+        }
         activationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -67,29 +109,45 @@ final class KeepAwakeModel {
         }
     }
 
-    func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date()) {
-        guard !isChanging else { return }
+    @discardableResult
+    func start(profile: KeepAwakeProfile) -> Task<Void, Never>? {
+        guard !isActive, !isChanging, !isAwaitingHelperApproval else { return nil }
+        return start(mode: profile.mode, duration: profile.duration, name: profile.title, origin: .profile)
+    }
+
+    @discardableResult
+    func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
+               id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
+               origin: RemoteStatus.Origin = .manual) -> Task<Void, Never>? {
+        guard !isChanging else { return nil }
+        let unattended = Self.isUnattended(origin: origin, mode: mode)
+        if let event = safety.blockingEvent(unattended: unattended) {
+            let wasActive = isActive
+            if wasActive { stop(reason: event == .thermalStop ? .thermal : .battery) }
+            showSafetyReason(event, id: UUID().uuidString, starting: !wasActive)
+            return nil
+        }
         cancelApprovalWait()
         let previousLeaseID = session?.mode == .lidClosed ? sessionID : nil
         clearLocalSession()
-        let id = UUID().uuidString
         sessionID = id
         isChanging = true
         errorMessage = nil
         isStoppedReasonInformational = false
         notice.dismiss()
-        Task {
-            defer { isChanging = false }
+        return Task {
+            defer {
+                isChanging = false
+                // A safety stop may immediately start async lease cleanup.
+                // Do not overwrite that cleanup's busy state afterward.
+                if sessionID == id, session != nil { safety.startSession() }
+            }
             var releasingPrevious = previousLeaseID != nil
             do {
                 if let previousLeaseID {
                     let result = try await helper.releaseLidSleepLease(previousLeaseID)
                     guard result == .success || result == .inactive else {
-                        if sessionID == id {
-                            stopAfterLeaseFailure(result, sessionID: id, releaseFailed: true)
-                        } else {
-                            showStoppedReason(result, sessionID: id, releaseFailed: true)
-                        }
+                        stopAfterLeaseFailure(result, sessionID: id, releaseFailed: true)
                         return
                     }
                     guard sessionID == id else { return }
@@ -97,7 +155,7 @@ final class KeepAwakeModel {
                 }
                 guard sessionID == id else { return }
                 if mode == .lidClosed {
-                    try await helper.prepareForLidSleep()
+                    if allowHelperSetup { try await helper.prepareForLidSleep() }
                     guard sessionID == id else { return }
                     let result = try await helper.acquireLidSleepLease(id) { [weak self] in
                         self?.sessionID == id
@@ -115,12 +173,17 @@ final class KeepAwakeModel {
                         return
                     }
                 }
+                // Authorization can take long enough for charge or thermal
+                // conditions to change. Recheck before creating the assertion.
+                if let event = safety.blockingEvent(unattended: unattended) { throw StartFailure.protection(event) }
                 let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
                 guard !new.hasExpired(at: Date()),
                     assertion.take(mode: mode, until: new.deadline) else {
                     throw CocoaError(.featureUnsupported)
                 }
                 session = new
+                sessionName = name
+                sessionOrigin = origin
                 scheduleExpiry(for: new, now: Date())
                 if mode == .lidClosed {
                     renewalActivity = ProcessInfo.processInfo.beginActivity(
@@ -130,18 +193,10 @@ final class KeepAwakeModel {
                 }
             } catch PowerHelperClient.Failure.unknownLeaseStatus {
                 // An unrecognized wire result does not authorize rollback.
-                if sessionID == id {
-                    stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: releasingPrevious)
-                } else {
-                    showStoppedReason(nil, sessionID: id, releaseFailed: releasingPrevious)
-                }
+                stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: releasingPrevious)
             } catch {
                 if releasingPrevious {
-                    if sessionID == id {
-                        stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: true)
-                    } else {
-                        showStoppedReason(nil, sessionID: id, releaseFailed: true)
-                    }
+                    stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: true)
                     return
                 }
                 // Only an acquisition that reached the helper can have mutated
@@ -156,15 +211,21 @@ final class KeepAwakeModel {
                     guard sessionID == id else { return }
                     clearLocalSession()
                 }
-                showStartFailure(error, duration: duration)
+                showStartFailure(error, duration: duration, allowHelperSetup: allowHelperSetup)
             }
         }
     }
 
-    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration) {
+    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool) {
         isStoppedReasonInformational = false
         switch error {
+        case StartFailure.protection(let event):
+            showSafetyReason(event, id: UUID().uuidString, starting: true)
         case PowerHelperClient.Failure.needsApproval:
+            guard allowHelperSetup else {
+                errorMessage = String(localized: "Set up the power helper in Battistics before using closed-lid automation.")
+                return
+            }
             isStoppedReasonInformational = true
             errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
             helper.openLoginItemsSettings()
@@ -200,7 +261,12 @@ final class KeepAwakeModel {
                     return
                 }
             }
-            self?.approvalTask = nil
+            guard let self, !Task.isCancelled else { return }
+            self.approvalTask = nil
+            if self.session == nil, self.mode == .lidClosed {
+                self.isStoppedReasonInformational = false
+                self.errorMessage = String(localized: "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.")
+            }
         }
     }
 
@@ -209,7 +275,8 @@ final class KeepAwakeModel {
         approvalTask = nil
     }
 
-    func stop() {
+    func stop(reason: RemoteStatus.EndReason = .user) {
+        if session != nil { lastEnd = .init(reason: reason, at: Date()) }
         let leaseID = session?.mode == .lidClosed ? sessionID : nil
         if approvalTask != nil {
             cancelApprovalWait()
@@ -224,9 +291,7 @@ final class KeepAwakeModel {
             defer { isChanging = false }
             do {
                 let result = try await helper.releaseLidSleepLease(leaseID)
-                if result == .ownershipLost {
-                    showStoppedReason(result, sessionID: leaseID, releaseFailed: true)
-                } else if result != .success && result != .inactive {
+                if result != .success && result != .inactive {
                     showStoppedReason(result, sessionID: leaseID, releaseFailed: true)
                 }
             } catch {
@@ -247,6 +312,8 @@ final class KeepAwakeModel {
     }
 
     private func clearLocalSession() {
+        let endedID = sessionID
+        safety.endSession()
         sessionID = nil
         expiryTask?.cancel()
         expiryTask = nil
@@ -258,10 +325,13 @@ final class KeepAwakeModel {
         }
         assertion.release()
         session = nil
+        sessionName = nil
+        sessionOrigin = .manual
+        if let endedID { onOwnershipReleased?(endedID) }
     }
 
     func toggle() {
-        isActive ? stop() : start(mode: mode, duration: duration)
+        if isActive { stop() } else { start(mode: mode, duration: duration) }
     }
 
     func sleepDisplayNow() {
@@ -269,9 +339,7 @@ final class KeepAwakeModel {
         Task {
             let success: Bool
             do {
-                _ = try await BoundedCommand.run(
-                    executable: "/usr/bin/pmset", arguments: ["displaysleepnow"],
-                    timeout: 5, maximumOutputBytes: 16_384)
+                try await DisplaySleep.now()
                 success = true
             } catch { success = false }
             // A late display command must not replace the retained reason for
@@ -295,9 +363,10 @@ final class KeepAwakeModel {
     }
 
     private func reconcileAfterWakeOrActivation() {
+        safety.refresh()
         guard let session else { return }
         if session.hasExpired(at: Date()) {
-            stop()
+            stop(reason: .timer)
         } else if session.mode == .lidClosed, let id = sessionID {
             Task { await reconcileLease(sessionID: id) }
         }
@@ -320,11 +389,15 @@ final class KeepAwakeModel {
         }
     }
 
+    /// Ends the session if it is still the current one; a superseded start
+    /// only reports why it failed.
     private func stopAfterLeaseFailure(
         _ result: LidSleepLeaseResult?, sessionID id: String, releaseFailed: Bool = false
     ) {
-        guard sessionID == id else { return }
-        clearLocalSession()
+        if sessionID == id {
+            if session != nil { lastEnd = .init(reason: .failure, at: Date()) }
+            clearLocalSession()
+        }
         // Ownership was lost: no release/rollback RPC and no automatic restart.
         showStoppedReason(result, sessionID: id, releaseFailed: releaseFailed)
     }
@@ -354,6 +427,35 @@ final class KeepAwakeModel {
         session?.remaining(at: now)
     }
 
+    private func showSafetyReason(_ event: KeepAwakeSafetyPolicy.Event, id: String, starting: Bool = false) {
+        isStoppedReasonInformational = true
+        errorMessage = KeepAwakeSafetyMonitor.message(for: event, starting: starting)
+        notice.show(sessionID: id, message: errorMessage ?? "",
+                    title: starting ? String(localized: "Keep Awake not started") : String(localized: "Keep Awake stopped"))
+    }
+
+    /// A new duration counts from now. The closed-lid lease is untouched; it
+    /// does not carry a deadline of its own.
+    private func retime(_ current: KeepAwakeSession, to duration: KeepAwakeDuration) {
+        guard !isChanging else { return }
+        let now = Date()
+        let new = KeepAwakeSession(mode: current.mode, duration: duration, startedAt: now)
+        guard assertion.take(mode: new.mode, until: new.deadline, now: now) else {
+            stop(reason: .failure)
+            isStoppedReasonInformational = false
+            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            return
+        }
+        session = new
+        scheduleExpiry(for: new, now: now)
+        // A duration picked on this Mac takes the session over from automation or a phone.
+        if sessionOrigin != .profile {
+            sessionOrigin = .manual
+            sessionName = nil
+        }
+        if let sessionID { onOwnershipReleased?(sessionID) }
+    }
+
     /// One-shot, not a poll. The kernel releases the assertion on its own
     /// timeout regardless; this exists so the UI clears at the same moment.
     private func scheduleExpiry(for session: KeepAwakeSession, now: Date) {
@@ -366,7 +468,7 @@ final class KeepAwakeModel {
         expiryTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(interval))
             guard !Task.isCancelled else { return }
-            self?.stop()
+            self?.stop(reason: .timer)
         }
     }
 }
@@ -403,20 +505,6 @@ extension KeepAwakeDuration {
         case .sixHours: String(localized: "6 hours")
         case .twelveHours: String(localized: "12 hours")
         case .indefinite: String(localized: "Until I turn it off")
-        }
-    }
-
-    /// Compact form for the popover strip and the duration chips.
-    var shortLabel: String {
-        switch self {
-        case .fifteenMinutes: "15m"
-        case .thirtyMinutes: "30m"
-        case .oneHour: "1h"
-        case .twoHours: "2h"
-        case .fourHours: "4h"
-        case .sixHours: "6h"
-        case .twelveHours: "12h"
-        case .indefinite: "∞"
         }
     }
 }

@@ -26,43 +26,49 @@ struct SystemPane: View {
     var body: some View {
         @Bindable var keepAwake = keepAwake
         return Form {
+            if keepAwake.isActive {
+                Section("Current session") { KeepAwakeSessionCard() }
+            }
             Section("Keep Awake") {
-                Toggle(
-                    "Prevent this Mac from sleeping",
-                    isOn: Binding(
-                        get: { keepAwake.isActive },
-                        set: { _ in keepAwake.toggle() }))
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(
+                        "Prevent this Mac from sleeping",
+                        isOn: Binding(
+                            get: { keepAwake.isActive },
+                            set: { _ in keepAwake.toggle() }))
 
-                Picker("Mode", selection: $keepAwake.mode) {
-                    ForEach(KeepAwakeMode.allCases) { mode in
-                        Text(mode.label).tag(mode)
+                    Picker("Mode", selection: $keepAwake.displayedMode) {
+                        ForEach(KeepAwakeMode.allCases) { mode in
+                            Text(mode.label).tag(mode)
+                        }
+                    }
+                    if let caption = keepAwake.displayedMode.caption {
+                        Text(caption)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Picker("Duration", selection: $keepAwake.displayedDuration) {
+                        ForEach(KeepAwakeDuration.allCases) { duration in
+                            Text(duration.label).tag(duration)
+                        }
+                    }
+
+                    if let error = keepAwake.errorMessage {
+                        Text(error)
+                            .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
+                    }
+                    if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
+                        Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
                     }
                 }
-                if let caption = keepAwake.mode.caption {
-                    Text(caption)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Picker("Duration", selection: $keepAwake.duration) {
-                    ForEach(KeepAwakeDuration.allCases) { duration in
-                        Text(duration.label).tag(duration)
-                    }
-                }
-
-                if let error = keepAwake.errorMessage {
-                    Text(error)
-                        .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
-                }
-                if keepAwake.isActive && keepAwake.mode != .displayOn {
-                    Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
-                }
-                if keepAwake.isActive {
-                    LabeledContent("Time remaining", value: remainingText)
-                }
+                .disabled(keepAwake.isChanging)
+                .tourTarget(.power)
             }
 
-            .disabled(keepAwake.isChanging)
+            KeepAwakeProfiles()
+            KeepAwakeSafetySettings()
+            AutomationSettings()
 
             Section {
                 Text(
@@ -74,10 +80,19 @@ struct SystemPane: View {
 
             Section {
                 if let power = powerModel.settings {
+                    if power.sleepDisabled == true, !holdsLidSleep {
+                        LabeledContent {
+                            Button("Allow Sleep") { apply(.allowSleep) }
+                        } label: {
+                            Label("Sleep is turned off", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                            Text("This Mac will not sleep, not even with the lid closed, and it stays this way after a restart.")
+                        }
+                    }
                     if let mode = power.lowPowerMode {
                         Picker("Low Power Mode", selection: lowPowerBinding(mode)) {
                             ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
-                                Text(label(for: option)).tag(option)
+                                Text(option.label).tag(option)
                             }
                         }
                     }
@@ -111,6 +126,7 @@ struct SystemPane: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(TourScrollModifier())
         .navigationTitle("Power")
         .alert(
             failure?.title ?? "", isPresented: failureBinding, presenting: failure
@@ -123,6 +139,13 @@ struct SystemPane: View {
         // only from System Settings, so there is nothing here to poll.
         .task {
             helper.refreshStatus()
+            await powerModel.refresh()
+        }
+        // The helper turns sleep back on as a closed-lid session ends; read
+        // it again once that has landed, or the warning above shows stale.
+        .task(id: holdsLidSleep) {
+            guard !holdsLidSleep, powerModel.settings?.sleepDisabled == true else { return }
+            try? await Task.sleep(for: .seconds(3))
             await powerModel.refresh()
         }
     }
@@ -149,14 +172,20 @@ struct SystemPane: View {
             // Silent or outdated: re-registering fixes it, removing does not.
             Button("Repair") { repairHelper() }
                 .controlSize(.small)
-                .disabled(isRepairing)
+                .disabled(isRepairing || holdsLidSleep)
         } else if helper.isInstalled {
             Button("Remove Helper") { removeHelper() }
                 .controlSize(.small)
+                .disabled(holdsLidSleep)
         } else {
             Button("Never Ask Again…") { installHelper() }
                 .controlSize(.small)
         }
+    }
+
+    /// Re-registering or removing the helper ends a closed-lid session it holds.
+    private var holdsLidSleep: Bool {
+        keepAwake.session?.mode == .lidClosed || keepAwake.isChanging
     }
 
     private var permissionIcon: String {
@@ -378,15 +407,6 @@ struct SystemPane: View {
         }
     }
 
-    private func label(for mode: LowPowerModeSetting) -> String {
-        switch mode {
-        case .never: String(localized: "Never")
-        case .always: String(localized: "Always")
-        case .onlyOnBattery: String(localized: "Only on battery")
-        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
-        }
-    }
-
     private func label(for mode: EnergyMode) -> String {
         switch mode {
         case .automatic: String(localized: "Automatic")
@@ -395,13 +415,15 @@ struct SystemPane: View {
         }
     }
 
-    private var remainingText: String {
-        // Reading the snapshot subscribes this view to the dashboard's
-        // refresh loop, which is what re-evaluates the countdown.
-        _ = model.snapshot
-        guard let seconds = keepAwake.remaining() else {
-            return String(localized: "Until turned off")
+}
+
+extension LowPowerModeSetting {
+    var label: String {
+        switch self {
+        case .never: String(localized: "Never")
+        case .always: String(localized: "Always")
+        case .onlyOnBattery: String(localized: "Only on battery")
+        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
         }
-        return Formatting.duration(minutes: Int(seconds / 60))
     }
 }

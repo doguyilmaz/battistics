@@ -41,8 +41,6 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
     /// Missing context alone does not imply inconsistent readings.
     public let hasInconsistentReadings: Bool
 
-    public var source: String { "AppleSmartBattery.PowerTelemetryData" }
-
     /// Parses only the dictionary already obtained by BatteryReader.
     /// Estimates are explicitly sourced; adapter ratings never substitute for
     /// measured input and missing operands never become assumed zeros.
@@ -70,13 +68,6 @@ public struct PowerFlowTelemetry: Sendable, Equatable {
             batteryDirection: direction(from: props, batteryWatts: batteryPower),
             hasInconsistentReadings: negativeSystemLoad || batteryConflict
         )
-    }
-
-    public func isStale(at now: Date, maximumAge: TimeInterval = 30) -> Bool {
-        let age = now.timeIntervalSince(readAt)
-        guard age.isFinite, maximumAge.isFinite, maximumAge >= 0 else { return true }
-        // Clock changes cannot make a future-dated read indefinitely fresh.
-        return age < 0 || age > maximumAge
     }
 
     public func hasSameReadings(as other: Self) -> Bool {

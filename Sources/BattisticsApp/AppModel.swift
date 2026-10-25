@@ -19,6 +19,7 @@ final class AppModel {
     var dashboardPane: DashboardPane = .overview
     /// The About pane presents the report sheet and clears this.
     var reportRequested = false
+    var tourRequested = false
     /// macOS's own health verdict, fetched lazily once per launch.
     private(set) var appleHealth: AppleHealthInfo?
     @ObservationIgnored private var appleHealthTask: Task<Void, Never>?
@@ -30,10 +31,12 @@ final class AppModel {
     let history: HistoryStore
 
     @ObservationIgnored private let monitor = PowerSourceMonitor()
-    @ObservationIgnored private let alertDispatcher = AlertDispatcher()
-    @ObservationIgnored private var alertState = AlertState()
+    @ObservationIgnored private let alertDispatcher = AlertDispatcher.shared
+    /// Kept across launches, or a relaunch at 100% would announce the full charge again.
+    @ObservationIgnored private var alertState = UserDefaults.standard.data(forKey: Prefs.alertState)
+        .flatMap { try? JSONDecoder().decode(AlertState.self, from: $0) } ?? AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
-    @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var lastPowerSampleAt: Date?
     @ObservationIgnored private var visibleSamplingTask: Task<Void, Never>?
     @ObservationIgnored private var visibleSamplingInterval: Duration?
     @ObservationIgnored private var visibleSensorConsumers: [UUID: Duration] = [:]
@@ -44,14 +47,20 @@ final class AppModel {
     @ObservationIgnored private var lastTransitionSnapshot: BatterySnapshot?
     /// Injectable for tests; production reads IOKit.
     @ObservationIgnored private let batteryProvider: () -> BatterySnapshot?
+    @ObservationIgnored private let onBatteryReading: (BatterySnapshot?) -> Void
+    @ObservationIgnored private let suppressLowBatteryNotification: () -> Bool
 
     init(
         historyDirectory: URL? = nil,
         batteryProvider: @escaping () -> BatterySnapshot? = {
             BatteryReader.read(includePowerFlow: UserDefaults.standard.bool(forKey: Prefs.showPowerFlow))
-        }
+        },
+        onBatteryReading: @escaping (BatterySnapshot?) -> Void = { _ in },
+        suppressLowBatteryNotification: @escaping () -> Bool = { false }
     ) {
         self.batteryProvider = batteryProvider
+        self.onBatteryReading = onBatteryReading
+        self.suppressLowBatteryNotification = suppressLowBatteryNotification
         Prefs.registerDefaults()
         let directory =
             historyDirectory
@@ -61,7 +70,6 @@ final class AppModel {
 
         refreshSensors()
         startMonitoring()
-        restartPowerSampling()
         observeWake()
         observeDefaults()
         observePaneLinks()
@@ -78,14 +86,14 @@ final class AppModel {
             if let launchUnplugDate,
                 self.snapshot?.externalConnected == false,
                 self.lastUnplugDate == launchUnplugDate,
-                let storedUnplug = await self.history.lastUnplugDate(),
+                let storedUnplug = await self.history.lastUnplugDate(currentPercent: self.snapshot?.percent),
                 self.snapshot?.externalConnected == false,
                 self.lastUnplugDate == launchUnplugDate {
                 // Restore the real unplug moment across relaunches, both for
                 // the UI and for the on-battery duration alert. A live AC
                 // transition while reading history starts a different session.
                 self.lastUnplugDate = storedUnplug
-                self.alertState.unpluggedAt = storedUnplug
+                self.alertState.restoreUnplug(storedUnplug)
             }
         }
     }
@@ -96,6 +104,7 @@ final class AppModel {
     /// ingestion point. Safe to call from any path, any frequency.
     func refreshSensors() {
         guard let current = batteryProvider() else {
+            onBatteryReading(nil)
             if snapshot != nil { snapshot = nil }
             powerFlowReadAt = nil
             return
@@ -147,6 +156,7 @@ final class AppModel {
     /// transitions are recorded and alerted no matter which path (power
     /// event, UI poll, background sampler) observed them first.
     private func ingest(_ current: BatterySnapshot) {
+        onBatteryReading(current)
         powerFlowReadAt = current.powerFlow?.readAt
         let previous = lastTransitionSnapshot
         // Timestamp-only changes do not affect battery presentation. Alerts
@@ -156,9 +166,15 @@ final class AppModel {
         }
         evaluateAlerts(for: current)
         maybeRecordDailyHealth(current)
+        maybeRecordPowerSample(current)
 
+        // A steady state still gets a sample before the history's sleep cap,
+        // or hours at 100% would count as minutes.
+        let heartbeatDue = previous.map {
+            current.timestamp.timeIntervalSince($0.timestamp) >= HistoryMath.maxGapSeconds * 2 / 3
+        } ?? true
         let changed =
-            previous == nil
+            heartbeatDue
             || previous?.percent != current.percent
             || previous?.externalConnected != current.externalConnected
             || previous?.isCharging != current.isCharging
@@ -218,48 +234,51 @@ final class AppModel {
     private func trackUnplug(previous: BatterySnapshot?, current: BatterySnapshot) {
         if current.externalConnected {
             lastUnplugDate = nil
-        } else if previous?.externalConnected != false {
+        } else if previous?.externalConnected != false || current.percent > (previous?.percent ?? 100) + 2 {
+            // A clear rise on battery means it charged while asleep: a new session.
             lastUnplugDate = Date()
         }
     }
 
     // MARK: - Background power sampling (single coalesced tick, toggleable)
 
+    /// Power samples ride on the sensor reads that already happen, at least
+    /// every 15 seconds, instead of a second timer reading the battery again.
     func restartPowerSampling() {
-        powerSamplingTask?.cancel()
-        powerSamplingTask = nil
-        let defaults = UserDefaults.standard
-        guard defaults.bool(forKey: Prefs.powerSamplingEnabled) else { return }
-        let interval = max(defaults.double(forKey: Prefs.powerSamplingInterval), 30)
-        powerSamplingTask = Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(
-                    for: .seconds(interval), tolerance: .seconds(interval * 0.25))
-                guard !Task.isCancelled else { break }
-                await self?.recordPowerSample()
-            }
-        }
+        lastPowerSampleAt = nil
     }
 
-    private func recordPowerSample() async {
-        guard let current = batteryProvider() else { return }
-        ingest(current)
-        guard current.batteryInstalled, let watts = current.watts else { return }
-        await history.recordPowerSample(
-            date: current.timestamp,
-            watts: abs(watts),
-            volts: current.voltageMV.map { Double($0) / 1000 },
-            amps: current.amperageMA.map { Double($0) / 1000 },
-            temperatureC: current.temperatureC
-        )
+    private func maybeRecordPowerSample(_ current: BatterySnapshot) {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: Prefs.powerSamplingEnabled),
+              current.batteryInstalled, let watts = current.watts else { return }
+        let interval = max(defaults.double(forKey: Prefs.powerSamplingInterval), 30)
+        if let last = lastPowerSampleAt, current.timestamp.timeIntervalSince(last) < interval * 0.9 { return }
+        lastPowerSampleAt = current.timestamp
+        Task { [weak self] in
+            await self?.history.recordPowerSample(
+                date: current.timestamp,
+                watts: abs(watts),
+                volts: current.voltageMV.map { Double($0) / 1000 },
+                amps: current.amperageMA.map { Double($0) / 1000 },
+                temperatureC: current.temperatureC
+            )
+        }
     }
 
     // MARK: - Alerts and health snapshots
 
     private func evaluateAlerts(for snapshot: BatterySnapshot) {
+        let before = alertState
         let alerts = AlertRules.evaluate(
             snapshot: snapshot, config: Prefs.alertConfig(), state: &alertState)
+        if alertState != before {
+            UserDefaults.standard.set(try? JSONEncoder().encode(alertState), forKey: Prefs.alertState)
+        }
         for alert in alerts {
+            // The session-specific notice already explains the upcoming stop.
+            // Keep evaluating general alert state without sending two banners.
+            if case .lowBattery = alert, suppressLowBatteryNotification() { continue }
             alertDispatcher.deliver(alert)
         }
     }
@@ -292,8 +311,16 @@ final class AppModel {
             guard await self.history.hasHealthSnapshot(forDay: snapshot.timestamp) else { return }
             self.recordedHealthDay = day
             let enabled = UserDefaults.standard.bool(forKey: Prefs.alertHealthDropEnabled)
+            let defaults = UserDefaults.standard
+            var lastAlerted = defaults.object(forKey: Prefs.alertHealthLastAlerted) as? Double
+            // A recovered or replaced battery starts over.
+            if let last = lastAlerted, BatteryHealth.display(snapshot.healthPercent) > last + AlertRules.healthDeclineMargin {
+                lastAlerted = nil
+                defaults.removeObject(forKey: Prefs.alertHealthLastAlerted)
+            }
             if let alert = AlertRules.healthDropAlert(
-                baseline: baseline, current: snapshot.healthPercent, enabled: enabled) {
+                baseline: baseline, current: snapshot.healthPercent, enabled: enabled, lastAlerted: lastAlerted) {
+                if case .healthDropped(_, let to) = alert { defaults.set(to, forKey: Prefs.alertHealthLastAlerted) }
                 self.alertDispatcher.deliver(alert)
             }
         }
@@ -387,5 +414,33 @@ final class AppModel {
                 keyWindow.makeKeyAndOrderFront(nil)
             }
         }
+    }
+}
+
+extension AppModel {
+    func timeOnBattery(at date: Date) -> String {
+        guard let unplugged = lastUnplugDate else { return "—" }
+        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
+    }
+}
+
+extension BatterySnapshot {
+    /// The one line under the charge in the popover and the dashboard.
+    var statusLine: String {
+        if isCharging {
+            if let minutes = timeRemainingMin {
+                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
+            }
+            return String(localized: "Charging")
+        }
+        if externalConnected {
+            return fullyCharged || percent >= 100
+                ? String(localized: "Fully charged · plugged in")
+                : String(localized: "Plugged in · charging on hold")
+        }
+        if let minutes = timeRemainingMin {
+            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
+        }
+        return String(localized: "On battery")
     }
 }

@@ -1,0 +1,113 @@
+---
+import MenuBar from "./MenuBar.astro";
+import Popover from "./Popover.astro";
+import DownloadButton from "./DownloadButton.astro";
+import BrewCommand from "./BrewCommand.astro";
+import Contours from "./Contours.astro";
+
+---
+
+<header class="desk" aria-labelledby="hero-title">
+  <Contours cx={1060} cy={470} class="hero-lines" />
+
+  <MenuBar />
+
+  <div class="hero">
+    <div class="pitch">
+      <p class="free">Free for every Mac. Open source.</p>
+      <h1 id="hero-title">Your Mac’s battery, read properly.</h1>
+      <p class="lede">
+        Battistics lives in the menu bar and shows what macOS knows about the battery: charge, health, cycles,
+        temperature and every watt going in or out. When the Mac has to stay up, it keeps it awake, even with the lid
+        closed in a bag.
+      </p>
+      <div class="actions">
+        <DownloadButton />
+        <BrewCommand />
+      </div>
+      <p class="fineprint">macOS 14 or later, Apple Silicon. Try the menu bar above: it works.</p>
+    </div>
+  </div>
+
+  <Popover />
+</header>
+
+<style>
+  .desk {
+    position: relative;
+    overflow: clip;
+    padding-bottom: clamp(56px, 8vw, 104px);
+    background:
+      radial-gradient(80% 60% at 75% 40%, color-mix(in oklab, var(--accent-b) 12%, transparent), transparent 70%),
+      var(--paper);
+  }
+  .desk :global(.hero-lines) {
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+    mask-image: linear-gradient(180deg, #000 55%, transparent);
+  }
+
+  .hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: clamp(32px, 6vw, 88px);
+    min-height: 700px;
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: clamp(56px, 9vw, 120px) var(--gutter) 0;
+  }
+  .pitch { min-width: 0; }
+  .free {
+    display: inline-block;
+    margin: 0 0 22px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: color-mix(in oklab, var(--accent-a) 22%, var(--paper));
+    border: 1px solid color-mix(in oklab, var(--accent-b) 35%, transparent);
+  }
+  h1 {
+    margin: 0;
+    max-width: 12ch;
+    font: 720 clamp(2.9rem, 6.6vw, 5.4rem) / 0.96 var(--display);
+    font-stretch: 86%;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+  .lede { max-width: 50ch; margin: 28px 0 0; font-size: 1.16rem; line-height: 1.56; color: var(--ink-2); }
+  .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin-top: 36px; }
+  .fineprint { margin: 16px 0 0; font-size: 0.92rem; color: var(--ink-3); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .desk :global(.pop) { position: relative; top: auto; right: auto; margin: 48px auto 0; width: min(340px, calc(100% - 2 * var(--gutter))); }
+    .desk :global(.pop .arrow) { display: none; }
+  }
+</style>
+
+<script>
+  // Hang the popover under the status item, as macOS does.
+  const desk = document.querySelector<HTMLElement>(".desk")!;
+  const pop = document.getElementById("popover")!;
+  const place = () => {
+    const item = document.querySelector<HTMLElement>("[data-status-item]");
+    if (!item || matchMedia("(max-width: 900px)").matches) return;
+    const box = item.getBoundingClientRect();
+    const deskBox = desk.getBoundingClientRect();
+    const center = box.left + box.width / 2 - deskBox.left;
+    const right = Math.max(12, Math.min(deskBox.width - center - 90, deskBox.width - 352));
+    desk.style.setProperty("--pop-right", `${right}px`);
+    pop.style.setProperty("--arrow-right", `${deskBox.width - right - center - 7}px`);
+  };
+  place();
+  addEventListener("resize", place);
+  document.fonts?.ready.then(place);
+  document.addEventListener("place-popover", place);
+  document.addEventListener("open-popover", () => {
+    place();
+    if (scrollY > 240) scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>

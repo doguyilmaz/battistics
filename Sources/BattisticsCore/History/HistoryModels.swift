@@ -81,22 +81,4 @@ public enum HistoryMath {
         }
         return totals
     }
-
-    /// Groups points into fixed buckets and averages them, newest-last.
-    public static func bucketed(points: [SeriesPoint], bucketSeconds: TimeInterval) -> [SeriesPoint] {
-        guard bucketSeconds > 0, !points.isEmpty else { return points }
-        var sums: [TimeInterval: (total: Double, count: Int)] = [:]
-        for point in points {
-            let bucket = (point.date.timeIntervalSince1970 / bucketSeconds).rounded(.down) * bucketSeconds
-            let entry = sums[bucket] ?? (0, 0)
-            sums[bucket] = (entry.total + point.value, entry.count + 1)
-        }
-        return sums.keys.sorted().map { bucket in
-            let entry = sums[bucket]!
-            return SeriesPoint(
-                date: Date(timeIntervalSince1970: bucket),
-                value: entry.total / Double(entry.count)
-            )
-        }
-    }
 }

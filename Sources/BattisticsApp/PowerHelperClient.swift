@@ -221,6 +221,11 @@ final class PowerHelperClient {
                 proxy.version { @Sendable version in done(version == powerHelperBuild ? 0 : 1) }
             }
             return code == 0 ? .current : .outdated
+        } catch Failure.unreachable where asked === leaseConnection {
+            // A timeout only: the helper answers one connection at a time and
+            // may be inside a pmset run. Invalidating a lease's connection
+            // would end the closed-lid session.
+            return isOutdated ? .outdated : .current
         } catch {
             // A connection made before launchd (re)started the daemon stays
             // dead. Drop it so the next question reaches the new process.
@@ -265,6 +270,22 @@ final class PowerHelperClient {
         record(build)
         if build == .current { return }
         try await repair()
+    }
+
+    /// For requests from another device: uses a helper that is installed and
+    /// current, and never installs or re-registers one. Only someone at the
+    /// Mac may do that.
+    func requireCurrent() async throws {
+        status = service.status
+        if status == .requiresApproval { throw Failure.needsApproval }
+        guard status == .enabled else { throw Failure.unreachable }
+        let build = await askBuild(timeout: Self.replyTimeout)
+        record(build)
+        switch build {
+        case .current: return
+        case .outdated: throw Failure.outdated
+        case .silent: throw Failure.unreachable
+        }
     }
 
     /// Re-registers the helper and waits for launchd to bring up the new
@@ -438,6 +459,8 @@ final class PowerHelperClient {
                 proxy.setSleepTimer(
                     timer.wireCode, minutes: interval.rawValue, source: source.wireCode,
                     reply: done)
+            case .allowSleep:
+                proxy.allowSleep(reply: done)
             }
         }
         guard code == 0 else { throw Failure.rejected(code) }

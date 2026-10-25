@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+- Battistics Remote for iPhone: battery and its last day, time left,
+  connection, lid, heat and Keep Awake for the Macs on your Apple ID, with
+  start and stop, push alerts, Siri shortcuts, widgets and a Lock Screen
+  countdown. Off by default on the Mac; everything goes through your private
+  iCloud, with nothing to pair.
+- The Keep Awake card shows the connection, a closed lid and, on battery,
+  when the charge will not last the session.
+- Optional Keep Awake stop at a battery level, also in the menu bar's Keep
+  Awake menu, with advance warnings; off by default. Optional stop under heavy
+  thermal pressure; fan speeds are not changed.
+- Optional warning when the adapter is unplugged during Keep Awake.
+- Picking a duration during a session applies it from that moment.
+- Keep Awake for terminal commands with `battistics run`, and for AI tasks
+  through a bundled, opt-in local MCP server.
+- AI Focus, Long Build, Overnight and Presentation profiles, and a session card
+  showing what started Keep Awake and why the last one ended.
+- An eight-step tour on first launch, replayable from Help, and searchable help
+  in English and Turkish with optional on-device answers on macOS 26.
+- Power shows "Sleep is turned off" with Allow Sleep when macOS's sleep
+  override outlived a closed-lid session, for example after a power loss.
+- The live readings in Overview and the popover keep every row, with a dash
+  for a value macOS has not reported, so the cards no longer change height.
+- "Still on Battery" is sent once per unplug, also across a relaunch.
+- Battistics Remote can remove a Mac that no longer answers, and tells you
+  when a command from a widget, the Lock Screen or Control Center was refused.
+
 ## 1.4.1
 
 - The popover's Keep Awake menu marks the duration and mode you picked. The

@@ -1,0 +1,438 @@
+---
+import { glyphSVG } from "../lib/glyph";
+import { symbolHTML } from "../lib/symbols";
+import { POLICY_LABELS } from "../lib/sim";
+
+const C = 2 * Math.PI * 42;
+// A day on battery and back on the adapter, as the popover's chart draws it.
+const day = [96, 95, 92, 88, 84, 79, 74, 70, 66, 61, 57, 55, 63, 74, 86, 97, 100, 100, 99, 96, 93, 90, 86, 82];
+const hours = day.map((_, i) => (24 - (day.length - 1 - i)) % 24);
+const sx = (i: number) => (i / (day.length - 1)) * 300;
+const sy = (v: number) => 50 - (v / 100) * 46;
+const line = day.map((v, i) => `${i ? "L" : "M"}${sx(i).toFixed(1)} ${sy(v).toFixed(1)}`).join("");
+const area = `${line}L300 52L0 52Z`;
+const durations = [
+  [15, "15 minutes"], [30, "30 minutes"], [60, "1 hour"], [120, "2 hours"],
+  [240, "4 hours"], [720, "12 hours"], [0, "Until turned off"],
+] as const;
+---
+
+<div class="pop intro" id="popover" data-open="true" role="dialog" aria-label="Battistics">
+  <span class="arrow" aria-hidden="true"></span>
+  <header>
+    <span class="head-glyph" data-head-glyph set:html={glyphSVG({ shape: "bat", fraction: 0.82, charging: false })} />
+    <strong>Battistics</strong>
+    <span class="pin" set:html={symbolHTML("pin", 12)} />
+    <span class="badge">Good</span>
+  </header>
+
+  <div class="session-wrap" data-session-wrap data-open="false">
+    <div class="session-clip">
+      <div class="session">
+        <div class="session-top">
+          <span class="session-title"><Fragment set:html={symbolHTML("cup.and.saucer.fill", 13)} />Keep Awake</span>
+          <button type="button" class="mini" data-stop>Stop</button>
+        </div>
+        <div class="session-sub"><span>Started manually</span><span data-session-left>Until turned off</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rings">
+    <figure data-tone="green" data-charge-ring>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" class="track" />
+        <circle cx="50" cy="50" r="42" class="value" style={`stroke-dasharray:${C.toFixed(2)};stroke-dashoffset:${(C * 0.18).toFixed(2)}`} data-charge-arc />
+      </svg>
+      <span class="sym top" data-bolt hidden set:html={symbolHTML("bolt.fill", 11)} />
+      <span class="ring-value" data-charge-value>82%</span>
+      <span class="sym bottom" data-leaf hidden set:html={symbolHTML("leaf.fill", 11)} />
+      <figcaption>Charge</figcaption>
+    </figure>
+    <figure data-tone="green">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" class="track" />
+        <circle cx="50" cy="50" r="42" class="value" style={`stroke-dasharray:${C.toFixed(2)};stroke-dashoffset:${(C * 0.14).toFixed(2)}`} />
+      </svg>
+      <span class="ring-value">86%</span>
+      <figcaption>Health</figcaption>
+    </figure>
+  </div>
+  <p class="status-line" data-status-line>On battery · 5:44 remaining</p>
+
+  <section class="card">
+    <h3>Charge</h3>
+    <dl>
+      <div><dt>Current Charge</dt><dd data-mah>4,222 mAh</dd></div>
+      <div><dt>Current Maximum</dt><dd>5,149 mAh</dd></div>
+      <div><dt>Original Maximum</dt><dd>6,075 mAh</dd></div>
+      <div><dt>Time on Battery</dt><dd>1h 12m</dd></div>
+    </dl>
+  </section>
+  <section class="card">
+    <h3>Battery</h3>
+    <dl>
+      <div><dt>Cycles</dt><dd>156</dd></div>
+      <div><dt>Temperature</dt><dd>34.1°C / 93.4°F</dd></div>
+      <div><dt>Power</dt><dd class="draw" data-watts>−9.8 W</dd></div>
+      <div><dt>Amperage</dt><dd>−786 mA</dd></div>
+      <div><dt>Voltage</dt><dd>12.47 V</dd></div>
+      <div><dt>Manufacture Date</dt><dd>January 2023 · 3.8 years</dd></div>
+    </dl>
+  </section>
+  <section class="card spark" data-spark>
+    <h3>Last 24 hours</h3>
+    <div class="chart">
+      <svg viewBox="0 0 300 52" preserveAspectRatio="none" aria-label="Charge over the last 24 hours: down to 55% in the morning, full by midday, 82% now">
+        <defs>
+          <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="var(--sys-green)" stop-opacity=".35" /><stop offset="1" stop-color="var(--sys-green)" stop-opacity=".03" />
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#spark-fill)" />
+        <path d={line} class="spark-line" />
+      </svg>
+      <span class="rule" data-rule hidden></span>
+      <span class="tip" data-tip hidden></span>
+    </div>
+    <script type="application/json" data-series set:html={JSON.stringify(day.map((v, i) => [v, hours[i]]))} />
+  </section>
+  <p class="flow" data-flow>In 0.0 W <span>·</span> Mac 9.8 W <span>·</span> ← Bat −9.8 W</p>
+
+  <footer>
+    <a class="btn" href="#window">Overview</a>
+    <span class="spacer"></span>
+    <div class="menu-wrap">
+      <button type="button" class="btn icon" data-menu-button="lowpower" aria-haspopup="menu" aria-expanded="false" aria-label="Low Power Mode">
+        <span class="leaf-icon off" set:html={symbolHTML("leaf", 12)} /><span class="leaf-icon on" set:html={symbolHTML("leaf.fill", 12)} />
+      </button>
+      <div class="menu" role="menu" data-menu="lowpower" hidden>
+        <p class="menu-title">Low Power Mode</p>
+        {Object.entries(POLICY_LABELS).map(([value, label]) => (
+          <button type="button" role="menuitemradio" aria-checked={value === "never"} data-policy={value}>{label}</button>
+        ))}
+      </div>
+    </div>
+    <div class="menu-wrap split">
+      <button type="button" class="btn icon" data-awake-toggle aria-label="Keep Awake">
+        <span class="cup off" set:html={symbolHTML("cup.and.saucer", 12)} /><span class="cup on" set:html={symbolHTML("cup.and.saucer.fill", 12)} />
+      </button>
+      <button type="button" class="btn chevron" data-menu-button="awake" aria-haspopup="menu" aria-expanded="false" aria-label="Keep Awake options">
+        <Fragment set:html={symbolHTML("chevron.down", 5)} />
+      </button>
+      <div class="menu" role="menu" data-menu="awake" hidden>
+        <button type="button" role="menuitem" data-stop hidden>Turn Off</button>
+        <p class="menu-title">Duration</p>
+        {durations.map(([minutes, label]) => (
+          <button type="button" role="menuitemradio" aria-checked={minutes === 0} data-duration={minutes}>{label}</button>
+        ))}
+        <p class="menu-title">Mode</p>
+        <button type="button" role="menuitemradio" aria-checked="true" data-mode="displayOn">Keep the display on</button>
+        <button type="button" role="menuitemradio" aria-checked="false" data-mode="displayMaySleep">Let the display sleep</button>
+        <button type="button" role="menuitemradio" aria-checked="false" data-mode="lidClosed">Stay awake with the lid closed</button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button type="button" class="btn icon" data-menu-button="app" aria-haspopup="menu" aria-expanded="false" aria-label="Settings and more" set:html={symbolHTML("gearshape", 12)} />
+      <div class="menu" role="menu" data-menu="app" hidden>
+        <a role="menuitem" href="/docs/menu-bar/">Settings…</a>
+        <a role="menuitem" href="#download">Check for Updates…</a>
+        <a role="menuitem" href="https://github.com/doguyilmaz/battistics/issues">Report a Problem…</a>
+        <a role="menuitem" href="#download">About Battistics</a>
+        <hr />
+        <button type="button" role="menuitem" data-quit>Quit Battistics</button>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<style>
+  .pop {
+    --pop-bg: rgb(246 248 246 / 0.86);
+    --pop-card: rgb(0 0 0 / 0.045);
+    --pop-line: rgb(0 0 0 / 0.08);
+    --pop-btn: rgb(0 0 0 / 0.06);
+    --pop-ink: #1d1d1f;
+    --pop-ink-2: rgb(29 29 31 / 0.6);
+    --pop-menu: rgb(250 250 250 / 0.96);
+    position: absolute;
+    z-index: 30;
+    top: 38px;
+    right: var(--pop-right, 60px);
+    width: 340px;
+    padding: 14px;
+    border-radius: 16px;
+    color: var(--pop-ink);
+    background: var(--pop-bg);
+    backdrop-filter: blur(40px) saturate(1.7);
+    -webkit-backdrop-filter: blur(40px) saturate(1.7);
+    border: 1px solid var(--pop-line);
+    box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 28px 70px -20px rgb(15 40 30 / 0.45);
+    font: 13px/1.3 var(--text);
+    -webkit-font-smoothing: antialiased;
+    transform-origin: calc(100% - var(--arrow-right, 90px)) -10px;
+  }
+  :global(:root[data-theme="dark"]) .pop,
+  :global(:root:not([data-theme="light"])) .pop {
+    @media (prefers-color-scheme: dark) {
+      --pop-bg: rgb(32 34 36 / 0.86);
+      --pop-card: rgb(255 255 255 / 0.06);
+      --pop-line: rgb(255 255 255 / 0.1);
+      --pop-btn: rgb(255 255 255 / 0.09);
+      --pop-ink: #f2f2f2;
+      --pop-ink-2: rgb(242 242 242 / 0.55);
+      --pop-menu: rgb(40 42 44 / 0.97);
+    }
+  }
+  .pop {
+    transition: opacity 0.16s ease, transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+  }
+  .pop[data-open="false"] {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    visibility: hidden;
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+  }
+  .arrow {
+    position: absolute;
+    top: -7px;
+    right: var(--arrow-right, 90px);
+    width: 14px;
+    height: 14px;
+    rotate: 45deg;
+    background: var(--pop-bg);
+    border-left: 1px solid var(--pop-line);
+    border-top: 1px solid var(--pop-line);
+    border-radius: 3px 0 0 0;
+  }
+  header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .head-glyph :global(svg) { display: block; width: 26px; height: 15px; overflow: visible; }
+  header strong { font-size: 13.5px; }
+  .pin { display: flex; margin-left: auto; color: var(--pop-ink-2); }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #22a447; background: rgb(52 199 89 / 0.15); }
+
+  .session-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.26s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .session-wrap[data-open="true"] { grid-template-rows: 1fr; }
+  .session-clip { overflow: hidden; min-height: 0; }
+  .session { margin-bottom: 12px; padding: 10px; border-radius: 10px; background: color-mix(in oklab, var(--sys-blue) 8%, transparent); opacity: 0; transition: opacity 0.2s ease; }
+  .session-wrap[data-open="true"] .session { opacity: 1; }
+  .session-top { display: flex; justify-content: space-between; align-items: center; }
+  .session-title { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+  .session-title { font-size: 13px; }
+  .session-sub { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--pop-ink-2); font-variant-numeric: tabular-nums; }
+  .mini { height: 20px; padding: 0 9px; border: 0; border-radius: 5px; font: 500 11px var(--text); color: inherit; background: var(--pop-btn); box-shadow: 0 0.5px 1px rgb(0 0 0 / 0.18), inset 0 0 0 0.5px rgb(0 0 0 / 0.06); cursor: pointer; }
+
+  .rings { display: flex; justify-content: center; gap: 28px; }
+  figure { position: relative; width: 92px; margin: 0; text-align: center; }
+  figure > svg { display: block; width: 92px; height: 92px; rotate: -90deg; }
+  figure { --tone: var(--sys-green); }
+  figure[data-tone="yellow"] { --tone: #eab308; }
+  figure[data-tone="orange"] { --tone: var(--sys-orange); }
+  figure[data-tone="red"] { --tone: var(--sys-red); }
+  .track { fill: none; stroke: var(--tone); stroke-opacity: 0.16; stroke-width: 8; transition: stroke 0.3s; }
+  .value { fill: none; stroke: var(--tone); stroke-width: 8; stroke-linecap: round; transition: stroke 0.3s, stroke-dashoffset 0.5s ease-in-out; }
+  .ring-value { position: absolute; top: 46px; left: 0; right: 0; translate: 0 -50%; font: 600 21px/1 ui-rounded, -apple-system, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .sym { position: absolute; left: 0; right: 0; display: flex; justify-content: center; color: var(--tone); }
+  .sym.top { top: 15px; }
+  .sym.bottom { top: 62px; }
+  figcaption { margin-top: 6px; font-size: 12px; color: var(--pop-ink-2); }
+  .status-line { margin: 10px 0 12px; text-align: center; font-size: 12.5px; color: var(--pop-ink-2); }
+
+  .card { margin-bottom: 10px; padding: 10px 12px; border-radius: 12px; background: var(--pop-card); }
+  .card h3 { margin: 0 0 6px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--pop-ink-2); }
+  dl { margin: 0; }
+  dl div { display: flex; justify-content: space-between; gap: 12px; padding: 2.5px 0; font-size: 12px; }
+  dt { color: var(--pop-ink-2); }
+  dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+  dd.draw { color: var(--sys-orange); }
+  .chart { position: relative; height: 46px; }
+  .chart svg { display: block; width: 100%; height: 46px; }
+  .spark-line { fill: none; stroke: var(--sys-green); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .rule { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--pop-ink-2); opacity: 0.4; }
+  .tip { position: absolute; top: -4px; translate: -50% -100%; padding: 2px 5px; border-radius: 5px; font-size: 10.5px; white-space: nowrap; background: var(--pop-menu); box-shadow: 0 2px 8px rgb(0 0 0 / 0.15); font-variant-numeric: tabular-nums; }
+  .flow { margin: 2px 0 12px; text-align: center; font-size: 11.5px; color: var(--pop-ink-2); font-variant-numeric: tabular-nums; }
+
+  footer { display: flex; align-items: center; gap: 6px; }
+  .spacer { flex: 1; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    font: 500 12px var(--text);
+    color: inherit;
+    text-decoration: none;
+    background: var(--pop-btn);
+    cursor: pointer;
+  }
+  .btn.icon { width: 30px; padding: 0; }
+  .btn { color: var(--pop-ink-2); }
+  .btn:first-child { color: inherit; }
+  .on, :global(:root[data-low-power="true"]) .leaf-icon.off, :global(:root[data-awake="true"]) .cup.off { display: none; }
+  :global(:root[data-low-power="true"]) .leaf-icon.on, :global(:root[data-awake="true"]) .cup.on { display: flex; }
+  .split { display: flex; gap: 1px; }
+  .split .btn.icon { border-radius: 6px 0 0 6px; }
+  .btn.chevron { width: 18px; padding: 0; border-radius: 0 6px 6px 0; }
+
+  .btn:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 1px; }
+  :global(:root[data-low-power="true"]) .leaf-icon { color: #eab308; }
+  :global(:root[data-awake="true"]) [data-awake-toggle] { color: var(--sys-blue); }
+
+  .menu-wrap { position: relative; }
+  .menu {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 6px);
+    z-index: 5;
+    min-width: 224px;
+    padding: 5px;
+    border-radius: 9px;
+    background: var(--pop-menu);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--pop-line);
+    box-shadow: 0 12px 34px rgb(0 0 0 / 0.22);
+  }
+  .menu-title { margin: 4px 8px 2px; font-size: 11px; font-weight: 600; color: var(--pop-ink-2); }
+  .menu button,
+  .menu a {
+    display: block;
+    width: 100%;
+    padding: 4px 8px 4px 22px;
+    border: 0;
+    border-radius: 5px;
+    text-align: left;
+    font: 13px var(--text);
+    color: inherit;
+    text-decoration: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .menu [aria-checked="true"]::before { content: "✓"; position: absolute; left: 7px; font-size: 11px; }
+  .menu button:hover,
+  .menu a:hover,
+  .menu button:focus-visible,
+  .menu a:focus-visible { background: var(--sys-blue); color: #fff; outline: none; }
+  .menu hr { margin: 4px 6px; border: 0; border-top: 1px solid var(--pop-line); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pop.intro { animation: drop 0.34s cubic-bezier(0.2, 0.9, 0.25, 1.04) 0.25s both; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pop, .pop[data-open="false"], .session-wrap, .session { transition: none; }
+  }
+  @keyframes drop {
+    from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+    to { opacity: 1; transform: none; }
+  }
+</style>
+
+<script>
+  import { glyphSVG } from "../lib/glyph";
+  import { chargeTone, lowPowerActive, remainingSeconds, startSession, stopSession, subscribe, update, type AwakeMode, type LowPowerPolicy } from "../lib/sim";
+
+  const pop = document.getElementById("popover")!;
+  pop.addEventListener("animationend", () => pop.classList.remove("intro"), { once: true });
+  const $ = <T extends Element = HTMLElement>(sel: string) => pop.querySelector<T & HTMLElement>(sel);
+  const C = 2 * Math.PI * 42;
+  let pickedMinutes = 0;
+  let pickedMode: AwakeMode = "displayOn";
+
+  // Menus: one open at a time, closed by Escape or a click elsewhere.
+  const closeMenus = () => {
+    for (const menu of pop.querySelectorAll<HTMLElement>("[data-menu]")) menu.hidden = true;
+    for (const button of pop.querySelectorAll("[data-menu-button]")) button.setAttribute("aria-expanded", "false");
+  };
+  for (const button of pop.querySelectorAll<HTMLElement>("[data-menu-button]")) {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const menu = $(`[data-menu="${button.dataset.menuButton}"]`)!;
+      const opening = menu.hidden;
+      closeMenus();
+      menu.hidden = !opening;
+      button.setAttribute("aria-expanded", String(opening));
+      if (opening) menu.querySelector<HTMLElement>("button, a")?.focus();
+    });
+  }
+  document.addEventListener("click", (event) => {
+    if (!(event.target as Element).closest?.(".menu")) closeMenus();
+  });
+  document.addEventListener("keydown", (event) => event.key === "Escape" && closeMenus());
+
+  for (const item of pop.querySelectorAll<HTMLElement>("[data-policy]")) {
+    item.addEventListener("click", () => {
+      update((s) => (s.lowPower = item.dataset.policy as LowPowerPolicy));
+      closeMenus();
+    });
+  }
+  for (const item of pop.querySelectorAll<HTMLElement>("[data-duration]")) {
+    item.addEventListener("click", () => {
+      pickedMinutes = Number(item.dataset.duration);
+      for (const other of pop.querySelectorAll("[data-duration]")) other.setAttribute("aria-checked", String(other === item));
+    });
+  }
+  for (const item of pop.querySelectorAll<HTMLElement>("[data-mode]")) {
+    item.addEventListener("click", () => {
+      pickedMode = item.dataset.mode as AwakeMode;
+      for (const other of pop.querySelectorAll("[data-mode]")) other.setAttribute("aria-checked", String(other === item));
+    });
+  }
+  $("[data-awake-toggle]")?.addEventListener("click", () => {
+    if (document.documentElement.dataset.awake === "true") stopSession();
+    else startSession(pickedMode, pickedMinutes);
+  });
+  for (const stop of pop.querySelectorAll("[data-stop]")) stop.addEventListener("click", () => { stopSession(); closeMenus(); });
+  $("[data-quit]")?.addEventListener("click", () => {
+    closeMenus();
+    pop.dataset.open = "false";
+    document.querySelector("[data-status-item]")?.setAttribute("aria-expanded", "false");
+  });
+
+  // The chart reads out the hour under the pointer, like the app's sparkline.
+  const chart = $(".chart")!;
+  const series: [number, number][] = JSON.parse($("[data-series]")!.textContent ?? "[]");
+  const rule = $("[data-rule]")!;
+  const tip = $("[data-tip]")!;
+  chart.addEventListener("pointermove", (event) => {
+    const box = chart.getBoundingClientRect();
+    const i = Math.round(((event.clientX - box.left) / box.width) * (series.length - 1));
+    const [value, hour] = series[Math.min(Math.max(i, 0), series.length - 1)];
+    const x = (i / (series.length - 1)) * box.width;
+    rule.hidden = tip.hidden = false;
+    rule.style.left = tip.style.left = `${x}px`;
+    tip.textContent = `${value}%  ${String(hour).padStart(2, "0")}:00`;
+  });
+  chart.addEventListener("pointerleave", () => (rule.hidden = tip.hidden = true));
+
+  let ticker: number | undefined;
+  subscribe((s) => {
+    const low = lowPowerActive(s);
+    const tone = chargeTone(s);
+    $("[data-charge-ring]")!.dataset.tone = tone;
+    $<SVGCircleElement>("[data-charge-arc]")!.style.strokeDashoffset = String(C * (1 - s.charge / 100));
+    $("[data-charge-value]")!.textContent = `${s.charge}%`;
+    $("[data-leaf]")!.hidden = !low;
+    $("[data-bolt]")!.hidden = !s.charging;
+    $("[data-head-glyph]")!.innerHTML = glyphSVG({ shape: "bat", fraction: s.charge / 100, charging: s.charging });
+    for (const item of pop.querySelectorAll("[data-policy]")) {
+      item.setAttribute("aria-checked", String((item as HTMLElement).dataset.policy === s.lowPower));
+    }
+    $("[data-session-wrap]")!.dataset.open = String(s.session !== null);
+    for (const stop of pop.querySelectorAll<HTMLElement>("[data-stop]")) if (stop.closest(".menu")) stop.hidden = !s.session;
+    clearInterval(ticker);
+    if (s.session) {
+      const current = s.session;
+      const left = $("[data-session-left]")!;
+      const draw = () => {
+        const seconds = remainingSeconds(current);
+        if (seconds === 0) return stopSession();
+        left.textContent = seconds === null ? "Until turned off" : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s left`;
+      };
+      draw();
+      ticker = window.setInterval(draw, 1000);
+    }
+  });
+</script>

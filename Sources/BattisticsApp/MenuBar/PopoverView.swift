@@ -27,6 +27,7 @@ struct PopoverView: View {
     var body: some View {
         VStack(spacing: 12) {
             header
+            if keepAwake.isActive { KeepAwakeSessionCard(compact: true) }
             if let snapshot = model.snapshot, snapshot.batteryInstalled {
                 HStack(spacing: 28) {
                     GaugeRing(
@@ -46,7 +47,7 @@ struct PopoverView: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                Text(statusText(snapshot))
+                Text(snapshot.statusLine)
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
@@ -57,12 +58,13 @@ struct PopoverView: View {
                     PowerFlowSummary()
                 }
             } else {
-                ContentUnavailableView(
-                    "No battery found",
-                    systemImage: "minus.plus.batteryblock.exclamationmark",
-                    description: Text("Battistics needs a Mac with a built-in battery.")
-                )
+                NoBatteryView()
                 .frame(height: 200)
+            }
+            if let warning = keepAwake.safety.warningMessage {
+                Label(warning, systemImage: "exclamationmark.triangle")
+                    .font(.caption).foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             if let error = keepAwake.errorMessage {
                 Text(error).font(.caption)
@@ -107,12 +109,6 @@ struct PopoverView: View {
             Text("Battistics")
                 .font(.headline)
                 .fixedSize()
-            // Before the Spacer on purpose: everything left of it is
-            // left-aligned and everything right of it is pinned right, so the
-            // Spacer absorbs the whole width change and nothing moves.
-            if keepAwake.isActive {
-                keepAwakeChip
-            }
             Spacer()
             if !isPinnedWindow {
                 Button {
@@ -168,24 +164,7 @@ struct PopoverView: View {
                         ("Power", "Battery power. Negative means draining; positive means charging."),
                         ("Voltage", "Battery pack voltage."),
                     ])
-                StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
-                if let temperature = snapshot.temperatureC {
-                    StatRow(
-                        label: "Temperature",
-                        value: Formatting.temperature(temperature, unit: temperatureUnit))
-                }
-                if let watts = snapshot.watts {
-                    StatRow(
-                        label: "Power",
-                        value: Formatting.watts(watts, signed: true),
-                        valueColor: watts < 0 ? .orange : nil)
-                }
-                if let amperage = snapshot.amperageMA {
-                    StatRow(label: "Amperage", value: Formatting.milliamps(amperage))
-                }
-                if let voltage = snapshot.voltageMV {
-                    StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
-                }
+                LiveBatteryRows(snapshot: snapshot, temperatureUnit: temperatureUnit)
                 if let date = snapshot.manufactureDate {
                     let dateText =
                         snapshot.manufactureDateIsApproximate
@@ -268,48 +247,6 @@ struct PopoverView: View {
         }
     }
 
-    /// Matches the banner it replaces: cup, message, and its own close
-    /// button. Measured at 117.6pt worst case against 122.2pt of header room,
-    /// so it survives the widest health badge and the longest duration.
-    private var keepAwakeChip: some View {
-        HStack(spacing: 3) {
-            Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 9))
-            Group {
-                if windowVisible, let session = keepAwake.session, session.deadline != nil {
-                    TimelineView(.periodic(from: session.startedAt, by: 60)) { _ in
-                        Text(chipText(at: Date()))
-                    }
-                } else {
-                    Text(chipText(at: Date()))
-                }
-            }
-                .font(.system(size: 10, weight: .medium))
-                .monospacedDigit()
-                .lineLimit(1)
-            Button {
-                keepAwake.stop()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 8, weight: .bold))
-            }
-            .buttonStyle(.plain)
-            .padding(.leading, 1)
-            .help("Turn off Keep Awake")
-        }
-        .foregroundStyle(Color.accentColor)
-        .padding(.horizontal, 5)
-        .padding(.vertical, 2)
-        .background(Color.accentColor.opacity(0.14), in: Capsule())
-    }
-
-    private func chipText(at date: Date) -> String {
-        guard let seconds = keepAwake.remaining(at: date) else {
-            return String(localized: "Awake")
-        }
-        return String(localized: "Awake · \(Formatting.duration(minutes: Int(seconds / 60)))")
-    }
-
     /// Low Power Mode only. The sleep timers are set-and-forget and belong
     /// in the System pane; this is the one people actually flip.
     ///
@@ -323,7 +260,7 @@ struct PopoverView: View {
             if let current = powerModel.settings?.lowPowerMode {
                 Picker("Low Power Mode", selection: lowPowerBinding(current)) {
                     ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
-                        Text(lowPowerLabel(option)).tag(option)
+                        Text(option.label).tag(option)
                     }
                 }
                 .pickerStyle(.inline)
@@ -354,35 +291,35 @@ struct PopoverView: View {
             })
     }
 
-    private func lowPowerLabel(_ mode: LowPowerModeSetting) -> String {
-        switch mode {
-        case .never: String(localized: "Never")
-        case .always: String(localized: "Always")
-        case .onlyOnBattery: String(localized: "Only on battery")
-        case .onlyOnPowerAdapter: String(localized: "Only on power adapter")
-        }
-    }
-
     private var keepAwakeMenu: some View {
         @Bindable var keepAwake = keepAwake
+        @Bindable var safety = keepAwake.safety
         return Menu {
             if keepAwake.isActive {
                 Button("Turn Off") { keepAwake.stop() }
                 Divider()
             }
-            Picker("Duration", selection: $keepAwake.duration) {
+            Picker("Duration", selection: $keepAwake.displayedDuration) {
                 ForEach(KeepAwakeDuration.allCases) { duration in
                     Text(duration.label).tag(duration)
                 }
             }
             .pickerStyle(.inline)
             Divider()
-            Picker("Mode", selection: $keepAwake.mode) {
+            Picker("Mode", selection: $keepAwake.displayedMode) {
                 ForEach(KeepAwakeMode.allCases) { mode in
                     Text(mode.label).tag(mode)
                 }
             }
             .pickerStyle(.inline)
+            Divider()
+            Picker("Stop on Low Battery", selection: $safety.configuration.batteryStopLevel) {
+                Text("Never").tag(0)
+                ForEach(batteryStopLevels, id: \.self) { level in
+                    Text(Formatting.percent(Double(level))).tag(level)
+                }
+            }
+            .pickerStyle(.menu)
         } label: {
             Image(systemName: keepAwake.isActive ? "cup.and.saucer.fill" : "cup.and.saucer")
         } primaryAction: {
@@ -391,8 +328,13 @@ struct PopoverView: View {
         .menuStyle(.button)
         // A menu with a primary action builds its items once and never
         // updates them; a new identity rebuilds them.
-        .id("\(keepAwake.isActive) \(keepAwake.duration.rawValue) \(keepAwake.mode.rawValue)")
+        .id("\(keepAwake.isActive) \(keepAwake.displayedDuration.rawValue) \(keepAwake.displayedMode.rawValue) \(keepAwake.safety.configuration.batteryStopLevel)")
         .help("Keep Awake")
+    }
+
+    private var batteryStopLevels: [Int] {
+        let current = keepAwake.safety.configuration.batteryStopLevel
+        return Set([5, 10, 15, 20, 30]).union(current > 0 ? [current] : []).sorted()
     }
 
     /// An update Sparkle is holding after a background check.
@@ -463,16 +405,11 @@ struct PopoverView: View {
     @ViewBuilder private var timeOnBatteryRow: some View {
         if windowVisible, let unplugged = model.lastUnplugDate {
             TimelineView(.periodic(from: unplugged, by: 60)) { context in
-                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
+                StatRow(label: "Time on Battery", value: model.timeOnBattery(at: context.date))
             }
         } else {
-            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
+            StatRow(label: "Time on Battery", value: model.timeOnBattery(at: Date()))
         }
-    }
-
-    private func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = model.lastUnplugDate else { return String(localized: "N/A") }
-        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     private var nearestSparklinePoint: SeriesPoint? {
@@ -483,23 +420,6 @@ struct PopoverView: View {
         }
     }
 
-    private func statusText(_ snapshot: BatterySnapshot) -> String {
-        if snapshot.isCharging {
-            if let minutes = snapshot.timeRemainingMin {
-                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
-            }
-            return String(localized: "Charging")
-        }
-        if snapshot.externalConnected {
-            return snapshot.fullyCharged || snapshot.percent >= 100
-                ? String(localized: "Fully charged · plugged in")
-                : String(localized: "Plugged in · charging on hold")
-        }
-        if let minutes = snapshot.timeRemainingMin {
-            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
-        }
-        return String(localized: "On battery")
-    }
 
 
     private func statusWord(_ status: HealthStatus) -> String {

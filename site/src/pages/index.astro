@@ -1,0 +1,100 @@
+---
+import Page from "../layouts/Page.astro";
+import MenuBarHero from "../components/MenuBarHero.astro";
+import DashboardWindow from "../components/DashboardWindow.astro";
+import MenuBarLab from "../components/MenuBarLab.astro";
+import KeepAwakeShowcase from "../components/KeepAwakeShowcase.astro";
+import RemoteSection from "../components/RemoteSection.astro";
+import DevelopersSection from "../components/DevelopersSection.astro";
+import PrivacySection from "../components/PrivacySection.astro";
+import GetSection from "../components/GetSection.astro";
+import Contours from "../components/Contours.astro";
+---
+
+<Page
+  title="Battistics: battery statistics for the Mac"
+  description="A free, open source menu bar app that shows your Mac's battery health, cycles, power and history, and keeps the Mac awake when you need it, lid closed included."
+>
+  <MenuBarHero />
+
+  <main>
+    <section class="band" id="window" aria-labelledby="window-title">
+      <div class="head">
+        <h2 id="window-title">Everything the battery reports, in one window</h2>
+        <p>
+          macOS tracks far more about the battery than the menu bar shows. Battistics reads it whenever the power state
+          changes and lays it out in plain words. Click through the window; any pane opens larger.
+        </p>
+      </div>
+      <DashboardWindow />
+    </section>
+
+    <section class="band" id="menubar" aria-labelledby="menubar-title">
+      <div class="head">
+        <h2 id="menubar-title">An icon that reads like a gauge</h2>
+        <p>
+          Five styles, each drawn live at the battery's real level, with the reading you want beside it or inside it and
+          colours for low, critical, full and charging. These are the app's own settings.
+        </p>
+      </div>
+      <MenuBarLab />
+    </section>
+  </main>
+
+  <KeepAwakeShowcase />
+  <RemoteSection />
+  <DevelopersSection />
+  <div class="ending">
+    <Contours cx={720} cy={1050} start={640} step={240} count={8} class="ending-lines" />
+    <PrivacySection />
+    <GetSection />
+
+  <footer>
+    <nav aria-label="More">
+      <a href="/docs/">Documentation</a>
+      <a href="https://github.com/doguyilmaz/battistics">Source on GitHub</a>
+      <a href="https://github.com/doguyilmaz/battistics/blob/main/CHANGELOG.md">What's new</a>
+      <a href="https://github.com/doguyilmaz/battistics/issues">Report a problem</a>
+    </nav>
+    <p>Made by <a href="https://doguyilmaz.com">Dogu Yilmaz</a>. Free and open source.</p>
+  </footer>
+  </div>
+</Page>
+
+<style>
+  .ending { position: relative; overflow: clip; }
+  .ending > :global(*:not(.contours)) { position: relative; }
+  .ending :global(.ending-lines) {
+    opacity: 0.7;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%);
+    mask-image: linear-gradient(180deg, transparent, #000 30%);
+  }
+  main { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
+  .band { padding-top: clamp(72px, 10vw, 128px); }
+  .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 56px; align-items: end; margin-bottom: 40px; }
+  h2 {
+    margin: 0;
+    font: 720 clamp(2.1rem, 4.4vw, 3.4rem) / 1 var(--display);
+    font-stretch: 86%;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .head p { margin: 0; max-width: 54ch; color: var(--ink-2); font-size: 1.08rem; line-height: 1.55; }
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 48px var(--gutter) 56px;
+    color: var(--ink-3);
+    font-size: 0.93rem;
+  }
+  footer nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  footer a { color: var(--ink-2); }
+  footer p { margin: 0; }
+  @media (max-width: 860px) {
+    .head { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

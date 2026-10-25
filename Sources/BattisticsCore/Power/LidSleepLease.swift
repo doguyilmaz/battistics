@@ -16,6 +16,11 @@ public final class LidSleepLease {
 
     private var active: Active?
     private var disconnectedOwners: Set<UUID> = []
+    private var disconnectedOrder: [UUID] = []
+    private var terminalOrder: [UUID] = []
+    /// The daemon lives for days; old sessions and owners only need to be
+    /// remembered long enough to answer a late message.
+    private static let memory = 256
     private var terminal: [UUID: Terminal] = [:]
     private var blocked = false
     private let read: () throws -> Bool
@@ -42,12 +47,12 @@ public final class LidSleepLease {
         guard active == nil else { return .rejected }
         let original: Bool
         do { original = try read() } catch {
-            terminal[session] = Terminal(owner: owner, result: .unavailable)
+            markEnded(session, Terminal(owner: owner, result: .unavailable))
             return .unavailable
         }
         var record = LidSleepLeaseJournal(original: original, session: session, phase: .prepared)
         do { try save(record) } catch {
-            terminal[session] = Terminal(owner: owner, result: .failed)
+            markEnded(session, Terminal(owner: owner, result: .failed))
             // A failed atomic write may still have left a record. Disarm it.
             _ = abandon(record)
             return .failed
@@ -105,7 +110,8 @@ public final class LidSleepLease {
     public func disconnected(owner: UUID) -> LidSleepLeaseResult {
         // An invalidation can reach the serial queue before a concurrently
         // delivered acquire request. That dead endpoint cannot create a lease.
-        disconnectedOwners.insert(owner)
+        if disconnectedOwners.insert(owner).inserted { disconnectedOrder.append(owner) }
+        if disconnectedOrder.count > Self.memory { disconnectedOwners.remove(disconnectedOrder.removeFirst()) }
         guard let current = active, current.owner == owner else { return .inactive }
         return restore()
     }
@@ -116,6 +122,12 @@ public final class LidSleepLease {
         return restore()
     }
 
+    /// The helper is being stopped. Once launchd has unloaded it, nothing
+    /// replays the journal, so a lid override left on would never be undone.
+    public func shutdown() -> LidSleepLeaseResult {
+        restore()
+    }
+
     public func recover(journal: LidSleepLeaseJournal) -> LidSleepLeaseResult {
         guard active == nil, !blocked else { return .rejected }
         if let session = journal.session, let ended = terminal[session] {
@@ -123,7 +135,7 @@ public final class LidSleepLease {
         }
         let result = recoverOnce(journal: journal)
         if let session = journal.session {
-            terminal[session] = Terminal(owner: nil, result: result == .success ? .inactive : result)
+            markEnded(session, Terminal(owner: nil, result: result == .success ? .inactive : result))
         }
         return result
     }
@@ -149,6 +161,11 @@ public final class LidSleepLease {
         } catch { return .unavailable }
         do { try write(false) } catch { return .failed }
         do { return try read() ? .failed : .success } catch { return .unavailable }
+    }
+
+    private func markEnded(_ session: UUID, _ ended: Terminal) {
+        if terminal.updateValue(ended, forKey: session) == nil { terminalOrder.append(session) }
+        if terminalOrder.count > Self.memory { terminal[terminalOrder.removeFirst()] = nil }
     }
 
     private func terminalResult(owner: UUID, session: UUID) -> LidSleepLeaseResult {
@@ -179,14 +196,14 @@ public final class LidSleepLease {
     }
 
     private func remember(_ result: LidSleepLeaseResult, for current: Active) -> LidSleepLeaseResult {
-        terminal[current.session] = Terminal(owner: current.owner, result: result)
+        markEnded(current.session, Terminal(owner: current.owner, result: result))
         return result
     }
 
     private func finish(result: LidSleepLeaseResult) -> LidSleepLeaseResult {
         guard let current = active else { return .inactive }
         active = nil
-        terminal[current.session] = Terminal(owner: current.owner, result: result)
+        markEnded(current.session, Terminal(owner: current.owner, result: result))
         return abandon(current.journal) ? result : remember(.failed, for: current)
     }
 

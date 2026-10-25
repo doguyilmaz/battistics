@@ -32,19 +32,6 @@ struct HistoryMathTests {
         let totals = HistoryMath.timeTotals(samples: samples)
         #expect(totals.onBattery == HistoryMath.maxGapSeconds)
     }
-
-    @Test func bucketedAverages() {
-        let base = Date(timeIntervalSince1970: 1_700_000_000)
-        let points = [
-            SeriesPoint(date: base, value: 10),
-            SeriesPoint(date: base.addingTimeInterval(10), value: 20),
-            SeriesPoint(date: base.addingTimeInterval(70), value: 40),
-        ]
-        let buckets = HistoryMath.bucketed(points: points, bucketSeconds: 60)
-        #expect(buckets.count == 2)
-        #expect(buckets[0].value == 15)
-        #expect(buckets[1].value == 40)
-    }
 }
 
 @Suite("History store", .serialized)
@@ -53,6 +40,19 @@ struct HistoryStoreTests {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("battistics-tests-\(UUID().uuidString)")
         return HistoryStore(directory: directory)
+    }
+
+    @Test func unreadableFileIsMovedAsideAndHistoryKeepsWorking() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("battistics-tests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data(repeating: 0x42, count: 4096).write(to: directory.appendingPathComponent("history.sqlite"))
+        let store = HistoryStore(directory: directory)
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        await store.recordChargeSample(ChargeSample(date: date, percent: 50, externalConnected: false, isCharging: false))
+        #expect(await store.chargeSamples(from: date.addingTimeInterval(-60), to: date.addingTimeInterval(60)).count == 1)
+        let names = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        #expect(names.contains { $0.hasPrefix("history.sqlite.corrupt-") })
     }
 
     @Test func recordsAndQueriesChargeSeries() async {
@@ -107,6 +107,16 @@ struct HistoryStoreTests {
 
         let unplug = await store.lastUnplugDate()
         #expect(unplug == base.addingTimeInterval(600))
+    }
+
+    @Test func lastUnplugDateIgnoresAChargeNobodyRecorded() async {
+        let store = makeStore()
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        await store.recordChargeSample(ChargeSample(date: base, percent: 100, externalConnected: true, isCharging: false))
+        await store.recordChargeSample(
+            ChargeSample(date: base.addingTimeInterval(600), percent: 40, externalConnected: false, isCharging: false))
+        #expect(await store.lastUnplugDate(currentPercent: 40) == base.addingTimeInterval(600))
+        #expect(await store.lastUnplugDate(currentPercent: 95) == nil)
     }
 
     @Test func lastUnplugDateNilWhilePlugged() async {
@@ -267,6 +277,10 @@ struct HistoryStoreTests {
         "hourly,1700000000,8,10,invalid",
         "health,2023-11-14,1700000000,nan,5900,,6075,10",
         "health,2023-11-14,1700000000,98,5900,invalid,6075,10",
+        "health,yesterday,1700000000,98,5900,,6075,10",
+        "health,2023-11-14,1700000000,980,5900,,6075,10",
+        "health,2023-11-14,1700000000,98,0,,6075,10",
+        "health,2023-11-14,1700000000,98,5900,,-1,10",
     ])
     func csvRejectsInvalidNumericValues(row: String) {
         #expect(throws: HistoryError.self) { try CSVPort.parse(row) }

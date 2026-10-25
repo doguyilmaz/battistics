@@ -1,0 +1,59 @@
+---
+const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
+---
+
+<a class="download" href={fallback} data-download>
+  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.2M6 8.6l4 4 4-4M4 16h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span>Download for Mac</span>
+  <small data-download-meta>DMG</small>
+</a>
+
+<style>
+  .download {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 16px 0 18px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: var(--paper);
+    font: 600 1rem/1 var(--text);
+    text-decoration: none;
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18);
+    transition: transform 0.12s ease;
+  }
+  .download:active { transform: translateY(1px); }
+  .download:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+  .download svg { width: 20px; height: 20px; }
+  .download small {
+    margin-left: auto;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    background: var(--charge);
+  }
+
+</style>
+
+<script>
+  // Points every Download button at the newest DMG and names its version.
+  type Release = { tag_name: string; assets: { name: string; size: number; browser_download_url: string }[] };
+  const buttons = document.querySelectorAll<HTMLAnchorElement>("[data-download]");
+  fetch("https://api.github.com/repos/doguyilmaz/battistics/releases/latest")
+    .then((response) => (response.ok ? (response.json() as Promise<Release>) : Promise.reject()))
+    .then((release) => {
+      const dmg = release.assets.find((asset) => asset.name.endsWith(".dmg"));
+      if (!dmg) return;
+      const megabytes = Math.max(1, Math.round(dmg.size / 1_000_000));
+      for (const button of buttons) {
+        button.href = dmg.browser_download_url;
+        const meta = button.querySelector("[data-download-meta]");
+        if (meta) meta.textContent = `${release.tag_name}, ~${megabytes} MB`;
+      }
+    })
+    .catch(() => {});
+</script>

@@ -23,11 +23,6 @@ public enum KeepAwakeMode: String, Sendable, CaseIterable, Identifiable {
         case .lidClosed: "PreventUserIdleSystemSleep"
         }
     }
-
-    /// Closed-lid mode uses a helper lease and works on either source.
-    public var requiresExternalPower: Bool {
-        false
-    }
 }
 
 /// How long to stay awake. The raw value is the duration in minutes, which
@@ -47,6 +42,9 @@ public enum KeepAwakeDuration: Int, Sendable, CaseIterable, Identifiable {
     public var minutes: Int? {
         self == .indefinite ? nil : rawValue
     }
+
+    /// What automation may ask for: never open-ended.
+    public static let finite = allCases.filter { $0 != .indefinite }
 }
 
 /// An active keep-awake session. Pure: the deadline is derived, never

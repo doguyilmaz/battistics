@@ -30,6 +30,7 @@ struct NotificationSettings: View {
             }
             Section("On Battery") {
                 Toggle("Low battery", isOn: $lowEnabled)
+                    .tourTarget(.notifications)
                 if lowEnabled {
                     LabeledContent("Notify at \(lowThreshold)%") {
                         Slider(
@@ -79,5 +80,6 @@ struct NotificationSettings: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(TourScrollModifier())
     }
 }

@@ -1,0 +1,86 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Check my Mac with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check my Mac with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imi kontrol et"
+          }
+        }
+      }
+    },
+    "Keep my Mac awake with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep my Mac awake with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imi uyanık tut"
+          }
+        }
+      }
+    },
+    "Let my Mac sleep with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let my Mac sleep with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imi uyut"
+          }
+        }
+      }
+    },
+    "Set my Mac’s Low Power Mode with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set my Mac’s Low Power Mode with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imin Düşük Güç Modunu ayarla"
+          }
+        }
+      }
+    },
+    "Turn off my Mac’s display with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off my Mac’s display with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imin ekranını kapat"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

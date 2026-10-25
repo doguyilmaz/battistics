@@ -131,7 +131,11 @@ struct EnergyPane: View {
     /// leave a permanent TCC entry for each one. A signal to a process owned
     /// by the same user needs nothing at all.
     private func quit(_ row: EnergyRow) {
-        kill(row.sample.pid, SIGTERM)
+        // The dialog may stay open long enough for the PID to be reused; a
+        // different name means the process already exited.
+        if ProcessEnergySampler.processName(for: row.sample.pid) == row.sample.name {
+            guard kill(row.sample.pid, SIGTERM) == 0 || errno == ESRCH else { return }
+        }
         rows.removeAll { $0.id == row.id }
     }
 

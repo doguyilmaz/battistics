@@ -36,7 +36,6 @@ struct PowerFlowTests {
         #expect(flow.batteryPowerWatts == 0)
         #expect(flow.batteryDirection == .idle)
         #expect(flow.readAt == readAt)
-        #expect(flow.source == "AppleSmartBattery.PowerTelemetryData")
         #expect(enabled.watts == before.watts)
         #expect(enabled.adapter == before.adapter)
         #expect(enabled.isCharging == before.isCharging)
@@ -427,15 +426,6 @@ struct PowerFlowTests {
         #expect(direct.systemPowerSource == .reported)
         #expect(estimated.systemPowerSource == .estimatedFromInputAndBattery)
         #expect(!direct.hasSameReadings(as: estimated))
-    }
-
-    @Test func registryReadFreshnessCannotClaimHardwareSampleFreshness() throws {
-        let flow = try #require(PowerFlowTelemetry.parse(from: props(), readAt: readAt))
-        #expect(!flow.isStale(at: readAt.addingTimeInterval(30)))
-        #expect(flow.isStale(at: readAt.addingTimeInterval(31)))
-        #expect(flow.isStale(at: readAt.addingTimeInterval(-1)))
-        #expect(flow.isStale(at: readAt, maximumAge: -1))
-        #expect(flow.isStale(at: readAt, maximumAge: .nan))
     }
 
     @Test func repeatedReadsPreserveReportedRegistryUpdateTime() throws {

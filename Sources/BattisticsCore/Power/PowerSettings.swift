@@ -68,10 +68,13 @@ public struct PowerSettings: Sendable, Equatable {
 
     public var ac: Source?
     public var battery: Source?
+    /// The `disablesleep` override, nil when it could not be read.
+    public var sleepDisabled: Bool?
 
-    public init(ac: Source? = nil, battery: Source? = nil) {
+    public init(ac: Source? = nil, battery: Source? = nil, sleepDisabled: Bool? = nil) {
         self.ac = ac
         self.battery = battery
+        self.sleepDisabled = sleepDisabled
     }
 
     /// nil on a Mac with no battery, where the four-way choice has no meaning.
@@ -101,10 +104,12 @@ public struct PowerSettings: Sendable, Equatable {
 public enum PowerSettingsReader {
     public static func fetch() async -> PowerSettings? {
         guard let data = try? await BoundedCommand.run(
-            executable: "/usr/bin/pmset", arguments: ["-g", "custom"],
+            executable: PowerSettingsWriter.executable, arguments: ["-g", "custom"],
             timeout: 5, maximumOutputBytes: 65_536
         ), !Task.isCancelled else { return nil }
-        return parse(String(decoding: data, as: UTF8.self))
+        var settings = parse(String(decoding: data, as: UTF8.self))
+        settings.sleepDisabled = try? await SystemSleep.isDisabled()
+        return settings
     }
 
     /// Pure and unit-testable.
@@ -208,10 +213,6 @@ public enum PowerSettingsWriter {
     ) -> [String] {
         [source.rawValue, timer.rawValue, String(interval.rawValue)]
     }
-
-    public static func command(_ arguments: [String]) -> String {
-        ([executable] + arguments).joined(separator: " ")
-    }
 }
 
 /// One power setting change, as a value.
@@ -224,9 +225,12 @@ public enum PowerChange: Sendable, Equatable {
     case lowPowerMode(LowPowerModeSetting)
     case energyMode(EnergyMode)
     case sleepTimer(SleepTimer, SleepInterval, PowerSource)
+    /// Clears a `disablesleep` override that outlived its session.
+    case allowSleep
 
     public var arguments: [String] {
         switch self {
+        case .allowSleep: ["-a", "disablesleep", "0"]
         case .lowPowerMode(let setting): PowerSettingsWriter.arguments(for: setting)
         case .energyMode(let mode): PowerSettingsWriter.arguments(for: mode)
         case .sleepTimer(let timer, let interval, let source):
@@ -251,6 +255,8 @@ extension PowerChange {
             return settings.lowPowerMode == wanted
         case .energyMode(let wanted):
             return settings.energyMode == wanted
+        case .allowSleep:
+            return settings.sleepDisabled == false
         case .sleepTimer(let timer, let wanted, let source):
             let side: PowerSettings.Source? =
                 switch source {

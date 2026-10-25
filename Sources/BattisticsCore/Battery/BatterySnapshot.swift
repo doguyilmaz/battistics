@@ -211,10 +211,6 @@ public struct BatterySnapshot: Sendable, Equatable {
         return Double(voltageMV) * Double(amperageMA) / 1_000_000
     }
 
-    public var isDischarging: Bool {
-        !externalConnected
-    }
-
     /// Minutes to full while charging, minutes to empty on battery, nil when idle on AC.
     public var timeRemainingMin: Int? {
         if isCharging { return Self.validMinutes(avgTimeToFullMin) }

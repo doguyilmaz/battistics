@@ -52,7 +52,7 @@ public struct AlertConfig: Sendable, Equatable {
 
 /// Mutable evaluation state carried between snapshots so alerts fire once
 /// per crossing instead of repeating on every sample.
-public struct AlertState: Sendable, Equatable {
+public struct AlertState: Sendable, Equatable, Codable {
     public var lowBatteryFired = false
     public var lastDropNotifiedPercent: Int?
     public var chargeLimitFired = false
@@ -60,8 +60,24 @@ public struct AlertState: Sendable, Equatable {
     public var highTemperatureFired = false
     public var unpluggedAt: Date?
     public var onBatteryDurationFired = false
+    /// The unplug the on-battery alert was sent for, kept across relaunches.
+    var durationAlertUnplug: Date?
 
     public init() {}
+
+    /// Starts from the unplug moment history found at launch. The alert
+    /// counts as sent only if it was sent for that same unplug.
+    public mutating func restoreUnplug(_ date: Date) {
+        unpluggedAt = date
+        onBatteryDurationFired = durationAlertUnplug.map { abs($0.timeIntervalSince(date)) < 60 } ?? false
+    }
+
+    /// The unplug session is rebuilt from history at launch; a stored one
+    /// could predate a charge that happened while the app was not running.
+    private enum CodingKeys: String, CodingKey {
+        case lowBatteryFired, lastDropNotifiedPercent, chargeLimitFired, fullChargeFired, highTemperatureFired
+        case durationAlertUnplug
+    }
 }
 
 /// Pure alert evaluation: (snapshot, config, state) in, alerts out.
@@ -141,6 +157,7 @@ public enum AlertRules {
             let hours = now.timeIntervalSince(unpluggedAt) / 3600
             if hours >= config.onBatteryDurationHours, !state.onBatteryDurationFired {
                 state.onBatteryDurationFired = true
+                state.durationAlertUnplug = unpluggedAt
                 alerts.append(.onBatteryDuration(hours: hours))
             }
         }
@@ -157,11 +174,14 @@ public enum AlertRules {
     /// mean something; day-over-day comparison made it noise.
     public static let healthDeclineMargin = 3.0
 
-    public static func healthDropAlert(baseline: [Double], current: Double, enabled: Bool) -> BatteryAlert? {
+    /// `lastAlerted` is the health of the previous alert: the baseline median
+    /// lags a real drop by weeks, so the same drop must not alert every day.
+    public static func healthDropAlert(baseline: [Double], current: Double, enabled: Bool,
+                                       lastAlerted: Double? = nil) -> BatteryAlert? {
         guard enabled, let rawBaseline = BatteryHealth.median(baseline) else { return nil }
         let from = BatteryHealth.display(rawBaseline)
         let to = BatteryHealth.display(current)
-        guard to < from - healthDeclineMargin else { return nil }
+        guard to < from - healthDeclineMargin, lastAlerted.map({ to < $0 }) ?? true else { return nil }
         return .healthDropped(from: from, to: to)
     }
 }

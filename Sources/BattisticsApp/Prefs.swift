@@ -139,6 +139,20 @@ enum Prefs {
     static let keepAwakeMode = "keepAwakeMode"
     static let keepAwakeDuration = "keepAwakeDuration"
     static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
+    static let keepAwakeStopOnLowBattery = "keepAwakeStopOnLowBattery"
+    static let keepAwakeStopPercent = "keepAwakeStopPercent"
+    static let keepAwakeWarnOnLowBattery = "keepAwakeWarnOnLowBattery"
+    static let keepAwakeWarningPercent = "keepAwakeWarningPercent"
+    static let keepAwakeStopOnThermalPressure = "keepAwakeStopOnThermalPressure"
+    static let keepAwakeWarnOnAdapterDisconnect = "keepAwakeWarnOnAdapterDisconnect"
+    static let hasSeenTour = "hasSeenTour"
+    static let automationEnabled = "automationEnabled"
+    static let automationClosedLidAllowed = "automationClosedLidAllowed"
+    static let alertHealthLastAlerted = "alertHealthLastAlerted"
+    static let remoteEnabled = "remoteEnabled"
+    static let remoteClosedLidAllowed = "remoteClosedLidAllowed"
+    static let remoteMacID = "remoteMacID"
+    static let remoteWithdrawPending = "remoteWithdrawPending"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 
@@ -160,6 +174,18 @@ enum Prefs {
     static let alertDurationEnabled = "alertDurationEnabled"
     static let alertDurationHours = "alertDurationHours"
     static let alertHealthDropEnabled = "alertHealthDropEnabled"
+    static let alertState = "alertState"
+
+    /// Installs from before the tour have saved preferences; only a first
+    /// launch should open it unasked. Sparkle's own keys do not count.
+    static func markTourSeenForExistingInstall(_ defaults: UserDefaults = .standard) {
+        guard defaults.object(forKey: hasSeenTour) == nil,
+              let domain = Bundle.main.bundleIdentifier.flatMap(defaults.persistentDomain(forName:)),
+              domain.keys.contains(where: { !$0.hasPrefix("SU") }) else { return }
+        defaults.set(true, forKey: hasSeenTour)
+    }
+
+    private static let safetyDefaults = KeepAwakeSafetyPolicy.Configuration()
 
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
@@ -184,6 +210,14 @@ enum Prefs {
             keepAwakeMode: KeepAwakeMode.displayOn.rawValue,
             keepAwakeDuration: KeepAwakeDuration.indefinite.rawValue,
             keepAwakeMenuBarIcon: true,
+            keepAwakeStopOnLowBattery: safetyDefaults.stopOnLowBattery,
+            keepAwakeStopPercent: safetyDefaults.stopPercent,
+            keepAwakeWarnOnLowBattery: safetyDefaults.warnOnLowBattery,
+            keepAwakeWarningPercent: safetyDefaults.warningPercent,
+            keepAwakeStopOnThermalPressure: safetyDefaults.stopOnThermalPressure,
+            keepAwakeWarnOnAdapterDisconnect: safetyDefaults.warnOnAdapterDisconnect,
+            automationEnabled: false,
+            automationClosedLidAllowed: false,
             readBluetoothBatteries: false,
 
             showPowerFlow: true,
@@ -225,5 +259,26 @@ enum Prefs {
 
     static var temperatureUnitValue: TemperatureUnit {
         TemperatureUnit(rawValue: UserDefaults.standard.string(forKey: temperatureUnit) ?? "") ?? .both
+    }
+
+    static func safetyConfiguration() -> KeepAwakeSafetyPolicy.Configuration {
+        let defaults = UserDefaults.standard
+        return .init(
+            stopOnLowBattery: defaults.bool(forKey: keepAwakeStopOnLowBattery),
+            stopPercent: defaults.integer(forKey: keepAwakeStopPercent),
+            warnOnLowBattery: defaults.bool(forKey: keepAwakeWarnOnLowBattery),
+            warningPercent: defaults.integer(forKey: keepAwakeWarningPercent),
+            stopOnThermalPressure: defaults.bool(forKey: keepAwakeStopOnThermalPressure),
+            warnOnAdapterDisconnect: defaults.bool(forKey: keepAwakeWarnOnAdapterDisconnect))
+    }
+
+    static func saveSafetyConfiguration(_ configuration: KeepAwakeSafetyPolicy.Configuration) {
+        let defaults = UserDefaults.standard
+        defaults.set(configuration.stopOnLowBattery, forKey: keepAwakeStopOnLowBattery)
+        defaults.set(configuration.effectiveStopPercent, forKey: keepAwakeStopPercent)
+        defaults.set(configuration.warnOnLowBattery, forKey: keepAwakeWarnOnLowBattery)
+        defaults.set(configuration.effectiveWarningPercent, forKey: keepAwakeWarningPercent)
+        defaults.set(configuration.stopOnThermalPressure, forKey: keepAwakeStopOnThermalPressure)
+        defaults.set(configuration.warnOnAdapterDisconnect, forKey: keepAwakeWarnOnAdapterDisconnect)
     }
 }

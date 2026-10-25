@@ -1,0 +1,97 @@
+---
+import { Image } from "astro:assets";
+import original from "../assets/icons/original.png";
+import gauge from "../assets/icons/gauge.png";
+import batbattery from "../assets/icons/batbattery.png";
+import stats from "../assets/icons/stats.png";
+import DownloadButton from "./DownloadButton.astro";
+import BrewCommand from "./BrewCommand.astro";
+
+const icons = [
+  { id: "original", label: "Original", image: original },
+  { id: "gauge", label: "Gauge", image: gauge },
+  { id: "batbattery", label: "Bat Battery", image: batbattery },
+  { id: "stats", label: "Stats", image: stats },
+];
+---
+
+<section class="get" id="download" aria-labelledby="get-title">
+  <div class="icon-stage" data-icons>
+    {icons.map((icon, i) => (
+      <Image src={icon.image} alt="" width={160} height={160} class:list={["big", { shown: i === 0 }]} data-icon-big={icon.id} loading="lazy" />
+    ))}
+  </div>
+  <h2 id="get-title">Get Battistics</h2>
+  <p class="terms">Free and open source under the MIT license.<br />macOS 14 or later, Apple Silicon. Updates arrive in the app.</p>
+  <div class="actions">
+    <DownloadButton />
+    <BrewCommand />
+  </div>
+  <div class="picker" role="radiogroup" aria-label="App icon">
+    <span>Four app icons to choose from:</span>
+    {icons.map((icon, i) => (
+      <button type="button" role="radio" aria-checked={i === 0 ? "true" : "false"} data-icon={icon.id} aria-label={icon.label}>
+        <Image src={icon.image} alt="" width={44} height={44} />
+      </button>
+    ))}
+  </div>
+</section>
+
+<style>
+  .get {
+    max-width: var(--page);
+    margin: clamp(80px, 12vw, 140px) auto 0;
+    padding: clamp(56px, 8vw, 96px) var(--gutter);
+    text-align: center;
+    border-radius: 32px;
+    color: #e8efe9;
+    background:
+      radial-gradient(70% 60% at 50% 0%, color-mix(in oklab, var(--accent-b) 30%, transparent), transparent 70%),
+      #0f1513;
+    --ink: #e8efe9;
+    --ink-2: #b2c0b8;
+    --ink-3: #8a988f;
+    --paper: #0f1513;
+    --line: #2c3833;
+  }
+  .icon-stage { position: relative; width: 160px; height: 160px; margin: 0 auto; }
+  .big {
+    position: absolute;
+    inset: 0;
+    width: 160px;
+    height: 160px;
+    border-radius: 22.5%;
+    filter: drop-shadow(0 24px 40px rgb(0 0 0 / 0.5));
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+  .big.shown { opacity: 1; transform: none; }
+  h2 { margin: 28px 0 0; font: 720 clamp(2.2rem, 4.6vw, 3.4rem) / 1 var(--display); font-stretch: 86%; letter-spacing: -0.02em; }
+  .terms { max-width: 60ch; margin: 18px auto 0; color: var(--ink-2); line-height: 1.6; text-wrap: balance; }
+  .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin: 32px auto 0; text-align: left; }
+  .actions :global(.download) { background: var(--charge); color: #0f1513; }
+  .actions :global(.download small) { background: rgb(15 21 19 / 0.85); color: #e8efe9; }
+  .picker { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 36px; color: var(--ink-3); font-size: 0.92rem; }
+  .picker span { margin-right: 4px; }
+  .picker button { padding: 3px; border: 2px solid transparent; border-radius: 14px; background: none; cursor: pointer; }
+  .picker button :global(img) { display: block; width: 44px; height: 44px; border-radius: 22.5%; }
+  .picker button[aria-checked="true"] { border-color: var(--accent-a); }
+  .picker button:focus-visible { outline: 2px solid var(--accent-a); outline-offset: 2px; }
+  @media (max-width: 560px) {
+    .get { border-radius: 0; }
+    .terms br { display: none; }
+  }
+</style>
+
+<script>
+  const root = document.getElementById("download")!;
+  const select = (id: string) => {
+    for (const big of root.querySelectorAll<HTMLElement>("[data-icon-big]")) big.classList.toggle("shown", big.dataset.iconBig === id);
+    for (const button of root.querySelectorAll("[data-icon]")) button.setAttribute("aria-checked", String((button as HTMLElement).dataset.icon === id));
+  };
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-icon]")) {
+    button.addEventListener("click", () => select(button.dataset.icon!));
+    button.addEventListener("pointerenter", () => select(button.dataset.icon!));
+  }
+</script>

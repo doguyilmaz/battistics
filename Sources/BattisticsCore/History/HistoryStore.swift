@@ -3,10 +3,16 @@ import SQLite3
 
 private let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
-public enum HistoryError: Error {
+public enum HistoryError: LocalizedError {
     case cannotOpen(String)
     case statementFailed(String)
     case importFailed(String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .cannotOpen(let detail), .statementFailed(let detail), .importFailed(let detail): detail
+        }
+    }
 }
 
 /// SQLite-backed history. An actor so all database work stays off the main
@@ -36,7 +42,8 @@ public actor HistoryStore {
     public func recordChargeSample(_ sample: ChargeSample) {
         guard ensureOpen() else { return }
         run(
-            "INSERT OR IGNORE INTO charge_samples (ts, percent, external, charging) VALUES (?,?,?,?)",
+            // The later of two readings in one second is the settled state.
+            "INSERT OR REPLACE INTO charge_samples (ts, percent, external, charging) VALUES (?,?,?,?)",
             bind: [
                 .int(Int64(sample.date.timeIntervalSince1970)),
                 .int(Int64(sample.percent)),
@@ -227,17 +234,22 @@ public actor HistoryStore {
     }
 
     /// The moment the machine last switched from AC to battery, if it is
-    /// currently on battery according to the recorded samples.
-    public func lastUnplugDate() -> Date? {
+    /// currently on battery according to the recorded samples. A charge
+    /// above the last recorded one means it was charged while nothing was
+    /// recording, so that unplug no longer applies.
+    public func lastUnplugDate(currentPercent: Int? = nil) -> Date? {
         guard ensureOpen() else { return nil }
         var lastPluggedTs: Int64?
         var latestTs: Int64?
         var latestExternal = true
-        query("SELECT ts, external FROM charge_samples ORDER BY ts DESC LIMIT 1") { statement in
+        var latestPercent = 0
+        query("SELECT ts, external, percent FROM charge_samples ORDER BY ts DESC LIMIT 1") { statement in
             latestTs = sqlite3_column_int64(statement, 0)
             latestExternal = sqlite3_column_int64(statement, 1) != 0
+            latestPercent = Int(sqlite3_column_int64(statement, 2))
         }
         guard latestTs != nil, !latestExternal else { return nil }
+        if let currentPercent, currentPercent > latestPercent { return nil }
         query("SELECT MAX(ts) FROM charge_samples WHERE external = 1") { statement in
             if sqlite3_column_type(statement, 0) != SQLITE_NULL {
                 lastPluggedTs = sqlite3_column_int64(statement, 0)
@@ -426,6 +438,19 @@ public actor HistoryStore {
 
     private func ensureOpen() -> Bool {
         if connection != nil { return true }
+        switch open() {
+        case .opened: return true
+        case .failed: return false
+        case .unreadable:
+            // Otherwise history stays off for good, retried on every reading.
+            moveAsideUnreadableDatabase()
+            return open() == .opened
+        }
+    }
+
+    private enum OpenResult { case opened, failed, unreadable }
+
+    private func open() -> OpenResult {
         do {
             try FileManager.default.createDirectory(
                 at: databaseURL.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -433,16 +458,26 @@ public actor HistoryStore {
             let flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX
             guard sqlite3_open_v2(databaseURL.path, &handle, flags, nil) == SQLITE_OK, let handle else {
                 if let handle { sqlite3_close_v2(handle) }
-                return false
+                return .failed
             }
             connection = Connection(handle: handle)
             try execute("PRAGMA journal_mode=WAL")
             try execute("PRAGMA synchronous=NORMAL")
             try createSchema()
-            return true
+            return .opened
         } catch {
+            let code = db.map { sqlite3_errcode($0) }
             connection = nil
-            return false
+            return code == SQLITE_NOTADB || code == SQLITE_CORRUPT ? .unreadable : .failed
+        }
+    }
+
+    /// Kept beside the new file rather than deleted, in case it can be recovered.
+    private func moveAsideUnreadableDatabase() {
+        let stamp = Int(Date().timeIntervalSince1970)
+        for suffix in ["", "-wal", "-shm"] {
+            let url = URL(fileURLWithPath: databaseURL.path + suffix)
+            try? FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: url.path + ".corrupt-\(stamp)"))
         }
     }
 

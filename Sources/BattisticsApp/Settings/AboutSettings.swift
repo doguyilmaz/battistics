@@ -34,6 +34,9 @@ struct AboutSettings: View {
                         if let url = URL(string: "https://github.com/doguyilmaz") {
                             Link(destination: url) { Text(verbatim: "@doguyilmaz") }
                         }
+                        if let url = URL(string: "https://battistics.apps.doguyilmaz.com") {
+                            Link("Website", destination: url)
+                        }
                         if let url = URL(string: "https://github.com/doguyilmaz/battistics") {
                             Link("GitHub", destination: url)
                         }
@@ -68,7 +71,7 @@ struct AboutSettings: View {
                 }
             }
             Section {
-                Text("Updates are the only network traffic Battistics ever makes. No analytics, no tracking, nothing else leaves this Mac.")
+                Text("Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

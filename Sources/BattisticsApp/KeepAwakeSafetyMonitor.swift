@@ -1,0 +1,140 @@
+import BattisticsCore
+import Foundation
+import Observation
+
+@MainActor
+@Observable
+final class KeepAwakeSafetyMonitor {
+    var configuration: KeepAwakeSafetyPolicy.Configuration {
+        didSet {
+            Prefs.saveSafetyConfiguration(configuration)
+            refresh()
+        }
+    }
+    private(set) var thermalState = ProcessInfo.processInfo.thermalState
+    private(set) var warningMessage: String?
+    private(set) var batteryWarningActive = false
+    @ObservationIgnored var onStop: ((KeepAwakeSafetyPolicy.Event) -> Void)?
+    @ObservationIgnored var isUnattended: () -> Bool = { false }
+    @ObservationIgnored private var policy = KeepAwakeSafetyPolicy()
+    @ObservationIgnored private var active = false
+    @ObservationIgnored private var thermalObserver: NSObjectProtocol?
+    @ObservationIgnored private let dispatcher = AlertDispatcher.shared
+    @ObservationIgnored private let notice: KeepAwakeNoticeController
+    @ObservationIgnored private var lastNotice: KeepAwakeSafetyPolicy.Event?
+    @ObservationIgnored private var adapterWarningActive = false
+
+    init(notice: KeepAwakeNoticeController) {
+        self.notice = notice
+        configuration = Prefs.safetyConfiguration()
+        thermalObserver = NotificationCenter.default.addObserver(
+            forName: ProcessInfo.thermalStateDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            DispatchQueue.main.async { self?.refresh() }
+        }
+    }
+
+    func startSession() {
+        policy = KeepAwakeSafetyPolicy()
+        adapterWarningActive = false
+        lastNotice = nil
+        warningMessage = nil
+        active = true
+        refresh()
+    }
+
+    func endSession() {
+        active = false
+        batteryWarningActive = false
+        warningMessage = nil
+        notice.dismiss()
+    }
+
+    /// `unattended` judges a session that is about to start, before `isUnattended` can see it.
+    func blockingEvent(unattended: Bool = false) -> KeepAwakeSafetyPolicy.Event? {
+        thermalState = ProcessInfo.processInfo.thermalState
+        return KeepAwakeSafetyPolicy.stopReason(
+            snapshot: BatteryReader.read(), thermalPressure: hasThermalPressure,
+            configuration: unattended ? configuration.unattended : effectiveConfiguration)
+    }
+
+    func refresh() {
+        thermalState = ProcessInfo.processInfo.thermalState
+        guard active else { return }
+        update(BatteryReader.read())
+    }
+
+    /// Fed by AppModel even with every window closed and history disabled.
+    func update(_ snapshot: BatterySnapshot?) {
+        thermalState = ProcessInfo.processInfo.thermalState
+        guard active else { return }
+        let configuration = effectiveConfiguration
+        let events = policy.evaluate(
+            snapshot: snapshot, thermalPressure: hasThermalPressure, configuration: configuration)
+        if !configuration.warnOnAdapterDisconnect || snapshot?.externalConnected == true {
+            adapterWarningActive = false
+        }
+        if events.contains(.adapterDisconnected) { adapterWarningActive = true }
+        var messages: [String] = []
+        if adapterWarningActive { messages.append(Self.message(for: .adapterDisconnected)) }
+        batteryWarningActive = KeepAwakeSafetyPolicy.isBatteryLow(snapshot, configuration: configuration)
+        if batteryWarningActive, let snapshot {
+            messages.append(Self.message(for: .batteryWarning(
+                percent: snapshot.percent,
+                stopAt: configuration.stopOnLowBattery ? configuration.effectiveStopPercent : nil)))
+        }
+        if hasThermalPressure { messages.append(Self.message(for: .thermalWarning)) }
+        warningMessage = messages.isEmpty ? nil : messages.joined(separator: "\n\n")
+        let shouldDismiss: Bool = switch lastNotice {
+        case .thermalWarning: !hasThermalPressure
+        case .adapterDisconnected: !adapterWarningActive
+        default: !batteryWarningActive
+        }
+        if shouldDismiss { notice.dismiss() }
+        for event in events {
+            if event.endsSession {
+                onStop?(event)
+                return
+            }
+            let message = Self.message(for: event)
+            // This in-app notice also works when notification permission is denied.
+            let category = event == .thermalWarning ? "thermal" : event == .adapterDisconnected ? "adapter" : "battery"
+            lastNotice = event
+            notice.show(sessionID: UUID().uuidString, message: message,
+                        title: String(localized: "Keep Awake needs attention"))
+            dispatcher.deliverNotice(identifier: "battistics.keepAwake.\(category)",
+                                     title: String(localized: "Keep Awake needs attention"), body: message)
+        }
+    }
+
+    /// What the running session is held to, which may be stricter than the settings.
+    var effectiveConfiguration: KeepAwakeSafetyPolicy.Configuration {
+        isUnattended() ? configuration.unattended : configuration
+    }
+
+    private var hasThermalPressure: Bool { thermalState == .serious || thermalState == .critical }
+
+    static func message(for event: KeepAwakeSafetyPolicy.Event, starting: Bool = false) -> String {
+        switch event {
+        case .adapterDisconnected:
+            return String(localized: "Power adapter disconnected. Keep Awake is still running on battery. Connect power for uninterrupted work; your battery and thermal protections still apply.")
+        case .batteryWarning(let percent, let stopAt):
+            if let stopAt {
+                return String(localized: "Battery is at \(percent)%. Keep Awake will stop at \(stopAt)%. Connect power or save your work; with the lid closed, the Mac may sleep immediately.")
+            }
+            return String(localized: "Battery is at \(percent)%. Keep Awake cannot prevent an empty battery from interrupting your work. Connect power soon.")
+        case .batteryStop(let percent):
+            if starting {
+                return String(localized: "Keep Awake cannot start at \(percent)% with battery protection enabled. Connect power before starting a session.")
+            }
+            return String(localized: "Keep Awake ended because battery charge reached \(percent)%. Normal sleep is allowed again. Connect power before starting another session.")
+        case .thermalWarning:
+            return String(localized: "macOS reports high thermal pressure. Open the lid, keep the vents clear, and reduce heavy workloads. Battistics does not change fan speeds.")
+        case .thermalStop:
+            if starting {
+                return String(localized: "Keep Awake cannot start while macOS reports high thermal pressure and thermal protection is enabled. Let the Mac cool first.")
+            }
+            return String(localized: "Keep Awake ended because macOS reported high thermal pressure. Let the Mac cool before starting another session. Battistics does not change fan speeds.")
+        }
+    }
+}

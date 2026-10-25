@@ -1,0 +1,112 @@
+---
+const run = "battistics run --name Build -- swift build";
+const runLid = "battistics run --minutes 120 --mode lidClosed -- ./export.sh";
+const mcp = `{
+  "mcpServers": {
+    "battistics": {
+      "command": "/Applications/Battistics.app/Contents/MacOS/battistics-mcp",
+      "args": []
+    }
+  }
+}`;
+---
+
+<section class="dev" id="developers" aria-labelledby="dev-title">
+  <h2 id="dev-title">Long builds and AI tasks keep the Mac up by themselves</h2>
+  <p class="lede">
+    Turn on Local automation in Power. Keep Awake then lasts exactly as long as a command, or from the start to the end
+    of an AI task. It never kills your command, and nothing leaves the Mac: no port, no API key.
+  </p>
+  <div class="pair">
+    <article class="card">
+      <header>
+        <h3>Terminal</h3>
+        <button type="button" class="copy" data-copy={run}>Copy</button>
+      </header>
+      <pre><code><span class="comment"># Awake for as long as the build runs</span>
+<span class="prompt">$</span> {run}
+
+<span class="comment"># Two hours at most, lid closed in a bag</span>
+<span class="prompt">$</span> {runLid}</code></pre>
+      <ul>
+        <li>Runs in your shell, with your directory, environment and output.</li>
+        <li>Ends when the command does, 12 hours at most.</li>
+        <li>Exit status is the command's own.</li>
+      </ul>
+      <a href="/docs/automation/terminal/">Terminal guide</a>
+    </article>
+    <article class="card">
+      <header>
+        <h3>MCP for AI clients</h3>
+        <button type="button" class="copy" data-copy={mcp}>Copy</button>
+      </header>
+      <pre><code set:html={mcp.replace(/("[^"]*")(\s*:)/g, '<span class="key">$1</span>$2').replace(/(:\s*)("[^"]*")/g, '$1<span class="str">$2</span>')} /></pre>
+      <ul>
+        <li>The client calls start before the work and stop after it.</li>
+        <li>A stalled or closed client ends its session within 45 seconds.</li>
+        <li>It cannot touch protection settings or anything else.</li>
+      </ul>
+      <a href="/docs/automation/mcp/">MCP guide</a>
+    </article>
+  </div>
+</section>
+
+<style>
+  .dev { max-width: var(--page); margin: 0 auto; padding: clamp(80px, 12vw, 140px) var(--gutter) 0; }
+  h2 {
+    margin: 0;
+    max-width: 20ch;
+    font: 720 clamp(2.1rem, 4.2vw, 3.3rem) / 1 var(--display);
+    font-stretch: 86%;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .lede { max-width: 64ch; margin: 20px 0 0; font-size: 1.08rem; line-height: 1.55; color: var(--ink-2); }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 40px; }
+  .card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 20px;
+    border-radius: 20px;
+    background: #121916;
+    color: #e3ebe6;
+    border: 1px solid rgb(255 255 255 / 0.06);
+  }
+  .card header { display: flex; justify-content: space-between; align-items: center; }
+  .card h3 { margin: 0; font-size: 1rem; }
+  .copy {
+    width: 74px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    font: 600 13px var(--text);
+    color: #e3ebe6;
+    background: rgb(255 255 255 / 0.1);
+    cursor: pointer;
+  }
+  .copy:focus-visible { outline: 2px solid var(--accent-a); outline-offset: 2px; }
+  pre {
+    flex: 1;
+    min-height: 200px;
+    margin: 16px 0 0;
+    padding: 16px;
+    overflow-x: auto;
+    border-radius: 12px;
+    background: #0a0f0d;
+    font: 13px/1.65 var(--mono);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .comment { color: #6f8279; }
+  .prompt { color: var(--accent-a); user-select: none; }
+  pre :global(.key) { color: #8fd3c7; }
+  pre :global(.str) { color: #d8e88f; }
+  .card ul { margin: 16px 0 0; padding-left: 18px; color: #a9b8b0; line-height: 1.5; }
+  .card a { margin-top: 14px; color: var(--accent-a); font-weight: 600; }
+  @media (max-width: 860px) {
+    .pair { grid-template-columns: minmax(0, 1fr); }
+    pre { min-height: 0; }
+  }
+</style>

@@ -63,17 +63,23 @@ final class PowerSettingsModel {
             do {
                 try await helper.apply(change)
                 helperHandledIt = true
+            } catch PowerHelperClient.Failure.rejected {
+                // It answered and pmset refused; a password will not change that.
+                helperHandledIt = true
+                outcome = .failed
             } catch {
                 // Registered but not answering — launchd refuses to spawn an
                 // unnotarized binary, for one. Fall through to asking for a
-                // password rather than silently doing nothing.
+                // password rather than silently doing nothing, and probe it
+                // again so later changes do not each wait out the timeout.
                 helperHandledIt = false
+                helper.refreshStatus()
             }
         }
         if !helperHandledIt {
             if !auth.isUnlocked {
                 do {
-                    try auth.unlock()
+                    try await auth.unlock()
                 } catch PowerAuthorization.Failure.cancelled {
                     return .cancelled
                 } catch {

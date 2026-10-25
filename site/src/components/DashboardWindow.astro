@@ -1,0 +1,158 @@
+---
+import { Image } from "astro:assets";
+import overview from "../assets/panes/overview.png";
+import history from "../assets/panes/history.png";
+import energy from "../assets/panes/energy.png";
+import peripherals from "../assets/panes/peripherals.png";
+import power from "../assets/panes/system.png";
+import phone from "../assets/panes/phone.png";
+import general from "../assets/panes/general.png";
+import menubar from "../assets/panes/appearance.png";
+import notifications from "../assets/panes/notifications.png";
+import data from "../assets/panes/data.png";
+import help from "../assets/panes/help.png";
+import { symbolHTML } from "../lib/symbols";
+
+const groups = [
+  {
+    title: "Battery",
+    panes: [
+      { id: "overview", label: "Overview", icon: "gauge.with.dots.needle.67percent", image: overview, about: "Charge, health and cycles at a glance, then every capacity and live reading, and the adapter in use." },
+      { id: "history", label: "History", icon: "chart.xyaxis.line", image: history, about: "Charge, power, temperature and health by day, week, month and year, with time on battery, charging and full." },
+      { id: "energy", label: "Energy", icon: "bolt.circle", image: energy, about: "Power coming in, used by the Mac and drawn from the battery, and the apps using the most, measured only while you look." },
+      { id: "peripherals", label: "Peripherals", icon: "keyboard", image: peripherals, about: "Keyboards, mice, trackpads and headphones that report a battery." },
+    ],
+  },
+  {
+    title: "Controls",
+    panes: [
+      { id: "power", label: "Power", icon: "switch.2", image: power, about: "Keep Awake with its modes and profiles, session protection, Low Power Mode and the sleep timers." },
+      { id: "iphone", label: "iPhone", icon: "iphone", image: phone, about: "Show this Mac in Battistics Remote and let the iPhone start closed-lid sessions." },
+    ],
+  },
+  {
+    title: "Settings",
+    panes: [
+      { id: "general", label: "General", icon: "gearshape", image: general, about: "Start at login, Dock and menu bar visibility, theme and the app icon." },
+      { id: "menubar", label: "Menu Bar", icon: "menubar.rectangle", image: menubar, about: "Icon style, the readings beside it and the colours it takes." },
+      { id: "notifications", label: "Notifications", icon: "bell.badge", image: notifications, about: "Low battery, full charge, charge limit, heat and health alerts, each with its own threshold." },
+      { id: "data", label: "Data", icon: "internaldrive", image: data, about: "Power and temperature recording, CSV export and import, and how much history is on disk." },
+    ],
+  },
+  {
+    title: "Help",
+    panes: [{ id: "help", label: "Help & Assistant", icon: "questionmark.circle", image: help, about: "A guided tour, built-in answers and, on macOS 26, an on-device assistant that only points to them." }],
+  },
+];
+const first = groups[0].panes[0];
+---
+
+<div class="window" data-window>
+  <div class="titlebar">
+    <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="title" data-window-title>{first.label}</span>
+  </div>
+  <div class="body">
+    <nav class="sidebar" aria-label="Battistics window">
+      {groups.map((group) => (
+        <div class="group">
+          <p>{group.title}</p>
+          {group.panes.map((pane) => (
+            <button type="button" data-pane={pane.id} aria-pressed={pane.id === first.id ? "true" : "false"}>
+              <span class="icon" set:html={symbolHTML(pane.icon, 14)} />
+              {pane.label}
+            </button>
+          ))}
+        </div>
+      ))}
+    </nav>
+    <div class="content">
+      {groups.flatMap((group) => group.panes).map((pane) => (
+        <figure data-pane-view={pane.id} data-active={pane.id === first.id ? "true" : "false"}>
+          <div class="shot" role="button" tabindex="0" data-zoom={pane.image.src} data-caption={pane.about} aria-label={`Enlarge the ${pane.label} pane`}>
+            <Image src={pane.image} alt={`The ${pane.label} pane`} quality={95} loading={pane.id === first.id ? "eager" : "lazy"} />
+          </div>
+          <figcaption>{pane.about}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .window {
+    --win-bg: #232628;
+    --win-side: #1d2022;
+    --win-ink: #eceeef;
+    --win-ink-2: rgb(236 238 239 / 0.55);
+    max-width: 870px;
+    margin: 0 auto;
+    border-radius: 14px;
+    overflow: hidden;
+    color: var(--win-ink);
+    background: var(--win-bg);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35), 0 40px 90px -30px rgb(10 30 20 / 0.55);
+    font: 13px/1.35 var(--text);
+  }
+  .titlebar { display: flex; align-items: center; gap: 18px; height: 46px; padding: 0 16px; border-bottom: 1px solid rgb(0 0 0 / 0.35); }
+  .lights { display: flex; gap: 8px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+  .lights i:nth-child(2) { background: #febc2e; }
+  .lights i:nth-child(3) { background: #28c840; }
+  .title { font-size: 14px; font-weight: 600; }
+  .body { display: grid; grid-template-columns: 200px minmax(0, 1fr); }
+  .sidebar { padding: 12px 10px 16px; background: var(--win-side); border-right: 1px solid rgb(0 0 0 / 0.3); }
+  .group + .group { margin-top: 12px; }
+  .group p { margin: 0 0 4px 8px; font-size: 11px; font-weight: 600; color: var(--win-ink-2); }
+  .sidebar button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    height: 30px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 7px;
+    font: 13.5px var(--text);
+    color: inherit;
+    text-align: left;
+    background: none;
+    cursor: pointer;
+  }
+  .icon { display: flex; justify-content: center; width: 18px; opacity: 0.9; }
+  .sidebar button[aria-pressed="true"] .icon { opacity: 1; }
+  .sidebar button:hover { background: rgb(255 255 255 / 0.06); }
+  .sidebar button[aria-pressed="true"] { background: #0a63d8; }
+  .sidebar button:focus-visible { outline: 2px solid #4b9bff; outline-offset: -2px; }
+  .content { display: grid; min-width: 0; }
+  figure { grid-area: 1 / 1; margin: 0; visibility: hidden; opacity: 0; transition: opacity 0.15s ease, visibility 0s linear 0.15s; }
+  figure[data-active="true"] { visibility: visible; opacity: 1; transition: opacity 0.15s ease; }
+  .shot { display: block; aspect-ratio: 668 / 530; max-width: 668px; background: var(--win-bg); }
+  .shot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  figcaption { padding: 14px 20px 18px; border-top: 1px solid rgb(255 255 255 / 0.06); color: var(--win-ink-2); font-size: 14px; line-height: 1.5; }
+
+  @media (max-width: 860px) {
+    .body { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { display: flex; gap: 6px; overflow-x: auto; padding: 10px; border-right: 0; border-bottom: 1px solid rgb(0 0 0 / 0.3); scrollbar-width: none; }
+    .group { display: contents; }
+    .group p { display: none; }
+    .sidebar button { flex: none; width: auto; }
+  }
+</style>
+
+<script>
+  const win = document.querySelector<HTMLElement>("[data-window]")!;
+  const title = win.querySelector<HTMLElement>("[data-window-title]")!;
+  const show = (id: string) => {
+    const button = win.querySelector<HTMLButtonElement>(`[data-pane="${id}"]`);
+    if (!button) return;
+    for (const other of win.querySelectorAll("[data-pane]")) other.setAttribute("aria-pressed", String(other === button));
+    for (const view of win.querySelectorAll<HTMLElement>("[data-pane-view]")) view.dataset.active = String(view.dataset.paneView === id);
+    title.textContent = button.textContent?.trim() ?? "";
+  };
+  for (const button of win.querySelectorAll<HTMLButtonElement>("[data-pane]")) {
+    button.addEventListener("click", () => show(button.dataset.pane!));
+  }
+  document.addEventListener("show-pane", (event) => show((event as CustomEvent<string>).detail));
+</script>

@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore: ["site/**"]
   pull_request:
+    paths-ignore: ["site/**"]
 
 jobs:
   test:
@@ -11,10 +13,10 @@ jobs:
     # the current system appearance (Liquid Glass) instead of compatibility mode.
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install XcodeGen
         run: brew install xcodegen
-      - name: Core tests
+      - name: Core and MCP tests
         run: swift test
       - name: Build app
         run: |
@@ -22,3 +24,17 @@ jobs:
           xcodebuild -project Battistics.xcodeproj -scheme Battistics \
             -configuration Debug -derivedDataPath .build/xcode build \
             CODE_SIGN_IDENTITY="-"
+      - name: Bundled MCP protocol smoke test
+        run: python3 scripts/test-mcp-stdio.py
+      - name: Command lifecycle integration
+        run: python3 scripts/test-cli.py
+      - name: App automation integration
+        run: python3 scripts/test-automation.py
+      - name: Onboarding tour integration
+        run: python3 scripts/test-automation.py --tour
+      - name: iPhone remote integration
+        run: python3 scripts/test-automation.py --remote
+      - name: Build iPhone app
+        run: |
+          xcodebuild -project Battistics.xcodeproj -scheme BattisticsPhone \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath .build/xcode build

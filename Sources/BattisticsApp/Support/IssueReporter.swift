@@ -68,7 +68,7 @@ enum IssueReporter {
         NSWorkspace.shared.open(url)
     }
 
-    private static var hardwareModel: String {
+    static var hardwareModel: String {
         var size = 0
         sysctlbyname("hw.model", nil, &size, nil, 0)
         guard size > 0 else { return "unknown" }

@@ -147,6 +147,27 @@ struct StatRow: View {
     }
 }
 
+/// The battery's live readings. Every row stays, with a dash for a value
+/// IOKit has not reported, so a card keeps its height as readings come and go.
+struct LiveBatteryRows: View {
+    let snapshot: BatterySnapshot
+    let temperatureUnit: TemperatureUnit
+
+    var body: some View {
+        let dash = "—"
+        StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
+        StatRow(
+            label: "Temperature",
+            value: snapshot.temperatureC.map { Formatting.temperature($0, unit: temperatureUnit) } ?? dash)
+        StatRow(
+            label: "Power",
+            value: snapshot.watts.map { Formatting.watts($0, signed: true) } ?? dash,
+            valueColor: (snapshot.watts ?? 0) < 0 ? .orange : nil)
+        StatRow(label: "Amperage", value: snapshot.amperageMA.map { Formatting.milliamps($0) } ?? dash)
+        StatRow(label: "Voltage", value: snapshot.voltageMV.map { Formatting.volts(millivolts: $0) } ?? dash)
+    }
+}
+
 /// Section title with an optional "?" popover explaining every stat in
 /// plain language.
 struct SectionHeader: View {
@@ -255,17 +276,17 @@ extension Color {
     /// matters more than "you are in Low Power Mode".
     static func charge(percent: Double, lowPower: Bool = false) -> Color {
         switch percent {
-        case ..<10: .red
-        case ..<20: .orange
+        case ...10: .red
+        case ...20: .orange
         default: lowPower ? .lowPower : .green
         }
     }
 
     static func health(percent: Double) -> Color {
-        switch percent {
-        case 80...: .green
-        case 60..<80: .orange
-        default: .red
+        switch HealthStatus(healthPercent: percent) {
+        case .good: .green
+        case .fair: .orange
+        case .poor: .red
         }
     }
 
@@ -276,5 +297,16 @@ extension Color {
         case ..<0.85: .orange
         default: .red
         }
+    }
+}
+
+/// Shown in place of battery readings on a Mac without a battery.
+struct NoBatteryView: View {
+    var body: some View {
+        ContentUnavailableView(
+            "No battery found",
+            systemImage: "minus.plus.batteryblock.exclamationmark",
+            description: Text("Battistics needs a Mac with a built-in battery.")
+        )
     }
 }

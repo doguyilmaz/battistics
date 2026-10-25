@@ -66,6 +66,16 @@ struct LidSleepLeaseTests {
         }
     }
 
+    @Test func shutdownRestoresAnActiveOverride() {
+        let f = Fixture()
+        let lease = f.makeLease()
+        #expect(lease.shutdown() == .inactive)
+        #expect(lease.acquire(owner: f.owner, session: f.session, now: f.now) == .success)
+        #expect(lease.shutdown() == .success)
+        #expect(!f.value)
+        #expect(f.journal == nil)
+    }
+
     @Test func externalChangeEndsBorrowedAndOwnedSessionsWithoutRollback() {
         for original in [false, true] {
             let f = Fixture()
@@ -352,5 +362,25 @@ struct LidSleepLeaseTests {
         for invalid in ["", "2", "false", "{\"version\":2,\"original\":false,\"phase\":\"active\"}"] {
             #expect(throws: (any Error).self) { try LidSleepLeaseJournal.decode(Data(invalid.utf8)) }
         }
+    }
+}
+
+@Suite("Lid sleep lease memory")
+struct LidSleepLeaseMemoryTests {
+    @Test func oldEndedSessionsAreForgottenButRecentOnesStillAnswer() {
+        final class Setting: @unchecked Sendable { var disabled = false }
+        let setting = Setting()
+        let lease = LidSleepLease(read: { setting.disabled }, write: { setting.disabled = $0 },
+                                  save: { _ in }, clear: {})
+        let owner = UUID()
+        var sessions: [UUID] = []
+        for _ in 0..<300 {
+            let session = UUID()
+            sessions.append(session)
+            #expect(lease.acquire(owner: owner, session: session) == .success)
+            _ = lease.release(owner: owner, session: session)
+        }
+        #expect(lease.acquire(owner: owner, session: sessions.last!) == .inactive)
+        #expect(lease.acquire(owner: owner, session: sessions.first!) == .success)
     }
 }

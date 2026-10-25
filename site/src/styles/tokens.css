@@ -1,0 +1,78 @@
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url(/fonts/bricolage-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url(/fonts/bricolage-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@property --accent-a { syntax: "<color>"; inherits: true; initial-value: #a9cf2e; }
+@property --accent-b { syntax: "<color>"; inherits: true; initial-value: #1f9e8e; }
+
+:root {
+  --paper: #f2f5f0;
+  --paper-2: #e8ede6;
+  --ink: #16201b;
+  --ink-2: #4c5952;
+  --ink-3: #75837b;
+  --line: #d6ded5;
+  --lime: #a9cf2e;
+  --teal: #1f9e8e;
+  --teal-ink: #0d6f62;
+  --accent-a: var(--lime);
+  --accent-b: var(--teal);
+  --charge: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  --sys-green: #34c759;
+  --sys-orange: #ff9500;
+  --sys-red: #ff3b30;
+  --sys-blue: #007aff;
+  --sys-yellow: #e5b20a;
+  --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --measure: 66ch;
+  --page: 1160px;
+  --gutter: clamp(16px, 4vw, 40px);
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1412;
+    --paper-2: #161d1a;
+    --ink: #e5ebe6;
+    --ink-2: #a3b1a9;
+    --ink-3: #74827a;
+    --line: #26302b;
+    --teal-ink: #5fd0bf;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1412;
+  --paper-2: #161d1a;
+  --ink: #e5ebe6;
+  --ink-2: #a3b1a9;
+  --ink-3: #74827a;
+  --line: #26302b;
+  --teal-ink: #5fd0bf;
+}
+
+/* Low Power Mode in the demo turns the page the app's Low Power yellow. */
+:root { transition: --accent-a 0.6s ease, --accent-b 0.6s ease; }
+:root[data-low-power="true"] {
+  --accent-a: #f7d44a;
+  --accent-b: #e3a008;
+}

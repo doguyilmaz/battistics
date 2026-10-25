@@ -8,12 +8,26 @@ public struct PeripheralBattery: Sendable, Equatable, Identifiable {
     /// Which cell, for devices that report more than one: Left, Right, Case.
     /// nil when the device has a single battery and the name says it all.
     public let detail: String?
+    /// Stored when a device has no product name; the app shows it localized.
+    public static let unknownName = "Unknown device"
 
     public init(id: String, name: String, percent: Int, detail: String? = nil) {
         self.id = id
         self.name = name
         self.percent = percent
         self.detail = detail
+    }
+
+    /// The order every battery list uses: by name, then cell, then identity.
+    public static func displayOrder(_ lhs: Self, _ rhs: Self) -> Bool {
+        (lhs.name, lhs.detail ?? "", lhs.id) < (rhs.name, rhs.detail ?? "", rhs.id)
+    }
+
+    /// IORegistry writes `AA-BB-…`, system_profiler `aa:bb:…`, for the same device.
+    static func normalizedAddress(_ raw: String?) -> String? {
+        raw?.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "-", with: ":")
+            .lowercased()
     }
 }
 
@@ -44,11 +58,8 @@ public enum PeripheralBatteryReader {
             guard let percent = property("BatteryPercent") as? Int, (0...100).contains(percent) else {
                 continue
             }
-            let name = (property("Product") as? String) ?? "Unknown device"
-            let address = (property("DeviceAddress") as? String)?
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: "-", with: ":")
-                .lowercased()
+            let name = (property("Product") as? String) ?? PeripheralBattery.unknownName
+            let address = PeripheralBattery.normalizedAddress(property("DeviceAddress") as? String)
             let serial = (property("SerialNumber") as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             var registryID: UInt64 = 0

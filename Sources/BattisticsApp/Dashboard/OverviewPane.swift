@@ -20,6 +20,7 @@ struct OverviewPane: View {
             // overview always fits.
             VStack(spacing: 16) {
                 hero(snapshot)
+                    .tourTarget(.overview)
                 HStack(alignment: .top, spacing: 16) {
                     capacityCard(snapshot)
                     liveCard(snapshot)
@@ -30,11 +31,8 @@ struct OverviewPane: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .navigationTitle("Overview")
         } else {
-            ContentUnavailableView(
-                "No battery found",
-                systemImage: "minus.plus.batteryblock.exclamationmark",
-                description: Text("Battistics needs a Mac with a built-in battery.")
-            )
+            NoBatteryView()
+            .tourTarget(.overview)
         }
     }
 
@@ -77,7 +75,7 @@ struct OverviewPane: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                Text(statusLine(snapshot))
+                Text(snapshot.statusLine)
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -114,24 +112,7 @@ struct OverviewPane: View {
         GlassCard {
             VStack(spacing: 7) {
                 SectionHeader(title: "Live")
-                StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
-                if let temperature = snapshot.temperatureC {
-                    StatRow(
-                        label: "Temperature",
-                        value: Formatting.temperature(temperature, unit: temperatureUnit))
-                }
-                if let watts = snapshot.watts {
-                    StatRow(
-                        label: "Power",
-                        value: Formatting.watts(watts, signed: true),
-                        valueColor: watts < 0 ? .orange : nil)
-                }
-                if let amperage = snapshot.amperageMA {
-                    StatRow(label: "Amperage", value: Formatting.milliamps(amperage))
-                }
-                if let voltage = snapshot.voltageMV {
-                    StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
-                }
+                LiveBatteryRows(snapshot: snapshot, temperatureUnit: temperatureUnit)
                 timeOnBatteryRow
             }
         }
@@ -140,16 +121,11 @@ struct OverviewPane: View {
     @ViewBuilder private var timeOnBatteryRow: some View {
         if isVisible, let unplugged = model.lastUnplugDate {
             TimelineView(.periodic(from: unplugged, by: 60)) { context in
-                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
+                StatRow(label: "Time on Battery", value: model.timeOnBattery(at: context.date))
             }
         } else {
-            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
+            StatRow(label: "Time on Battery", value: model.timeOnBattery(at: Date()))
         }
-    }
-
-    private func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = model.lastUnplugDate else { return String(localized: "N/A") }
-        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     /// Always four rows, present whether or not anything is plugged in.
@@ -183,22 +159,5 @@ struct OverviewPane: View {
         }
     }
 
-    private func statusLine(_ snapshot: BatterySnapshot) -> String {
-        if snapshot.isCharging {
-            if let minutes = snapshot.timeRemainingMin {
-                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
-            }
-            return String(localized: "Charging")
-        }
-        if snapshot.externalConnected {
-            return snapshot.fullyCharged || snapshot.percent >= 100
-                ? String(localized: "Fully charged · plugged in")
-                : String(localized: "Plugged in · charging on hold")
-        }
-        if let minutes = snapshot.timeRemainingMin {
-            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
-        }
-        return String(localized: "On battery")
-    }
 
 }
