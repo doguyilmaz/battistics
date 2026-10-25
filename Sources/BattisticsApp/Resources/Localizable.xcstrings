@@ -7703,6 +7703,23 @@
           }
         }
       }
+    },
+    "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet, aynı Apple ID’yi kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
