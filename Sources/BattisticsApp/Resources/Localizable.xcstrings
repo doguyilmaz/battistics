@@ -1152,6 +1152,17 @@
         }
       }
     },
+    "Battery is at %@. Connect power if the Mac must keep running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağlayın."
+          }
+        }
+      }
+    },
     "Battery is at %lld%%. Keep Awake cannot prevent an empty battery from interrupting your work. Connect power soon.": {
       "extractionState": "manual",
       "localizations": {
@@ -1241,6 +1252,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil gücü. Negatif değer boşalmayı, pozitif değer şarjı gösterir."
+          }
+        }
+      }
+    },
+    "Battery protection stopped it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil koruması durdurdu."
+          }
+        }
+      }
+    },
+    "Battery runs out first": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil önce bitecek"
           }
         }
       }
@@ -1906,6 +1939,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Durum"
+          }
+        }
+      }
+    },
+    "Connect the Mac to Personal Hotspot if you are taking it with you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
           }
         }
       }
@@ -3095,6 +3139,17 @@
         }
       }
     },
+    "Heat protection stopped it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isı koruması durdurdu."
+          }
+        }
+      }
+    },
     "Help": {
       "extractionState": "manual",
       "localizations": {
@@ -3425,6 +3480,17 @@
         }
       }
     },
+    "Keep Awake ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bitti"
+          }
+        }
+      }
+    },
     "Keep Awake ended because battery charge reached %lld%%. Normal sleep is allowed again. Connect power before starting another session.": {
       "extractionState": "manual",
       "localizations": {
@@ -3741,6 +3807,17 @@
         }
       }
     },
+    "Lid closed without Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak Erişim Noktası olmadan kapandı"
+          }
+        }
+      }
+    },
     "Light": {
       "localizations": {
         "tr": {
@@ -3925,6 +4002,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac %@"
+          }
+        }
+      }
+    },
+    "Mac battery low": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’in pili azaldı"
+          }
+        }
+      }
+    },
+    "Mac unplugged on Wi‑Fi": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Wi‑Fi’dayken güçten çıkarıldı"
           }
         }
       }
@@ -6112,6 +6211,28 @@
         }
       }
     },
+    "Stopped from iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’dan durduruldu."
+          }
+        }
+      }
+    },
+    "Stopped on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te durduruldu."
+          }
+        }
+      }
+    },
     "Stops at %lld%% battery": {
       "localizations": {
         "en": {
@@ -6369,6 +6490,17 @@
         }
       }
     },
+    "The Mac can sleep again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac yeniden uyuyabilir."
+          }
+        }
+      }
+    },
     "The Mac has been on battery power for %@.": {
       "localizations": {
         "tr": {
@@ -6397,6 +6529,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Asistan, macOS 26 veya üzerini ve Apple Intelligence’ı gerektirir. Hazır yardım içerikleri bu Mac’te çalışır."
+          }
+        }
+      }
+    },
+    "The battery lasts about %@, less than the Keep Awake session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil yaklaşık %@ dayanır; bu, Uyanık Tut oturumundan kısa."
           }
         }
       }
@@ -6655,6 +6798,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sistemin uyku ayarı başka bir yerden değiştirildi. Mevcut ayarınız korundu."
+          }
+        }
+      }
+    },
+    "The task finished.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görev bitti."
+          }
+        }
+      }
+    },
+    "The time you set is up.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belirlediğiniz süre doldu."
           }
         }
       }
@@ -6947,6 +7112,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapat"
+          }
+        }
+      }
+    },
+    "Turn on Personal Hotspot before the Mac goes in a bag, so its tasks stay online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı açın ki görevleri çevrimiçi kalsın."
           }
         }
       }
@@ -7703,6 +7879,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS, kapak kapalı modun ihtiyaç duyduğu güç yardımcısını kurmadı."
+          }
+        }
+      }
+    },
+    "macOS ended it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS sonlandırdı."
           }
         }
       }

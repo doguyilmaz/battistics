@@ -222,6 +222,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// The outcome of the newest phone command the Mac handled.
     public var lastCommand: CommandResult?
     public var extras: Extras?
+    /// Set by a Mac that posts its own alerts through iCloud, so a phone does
+    /// not repeat the ones it pushes.
+    public var pushesAlerts: Bool?
 
     public struct CommandResult: Codable, Sendable, Equatable {
         public var id: String

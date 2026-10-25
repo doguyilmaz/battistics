@@ -11,6 +11,32 @@ public enum RemoteAlert: Equatable, Sendable {
     case chargeReached(percent: Int)
     case unreachable
 
+    public enum Kind: String, Sendable {
+        case ended, battery, runtime, unplugged, closedlid, charged, silent
+    }
+
+    /// One notification per kind and Mac: a newer one replaces the older.
+    public var kind: Kind {
+        switch self {
+        case .sessionEnded: .ended
+        case .batteryLow: .battery
+        case .batteryRunsOut: .runtime
+        case .unpluggedWithoutHotspot: .unplugged
+        case .closedLidWithoutHotspot: .closedlid
+        case .chargeReached: .charged
+        case .unreachable: .silent
+        }
+    }
+
+    /// Kinds the Mac notices itself. The charge target is the phone's own
+    /// setting, and only a phone can tell that the Mac stopped answering.
+    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid]
+
+    /// What the Mac posts after publishing `current` over `previous`.
+    public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
+        changes(from: previous, to: current, chargeTarget: nil).filter { pushedKinds.contains($0.kind) }
+    }
+
     /// `current` is nil when the Mac did not answer; `previous` is nil before
     /// the first reading and `.some(nil)` after an unanswered one.
     /// `chargeTarget` is the charge level the user wants to hear about while the Mac charges.

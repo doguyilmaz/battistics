@@ -169,6 +169,15 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: below, to: status(percent: 80, adapter: false, session: false), chargeTarget: 80).isEmpty)
     }
 
+    @Test func theMacPushesWhatItCanSeeAndLeavesThePhoneItsOwn() {
+        #expect(RemoteAlert.pushed(from: status(), to: status(session: false, ended: .timer)) == [.sessionEnded(.timer)])
+        #expect(RemoteAlert.pushed(from: status(percent: 21), to: status(percent: 20)) == [.batteryLow(percent: 20)])
+        let below = status(percent: 79, adapter: true, session: false)
+        #expect(RemoteAlert.pushed(from: below, to: status(percent: 80, adapter: true, session: false)).isEmpty)
+        #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.unreachable.kind))
+        #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
+    }
+
     @Test func silenceAlertsOnlyWhileASessionRan() {
         #expect(RemoteAlert.alerts(from: status(), to: nil) == [.unreachable])
         #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)

@@ -28,6 +28,10 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
   - The Live Activity uses `unheardDate` as its stale date, also for timed sessions, and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Settings › Notifications › When Charged To reports once when a charging Mac reaches 80, 90 or 100%. It is evaluated on the phone, so it arrives with the next update the phone receives.
 - Alerts are delivered once per change and awaited before a background task completes. Lid and unplug warnings are cleared when the Mac moves to Hotspot.
+- The Mac posts the alerts it can see itself (session ended, battery low or running out, unplugged or lid closed away from Hotspot) as short-lived `Event` records after each publish (`RemoteAlert.pushed`). Phones hold one CloudKit query subscription on `Event` (`remote-alerts`), so iOS shows them straight from the push, without the silent-push throttling and while the app is not running. No server, no cost.
+- Push payloads cannot carry encrypted fields, so an `Event` holds only a title and a sentence in the Mac's language and a collapse id; no Mac name, network or reading beyond the percentage or time the alert is about. The Mac deletes them after 10 minutes.
+- A status carries `pushesAlerts`; a phone whose subscription is saved then skips those kinds locally, leaving it the charge target and "stopped answering". The collapse id equals the local notification id, so the two replace each other instead of stacking.
+- CloudKit does not push a change to the device that made it, so a Mac never shows its own alerts; one that receives another Mac's alert removes it.
 
 ## iPhone app
 
@@ -65,12 +69,8 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 ## Signing and release
 
 - Mac iCloud signing is opt-in: `make run-icloud` sets `BATTISTICS_ENTITLEMENTS` and team `5MYT4VYJFC`. CI, `make build`, `make app` and Developer ID builds have no iCloud and show "not signed for iCloud" in the iPhone pane. `make build` and the test harnesses write to the same folder, so run `make run-icloud` again after them; a separate folder would move the app away from its registered power helper and Location permission.
-- A release with iCloud needs: a Developer ID provisioning profile with iCloud and Push embedded in the app, release entitlements with `aps-environment` production and container environment Production, `scripts/sign-app.sh` passing `--entitlements` for the app, the `MacStatus` and `Command` schema deployed to Production in CloudKit Console, and phone and Mac builds in the same environment.
+- A release with iCloud needs: a Developer ID provisioning profile with iCloud and Push embedded in the app, release entitlements with `aps-environment` production and container environment Production, `scripts/sign-app.sh` passing `--entitlements` for the app, the `MacStatus`, `Command` and `Event` schema deployed to Production in CloudKit Console, and phone and Mac builds in the same environment.
 
 ## Verified on a device
 
 - iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later; the Display Off and Mac Low Power shortcuts from the Shortcuts app; switching the app icon to Gauge and back; the Live Activity's offline state after a fetch found the Mac silent, with the quiet note removed by that fetch; with steady pushes, the alert about 9 minutes after the last reading and no quiet note before it.
-
-## Considered and not built
-
-- Visible alerts sent by the Mac through a CloudKit query subscription would arrive without the silent-push throttling. Subscriptions belong to the account, so the Mac app would receive and display the same alerts. Revisit with a record field the subscription can filter on once it can be indexed in CloudKit Console.

@@ -9,6 +9,8 @@ public actor RemoteCloud {
     static let zoneID = CKRecordZone.ID(zoneName: "Remote")
     static let statusType = "MacStatus"
     static let commandType = "Command"
+    static let eventType = "Event"
+    static let alertSubscriptionID = "remote-alerts"
 
     public struct Snapshot: Sendable {
         public var statuses: [String: RemoteStatus] = [:]
@@ -17,6 +19,8 @@ public actor RemoteCloud {
         /// Status records deleted since the previous read, such as a Mac a phone removed.
         public var removedStatuses: Set<String> = []
         public var commands: [Command] = []
+        /// Alert records by name, with when they were posted.
+        public var events: [String: Date] = [:]
         /// Read from the start rather than as changes, so a missing record is really missing.
         public var isFull = false
     }
@@ -112,6 +116,10 @@ public actor RemoteCloud {
             let changes = try await database.recordZoneChanges(inZoneWith: Self.zoneID, since: token)
             for case .success(let modification) in changes.modificationResultsByID.values {
                 let record = modification.record
+                if record.recordType == Self.eventType {
+                    snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
+                    continue
+                }
                 guard let payload = record.encryptedValues["payload"] as? Data else { continue }
                 switch record.recordType {
                 case Self.statusType:
@@ -165,6 +173,44 @@ public actor RemoteCloud {
         let saved = try await database.modifyRecords(saving: [record], deleting: [])
         for result in saved.saveResults.values { _ = try result.get() }
         return record.recordID.recordName
+    }
+
+    /// An alert iOS shows on the account's phones straight from the push,
+    /// even while Battistics Remote is not running. Push payloads cannot
+    /// carry encrypted fields, so the text names no Mac and no network.
+    public func post(title: String, body: String, collapseID: String) async throws {
+        try await prepare()
+        let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: UUID().uuidString, zoneID: Self.zoneID))
+        record["title"] = title
+        record["body"] = body
+        record["collapse"] = collapseID
+        let saved = try await database.modifyRecords(saving: [record], deleting: [])
+        for result in saved.saveResults.values { _ = try result.get() }
+    }
+
+    /// Shows alert records as notifications on this device's account. The
+    /// text arrives already written; "%@" only places it.
+    public func subscribeToAlerts() async throws {
+        let subscription = CKQuerySubscription(recordType: Self.eventType, predicate: NSPredicate(value: true),
+                                               subscriptionID: Self.alertSubscriptionID, options: [.firesOnRecordCreation])
+        subscription.zoneID = Self.zoneID
+        let info = CKSubscription.NotificationInfo()
+        info.titleLocalizationKey = "%@"
+        info.titleLocalizationArgs = ["title"]
+        info.alertLocalizationKey = "%@"
+        info.alertLocalizationArgs = ["body"]
+        info.soundName = "default"
+        info.collapseIDKey = "collapse"
+        subscription.notificationInfo = info
+        _ = try await database.modifySubscriptions(saving: [subscription], deleting: [])
+    }
+
+    public func unsubscribeFromAlerts() async throws {
+        let result = try await database.modifySubscriptions(saving: [], deleting: [Self.alertSubscriptionID])
+        for case .failure(let error) in result.deleteResults.values
+        where (error as? CKError)?.code != .unknownItem {
+            throw error
+        }
     }
 
     public func delete(_ recordNames: [String]) async throws {

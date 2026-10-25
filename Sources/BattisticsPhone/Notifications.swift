@@ -7,6 +7,8 @@ import UserNotifications
 /// timer when Keep Awake is active: no third-party server, no cost.
 enum Notifications {
     static let enabledKey = "notificationsEnabled"
+    /// Whether iCloud shows the Mac's own alerts on this phone, so the app does not repeat them.
+    static let pushedKey = "alertPushesSubscribed"
     /// Charge level to report while a Mac charges; 0 is off.
     static let chargeTargetKey = "chargeAlertPercent"
 
@@ -47,7 +49,7 @@ enum Notifications {
         let delivered = Set(await center.deliveredNotifications().map(\.request.identifier))
         for (mac, alerts) in results {
             for alert in alerts {
-                let id = "\(mac.id).\(alert.kind)"
+                let id = "\(mac.id).\(alert.kind.rawValue)"
                 // The watchdog already said so under this identifier; adding it again sounds twice.
                 if alert == .unreachable, delivered.contains(id) { continue }
                 let content = UNMutableNotificationContent()
@@ -156,18 +158,6 @@ enum DeliveryCadence {
 }
 
 private extension RemoteAlert {
-    var kind: String {
-        switch self {
-        case .sessionEnded: "ended"
-        case .batteryLow: "battery"
-        case .batteryRunsOut: "runtime"
-        case .unpluggedWithoutHotspot: "unplugged"
-        case .closedLidWithoutHotspot: "closedlid"
-        case .chargeReached: "charged"
-        case .unreachable: "silent"
-        }
-    }
-
     var message: String {
         switch self {
         case .sessionEnded(let reason):

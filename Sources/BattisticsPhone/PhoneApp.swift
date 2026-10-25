@@ -30,6 +30,7 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Notifications.register()
         application.registerForRemoteNotifications()
+        Task { await MacStore.shared.syncAlertSubscription() }
         return true
     }
 

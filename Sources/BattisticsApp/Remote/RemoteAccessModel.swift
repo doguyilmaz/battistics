@@ -48,12 +48,15 @@ final class RemoteAccessModel {
     @ObservationIgnored private let battery: @MainActor () -> BatterySnapshot?
     /// The last published status before history and power settings were added, for cheap comparisons.
     @ObservationIgnored private var lastCheap: RemoteStatus?
+    /// The last full status published, which alerts compare against.
+    @ObservationIgnored private var lastStatus: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
     @ObservationIgnored private var handledCommands: Set<String> = []
+    @ObservationIgnored private var events: [String: Date] = [:]
     @ObservationIgnored private var retryAt: Date?
     @ObservationIgnored private var cachedPower: (settings: PowerSettings?, at: Date)?
     @ObservationIgnored private var syncing = false
@@ -146,6 +149,12 @@ final class RemoteAccessModel {
                 if mine.count > 1 { try? await publish(force: true) }
                 handled = true
             }
+            // Alerts only need to live long enough to be pushed. A delta fetch
+            // shows each one once, so they are remembered until they expire.
+            events.merge(snapshot.events) { $1 }
+            let expired = events.filter { -$0.value.timeIntervalSinceNow > 10 * 60 }.keys
+            handledCommands.formUnion(expired)
+            for name in expired { events[name] = nil }
             try await cloud.delete(Array(handledCommands))
             handledCommands.removeAll()
         } catch {
@@ -172,6 +181,7 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
+        status.pushesAlerts = true
         if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
             var compared = status
             compared.readAt = lastCheap.readAt
@@ -193,6 +203,14 @@ final class RemoteAccessModel {
         }
         lastCheap = cheap
         lastPublished = Date()
+        let previous = lastStatus
+        lastStatus = status
+        guard let previous else { return }
+        for alert in RemoteAlert.pushed(from: previous, to: status) {
+            guard let text = alert.pushText else { continue }
+            // A lost alert is not worth failing the heartbeat over.
+            try? await cloud.post(title: text.title, body: text.body, collapseID: "\(macID).\(alert.kind.rawValue)")
+        }
     }
 
     /// Coalesces bursts of changes into one write.
@@ -215,6 +233,7 @@ final class RemoteAccessModel {
     private func withdraw() async {
         pendingPublish?.cancel()
         lastCheap = nil
+        lastStatus = nil
         lastPublished = nil
         problem = nil
         // Retried by the ticker until it lands, or phones keep a ghost of this Mac.

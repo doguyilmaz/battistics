@@ -41,6 +41,7 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
+    @ObservationIgnored private var alertSubscriptionTried: Date?
 
     private init() {
         readings = UserDefaults.standard.data(forKey: "readings")
@@ -103,6 +104,11 @@ final class MacStore {
         }
         // A cancelled refresh says nothing about the Macs.
         guard !Task.isCancelled else { return [] }
+        if !UserDefaults.standard.bool(forKey: Notifications.pushedKey),
+           UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true,
+           alertSubscriptionTried.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
+            await syncAlertSubscription()
+        }
         return await apply(snapshot)
     }
 
@@ -114,8 +120,10 @@ final class MacStore {
             let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
+            let pushed = status.pushesAlerts == true && UserDefaults.standard.bool(forKey: Notifications.pushedKey)
             let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil,
                                                chargeTarget: Notifications.chargeTarget)
+                .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
             alerts.append((mac, macAlerts))
             Notifications.syncWatchdog(for: mac, reading: reading)
         }
@@ -130,6 +138,21 @@ final class MacStore {
         // Awaited so a background task does not complete before the alerts are added.
         await Notifications.deliver(alerts)
         return alerts
+    }
+
+    /// Keeps iCloud's alert subscription in step with the Notifications switch.
+    /// Retried on refresh: iCloud refuses it until a Mac has posted the first
+    /// alert record in a fresh development container.
+    func syncAlertSubscription() async {
+        alertSubscriptionTried = .now
+        let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
+        do {
+            if wanted { try await cloud.subscribeToAlerts() } else { try await cloud.unsubscribeFromAlerts() }
+            UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)
+        } catch {
+            // The app's own alerts cover every kind until this succeeds.
+            UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
+        }
     }
 
     /// For a Mac that was erased or sold. One that still shares publishes

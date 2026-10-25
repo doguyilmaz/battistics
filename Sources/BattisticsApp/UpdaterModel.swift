@@ -152,11 +152,12 @@ private final class UpdateNotificationHandler: NSObject, UNUserNotificationCente
     }
 
     /// A menu bar app counts as frontmost while its popover or dashboard is
-    /// open; without this, alerts would arrive silently then.
+    /// open; without this, alerts would arrive silently then. Alerts that
+    /// another Mac posts for the phones are not for this Mac.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter, willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
-        [.banner, .sound]
+        notification.request.content.userInfo["ck"] == nil ? [.banner, .sound] : []
     }
 }
 
