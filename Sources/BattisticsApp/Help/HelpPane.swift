@@ -12,24 +12,20 @@ struct HelpPane: View {
         Form {
             Section {
                 HStack {
-                    Label("Make yourself at home", systemImage: "sparkle.magnifyingglass")
-                    Spacer()
                     Button("Take a Tour…") { model.tourRequested = true }
-                }
-                Text("Learn the controls in a short guided tour, or find an answer below.")
-                    .font(.caption).foregroundStyle(.secondary)
-                if let url = URL(string: "https://battistics.apps.doguyilmaz.com/docs/") {
-                    Link(destination: url) {
-                        Label("Read the Documentation Online", systemImage: "book")
+                    if let url = URL(string: "https://battistics.apps.doguyilmaz.com/docs/") {
+                        Link(destination: url) {
+                            Label("Read the Documentation Online", systemImage: "book")
+                        }
                     }
+                    Spacer()
                 }
             }
-            Section("Ask Battistics") {
+            Section {
                 TextField("Search help or ask a question", text: $query, axis: .vertical)
                     .lineLimit(1...3)
                     .onSubmit { assistant.ask(query) }
                     .tourTarget(.help)
-                Text(assistant.availabilityMessage).font(.caption).foregroundStyle(.secondary)
                 HStack {
                     if assistant.isResponding {
                         ProgressView().controlSize(.small)
@@ -56,10 +52,12 @@ struct HelpPane: View {
                 if let error = assistant.errorMessage {
                     Text(error).font(.caption).foregroundStyle(.secondary)
                 }
+            } header: {
+                InfoHeader("Ask Battistics", text: assistant.availabilityMessage)
             }
             if !assistant.sources.isEmpty {
                 Section("Source Articles") {
-                    ForEach(assistant.sources) { article in articleRow(article) }
+                    ForEach(assistant.sources) { article in ArticleTile(article: article) }
                 }
             }
             Section("Built-in Answers") {
@@ -68,7 +66,9 @@ struct HelpPane: View {
                         .foregroundStyle(.secondary)
                     Button("Show All Answers") { query = "" }
                 } else {
-                    ForEach(articles) { article in articleRow(article) }
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                        ForEach(articles) { article in ArticleTile(article: article) }
+                    }
                 }
             }
         }
@@ -78,15 +78,38 @@ struct HelpPane: View {
         .onChange(of: scenePhase) { if scenePhase == .active { assistant.refreshAvailability() } }
         .onDisappear { assistant.cancel() }
     }
+}
 
-    private func articleRow(_ article: HelpArticle) -> some View {
-        DisclosureGroup(article.title) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(article.answer).textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Button("Open \(article.pane.title)") { model.dashboardPane = article.pane }
+/// A question that opens its answer beside it, so the list stays one screen.
+private struct ArticleTile: View {
+    let article: HelpArticle
+    @Environment(AppModel.self) private var model
+    @State private var open = false
+
+    var body: some View {
+        Button { open.toggle() } label: {
+            Text(article.title)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, minHeight: 34, alignment: .leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.fill.opacity(open ? 0.9 : 0.5), in: RoundedRectangle(cornerRadius: 8))
+                .contentShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .popover(isPresented: $open, arrowEdge: .bottom) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(article.title).font(.headline)
+                Text(article.answer)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Open \(article.pane.title)") {
+                    open = false
+                    model.dashboardPane = article.pane
+                }
             }
-            .padding(.vertical, 6)
+            .padding(16)
+            .frame(width: 380, alignment: .leading)
         }
     }
 }

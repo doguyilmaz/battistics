@@ -4,12 +4,18 @@ import SwiftUI
 /// pane reads as controls rather than paragraphs.
 struct InfoHeader: View {
     let title: LocalizedStringKey
-    let paragraphs: [LocalizedStringKey]
+    let paragraphs: [Text]
     @State private var showing = false
 
     init(_ title: LocalizedStringKey, info paragraphs: LocalizedStringKey...) {
         self.title = title
-        self.paragraphs = paragraphs
+        self.paragraphs = paragraphs.map { Text($0) }
+    }
+
+    /// For an explanation already worded at runtime.
+    init(_ title: LocalizedStringKey, text: String) {
+        self.title = title
+        paragraphs = [Text(text)]
     }
 
     var body: some View {
@@ -26,7 +32,7 @@ struct InfoHeader: View {
             .popover(isPresented: $showing, arrowEdge: .trailing) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(paragraphs.indices, id: \.self) { index in
-                        Text(paragraphs[index])
+                        paragraphs[index]
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }

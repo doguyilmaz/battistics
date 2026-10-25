@@ -78,17 +78,10 @@ struct TourHarness {
             else { nextFrame = frame }
             try capture(host, step: step)
             precondition(!awake.isActive && awake.safety.configuration == protection && !automation.enabled)
-            if step == .help {
-                let scroll = try require(scrollViews(in: host).first {
-                    $0.convert($0.bounds, to: host).minX >= 180
-                        && ($0.documentView?.frame.height ?? 0) > $0.contentSize.height + 100
-                })
-                scroll.contentView.scroll(to: CGPoint(x: 0, y: scroll.documentView!.frame.height - scroll.contentSize.height))
-                scroll.reflectScrolledClipView(scroll.contentView)
-                try await settle()
-                let afterScroll = try find("tour.next", in: host)
-                let afterFrame = try require(attribute(afterScroll, "accessibilityFrame") as? NSValue).rectValue
-                precondition(afterFrame == frame, "Scrolling moved tour navigation")
+            // Every pane fits the window; none scrolls.
+            for scroll in scrollViews(in: host) where scroll.convert(scroll.bounds, to: host).minX >= 180 {
+                let overflow = (scroll.documentView?.frame.height ?? 0) - scroll.contentSize.height
+                precondition(overflow < 4, "\(step.pane) scrolls by \(overflow) pt")
             }
             try press(button)
         }
@@ -130,7 +123,7 @@ struct TourHarness {
         try capture(host, step: .power, suffix: "-active")
         precondition(awake.isActive, "Tour changed the running session")
         window.close()
-        print("PASS: visible targets, pinned controls during scroll, Next/Back/Done/Skip/replay, Return/Escape, settings unchanged")
+        print("PASS: visible targets, panes that fit without scrolling, Next/Back/Done/Skip/replay, Return/Escape, settings unchanged")
     }
 
     private static func find(_ identifier: String, in root: Any) throws -> NSObject {
