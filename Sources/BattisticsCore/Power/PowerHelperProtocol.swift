@@ -9,7 +9,7 @@ public let powerHelperMachServiceName = "com.doguyilmaz.Battistics.PowerHelper"
 /// so the binary on disk and the one answering can differ. The app compares
 /// against this to notice an old helper and re-register it. Bump it whenever
 /// the helper's behavior changes.
-public let powerHelperBuild = "4"
+public let powerHelperBuild = "5"
 
 /// Everything the root helper is able to do.
 ///

@@ -76,6 +76,11 @@ final class LidSleepController: @unchecked Sendable {
         }
     }
 
+    /// Waits for the restore, so the process can exit right after.
+    func shutdown() {
+        queue.sync { _ = lease.shutdown() }
+    }
+
     func disconnected(owner: UUID) {
         queue.async { [self] in
             _ = lease.disconnected(owner: owner)

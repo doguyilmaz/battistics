@@ -66,6 +66,16 @@ struct LidSleepLeaseTests {
         }
     }
 
+    @Test func shutdownRestoresAnActiveOverride() {
+        let f = Fixture()
+        let lease = f.makeLease()
+        #expect(lease.shutdown() == .inactive)
+        #expect(lease.acquire(owner: f.owner, session: f.session, now: f.now) == .success)
+        #expect(lease.shutdown() == .success)
+        #expect(!f.value)
+        #expect(f.journal == nil)
+    }
+
     @Test func externalChangeEndsBorrowedAndOwnedSessionsWithoutRollback() {
         for original in [false, true] {
             let f = Fixture()

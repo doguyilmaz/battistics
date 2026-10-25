@@ -122,6 +122,12 @@ public final class LidSleepLease {
         return restore()
     }
 
+    /// The helper is being stopped. Once launchd has unloaded it, nothing
+    /// replays the journal, so a lid override left on would never be undone.
+    public func shutdown() -> LidSleepLeaseResult {
+        restore()
+    }
+
     public func recover(journal: LidSleepLeaseJournal) -> LidSleepLeaseResult {
         guard active == nil, !blocked else { return .rejected }
         if let session = journal.session, let ended = terminal[session] {

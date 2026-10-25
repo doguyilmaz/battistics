@@ -160,6 +160,7 @@ struct SystemPane: View {
         } else if helper.isInstalled {
             Button("Remove Helper") { removeHelper() }
                 .controlSize(.small)
+                .disabled(keepAwake.session?.mode == .lidClosed)
         } else {
             Button("Never Ask Again…") { installHelper() }
                 .controlSize(.small)
