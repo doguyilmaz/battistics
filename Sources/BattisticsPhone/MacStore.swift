@@ -25,7 +25,8 @@ final class MacStore {
 
     private(set) var readings: [String: Reading]
     private(set) var refreshing = false
-    private(set) var pending: Set<String> = []
+    /// The command each Mac is waiting on, so only the control that sent it shows progress.
+    private(set) var pending: [String: RemoteRequest.Operation] = [:]
     /// Why iCloud could not be read, in the user's language.
     private(set) var problem: String?
     var selectedID: String? {
@@ -144,8 +145,8 @@ final class MacStore {
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
         let locks = request.operation != .inspect
-        if locks { pending.insert(mac.id) }
-        defer { if locks { pending.remove(mac.id) } }
+        if locks { pending[mac.id] = request.operation }
+        defer { if locks { pending[mac.id] = nil } }
         #if DEBUG
         if DemoData.isEnabled, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))

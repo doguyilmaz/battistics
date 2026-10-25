@@ -93,7 +93,7 @@ struct BatteryCard: View {
                 .foregroundStyle(lowPower ? PowerPalette.lowPower : .primary)
                 .fixedSize()
         }
-        .disabled(!reachable || store.pending.contains(mac.id))
+        .disabled(!reachable || store.pending[mac.id] != nil)
         .accessibilityLabel(Text("Mac power settings"))
     }
 

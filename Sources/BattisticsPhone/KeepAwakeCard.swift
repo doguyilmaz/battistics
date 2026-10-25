@@ -19,7 +19,8 @@ struct KeepAwakeCard: View {
 
     var body: some View {
         let session = status.session
-        let pending = store.pending.contains(mac.id)
+        let operation = store.pending[mac.id]
+        let pending = operation == .start || operation == .stop
 
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -57,7 +58,7 @@ struct KeepAwakeCard: View {
             actionButton(session: session, pending: pending)
         }
         .card(border: session != nil ? .orange.opacity(0.4) : nil)
-        .disabled(!reachable || pending)
+        .disabled(!reachable || operation != nil)
         .animation(.snappy, value: session != nil)
         .sensoryFeedback(.success, trigger: succeeded)
         .onChange(of: session) { message = nil }
