@@ -20,6 +20,13 @@
   showing what started Keep Awake and why the last one ended.
 - An eight-step tour on first launch, replayable from Help, and searchable help
   in English and Turkish with optional on-device answers on macOS 26.
+- Power shows "Sleep is turned off" with Allow Sleep when macOS's sleep
+  override outlived a closed-lid session, for example after a power loss.
+- The live readings in Overview and the popover keep every row, with a dash
+  for a value macOS has not reported, so the cards no longer change height.
+- "Still on Battery" is sent once per unplug, also across a relaunch.
+- Battistics Remote can remove a Mac that no longer answers, and tells you
+  when a command from a widget, the Lock Screen or Control Center was refused.
 
 ## 1.4.1
 
