@@ -28,9 +28,8 @@ struct BatteryCard: View {
                 }
 
                 HStack(spacing: 8) {
-                    MetricPill(label: (battery.watts.map { abs($0) >= 0.5 } ?? false)
-                                    ? String(localized: "Power") : String(localized: "Adapter"),
-                               value: battery.powerText ?? "–",
+                    MetricPill(label: String(localized: "Power"),
+                               value: battery.flowText ?? "0 W",
                                symbol: "bolt.fill",
                                tint: battery.isCharging ? PowerPalette.charging : .accentColor)
                     MetricPill(label: battery.cycleCount.map { String(localized: "\($0) cycles") } ?? String(localized: "Health"),
@@ -58,7 +57,11 @@ struct BatteryCard: View {
         if !reachable {
             return String(localized: "\(battery.percent)% · \(status.readAt.formatted(.relative(presentation: .named)))")
         }
-        return battery.timeText ?? battery.adapterWatts.map { String(localized: "\($0) W adapter") } ?? battery.headline
+        if let time = battery.timeText { return time }
+        if battery.onAdapter {
+            return battery.percent >= 100 ? String(localized: "Fully charged") : String(localized: "Not charging")
+        }
+        return battery.headline
     }
 
     private func powerMenu(_ battery: RemoteStatus.Battery) -> some View {

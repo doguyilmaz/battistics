@@ -171,14 +171,15 @@ extension RemoteStatus.Battery {
         return String(localized: "On Battery")
     }
 
-    /// Signed watts while power flows, the adapter rating otherwise.
-    var powerText: String? {
-        if let watts, abs(watts) >= 0.5 {
-            let rounded = Int(watts.rounded())
-            return rounded > 0 ? "+\(rounded) W" : "\(rounded) W"
-        }
-        return adapterWatts.map { "\($0) W" }
+    /// Signed watts while power flows into or out of the battery.
+    var flowText: String? {
+        guard let watts, abs(watts) >= 0.5 else { return nil }
+        let rounded = Int(watts.rounded())
+        return rounded > 0 ? "+\(rounded) W" : "\(rounded) W"
     }
+
+    /// The flow, or the adapter rating while nothing flows.
+    var powerText: String? { flowText ?? adapterWatts.map { "\($0) W" } }
 
     var temperatureText: String? {
         temperatureC.map { $0.formatted(.number.precision(.fractionLength(0))) + " °C" }

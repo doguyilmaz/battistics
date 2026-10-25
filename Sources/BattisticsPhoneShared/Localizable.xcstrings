@@ -3231,23 +3231,6 @@
         }
       }
     },
-    "%lld W adapter": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld W adapter"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld W adaptör"
-          }
-        }
-      }
-    },
     "%lld%% · %@": {
       "extractionState": "manual",
       "localizations": {
@@ -5114,6 +5097,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
+          }
+        }
+      }
+    },
+    "Fully charged": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fully charged"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam dolu"
+          }
+        }
+      }
+    },
+    "Not charging": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not charging"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj etmiyor"
           }
         }
       }
