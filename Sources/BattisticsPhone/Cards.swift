@@ -154,10 +154,10 @@ struct PocketModeDock: View {
             return String(localized: "Connected to iPhone, ready for bag mode.")
         }
         switch tipIndex {
-        case 1: return String(localized: "Set Mac Wi‑Fi › Ask to Join Hotspots to Automatic.")
-        case 2: return String(localized: "Enable Thermal Care on Mac to pause if bag warms.")
-        case 3: return String(localized: "Tap the selected duration pill again for ∞ mode.")
-        default: return String(localized: "Wi‑Fi drops when you leave. Turn on Hotspot first.")
+        case 1: return String(localized: "Set Mac Wi‑Fi to auto-join Hotspot.")
+        case 2: return String(localized: "Thermal Care pauses Mac if bag warms.")
+        case 3: return String(localized: "Tap selected duration again for ∞ mode.")
+        default: return String(localized: "Turn on Hotspot before leaving Wi‑Fi.")
         }
     }
 }
@@ -193,11 +193,11 @@ struct BatteryCard: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {
-                            Text(headline(battery))
+                            Text(enabled ? headline(battery) : String(localized: "Offline (\(battery.percent)%)"))
                                 .font(.headline)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.85)
-                            if battery.isCharging {
+                            if enabled && battery.isCharging {
                                 Image(systemName: "bolt.fill")
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(PowerPalette.charging)
@@ -205,7 +205,13 @@ struct BatteryCard: View {
                             }
                         }
 
-                        if let detail = detail(battery) {
+                        if !enabled {
+                            Text(String(localized: "Last reported · \(status.readAt.formatted(.relative(presentation: .named)))"))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                        } else if let detail = detail(battery) {
                             Text(detail)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
@@ -310,7 +316,7 @@ struct BatteryCard: View {
             HStack(spacing: 4) {
                 Image(systemName: isLPM ? "leaf.fill" : (policy?.symbol ?? "leaf"))
                     .font(.caption2.weight(.semibold))
-                Text(isLPM ? String(localized: "Low Power") : (policy?.shortBadge ?? String(localized: "Power Mode")))
+                Text(isLPM ? String(localized: "Low Power") : (policy?.compactBadge ?? String(localized: "Power Mode")))
                     .font(.caption2.weight(.semibold))
                     .lineLimit(1)
                 Image(systemName: "chevron.up.chevron.down")
@@ -331,20 +337,23 @@ struct BatteryCard: View {
 
     private func healthPrimaryValue(_ battery: RemoteStatus.Battery) -> String {
         if showCyclesPrimary, let cycles = battery.cycleCount {
-            return "\(cycles)"
+            return "\(cycles) cycles"
         }
-        return battery.healthPercent.map { "\($0)%" } ?? "-"
+        if let health = battery.healthPercent {
+            if let cycles = battery.cycleCount {
+                return "\(health)% · \(cycles)c"
+            }
+            return "\(health)%"
+        }
+        return "-"
     }
 
     private func healthSubtitle(_ battery: RemoteStatus.Battery) -> String {
-        if showCyclesPrimary, battery.cycleCount != nil {
+        if showCyclesPrimary {
             if let health = battery.healthPercent {
-                return String(localized: "Cycles · \(health)%")
+                return "\(health)% Health"
             }
             return String(localized: "Cycles")
-        }
-        if let cycles = battery.cycleCount {
-            return String(localized: "Health · \(cycles)c")
         }
         return String(localized: "Health")
     }
@@ -356,7 +365,7 @@ struct BatteryCard: View {
         let tint: Color
 
         var body: some View {
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: symbol)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(tint == .secondary ? Color.accentColor : tint)
@@ -365,14 +374,16 @@ struct BatteryCard: View {
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.primary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                     Text(label)
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                 }
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal, 9)
+            .padding(.horizontal, 8)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity)
             .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
@@ -388,19 +399,19 @@ struct BatteryCard: View {
 
     private func headline(_ battery: RemoteStatus.Battery) -> String {
         if battery.isCharging { return String(localized: "Charging") }
-        if battery.onAdapter { return String(localized: "On power adapter") }
-        return String(localized: "On battery")
+        if battery.onAdapter { return String(localized: "Plugged In") }
+        return String(localized: "On Battery")
     }
 
     private func detail(_ battery: RemoteStatus.Battery) -> String? {
         guard let minutes = battery.minutesRemaining else {
             if let adapterWatts = battery.adapterWatts {
-                return String(localized: "\(adapterWatts)W power adapter")
+                return String(localized: "\(adapterWatts)W Adapter")
             }
             return nil
         }
         let time = DurationLabel.long(minutes: minutes)
-        return battery.isCharging ? String(localized: "\(time) to full") : String(localized: "About \(time) left")
+        return battery.isCharging ? String(localized: "\(time) to full") : String(localized: "\(time) left")
     }
 
     private func powerFlowLabel(_ battery: RemoteStatus.Battery) -> String? {
@@ -605,7 +616,12 @@ struct KeepAwakeCard: View {
     /// warnings, session origin, and mode descriptions without any height change.
     @ViewBuilder
     private var feedbackLine: some View {
-        if let message {
+        if !enabled {
+            Label("Mac is offline or sleeping. Controls will sync when awake.", systemImage: "moon.fill")
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        } else if let message {
             Button {
                 withAnimation { self.message = nil }
             } label: {
@@ -657,7 +673,18 @@ struct KeepAwakeCard: View {
 
     @ViewBuilder
     private var actionButton: some View {
-        if status.session != nil {
+        if !enabled {
+            Button {} label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                    Text("Mac is Offline")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .frame(maxWidth: .infinity, minHeight: 26)
+            }
+            .buttonStyle(.bordered)
+            .disabled(true)
+        } else if status.session != nil {
             Button(role: .destructive) {
                 Task { await run { await store.stop(mac) } }
             } label: {
@@ -719,14 +746,20 @@ struct ConditionsGrid: View {
     var body: some View {
         let networkName = status.resolvedNetworkName(fallbackHotspot: UIDevice.current.name)
         let isHotspot = status.network == .hotspot
+        let networkPrimary = networkName ?? status.network.label
+        let networkSubtitle = networkName != nil ? status.network.label : String(localized: "Connection")
 
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
             Button {
-                HotspotOpener.open(using: openURL)
+                if isHotspot {
+                    NetworkSettingsOpener.openHotspot(using: openURL)
+                } else {
+                    NetworkSettingsOpener.openWiFi(using: openURL)
+                }
             } label: {
                 Tile(
-                    title: networkName ?? String(localized: "Connection"),
-                    value: status.network.label,
+                    title: networkSubtitle,
+                    value: networkPrimary,
                     symbol: status.network.symbol,
                     tint: status.network == .offline ? .orange : (isHotspot ? PowerPalette.hotspot : .secondary),
                     highlighted: isHotspot
@@ -792,10 +825,12 @@ struct ConditionsGrid: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(tint == .secondary ? Color.primary : tint)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     Text(title)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
                 Spacer(minLength: 0)
             }

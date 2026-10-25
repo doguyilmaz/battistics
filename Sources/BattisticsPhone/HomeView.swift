@@ -6,19 +6,21 @@ struct HomeView: View {
     @Environment(MacStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @State private var showingSettings = false
+    @State private var showingDetails = false
+    @State private var phone = LocalPhoneMonitor.shared
 
     var body: some View {
         NavigationStack {
             Group {
                 if store.isLocalPhoneSelected {
-                    LocalPhoneDashboard()
+                    LocalPhoneDashboard(showingDetails: $showingDetails)
                         .id(MacStore.localPhoneID)
                         .transition(.asymmetric(
                             insertion: .opacity.combined(with: .scale(scale: 0.98)),
                             removal: .opacity
                         ))
                 } else if let mac = store.selected {
-                    MacDashboard(mac: mac, showingSettings: $showingSettings)
+                    MacDashboard(mac: mac, showingSettings: $showingSettings, showingDetails: $showingDetails)
                         .id(mac.id)
                         .transition(.asymmetric(
                             insertion: .opacity.combined(with: .scale(scale: 0.98)),
@@ -29,9 +31,18 @@ struct HomeView: View {
                 }
             }
             .animation(.spring(duration: 0.35, bounce: 0.12), value: store.selectedID)
-            .navigationTitle(store.isLocalPhoneSelected ? UIDevice.current.name : (store.selected?.name ?? String(localized: "Battistics")))
+            .navigationTitle(store.isLocalPhoneSelected ? phone.pickerDisplayName : (store.selected?.name ?? String(localized: "Battistics")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if store.selected != nil || store.isLocalPhoneSelected {
+                        Button {
+                            showingDetails = true
+                        } label: {
+                            Label("Details", systemImage: "info.circle")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .principal) {
                     if let mac = store.selected {
                         MacHeaderPicker(selected: mac, showingSettings: $showingSettings)
@@ -41,16 +52,18 @@ struct HomeView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingSettings = true } label: {
-                        Label("Devices & Settings", systemImage: store.macs.count > 1 ? "laptopcomputer.and.iphone" : "gearshape")
+                        Label("Devices & Settings", systemImage: "gearshape")
                     }
                 }
             }
             .sheet(isPresented: $showingSettings) { SettingsView() }
+            .sheet(isPresented: $showingDetails) { DeviceDetailsSheet() }
         }
         .task(id: scenePhase == .active) {
             guard scenePhase == .active else { return }
             while !Task.isCancelled {
                 await store.refreshAll()
+                phone.ingestPairedPhoneName(from: store.readings)
                 try? await Task.sleep(for: .seconds(10))
             }
         }
@@ -87,15 +100,16 @@ private struct MacHeaderPicker: View {
                     }
                 }
             }
-            Section("This iPhone") {
+            Section("Your iPhones") {
                 Button {
                     phone.refresh()
+                    phone.ingestPairedPhoneName(from: store.readings)
                     withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
                         store.selectedID = MacStore.localPhoneID
                     }
                 } label: {
                     HStack {
-                        Label("\(UIDevice.current.name) (\(phone.modelName))", systemImage: "iphone")
+                        Label(phone.pickerDisplayName, systemImage: "iphone")
                         Text("\(phone.percent)%")
                         if isPhone {
                             Image(systemName: "checkmark")
@@ -107,24 +121,17 @@ private struct MacHeaderPicker: View {
             Button {
                 showingSettings = true
             } label: {
-                Label("All Devices & Settings…", systemImage: "laptopcomputer.and.iphone")
+                Label("Devices & Settings", systemImage: "slider.horizontal.3")
             }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isPhone ? "iphone" : (isHotspot ? "personalhotspot" : "laptopcomputer"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(isHotspot ? PowerPalette.hotspot : Color.accentColor)
-                Text(isPhone ? "\(UIDevice.current.name) · \(phone.modelName)" : selected.name)
+                Text(isPhone ? phone.pickerDisplayName : selected.name)
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                if store.macs.count > 1 && !isPhone {
-                    Text("\(store.macs.count)")
-                        .font(.caption2.weight(.bold))
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1)
-                        .background(Color.accentColor.opacity(0.15), in: Capsule())
-                }
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
@@ -140,7 +147,9 @@ struct MacDashboard: View {
     @Environment(MacStore.self) private var store
     let mac: MacStore.Mac
     @Binding var showingSettings: Bool
+    @Binding var showingDetails: Bool
     @State private var message: String?
+    @AppStorage("phoneAmbientEnergyBackdrop") private var showAmbientBackdrop = true
 
     var body: some View {
         let reading = store.reading(for: mac)
@@ -152,7 +161,7 @@ struct MacDashboard: View {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
 
-                if reachable, let status {
+                if showAmbientBackdrop, reachable, let status {
                     AmbientEnergyBackdrop(status: status)
                         .ignoresSafeArea()
                         .transition(.opacity)
@@ -313,15 +322,45 @@ private struct StatusLine: View {
     }
 }
 
-enum HotspotOpener {
+enum NetworkSettingsOpener {
+    static func openWiFi(using openURL: OpenURLAction) {
+        let candidates = [
+            "App-prefs:WIFI",
+            "App-Prefs:root=WIFI",
+            "prefs:root=WIFI"
+        ]
+        openFirst(candidates, using: openURL)
+    }
+
+    static func openHotspot(using openURL: OpenURLAction) {
+        let candidates = [
+            "App-prefs:INTERNET_TETHERING",
+            "App-Prefs:root=INTERNET_TETHERING",
+            "prefs:root=INTERNET_TETHERING"
+        ]
+        openFirst(candidates, using: openURL)
+    }
+
     static func open(using openURL: OpenURLAction) {
-        if let url = URL(string: "App-Prefs:root=INTERNET_TETHERING"), UIApplication.shared.canOpenURL(url) {
-            openURL(url)
-        } else if let url = URL(string: UIApplication.openSettingsURLString) {
-            openURL(url)
+        openHotspot(using: openURL)
+    }
+
+    private static func openFirst(_ candidates: [String], using openURL: OpenURLAction) {
+        for str in candidates {
+            if let url = URL(string: str) {
+                UIApplication.shared.open(url, options: [:]) { success in
+                    if success { return }
+                }
+                return
+            }
+        }
+        if let fallback = URL(string: UIApplication.openSettingsURLString) {
+            openURL(fallback)
         }
     }
 }
+
+typealias HotspotOpener = NetworkSettingsOpener
 
 extension View {
     func card(borderColor: Color? = nil) -> some View {

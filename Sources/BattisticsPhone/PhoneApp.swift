@@ -7,11 +7,23 @@ struct PhoneApp: App {
     @UIApplicationDelegateAdaptor private var delegate: PhoneAppDelegate
     @State private var store = MacStore.shared
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("phoneThemePreference") private var themeRaw = "automatic"
+
+    private var colorScheme: ColorScheme? {
+        switch themeRaw {
+        case "light": .light
+        case "dark": .dark
+        default: nil
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             HomeView()
                 .environment(store)
+                .preferredColorScheme(colorScheme)
+                .onAppear { PhoneThemeManager.apply(themeRaw) }
+                .onChange(of: themeRaw) { PhoneThemeManager.apply(themeRaw) }
         }
         .onChange(of: scenePhase) {
             if scenePhase == .background { Notifications.schedule() }
