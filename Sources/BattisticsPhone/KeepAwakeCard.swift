@@ -81,7 +81,7 @@ struct KeepAwakeCard: View {
 
     private var idleControls: some View {
         VStack(spacing: 10) {
-            Picker("Mode", selection: $mode) {
+            Picker("Mode", selection: Binding(get: { chosenMode }, set: { mode = $0 })) {
                 ForEach(modes, id: \.self) { Text($0.label).tag($0) }
             }
             .pickerStyle(.segmented)

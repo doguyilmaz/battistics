@@ -292,8 +292,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         let minimum = staleDate.timeIntervalSince(readAt) + 45
         let maximum = max(minimum, Self.unheardDelay)
         let times = backgroundDeliveries.sorted() + [now]
-        // Three recent wakes are enough to trust the cadence; fewer means throttled or unknown.
-        guard times.count >= 4 else { return maximum }
+        // A short burst says nothing about throttling, which iOS starts after a few pushes.
+        guard times.count >= 4, let oldest = times.first,
+              now.timeIntervalSince(oldest) >= Self.unheardDelay / 2 else { return maximum }
         let longestGap = zip(times, times.dropFirst()).map { $1.timeIntervalSince($0) }.max() ?? maximum
         return min(maximum, max(minimum, longestGap * 1.5))
     }

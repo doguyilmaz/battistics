@@ -86,8 +86,10 @@ struct RemoteTests {
         let status = RemoteStatus(machineName: "Mac", readAt: now, session: session,
                                   heartbeatSeconds: RemoteStatus.sessionHeartbeat)
         let stale = RemoteStatus.sessionHeartbeat * 4 + 45
-        let steady = (1...4).map { now.addingTimeInterval(Double(-$0) * 120) }
+        let steady = (1...8).map { now.addingTimeInterval(Double(-$0) * 120) }
         #expect(status.watchdogDelay(backgroundDeliveries: steady, now: now) == stale)
+        let burst = (1...4).map { now.addingTimeInterval(Double(-$0) * 120) }
+        #expect(status.watchdogDelay(backgroundDeliveries: burst, now: now) == RemoteStatus.unheardDelay)
         let throttled = (1...4).map { now.addingTimeInterval(Double(-$0) * 1500) }
         #expect(status.watchdogDelay(backgroundDeliveries: throttled, now: now) == RemoteStatus.unheardDelay)
         let patchy = [-1500, -900, -600, -120].map { now.addingTimeInterval(Double($0)) }

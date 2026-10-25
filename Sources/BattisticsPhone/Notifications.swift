@@ -104,7 +104,7 @@ enum DeliveryCadence {
     /// Called for every background wake that fetched the Mac's status.
     static func recordBackgroundDelivery(at date: Date = .now) {
         let recent = deliveries().filter { date.timeIntervalSince($0) < window }
-        UserDefaults.standard.set((recent + [date]).suffix(8).map(\.timeIntervalSince1970), forKey: key)
+        UserDefaults.standard.set((recent + [date]).suffix(16).map(\.timeIntervalSince1970), forKey: key)
     }
 
     static func watchdogDelay(for status: RemoteStatus, now: Date = .now) -> TimeInterval {
