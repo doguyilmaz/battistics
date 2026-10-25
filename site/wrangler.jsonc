@@ -1,7 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "battistics-site",
-  "account_id": "37c7e16bce7c0b544be037fae8090c7e",
   "compatibility_date": "2026-10-20",
   "assets": { "directory": "./dist", "not_found_handling": "404-page" },
   // Cloudflare creates the DNS record and certificate for this itself.

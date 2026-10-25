@@ -19,3 +19,5 @@ xcuserdata/
 *.xcarchive
 *.dmg
 *.zip
+
+.cloudflare/
