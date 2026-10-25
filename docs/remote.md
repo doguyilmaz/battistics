@@ -35,6 +35,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Mac dashboard, top to bottom: status line, battery (charge, time left, power, health with cycles, temperature, 24 hour chart, Low Power menu with Turn Off Mac Display), Keep Awake (mode, durations including an explicit ∞, one start or stop button; starting and running layouts share one height), Hotspot card (Bag Ready only when the Mac answers, is on Hotspot and allows closed-lid sessions), conditions grid, Accessories & Apps.
 - Accessories & Apps is sampled on the Mac only when asked (`RemoteRequest.Operation.inspect`): accessory batteries (IORegistry and `system_profiler`) and the five apps using the most CPU over 3 seconds.
 - This iPhone shows only what iOS reports (charge, state, Low Power Mode, heat, storage, time since restart) and the health and cycle count the user copied from Settings, labelled as entered. iOS gives apps neither those values nor the device name.
+- From its own readings it adds the last day's charge, how long since it saw the iPhone unplugged and the rate over the last hour (`ChargeRate`), with a time estimate worded as "at this rate". An unplug from before the app ran stays unknown.
 - Notification permission is asked on the first Keep Awake start, not at launch.
 - Theme is applied with `window.overrideUserInterfaceStyle`, which also reaches open sheets.
 - `-demo` (Debug builds only) fills the app with sample Macs and plays commands locally, for Simulator checks without iCloud.

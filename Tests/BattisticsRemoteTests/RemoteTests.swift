@@ -33,6 +33,17 @@ struct RemoteTests {
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 
+    @Test func chargeRateNeedsAQuarterHourOfRecentReadings() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let point = { (minutesAgo: Double, percent: Double) in RemoteStatus.ChargePoint(at: now.addingTimeInterval(-minutesAgo * 60), percent: percent) }
+        #expect(ChargeRate.perHour([point(10, 50), point(0, 48)], now: now) == nil)
+        #expect(ChargeRate.perHour([point(200, 90), point(60, 60), point(0, 50)], now: now) == -10)
+        #expect(ChargeRate.perHour([point(30, 40), point(0, 52)], now: now) == 24)
+        #expect(ChargeRate.perHour([point(60, 50), point(0, 50.5)], now: now) == nil)
+        #expect(ChargeRate.minutesLeft(percent: 50, rate: -10) == 300)
+        #expect(ChargeRate.minutesLeft(percent: 76, rate: 24) == 60)
+    }
+
     @Test func anOperationFromANewerPhoneDecodesAsUnknown() throws {
         var json = try JSONSerialization.jsonObject(with: RemoteWire.encode(RemoteRequest(operation: .stop))) as! [String: Any]
         json["operation"] = "hibernate"

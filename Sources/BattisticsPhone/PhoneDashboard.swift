@@ -28,6 +28,13 @@ struct PhoneDashboard: View {
                 StatTile(title: String(localized: "Free Storage"),
                          value: phone.availableStorage.formatted(.byteCount(style: .file)),
                          symbol: "internaldrive")
+                StatTile(title: String(localized: "On Battery"),
+                         value: onBatteryText,
+                         symbol: phone.onAdapter ? "powerplug.fill" : "battery.75percent")
+                StatTile(title: String(localized: "Last Hour"),
+                         value: rateText,
+                         symbol: "chart.line.uptrend.xyaxis",
+                         tint: (phone.chargeRate ?? 0) > 0 ? PowerPalette.charging : .accentColor)
                 StatTile(title: String(localized: "Since Restart"),
                          value: Duration.seconds(phone.uptime).formatted(.units(allowed: [.days, .hours, .minutes],
                                                                                  width: .narrow, maximumUnitCount: 2)),
@@ -42,6 +49,31 @@ struct PhoneDashboard: View {
         .onAppear { phone.refresh() }
     }
 
+    /// "About 5 hr left at this rate", worded as the estimate it is.
+    private var estimateText: String? {
+        guard let percent = phone.percent, let rate = phone.chargeRate,
+              (rate < 0) != phone.isCharging,
+              let minutes = ChargeRate.minutesLeft(percent: percent, rate: rate) else { return nil }
+        let time = DurationLabel.long(minutes: minutes)
+        return rate < 0
+            ? String(localized: "About \(time) left at this rate")
+            : String(localized: "About \(time) to full at this rate")
+    }
+
+    private var onBatteryText: String {
+        if phone.onAdapter { return String(localized: "Plugged In") }
+        guard let since = phone.unpluggedAt else { return "–" }
+        return Duration.seconds(Date.now.timeIntervalSince(since))
+            .formatted(.units(allowed: [.hours, .minutes], width: .narrow, maximumUnitCount: 2))
+    }
+
+    /// "−8% per hour", from this app's own readings; a dash until it has an hour's worth.
+    private var rateText: String {
+        guard let rate = phone.chargeRate else { return "–" }
+        let value = Int(rate.rounded())
+        return String(localized: "\(value > 0 ? "+" : "")\(value)% per hour")
+    }
+
     private var batteryCard: some View {
         let battery = phone.batteryStatus
         let tint = battery.map(PowerPalette.batteryTint) ?? .secondary
@@ -52,6 +84,11 @@ struct PhoneDashboard: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(battery?.headline ?? String(localized: "Battery level unavailable"))
                         .font(.headline)
+                    if let estimate = estimateText {
+                        Text(estimate)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                     if phone.lowPowerMode {
                         Text("Low Power Mode is on")
                             .font(.subheadline)

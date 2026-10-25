@@ -5304,6 +5304,74 @@
           }
         }
       }
+    },
+    "%@%lld%% per hour": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@%lld%% per hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saatte %@%%%lld"
+          }
+        }
+      }
+    },
+    "About %@ left at this rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About %@ left at this rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu hızla yaklaşık %@ kaldı"
+          }
+        }
+      }
+    },
+    "About %@ to full at this rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About %@ to full at this rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu hızla dolmasına yaklaşık %@"
+          }
+        }
+      }
+    },
+    "Last Hour": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last Hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son Bir Saat"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
