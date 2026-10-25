@@ -68,7 +68,7 @@ struct MacWidgetView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
                     Spacer(minLength: 2)
-                    SessionTimerText(session: session).monospacedDigit().fixedSize()
+                    SessionTimerText(session: session).monospacedDigit().multilineTextAlignment(.trailing).frame(maxWidth: 60, alignment: .trailing)
                 }
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.orange)
@@ -192,6 +192,7 @@ struct MacWidgetView: View {
                             .foregroundStyle(.orange)
                         SessionTimerText(session: session)
                             .font(.subheadline.weight(.bold).monospacedDigit())
+                            .frame(maxWidth: 90, alignment: .leading)
                     } else {
                         Text(snapshot.bagReady ? String(localized: "Bag Ready") : String(localized: "Keep Awake is off"))
                             .font(.caption.weight(.semibold))

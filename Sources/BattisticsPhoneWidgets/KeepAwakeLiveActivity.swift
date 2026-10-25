@@ -120,7 +120,7 @@ private struct LivePowerBadge: View {
                 Text("\(percent)%")
                     .font(.caption.weight(.bold).monospacedDigit())
                 if let watts = state.watts, abs(watts) >= 1 {
-                    Text(watts > 0 ? "+\(Int(watts.rounded()))W" : "\(Int(watts.rounded()))W")
+                    Text(watts > 0 ? "+\(Int(watts.rounded())) W" : "\(Int(watts.rounded())) W")
                         .font(.caption2.weight(.medium).monospacedDigit())
                 }
             }
@@ -212,7 +212,8 @@ private struct LockScreenLiveActivityView: View {
                     }
                 }
                 .foregroundStyle(offline ? .gray : .orange)
-                .fixedSize()
+                // Timer text claims all the width it is offered in a widget; bound it.
+                .frame(width: 100, alignment: .trailing)
             }
 
             if let deadline = state.deadline {

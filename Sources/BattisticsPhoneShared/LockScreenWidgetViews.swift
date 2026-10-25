@@ -79,7 +79,7 @@ struct MacLockScreenDetailView: View {
                 HStack(spacing: 4) {
                     Text(session.mode.label).lineLimit(1).minimumScaleFactor(0.75)
                     Spacer(minLength: 2)
-                    SessionTimerText(session: session).fixedSize()
+                    SessionTimerText(session: session).multilineTextAlignment(.trailing).frame(maxWidth: 60, alignment: .trailing)
                 }
                 .font(.caption2.weight(.semibold).monospacedDigit())
             } else if let battery {
