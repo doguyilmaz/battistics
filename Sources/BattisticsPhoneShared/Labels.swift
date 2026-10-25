@@ -77,13 +77,19 @@ extension RemoteStatus.Network {
 
 extension RemoteStatus {
     /// Returns the SSID / network name when available, falling back to the
-    /// phone's own name when the Mac is on a Personal Hotspot.
+    /// Resolves the human-readable Wi‑Fi SSID or Hotspot name, checking paired
+    /// Mac metadata and falling back to the phone's own name when on a Personal Hotspot.
     func resolvedNetworkName(fallbackHotspot: String? = nil) -> String? {
         if let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
             return name
         }
-        if network == .hotspot, let fallback = fallbackHotspot?.trimmingCharacters(in: .whitespacesAndNewlines), !fallback.isEmpty {
-            return fallback
+        if network == .hotspot {
+            if let paired = pairedPhoneName?.trimmingCharacters(in: .whitespacesAndNewlines), !paired.isEmpty {
+                return paired
+            }
+            if let fallback = fallbackHotspot?.trimmingCharacters(in: .whitespacesAndNewlines), !fallback.isEmpty {
+                return fallback
+            }
         }
         return nil
     }
@@ -131,6 +137,15 @@ extension RemoteStatus.LowPowerPolicy {
         case .onlyOnBattery: String(localized: "LPM Battery")
         case .onlyOnAdapter: String(localized: "LPM Adapter")
         case .always: String(localized: "LPM On")
+        }
+    }
+
+    var compactBadge: String {
+        switch self {
+        case .never: String(localized: "Off")
+        case .onlyOnBattery: String(localized: "Battery")
+        case .onlyOnAdapter: String(localized: "Adapter")
+        case .always: String(localized: "Always")
         }
     }
 

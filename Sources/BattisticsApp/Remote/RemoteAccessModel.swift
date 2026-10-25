@@ -123,6 +123,9 @@ final class RemoteAccessModel {
             compared.chargeHistory = lastSent.chargeHistory
             compared.battery?.watts = lastSent.battery?.watts
             compared.battery?.temperatureC = lastSent.battery?.temperatureC
+            compared.battery?.voltageMV = lastSent.battery?.voltageMV
+            compared.battery?.amperageMA = lastSent.battery?.amperageMA
+            compared.battery?.currentCapacityMah = lastSent.battery?.currentCapacityMah
             if compared == lastSent { return }
         }
         try await cloud.publish(status, macID: macID)
@@ -321,7 +324,19 @@ final class RemoteAccessModel {
                 watts: roundedWatts,
                 adapterWatts: snapshot.adapter?.watts,
                 temperatureC: roundedTemp,
-                cycleCount: snapshot.cycleCount
+                cycleCount: snapshot.cycleCount,
+                designCycleCount: snapshot.designCycleCount,
+                currentCapacityMah: snapshot.rawCurrentCapacity > 0 ? snapshot.rawCurrentCapacity : nil,
+                maxCapacityMah: snapshot.currentMaxCapacity > 0 ? snapshot.currentMaxCapacity : nil,
+                rawMaxCapacityMah: snapshot.rawMaxCapacity > 0 ? snapshot.rawMaxCapacity : nil,
+                designCapacityMah: snapshot.designCapacity > 0 ? snapshot.designCapacity : nil,
+                voltageMV: snapshot.voltageMV,
+                amperageMA: snapshot.amperageMA,
+                adapterName: snapshot.adapter?.name,
+                adapterVoltageMV: snapshot.adapter?.voltageMV,
+                adapterAmperageMA: snapshot.adapter?.amperageMA,
+                manufactureDate: snapshot.manufactureDate,
+                serialNumber: snapshot.serialNumber
             )
         }
         let session = awake.session.map { session in
@@ -331,6 +346,8 @@ final class RemoteAccessModel {
                 startedAt: session.startedAt, deadline: session.deadline)
         }
         let protection = awake.safety.configuration
+        let osVer = ProcessInfo.processInfo.operatingSystemVersion
+        let osString = "macOS \(osVer.majorVersion).\(osVer.minorVersion)\(osVer.patchVersion > 0 ? ".\(osVer.patchVersion)" : "")"
         return RemoteStatus(
             machineName: Host.current().localizedName ?? "Mac",
             readAt: now,
@@ -338,7 +355,7 @@ final class RemoteAccessModel {
             session: session,
             lastEnd: awake.lastEnd,
             network: network.state,
-            networkName: network.ssid,
+            networkName: network.ssid ?? (network.state == .hotspot ? network.preferredHotspotPhoneName : nil),
             lidClosed: Clamshell.read()?.isClosed,
             thermal: Self.thermal(ProcessInfo.processInfo.thermalState),
             protection: .init(
@@ -346,8 +363,40 @@ final class RemoteAccessModel {
                 warnAtPercent: protection.warnOnLowBattery ? protection.effectiveWarningPercent : nil,
                 stopOnThermal: protection.stopOnThermalPressure,
                 closedLidAllowed: closedLidAllowed
-            )
+            ),
+            macModel: Self.macHardwareModel(),
+            osVersion: osString,
+            pairedPhoneName: network.preferredHotspotPhoneName
         )
+    }
+
+    private static func macHardwareModel() -> String? {
+        var size: Int = 0
+        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0, size > 1 else { return nil }
+        var buffer = [CChar](repeating: 0, count: size)
+        guard sysctlbyname("hw.model", &buffer, &size, nil, 0) == 0 else { return nil }
+        let raw = buffer.withUnsafeBufferPointer { ptr in
+            ptr.baseAddress.map { String(cString: $0) } ?? ""
+        }
+        guard !raw.isEmpty else { return nil }
+        let friendly: String? = switch raw {
+        case "Mac14,9", "Mac14,5": "MacBook Pro 14\""
+        case "Mac14,10", "Mac14,6": "MacBook Pro 16\""
+        case "Mac14,7": "MacBook Pro 13\""
+        case "Mac14,2": "MacBook Air 13\""
+        case "Mac14,15": "MacBook Air 15\""
+        case "Mac15,3", "Mac15,6", "Mac15,8", "Mac15,10": "MacBook Pro 14\""
+        case "Mac15,7", "Mac15,9", "Mac15,11": "MacBook Pro 16\""
+        case "Mac15,12": "MacBook Air 13\""
+        case "Mac15,13": "MacBook Air 15\""
+        case "Mac16,1", "Mac16,6", "Mac16,8": "MacBook Pro 14\""
+        case "Mac16,5", "Mac16,7": "MacBook Pro 16\""
+        default: raw.hasPrefix("MacBook") ? raw : nil
+        }
+        if let friendly, friendly != raw {
+            return "\(friendly) (\(raw))"
+        }
+        return raw
     }
 
     private static func thermal(_ state: ProcessInfo.ThermalState) -> RemoteStatus.Thermal {

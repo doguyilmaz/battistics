@@ -29,6 +29,30 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public var temperatureC: Double?
         /// Battery cycle count.
         public var cycleCount: Int?
+        /// Design cycle limit (typically 1000 on Mac notebooks).
+        public var designCycleCount: Int?
+        /// Current charge in mAh.
+        public var currentCapacityMah: Int?
+        /// Smoothed full-charge capacity in mAh.
+        public var maxCapacityMah: Int?
+        /// Instantaneous measured full-charge capacity in mAh.
+        public var rawMaxCapacityMah: Int?
+        /// Original factory design capacity in mAh.
+        public var designCapacityMah: Int?
+        /// Battery pack voltage in millivolts.
+        public var voltageMV: Int?
+        /// Signed battery current in milliamps.
+        public var amperageMA: Int?
+        /// Connected power adapter name/description.
+        public var adapterName: String?
+        /// Adapter voltage in millivolts.
+        public var adapterVoltageMV: Int?
+        /// Adapter current rating in milliamps.
+        public var adapterAmperageMA: Int?
+        /// Battery pack manufacture date when available.
+        public var manufactureDate: Date?
+        /// Battery pack serial number when available.
+        public var serialNumber: String?
 
         public init(
             percent: Int,
@@ -41,7 +65,19 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             watts: Double? = nil,
             adapterWatts: Int? = nil,
             temperatureC: Double? = nil,
-            cycleCount: Int? = nil
+            cycleCount: Int? = nil,
+            designCycleCount: Int? = nil,
+            currentCapacityMah: Int? = nil,
+            maxCapacityMah: Int? = nil,
+            rawMaxCapacityMah: Int? = nil,
+            designCapacityMah: Int? = nil,
+            voltageMV: Int? = nil,
+            amperageMA: Int? = nil,
+            adapterName: String? = nil,
+            adapterVoltageMV: Int? = nil,
+            adapterAmperageMA: Int? = nil,
+            manufactureDate: Date? = nil,
+            serialNumber: String? = nil
         ) {
             self.percent = percent
             self.isCharging = isCharging
@@ -54,6 +90,18 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.adapterWatts = adapterWatts
             self.temperatureC = temperatureC
             self.cycleCount = cycleCount
+            self.designCycleCount = designCycleCount
+            self.currentCapacityMah = currentCapacityMah
+            self.maxCapacityMah = maxCapacityMah
+            self.rawMaxCapacityMah = rawMaxCapacityMah
+            self.designCapacityMah = designCapacityMah
+            self.voltageMV = voltageMV
+            self.amperageMA = amperageMA
+            self.adapterName = adapterName
+            self.adapterVoltageMV = adapterVoltageMV
+            self.adapterAmperageMA = adapterAmperageMA
+            self.manufactureDate = manufactureDate
+            self.serialNumber = serialNumber
         }
     }
 
@@ -121,6 +169,12 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     }
 
     public var machineName: String
+    /// Hardware marketing or model identifier for the Mac (e.g. "MacBook Pro (14-inch, M2 Pro)").
+    public var macModel: String?
+    /// macOS version string on the Mac (e.g. "macOS 15.4").
+    public var osVersion: String?
+    /// Known Personal Hotspot / paired iPhone name observed by the Mac when available.
+    public var pairedPhoneName: String?
     public var readAt: Date
     public var battery: Battery?
     public var session: Session?
@@ -160,9 +214,15 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         networkName: String? = nil,
         lidClosed: Bool? = nil,
         thermal: Thermal = .nominal,
-        protection: Protection = .init()
+        protection: Protection = .init(),
+        macModel: String? = nil,
+        osVersion: String? = nil,
+        pairedPhoneName: String? = nil
     ) {
         self.machineName = machineName
+        self.macModel = macModel
+        self.osVersion = osVersion
+        self.pairedPhoneName = pairedPhoneName
         self.readAt = readAt
         self.battery = battery
         self.session = session
