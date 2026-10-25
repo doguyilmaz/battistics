@@ -22,30 +22,30 @@ Connection happens through the user's private iCloud database (**CloudKit** cont
 
 ## 2. iPhone Single-Page Dashboard & UX Rules (`Sources/BattisticsPhone`)
 
-### Full-Screen, Zero-Jump Single-Page Dashboard
+### Single-Page Dashboard
 - **Proportional Viewport Layout:** Uses `GeometryReader` + `.frame(minHeight: proxy.size.height)` so the dashboard fills the iPhone 16e screen proportionally from top to bottom without unnecessary scrolling.
 - **Zero Layout Shift (No Jumping):**
-  - `KeepAwakeCard` maintains an identical height (`76pt` control body + `18pt` single-line feedback slot + `40pt` action button) whether Keep Awake is idle or active.
-  - Error messages, battery warnings, and mode subtitles swap inside the fixed `18pt` feedback slot and clear automatically whenever the user changes mode, duration, or starts/stops a session.
+  - `KeepAwakeCard` keeps one height (`76pt` controls, `30pt` two-line feedback slot, `40pt` action button) whether Keep Awake is idle or active.
+  - Errors, battery warnings and mode subtitles swap inside that slot and clear when the user changes mode or duration, or starts or stops a session.
   - `PocketModeDock` is always anchored at the bottom (`64pt` min height), morphing between Hotspot Paired, Wi‑Fi / Smart Tips, and Offline states without pushing or pulling other cards vertically.
 
-### Honest Bag Mode vs. Wi‑Fi Logic & Smart Mobility Protection
+### Bag Mode, Wi‑Fi and Hotspot
 Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose internet as soon as it leaves the building in a bag:
 - **"Bag Ready" Only on Hotspot:**
-  - The Lid tile and bottom dock only report `Lid · Bag ready` / `Pocket Mode Ready` when `status.network == .hotspot` and `closedLidAllowed == true`.
+  - The Lid tile, bottom dock and widgets only report `Bag Ready` when the Mac answers, `status.network == .hotspot` and `closedLidAllowed == true` (`SharedSnapshot.bagReady` for widgets).
   - When on Wi‑Fi with the lid closed, the Lid tile reports `Lid · Clamshell` (on power adapter) or `Lid · On Wi‑Fi` (on battery).
   - Tapping `Bag 1h` in `PocketModeDock` automatically selects `Lid Closed` mode and `1h` duration in `KeepAwakeCard` and starts the session.
 - **Wi‑Fi Closed-Lid Confirmation Dialog:**
   - If the user selects `Lid Closed` mode and taps Start while the Mac is on Wi‑Fi (`network != .hotspot`), the app presents a confirmation dialog explaining that stationary Wi‑Fi will drop when leaving range, offering:
-    1. **`Start & Open Hotspot Settings`** (starts the session and jumps directly to iOS Personal Hotspot settings)
+    1. **`How to Turn On Hotspot`** (explains Settings › Personal Hotspot; iOS has no public link to that screen)
     2. **`Start on Current Wi‑Fi`** (for desk clamshell or portable Wi‑Fi routers)
     3. **`Cancel`**
 - **Smart User-Friendly Notifications & Rolling Local Watchdog (`Notifications.swift` & `RemoteAlert.swift`):**
   1. **Unplugged on Wi‑Fi Alert (`unpluggedWithoutHotspot`):** When the Mac is unplugged from power (`onAdapter: true -> false`) during an active Keep Awake session while still on Wi‑Fi, the iPhone immediately reminds the user to turn on Personal Hotspot before putting the Mac in a bag.
   2. **Closed Lid on Battery without Hotspot (`closedLidWithoutHotspot`):** When the Mac lid closes on battery during an active session while not on Hotspot, the iPhone alerts the user to connect to Hotspot if they are taking the Mac with them.
-  3. **Rolling Local Dead-Man's Switch Watchdog (`syncWatchdog`):** While a Keep Awake session is running on the Mac, the iPhone schedules a rolling local `UNTimeIntervalNotificationTrigger` (10 minutes when mobile/on battery without Hotspot, 18 minutes otherwise). Each fresh CloudKit check-in pushes the timer forward. If the Mac loses internet in a bag and stops reporting, the local notification fires even when the iPhone app is suspended, warning the user that their Mac lost connection and tasks needing internet may have paused.
+  3. **Rolling local watchdog (`syncWatchdog`):** While a session runs, the Mac writes every 2 minutes (`RemoteStatus.sessionHeartbeat`) and the iPhone schedules a local notification at `status.staleDate` (4 missed writes) plus 45 s. Each fresh reading pushes it forward and removes an already delivered one. The dashboard, widgets (a timeline entry at `staleDate`) and the Live Activity (`ActivityContent.staleDate`) switch to offline at that same instant, so no surface says "disconnected" while another still shows the Mac online.
 - **Interactive Rotating Mobility Tips:**
-  - When on Wi‑Fi, tapping the text area of the bottom `PocketModeDock` cycles through practical tips (`Auto-Join Hotspot`, `Closed Bag Heat / Thermal Care`, and `2-Tap ∞ Until Turned Off`).
+  - When on Wi‑Fi, tapping the text area of the bottom `PocketModeDock` cycles through practical tips (`Auto-Join Hotspot`, `Closed Bag Heat / Thermal Care`, and `Until Turned Off`).
 
 ### Remote Mac Power Mode, Display Sleep & Cycle Count (`BatteryCard`)
 - **Power Mode Menu:** Top-right capsule inside `BatteryCard` displays the Mac's active Low Power Mode state or configured policy (`LPM Battery`, `LPM Off`, `Low Power`). Tapping opens a menu to set macOS Low Power Mode (`Never`, `Only on Battery`, `Only on Power Adapter`, `Always`) via `BattisticsPowerHelper` without password prompts, or trigger **`Sleep Mac Display Now`** (`pmset displaysleepnow`).
@@ -55,10 +55,10 @@ Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose 
 ### Zero-Permission SSID & Hotspot Network Resolution
 - On macOS 14/15/26, CoreWLAN `interface()?.ssid()` requires Location Services authorization. Battistics implements zero-permission fallback extraction directly from macOS `SCDynamicStore` by parsing the 802.11 Information Element tag #0 from `CachedScanRecord`, resolving the active Wi-Fi SSID immediately without prompts.
 - When tethered to Personal Hotspot, `RemoteAccessModel` and `RemoteStatus` automatically resolve the paired iPhone's name (e.g. `Dogu’s iPhone 16e`).
-- Tapping the Network tile on the phone opens the target iOS settings screen directly via `NetworkSettingsOpener`: Wi-Fi settings when on Wi-Fi, and Personal Hotspot settings when on Hotspot.
+- iOS has no public URL for Wi‑Fi or Personal Hotspot settings (`App-prefs:` is private API and fails App Review), so the Network tile and Hotspot buttons show short instructions instead (`hotspotHelp`).
 
 ### Setup & Connection Diagnostics (`SetupIntro.swift`)
-- When no Macs have reported to iCloud yet, `SetupIntro` provides a comprehensive onboarding experience:
+- When no Macs have reported to iCloud yet, `SetupIntro` shows:
   1. **This iPhone Instant Launch:** A prominent card lets the user immediately open their local iPhone battery, thermal, voltage, and hardware telemetry dashboard.
   2. **Mac App Links & AirDrop Share:** Direct buttons to download Battistics for Mac or share the link with their Mac via AirDrop with one tap.
   3. **Live Diagnostics:** Interactive iCloud authentication status check, network availability, and Mac records probe.
@@ -66,13 +66,13 @@ Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose 
 
 ### Blueprint Widget Showcase (`PhoneWidgetSettingsView`)
 - In `SettingsView › Widgets & Lock Screen`, all widgets are displayed inside architectural Blueprint Containers (`BlueprintCard`):
-  - Every Home Screen card shares an identical uniform height (218pt) with blueprint grid lines, technical size badges (`MEDIUM · 2×2`, `SMALL · 2×1`, `LARGE · 4×4`), and live previews. The Large widget scales proportionally to eliminate dead vertical space.
-  - Every Lock Screen card shares an identical uniform height (146pt) with wallpaper glass backdrops and badges (`ACCESSORY 2×1`, `CIRCULAR 1×1`, `INLINE`).
+  - Home Screen cards share one height with size badges (`SMALL · 2×2`, `MEDIUM · 4×2`, `LARGE · 4×4`) and live previews.
+  - Lock Screen cards share one height with badges (`RECTANGULAR`, `CIRCULAR`, `INLINE`).
   - Interactive options (Layout, Telemetry focus, SSID toggle) update the live blueprint previews in real time.
 
 ### Solid App Icons & Dynamic Theme Synchronization
-- Alternate app icons (`batbattery`, `gauge`, `stats`) are 100% opaque without alpha channels and marked `UIPrerenderedIcon: true` in `Info.plist`, preventing SpringBoard multitasking background white artifacts.
-- `PhoneThemeManager` synchronizes both SwiftUI's `preferredColorScheme` and UIKit's `window.overrideUserInterfaceStyle` across all window scenes so that Appearance modal sheets and background views switch dark/light mode simultaneously without reload.
+- Alternate app icons (`batbattery`, `gauge`, `stats`) have no alpha channel, so SpringBoard draws no white edges. The picker reads `UIApplication.alternateIconName` and only marks an icon selected after iOS confirms the change.
+- `PhoneThemeManager` is the only theme mechanism: it sets `window.overrideUserInterfaceStyle`, which also reaches presented sheets (`preferredColorScheme(nil)` never returns a sheet to the system appearance).
 
 ---
 
@@ -80,15 +80,25 @@ Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose 
 
 - **Separation of Families:** `MacWidget` is restricted to Home Screen (`.systemSmall`, `.systemMedium`, `.systemLarge`), while `MacLockScreenDetailWidget` is dedicated to Lock Screen (`.accessoryRectangular`, `.accessoryCircular`, `.accessoryInline`), resolving widget picker duplicate listings.
 
-- **3-Row Non-Truncating Lock Screen Live Activity (`LockScreenLiveActivityView`):**
-  - **Row 1:** Full Mac name (`layoutPriority(1)`) on the left, power/battery capsule (`100%`) on the right.
-  - **Row 2:** Keep Awake mode (`Screen Off`, `Screen On`, `Lid Closed`) + lid state + network/SSID on the left; right-aligned countdown or elapsed timer (`∞ Until stopped`) with fixed trailing width on the right so timer boxes never crush or truncate the left labels.
-  - **Row 3:** Power status on the left, interactive orange **`Stop`** button (`StopKeepAwakeLiveIntent`) on the right.
+- **Lock Screen Live Activity (`LockScreenLiveActivityView`):**
+  - **Row 1:** Mac name and the power badge (percent, watts, charging or Low Power color).
+  - **Row 2:** One headline that merges mode and lid (`Lid closed`, `Ready to close lid`, `Screen On · Lid closed`), the network with its name, and the countdown or `Until stopped` timer.
+  - **Row 3:** `Updated 2 min ago`, or `No update since 10:42` once `offline` is set or `context.isStale`, and the **`Stop`** button.
 - **Lock Screen & Home Screen Widgets:** `.accessoryInline`, `.accessoryCircular`, `.accessoryRectangular`, `.systemSmall`, and `.systemMedium` widgets with interactive `Keep Awake 1h` and `Stop` buttons.
 
 ---
 
-## 4. Roadmap & Recommendations (Future Sessions)
+## 4. Verified Only in Simulator, Pending on a Real Device
+
+- Mac and iPhone on the same personal Apple ID through CloudKit (needs the Mac App ID with the iCloud container).
+- Silent push wake-ups and the watchdog notification while the app is suspended.
+- Live Activity offline/stale rendering and the Stop button from the Lock Screen and Dynamic Island.
+- Widget offline entry at `staleDate`, Hotspot detection and Bag Ready on a real Personal Hotspot.
+- Alternate icons on the Home Screen and app switcher.
+
+---
+
+## 5. Roadmap & Recommendations (Future Sessions)
 
 1. **Bonjour / Peer-to-Peer Local Fast Path (`NWBrowser` + `NWListener`):** Direct local connection when Mac and iPhone share Personal Hotspot or Wi‑Fi for sub-100ms updates and offline-cellular hotspot control.
 2. **iOS 18+ Control Center & Action Button Toggle (`ControlWidget`):** One-tap Keep Awake / Pocket Mode toggle from Control Center or the iPhone Action Button.
