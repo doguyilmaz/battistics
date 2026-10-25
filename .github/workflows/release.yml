@@ -73,8 +73,9 @@ jobs:
 
       - name: Stamp version
         run: |
-          sed -E -i '' "s/CFBundleShortVersionString: \"[^\"]*\"/CFBundleShortVersionString: \"$VERSION\"/" project.yml
-          sed -E -i '' "s/CFBundleVersion: \"[^\"]*\"/CFBundleVersion: \"$VERSION\"/" project.yml
+          # The Mac target comes first in project.yml; the iPhone targets keep their own versions.
+          perl -0pi -e 's/CFBundleShortVersionString: "[^"]*"/CFBundleShortVersionString: "$ENV{VERSION}"/' project.yml
+          perl -0pi -e 's/CFBundleVersion: "[^"]*"/CFBundleVersion: "$ENV{VERSION}"/' project.yml
 
       - name: Core tests
         run: swift test
