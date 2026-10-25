@@ -19,6 +19,8 @@ final class LocalPhoneMonitor {
     private(set) var totalStorage: Int64 = 0
     private(set) var availableStorage: Int64 = 0
     private(set) var chargeHistory: [RemoteStatus.ChargePoint] = []
+    /// When this app last saw the iPhone come off the charger; nil while charging or before it has seen that.
+    private(set) var unpluggedAt: Date?
     /// This iPhone's name as its Personal Hotspot broadcasts it, seen by a Mac on that hotspot.
     private(set) var hotspotName: String?
 
@@ -37,6 +39,7 @@ final class LocalPhoneMonitor {
     private static let cyclesKey = "localPhoneCalibratedCycleCount"
     private static let nameKey = "localPhoneCustomDeviceName"
     private static let hotspotKey = "localPhoneHotspotName"
+    private static let unpluggedKey = "localPhoneUnpluggedAt"
 
     private init() {
         identifier = Self.machineIdentifier()
@@ -48,6 +51,7 @@ final class LocalPhoneMonitor {
         enteredCycles = defaults.object(forKey: Self.cyclesKey) as? Int
         customName = defaults.string(forKey: Self.nameKey) ?? ""
         hotspotName = defaults.string(forKey: Self.hotspotKey)
+        unpluggedAt = defaults.object(forKey: Self.unpluggedKey) as? Date
         chargeHistory = Self.loadHistory()
 
         UIDevice.current.isBatteryMonitoringEnabled = true
@@ -88,8 +92,10 @@ final class LocalPhoneMonitor {
         let level = UIDevice.current.batteryLevel
         percent = level >= 0 ? Int((level * 100).rounded()) : nil
         let state = UIDevice.current.batteryState
+        let wasOnAdapter = onAdapter
         isCharging = state == .charging
         onAdapter = state == .charging || state == .full
+        if state != .unknown { trackUnplug(wasOnAdapter: wasOnAdapter) }
         lowPowerMode = ProcessInfo.processInfo.isLowPowerModeEnabled
         thermal = switch ProcessInfo.processInfo.thermalState {
         case .nominal: .nominal
@@ -104,6 +110,20 @@ final class LocalPhoneMonitor {
             availableStorage = values.volumeAvailableCapacityForImportantUsage ?? 0
         }
         if let percent { record(Double(percent)) }
+    }
+
+    /// Percent per hour over the last hour of readings, positive while charging.
+    var chargeRate: Double? { ChargeRate.perHour(chargeHistory) }
+
+    /// Only an unplug this app saw counts; one from before it ran stays unknown.
+    private func trackUnplug(wasOnAdapter: Bool) {
+        let before = unpluggedAt
+        if onAdapter {
+            unpluggedAt = nil
+        } else if wasOnAdapter {
+            unpluggedAt = .now
+        }
+        if unpluggedAt != before { UserDefaults.standard.set(unpluggedAt, forKey: Self.unpluggedKey) }
     }
 
     /// A Mac joined to a hotspot reports its network name, which is this iPhone's name.
