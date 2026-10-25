@@ -48,6 +48,22 @@
           }
         }
       }
+    },
+    "Turn off my Mac’s display with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off my Mac’s display with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imin ekranını kapat"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

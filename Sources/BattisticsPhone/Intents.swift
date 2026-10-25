@@ -41,6 +41,19 @@ struct StopKeepAwakeIntent: AppIntent {
     }
 }
 
+struct TurnOffMacDisplayIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let title: LocalizedStringResource = "Turn Off Mac Display"
+    static let description = IntentDescription("Puts your Mac’s display to sleep. The Mac keeps running.")
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.sleepDisplay(mac) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "The display of \(mac.name) is off.")
+    }
+}
+
 struct MacStatusIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Check Mac"
@@ -72,5 +85,7 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Let Sleep", systemImageName: "moon.zzz")
         AppShortcut(intent: MacStatusIntent(), phrases: ["Check my Mac with \(.applicationName)"],
                     shortTitle: "Check Mac", systemImageName: "laptopcomputer")
+        AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my Mac’s display with \(.applicationName)"],
+                    shortTitle: "Display Off", systemImageName: "display")
     }
 }

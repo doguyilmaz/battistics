@@ -39,6 +39,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Home Screen: Mac (small, medium, large) and Mac Battery (small, medium). Lock Screen: rectangular, circular, inline. One preference set in Settings › Widgets applies to all of them.
 - The Live Activity merges mode and lid into one line ("Lid closed", "Ready to close lid") and ends with a freshness line and Stop.
 - Keep Mac Awake is a Control Center and Action Button control on iOS 18 (`KeepAwakeControl`).
+- Shortcuts and Siri: Keep Awake, Let Sleep, Check Mac and Display Off (`Intents.swift`).
 - Starting Keep Awake from a widget, Shortcut or control requires an unlocked iPhone. Stopping from the Live Activity or a Shortcut does not; the Control Center toggle asks in both directions, since a control has one policy.
 
 ## Safety
