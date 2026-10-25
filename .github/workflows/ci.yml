@@ -3,9 +3,9 @@ name: CI
 on:
   push:
     branches: [main]
-    paths-ignore: ["site/**", ".github/workflows/site.yml"]
+    paths-ignore: ["site/**"]
   pull_request:
-    paths-ignore: ["site/**", ".github/workflows/site.yml"]
+    paths-ignore: ["site/**"]
 
 jobs:
   test:

@@ -96,7 +96,7 @@ Either way updates arrive in-app: Battistics updates itself, so Homebrew is told
 
 ## Website
 
-The site and its documentation live in `site/` (Astro and Starlight, built with Bun) and deploy to Cloudflare from `.github/workflows/site.yml` whenever `site/` changes on `main`. App changes never trigger it, and site changes never trigger CI or a release. Run it locally with `cd site && bun install && bun run dev`.
+The site and its documentation live in `site/` (Astro and Starlight, built with Bun). Cloudflare Workers Builds deploys it whenever `site/` changes on `main`; app changes never trigger it, and site changes never trigger CI or a release. Run it locally with `cd site && bun install && bun run dev`.
 
 ## Build
 
