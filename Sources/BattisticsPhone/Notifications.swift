@@ -67,10 +67,12 @@ enum Notifications {
         let quietID = "\(mac.id).quiet"
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id, quietID])
+        // A fetch settled whether the Mac answers, which the quiet note left open.
+        center.removeDeliveredNotifications(withIdentifiers: [quietID])
 
         guard let reading, reading.reachable else { return }
         // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
-        center.removeDeliveredNotifications(withIdentifiers: [id, quietID])
+        center.removeDeliveredNotifications(withIdentifiers: [id])
         // On Hotspot the lid and unplug warnings no longer apply.
         if reading.status?.network == .hotspot {
             center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).closedlid", "\(mac.id).unplugged"])
@@ -103,7 +105,7 @@ enum Notifications {
         center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
 
         // While pushes arrive too unevenly to warn early, a silent note in
-        // Notification Center says only that no update came; the next reading removes it.
+        // Notification Center says only that no update came.
         let quietDelay = status.readAt.addingTimeInterval(status.quietDelay).timeIntervalSinceNow
         guard quietDelay < delay - 60 else { return }
         let quiet = UNMutableNotificationContent()

@@ -17,6 +17,8 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - The Mac writes `heartbeatSeconds` into every status: 120 s during a session, 600 s otherwise. A phone treats a reading as stale after 4 (session) or 2 missed heartbeats (`RemoteStatus.staleDate`). Only a real fetch may call a Mac offline.
 - iOS throttles the silent pushes that wake the phone, so surfaces that cannot fetch wait longer:
   - The watchdog notification ("No word from the Mac since 10:42") fires after `RemoteStatus.watchdogDelay`: just past the stale window once background pushes have arrived steadily for at least 15 minutes, otherwise up to 30 minutes. `DeliveryCadence` records when background pushes actually arrived.
+  - While the watchdog waits longer than the stale window, a passive note ("Last update at 10:42 ...", no sound) lands in Notification Center at `RemoteStatus.quietDelay`. It says only that no update came, and the next fetch removes it whatever it finds.
+  - Neither is scheduled when the session ends before the watchdog would fire.
   - Widgets add a timeline entry at `unheardDate` (at least 30 minutes after the reading) that shows the Mac offline.
   - The Live Activity uses `unheardDate` as its stale date and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Settings › Notifications › When Charged To reports once when a charging Mac reaches 80, 90 or 100%. It is evaluated on the phone, so it arrives with the next update the phone receives.
