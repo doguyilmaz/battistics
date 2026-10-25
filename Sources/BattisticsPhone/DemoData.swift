@@ -33,7 +33,7 @@ enum DemoData {
                            lowPowerMode: true, lowPowerPolicy: .onlyOnBattery, watts: -6.2, temperatureC: 30.1, cycleCount: 88),
             session: .init(mode: .lidClosed, origin: .phone, name: "iPhone", startedAt: now.addingTimeInterval(-1500),
                            deadline: now.addingTimeInterval(3900)),
-            network: .hotspot, networkName: "Dogu’s iPhone", lidClosed: true,
+            network: .hotspot, networkName: "Ada’s iPhone", lidClosed: true,
             protection: .init(warnAtPercent: 20, closedLidAllowed: true),
             heartbeatSeconds: RemoteStatus.sessionHeartbeat)
         return ["demo-desk": .init(status: desk, reachable: true), "demo-bag": .init(status: bag, reachable: true)]
