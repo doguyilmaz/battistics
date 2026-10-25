@@ -40,7 +40,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Home Screen: Mac (small, medium, large) and Mac Battery (small, medium). Lock Screen: rectangular, circular, inline. One preference set in Settings › Widgets applies to all of them.
 - The Live Activity merges mode and lid into one line ("Lid closed", "Ready to close lid") and ends with a freshness line and Stop.
 - Keep Mac Awake is a Control Center and Action Button control on iOS 18 (`KeepAwakeControl`).
-- Shortcuts and Siri: Keep Awake, Let Sleep, Check Mac and Display Off (`Intents.swift`).
+- Shortcuts and Siri: Keep Awake, Let Sleep, Check Mac, Mac Low Power and Display Off (`Intents.swift`).
 - Starting Keep Awake from a widget, Shortcut or control requires an unlocked iPhone. Stopping from the Live Activity or a Shortcut does not; the Control Center toggle asks in both directions, since a control has one policy.
 
 ## Safety
@@ -60,11 +60,10 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Verified on a device
 
-- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later; the Display Off shortcut from the Shortcuts app; switching the app icon to Gauge and back; the Live Activity's offline state after a fetch found the Mac silent, with the quiet note removed by that fetch.
+- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions; the Home Screen widget's start button; a 15-minute closed-lid session showing the 10% stop; with the Mac app frozen, the quiet note at the stale window and the alert at about 30 minutes, and the note cleared by the next fetch; the Remote zone deleted from the phone while the Mac ran, with the Mac back on the phone 17 seconds later; the Display Off and Mac Low Power shortcuts from the Shortcuts app; switching the app icon to Gauge and back; the Live Activity's offline state after a fetch found the Mac silent, with the quiet note removed by that fetch; with steady pushes, the alert about 9 minutes after the last reading and no quiet note before it.
 
 ## Verified only in Simulator or tests
 
-- The adaptive watchdog with steady background pushes. On a device the phone's real, uneven push history kept it at the 30-minute limit, as designed.
 
 ## Considered and not built
 
