@@ -7,8 +7,8 @@ Battistics Remote shows the battery of each Mac on your Apple Account: charge an
 
 ![The Lock Screen Live Activity for a MacBook Air kept awake with its lid closed.](../../../assets/shots/live-activity.png)
 
-:::note
-Battistics Remote is not on the App Store yet.
+:::tip[Coming soon to the App Store]
+Battistics Remote is on its way. Set up your Mac today and it will be ready the moment the app lands on your iPhone.
 :::
 
 ## Setting up

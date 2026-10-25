@@ -12,9 +12,9 @@ const modes = [
 ];
 
 const guards = [
-  { icon: "battery.25percent", title: "Stops before the battery runs out", text: "At 5 to 50%, after a warning. It ends the session, never the Mac." },
-  { icon: "thermometer.medium", title: "Stops when it runs hot", text: "Heavy thermal pressure warns you and can end it. Bags trap heat." },
-  { icon: "arrow.uturn.backward.circle", title: "Always gives sleep back", text: "On the timer, on a stop, or 45 seconds after Battistics quits." },
+  { icon: "battery.25percent", title: "Stops before the battery runs out", text: "Pick a level from 5 to 50%. A warning comes first, then the session ends. Only the session: the Mac itself is never shut down." },
+  { icon: "thermometer.medium", title: "Stops when it runs hot", text: "Heavy thermal pressure always warns you and can end the session. A closed bag traps heat, so this keeps an eye on it." },
+  { icon: "arrow.uturn.backward.circle", title: "Always gives sleep back", text: "When the timer ends, on a stop, or within 45 seconds if Battistics quits. With the lid still shut, the Mac then goes to sleep." },
 ];
 ---
 
@@ -43,31 +43,45 @@ const guards = [
         <article class="mode" data-ka-mode={mode.id}>
           <div class="art" aria-hidden="true">
             {mode.id === "displayOn" && (
-              <svg viewBox="0 0 160 96">
-                <defs><linearGradient id="lit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-a)" /><stop offset="1" stop-color="var(--accent-b)" /></linearGradient></defs>
-                <ellipse cx="80" cy="84" rx="66" ry="8" class="glow" />
-                <rect x="34" y="8" width="92" height="62" rx="6" class="lid" />
-                <rect x="39" y="13" width="82" height="52" rx="2" fill="url(#lit)" class="screen-on" />
-                <path d="M48 27h36M48 36h54M48 45h26" class="ui-lines" />
-                <path d="M22 72h116l-8 8H30z" class="base" />
+              <svg viewBox="0 0 160 100">
+                <defs>
+                  <linearGradient id="lit-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-a)" /><stop offset="1" stop-color="var(--accent-b)" /></linearGradient>
+                  <linearGradient id="lit-b" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc7ff" /><stop offset="1" stop-color="var(--accent-a)" /></linearGradient>
+                </defs>
+                <ellipse cx="80" cy="90" rx="70" ry="9" class="glow" />
+                <rect x="30" y="6" width="100" height="68" rx="7" class="lid" />
+                <rect x="35" y="11" width="90" height="58" rx="2.5" fill="url(#lit-a)" />
+                <rect x="35" y="11" width="90" height="58" rx="2.5" fill="url(#lit-b)" class="shift" />
+                <rect x="44" y="21" width="44" height="5" rx="2.5" class="line l1" />
+                <rect x="44" y="32" width="62" height="5" rx="2.5" class="line l2" />
+                <rect x="44" y="43" width="32" height="5" rx="2.5" class="line l3" />
+                <rect x="44" y="54" width="52" height="5" rx="2.5" class="line l4" />
+                <path d="M18 76h124l-9 9H27z" class="base" />
               </svg>
             )}
             {mode.id === "displayMaySleep" && (
-              <svg viewBox="0 0 160 96">
-                <rect x="34" y="8" width="92" height="62" rx="6" class="lid" />
-                <rect x="39" y="13" width="82" height="52" rx="2" class="screen-off" />
-                <text x="90" y="36" class="zz">z</text><text x="99" y="29" class="zz small">z</text>
-                <g class="activity"><circle cx="68" cy="48" r="2.6" /><circle cx="78" cy="48" r="2.6" /><circle cx="88" cy="48" r="2.6" /></g>
-                <path d="M22 72h116l-8 8H30z" class="base" />
+              <svg viewBox="0 0 160 100">
+                <rect x="30" y="6" width="100" height="68" rx="7" class="lid" />
+                <rect x="35" y="11" width="90" height="58" rx="2.5" class="screen-off" />
+                <text x="82" y="46" class="zz z1">Z</text>
+                <text x="99" y="33" class="zz z2">Z</text>
+                <text x="112" y="23" class="zz z3">Z</text>
+                <g class="activity"><circle cx="60" cy="56" r="3.4" /><circle cx="72" cy="56" r="3.4" /><circle cx="84" cy="56" r="3.4" /></g>
+                <path d="M18 76h124l-9 9H27z" class="base" />
               </svg>
             )}
             {mode.id === "lidClosed" && (
-              <svg viewBox="0 0 160 96">
-                <path d="M62 26c0-12 36-12 36 0" class="strap" />
-                <rect x="28" y="26" width="104" height="62" rx="13" class="bag" />
-                <rect x="44" y="45" width="72" height="8" rx="4" class="closed" />
-                <g class="waves"><path d="M114 14a9 9 0 0 1 13 0" /><path d="M110 9a15 15 0 0 1 21 0" /><circle cx="120.5" cy="18" r="1.8" /></g>
-                <path d="M50 70h60" class="seam" />
+              <svg viewBox="0 0 160 100">
+                <path d="M60 32c0-14 40-14 40 0" class="strap" />
+                <rect x="24" y="32" width="112" height="62" rx="14" class="bag" />
+                <rect x="42" y="52" width="76" height="9" rx="4.5" class="closed" />
+                <path d="M48 78h64" class="seam" />
+                <g class="waves" transform="translate(126 24)">
+                  <circle r="3.2" />
+                  <path d="M-8 -6a10 10 0 0 1 16 0" class="w1" />
+                  <path d="M-14 -12a18 18 0 0 1 28 0" class="w2" />
+                  <path d="M-20 -18a26 26 0 0 1 40 0" class="w3" />
+                </g>
               </svg>
             )}
           </div>
@@ -88,7 +102,8 @@ const guards = [
     <ul class="guards">
       {guards.map((guard) => (
         <li>
-          <h3><span class="guard-icon" set:html={symbolHTML(guard.icon, 16)} />{guard.title}</h3>
+          <span class="guard-icon" set:html={symbolHTML(guard.icon, 17)} />
+          <h3>{guard.title}</h3>
           <p>{guard.text}</p>
         </li>
       ))}
@@ -184,7 +199,7 @@ const guards = [
   .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
   .mode {
     display: grid;
-    grid-template-columns: 112px minmax(0, 1fr);
+    grid-template-columns: 132px minmax(0, 1fr);
     grid-template-rows: auto auto;
     gap: 4px 16px;
     align-items: center;
@@ -196,31 +211,51 @@ const guards = [
   }
   .mode[data-running="true"] { border-color: color-mix(in oklab, var(--accent-a) 70%, transparent); background: rgb(255 255 255 / 0.07); }
   .art { grid-row: 1 / span 2; }
-  .art svg { display: block; width: 112px; height: 68px; overflow: visible; }
+  .art svg { display: block; width: 132px; height: 84px; overflow: visible; }
   .lid { fill: #2a3330; stroke: #4a5752; }
-  .screen-off { fill: #0a0f0d; }
+  .screen-off { fill: #070b09; }
   .base { fill: #3a4541; }
-  .ui-lines { stroke: rgb(13 30 24 / 0.55); stroke-width: 4; stroke-linecap: round; }
-  .glow { fill: color-mix(in oklab, var(--accent-b) 40%, transparent); filter: blur(8px); }
-  .zz { fill: var(--n-ink-2); font: 700 12px var(--text); }
-  .zz.small { font-size: 8px; }
+  .glow { fill: color-mix(in oklab, var(--accent-b) 45%, transparent); filter: blur(9px); }
+  .line { fill: rgb(10 26 20 / 0.6); transform-box: fill-box; transform-origin: left center; }
+  .zz { fill: #dbe9e0; font: 800 22px var(--display); }
+  .zz.z2 { font-size: 17px; }
+  .zz.z3 { font-size: 13px; }
   .activity circle { fill: var(--accent-a); }
   .bag { fill: #26302c; stroke: #55635d; stroke-width: 1.5; }
   .strap { fill: none; stroke: #55635d; stroke-width: 5; stroke-linecap: round; }
   .closed { fill: #4a5752; }
   .seam { stroke: #3a4541; stroke-width: 2; stroke-dasharray: 3 4; }
-  .waves path { fill: none; stroke: var(--accent-a); stroke-width: 2; stroke-linecap: round; }
+  .waves path { fill: none; stroke: var(--accent-a); stroke-width: 3; stroke-linecap: round; }
   .waves circle { fill: var(--accent-a); }
+  .shift { opacity: 0; }
+
+  /* Idle loops are calm; a running card plays them faster and brighter. */
   @media (prefers-reduced-motion: no-preference) {
-    .mode[data-running="true"] .activity circle { animation: pulse 1.2s ease-in-out infinite; }
-    .mode[data-running="true"] .activity circle:nth-child(2) { animation-delay: 0.2s; }
-    .mode[data-running="true"] .activity circle:nth-child(3) { animation-delay: 0.4s; }
-    .mode[data-running="true"] .waves path { animation: pulse 1.6s ease-in-out infinite; }
-    .mode[data-running="true"] .waves path:nth-child(2) { animation-delay: 0.3s; }
-    .mode[data-running="true"] .screen-on { animation: breathe 3s ease-in-out infinite; }
+    .shift { animation: shift 6s ease-in-out infinite; }
+    .line { animation: type 2.4s ease-in-out infinite; }
+    .l2 { animation-delay: 0.3s; }
+    .l3 { animation-delay: 0.6s; }
+    .l4 { animation-delay: 0.9s; }
+    .zz { animation: drift 3.2s ease-in-out infinite; }
+    .z2 { animation-delay: 0.6s; }
+    .z3 { animation-delay: 1.2s; }
+    .activity circle { animation: pulse 1.4s ease-in-out infinite; }
+    .activity circle:nth-child(2) { animation-delay: 0.2s; }
+    .activity circle:nth-child(3) { animation-delay: 0.4s; }
+    .waves path { animation: signal 2s ease-in-out infinite; }
+    .waves .w2 { animation-delay: 0.25s; }
+    .waves .w3 { animation-delay: 0.5s; }
+    .mode[data-running="true"] .shift { animation-duration: 2.6s; }
+    .mode[data-running="true"] .line { animation-duration: 1.2s; }
+    .mode[data-running="true"] .zz { animation-duration: 1.8s; }
+    .mode[data-running="true"] .activity circle { animation-duration: 0.8s; }
+    .mode[data-running="true"] .waves path { animation-duration: 1s; }
   }
-  @keyframes pulse { 50% { opacity: 0.25; } }
-  @keyframes breathe { 50% { opacity: 0.8; } }
+  @keyframes shift { 50% { opacity: 1; } }
+  @keyframes type { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.45); } }
+  @keyframes drift { 0% { opacity: 0; transform: translate(0, 6px); } 30%, 70% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, -8px); } }
+  @keyframes pulse { 50% { opacity: 0.2; } }
+  @keyframes signal { 0%, 100% { opacity: 0.15; } 40% { opacity: 1; } }
   .text h3 { margin: 0; font: 700 1.15rem/1.15 var(--display); font-stretch: 92%; }
   .text p { margin: 4px 0 0; font-size: 0.93rem; line-height: 1.4; color: var(--n-ink-2); }
   .foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
@@ -241,9 +276,10 @@ const guards = [
   .mode[data-running="true"] .start { color: var(--n-ink); background: rgb(255 255 255 / 0.12); }
 
   .guards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; margin: 44px 0 0; padding: 32px 0 0; list-style: none; border-top: 1px solid var(--n-line); }
-  .guards h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1rem; }
-  .guard-icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 9px; color: var(--accent-a); background: rgb(255 255 255 / 0.07); }
-  .guards p { margin: 8px 0 0 40px; color: var(--n-ink-2); line-height: 1.5; font-size: 0.95rem; }
+  .guards li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px 12px; align-items: center; }
+  .guard-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: var(--accent-a); background: rgb(255 255 255 / 0.07); }
+  .guards h3 { margin: 0; font-size: 1.02rem; line-height: 1.25; }
+  .guards p { grid-column: 1 / -1; margin: 0; color: var(--n-ink-2); line-height: 1.55; font-size: 0.95rem; text-wrap: pretty; }
 
   .table-wrap { margin-top: 44px; overflow-x: auto; }
   table { width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; font-size: 0.95rem; }

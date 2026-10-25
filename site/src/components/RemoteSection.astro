@@ -6,12 +6,12 @@ import liveActivity from "../assets/shots/live-activity.png";
 import { symbolHTML } from "../lib/symbols";
 
 const features = [
-  { icon: "laptopcomputer", title: "The whole battery, anywhere", text: "Charge and its last day, time left, power, health, heat, the network and the lid." },
-  { icon: "cup.and.saucer.fill", title: "Keep Awake from your pocket", text: "Any mode, any duration, lid closed included. Low Power and Display Off too." },
-  { icon: "personalhotspot", title: "Ready for the bag", text: "On your Hotspot the Mac stays online with the lid shut, and Bag Ready says so." },
-  { icon: "lock.fill", title: "Lock Screen and Control Center", text: "A Live Activity with Stop, widgets, and a control for the Action Button." },
-  { icon: "bell.badge", title: "Alerts that matter", text: "A session ending, a low battery, a Mac gone quiet or charged to your level." },
-  { icon: "icloud", title: "Through your own iCloud", text: "Nothing to pair, no server, no account. Siri and Shortcuts work as well." },
+  { icon: "laptopcomputer", title: "The whole battery, anywhere", text: "Charge and its last day, time left, power, health and heat, plus the network the Mac is on and whether its lid is shut." },
+  { icon: "cup.and.saucer.fill", title: "Keep Awake from your pocket", text: "Start any mode for any duration, lid closed included, and stop it again. Switch Low Power Mode or turn the display off." },
+  { icon: "personalhotspot", title: "Ready for the bag", text: "Set the Mac to join your Hotspot and it stays online with the lid shut. Bag Ready tells you when it is safe to close it." },
+  { icon: "lock.fill", title: "Lock Screen and Control Center", text: "A Live Activity counts down with a Stop button, next to widgets and a Control Center and Action Button control." },
+  { icon: "bell.badge", title: "Alerts that matter", text: "Hear about it when a session ends, the battery runs low, the Mac stops answering or it reaches the charge you picked." },
+  { icon: "icloud", title: "Through your own iCloud", text: "Every Mac on your Apple Account shows up by itself. Nothing to pair, no server, no account, and Siri knows the Mac too." },
 ];
 
 const statusBar = `<span class="time">9:41</span><i class="island"></i><span class="icons">${symbolHTML("cellularbars", 10)}${symbolHTML("wifi", 10)}${symbolHTML("battery.100percent", 11)}</span>`;
@@ -92,7 +92,7 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
   .features li { display: flex; gap: 12px; align-items: flex-start; }
   .feature-icon { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 10px; color: var(--ink); background: color-mix(in oklab, var(--accent-a) 28%, var(--paper)); }
   .features h3 { margin: 0; font-size: 1rem; }
-  .features p { margin: 3px 0 0; max-width: 48ch; color: var(--ink-2); line-height: 1.45; font-size: 0.95rem; }
+  .features p { margin: 3px 0 0; color: var(--ink-2); line-height: 1.45; font-size: 0.95rem; text-wrap: pretty; }
   .more-row { padding-left: 44px; }
   .more-row a { font-weight: 600; }
 
@@ -128,9 +128,10 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     left: 0;
     bottom: 24px;
     width: min(340px, 74%);
-    border-radius: 22px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 30px 60px -20px rgb(10 20 40 / 0.55);
+    background: #121733;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 30px 60px -20px rgb(10 20 40 / 0.55);
     cursor: zoom-in;
   }
   .activity :global(img) { display: block; width: 100%; height: auto; }

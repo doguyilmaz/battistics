@@ -154,14 +154,17 @@ const previews = [
   .field input { flex: 1; min-width: 0; accent-color: var(--accent-b); }
   .field output { min-width: 4ch; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
   select {
+    appearance: none;
+    -webkit-appearance: none;
     min-width: 150px;
-    height: 26px;
-    padding: 0 8px;
+    height: 28px;
+    padding: 0 30px 0 10px;
+    background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M2 5l3-3 3 3M2 9l3 3 3-3' fill='none' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center / 9px 13px;
     border: 1px solid var(--line);
     border-radius: 6px;
     font: 13px var(--text);
     color: var(--ink);
-    background: var(--paper);
+    cursor: pointer;
   }
   input[role="switch"] {
     appearance: none;
