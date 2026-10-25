@@ -19,7 +19,6 @@ final class MacStore {
 
     struct Reading: Codable, Equatable {
         var status: RemoteStatus?
-        var lastSeen: Date?
         /// Whether the Mac reported recently enough to count as awake.
         var reachable: Bool
     }
@@ -41,13 +40,15 @@ final class MacStore {
         selectedID == Self.localPhoneID
     }
 
-    @ObservationIgnored private let cloud = RemoteCloud()
+    @ObservationIgnored private lazy var cloud = RemoteCloud()
 
     private init() {
         readings = UserDefaults.standard.data(forKey: "readings")
             .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
-        LocalPhoneMonitor.shared.ingestPairedPhoneName(from: readings)
+        #if DEBUG
+        if DemoData.isEnabled { readings = DemoData.readings }
+        #endif
         RemoteIntentBridge.startOneHour = { [weak self] in
             guard let self, let mac = self.selected else { return }
             _ = await self.start(mac, mode: .displayMaySleep, minutes: 60)
@@ -74,11 +75,13 @@ final class MacStore {
     @discardableResult
     func refreshAll() async -> [(Mac, [RemoteAlert])] {
         guard !refreshing else { return [] }
+        #if DEBUG
+        if DemoData.isEnabled { return [] }
+        #endif
         refreshing = true
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
         do {
-            try await cloud.prepare()
             snapshot = try await cloud.fetch()
             problem = nil
         } catch {
@@ -95,7 +98,7 @@ final class MacStore {
         for (id, status) in snapshot.statuses {
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
-            let reading = Reading(status: status, lastSeen: status.readAt, reachable: fresh)
+            let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
             let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil)
@@ -108,7 +111,7 @@ final class MacStore {
             Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
         }
         save()
-        LocalPhoneMonitor.shared.ingestPairedPhoneName(from: readings)
+        LocalPhoneMonitor.shared.learnHotspotName(from: readings)
         // Awaited so a background task does not complete before the alerts are added.
         await Notifications.deliver(alerts)
         return alerts
@@ -133,12 +136,25 @@ final class MacStore {
         await send(.init(operation: .sleepDisplay, deviceName: UIDevice.current.name), to: mac)
     }
 
+    func inspect(_ mac: Mac) async -> String? {
+        await send(.init(operation: .inspect, deviceName: UIDevice.current.name), to: mac)
+    }
+
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
-        pending.insert(mac.id)
-        defer { pending.remove(mac.id) }
+        // Inspecting runs alongside the controls instead of locking them.
+        let locks = request.operation != .inspect
+        if locks { pending.insert(mac.id) }
+        defer { if locks { pending.remove(mac.id) } }
+        #if DEBUG
+        if DemoData.isEnabled, var status = readings[mac.id]?.status {
+            try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
+            DemoData.apply(request, to: &status)
+            readings[mac.id] = .init(status: status, reachable: true)
+            return nil
+        }
+        #endif
         do {
-            try await cloud.prepare()
             _ = try await cloud.send(request, to: mac.id)
             for _ in 0..<16 {
                 try await Task.sleep(for: .seconds(1.5))

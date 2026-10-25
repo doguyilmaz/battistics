@@ -5,13 +5,9 @@ import Foundation
 struct SharedSnapshot: Codable, Equatable {
     var macName: String
     var status: RemoteStatus?
-    var lastSeen: Date?
     var reachable: Bool
 
-    /// Hotspot keeps a closed Mac online, and the Mac must allow closed-lid sessions.
-    var bagReady: Bool {
-        reachable && status?.network == .hotspot && status?.protection.closedLidAllowed == true
-    }
+    var bagReady: Bool { reachable && status?.isBagReady == true }
 
     /// The snapshot as a widget should show it at `date`: offline once the app
     /// would have heard from the Mac by then, even with pushes throttled.

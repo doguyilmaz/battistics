@@ -6,15 +6,17 @@ import UIKit
 struct PhoneApp: App {
     @UIApplicationDelegateAdaptor private var delegate: PhoneAppDelegate
     @State private var store = MacStore.shared
+    @State private var phone = LocalPhoneMonitor.shared
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage("phoneThemePreference") private var themeRaw = "automatic"
+    @AppStorage(PhoneTheme.key) private var theme = PhoneTheme.automatic
 
     var body: some Scene {
         WindowGroup {
             HomeView()
                 .environment(store)
-                .onAppear { PhoneThemeManager.apply(themeRaw) }
-                .onChange(of: themeRaw) { PhoneThemeManager.apply(themeRaw) }
+                .environment(phone)
+                .onAppear { theme.apply() }
+                .onChange(of: theme) { theme.apply() }
         }
         .onChange(of: scenePhase) {
             if scenePhase == .background { Notifications.schedule() }

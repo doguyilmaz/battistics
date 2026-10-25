@@ -16,12 +16,7 @@ enum WidgetBridge {
             endActivities()
             return
         }
-        var adjustedStatus = reading?.status
-        if adjustedStatus?.network == .hotspot, adjustedStatus?.networkName == nil {
-            adjustedStatus?.networkName = UIDevice.current.name
-        }
-        let snapshot = SharedSnapshot(macName: mac.name, status: adjustedStatus,
-                                      lastSeen: reading?.lastSeen, reachable: reading?.reachable ?? false)
+        let snapshot = SharedSnapshot(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false)
         if snapshot != SharedSnapshot.load() {
             snapshot.save()
             WidgetCenter.shared.reloadAllTimelines()
@@ -57,7 +52,7 @@ enum WidgetBridge {
             watts: status.battery?.watts,
             lidClosed: status.lidClosed,
             network: status.network,
-            networkName: status.resolvedNetworkName(fallbackHotspot: UIDevice.current.name),
+            networkName: status.resolvedNetworkName(),
             lastUpdate: status.readAt,
             offline: reachable ? nil : true
         )

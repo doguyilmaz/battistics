@@ -154,23 +154,6 @@
         }
       }
     },
-    "12h ago": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12h ago"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12sa önce"
-          }
-        }
-      }
-    },
     "15 minutes": {
       "extractionState": "manual",
       "localizations": {
@@ -201,23 +184,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "2 saat"
-          }
-        }
-      }
-    },
-    "24h ago": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "24h ago"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "24sa önce"
           }
         }
       }
@@ -269,23 +235,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "6 saat"
-          }
-        }
-      }
-    },
-    "AC": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AC"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör"
           }
         }
       }
@@ -371,23 +320,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%%%lld’de"
-          }
-        }
-      }
-    },
-    "Bag 1h": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bag 1h"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çanta 1sa"
           }
         }
       }
@@ -630,23 +562,6 @@
         }
       }
     },
-    "Connected to iPhone, ready for bag mode.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected to iPhone, ready for bag mode."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone’a bağlı, çanta moduna hazır."
-          }
-        }
-      }
-    },
     "Connecting…": {
       "extractionState": "manual",
       "localizations": {
@@ -660,23 +575,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bağlanıyor…"
-          }
-        }
-      }
-    },
-    "Connection": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connection"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bağlantı"
           }
         }
       }
@@ -715,23 +613,6 @@
         }
       }
     },
-    "Devices & Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Devices & Settings"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cihazlar ve Ayarlar"
-          }
-        }
-      }
-    },
     "Done": {
       "extractionState": "manual",
       "localizations": {
@@ -762,23 +643,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süre"
-          }
-        }
-      }
-    },
-    "Enable iPhone access in Battistics on your Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable iPhone access in Battistics on your Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’inizdeki Battistics’te iPhone erişimini açın."
           }
         }
       }
@@ -830,23 +694,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sağlık"
-          }
-        }
-      }
-    },
-    "Health · %lldc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health · %lldc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık · %lldd"
           }
         }
       }
@@ -919,40 +766,6 @@
         }
       }
     },
-    "Hotspot Paired": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hotspot Paired"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hotspot Eşleşti"
-          }
-        }
-      }
-    },
-    "If you put your Mac in a bag and leave Wi‑Fi range, internet and remote control will drop unless you use Personal Hotspot or a mobile router.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "If you put your Mac in a bag and leave Wi‑Fi range, internet and remote control will drop unless you use Personal Hotspot or a mobile router."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’i çantaya koyup Wi‑Fi menzilinden çıkarsanız, Kişisel Erişim Noktası veya taşınabilir modem kullanmadığınız sürece internet ve uzaktan kontrol kopar."
-          }
-        }
-      }
-    },
     "Keep Awake": {
       "extractionState": "manual",
       "localizations": {
@@ -966,23 +779,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uyanık Tut"
-          }
-        }
-      }
-    },
-    "Keep Awake Until Stopped": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep Awake Until Stopped"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durdurulana Kadar Uyanık Tut"
           }
         }
       }
@@ -1123,23 +919,6 @@
         }
       }
     },
-    "Keep Awake was running when last seen.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep Awake was running when last seen."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son görüldüğünde Uyanık Tut çalışıyordu."
-          }
-        }
-      }
-    },
     "Keep Mac Awake": {
       "extractionState": "manual",
       "localizations": {
@@ -1153,23 +932,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’i Uyanık Tut"
-          }
-        }
-      }
-    },
-    "Keeping awake": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keeping awake"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık tutuluyor"
           }
         }
       }
@@ -1344,23 +1106,6 @@
         }
       }
     },
-    "Lid closed and awake on your hotspot.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lid closed and awake on your hotspot."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hotspot’ta kapak kapalı ve uyanık."
-          }
-        }
-      }
-    },
     "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you.": {
       "extractionState": "manual",
       "localizations": {
@@ -1378,40 +1123,6 @@
         }
       }
     },
-    "Lid · Bag ready": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lid · Bag ready"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapak · Çantaya hazır"
-          }
-        }
-      }
-    },
-    "Lid · Clamshell": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lid · Clamshell"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapak · Masaüstü"
-          }
-        }
-      }
-    },
     "Low Power": {
       "extractionState": "manual",
       "localizations": {
@@ -1425,57 +1136,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Düşük Güç"
-          }
-        }
-      }
-    },
-    "Mac Low Power Mode": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Low Power Mode"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Düşük Güç Modu"
-          }
-        }
-      }
-    },
-    "Mac Power Mode": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Power Mode"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Güç Modu"
-          }
-        }
-      }
-    },
-    "Mac is on Wi‑Fi, not Hotspot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac is on Wi‑Fi, not Hotspot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Hotspot’ta değil, Wi‑Fi’de"
           }
         }
       }
@@ -1531,23 +1191,6 @@
         }
       }
     },
-    "No Mac Connected": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Mac Connected"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bağlı Mac Yok"
-          }
-        }
-      }
-    },
     "Normal": {
       "extractionState": "manual",
       "localizations": {
@@ -1578,23 +1221,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bildirimler"
-          }
-        }
-      }
-    },
-    "Notify me": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notify me"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bana bildir"
           }
         }
       }
@@ -1663,23 +1289,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çevrimdışı"
-          }
-        }
-      }
-    },
-    "Offline. Open Hotspot if away from Wi‑Fi.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline. Open Hotspot if away from Wi‑Fi."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çevrimdışı. Wi‑Fi yoksa Hotspot’u açın."
           }
         }
       }
@@ -1769,40 +1378,6 @@
         }
       }
     },
-    "Open iOS Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open iOS Settings"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS Ayarları’nı Aç"
-          }
-        }
-      }
-    },
-    "Physical Memory": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Physical Memory"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fiziksel Bellek"
-          }
-        }
-      }
-    },
     "Plugged in": {
       "extractionState": "manual",
       "localizations": {
@@ -1816,23 +1391,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prize takılı"
-          }
-        }
-      }
-    },
-    "Pocket Mode Needs Hotspot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pocket Mode Needs Hotspot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çanta Modu İçin Hotspot Gerekli"
           }
         }
       }
@@ -1854,23 +1412,6 @@
         }
       }
     },
-    "Power Mode": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Power Mode"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç Modu"
-          }
-        }
-      }
-    },
     "Profile": {
       "extractionState": "manual",
       "localizations": {
@@ -1884,23 +1425,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Profil"
-          }
-        }
-      }
-    },
-    "Quick Action": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quick Action"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hızlı İşlem"
           }
         }
       }
@@ -1973,40 +1497,6 @@
         }
       }
     },
-    "Sleep Mac Display Now": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sleep Mac Display Now"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Ekranını Şimdi Uyut"
-          }
-        }
-      }
-    },
-    "Standard": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standard"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standart"
-          }
-        }
-      }
-    },
     "Start closed-lid Keep Awake on the Mac once to set up its helper.": {
       "extractionState": "manual",
       "localizations": {
@@ -2020,23 +1510,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yardımcıyı kurmak için Mac’te kapak kapalı Uyanık Tut’u bir kez başlatın."
-          }
-        }
-      }
-    },
-    "Start on Current Wi‑Fi": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start on Current Wi‑Fi"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Wi‑Fi ile Başlat"
           }
         }
       }
@@ -2160,23 +1633,6 @@
         }
       }
     },
-    "System & Storage": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System & Storage"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sistem ve Depolama"
-          }
-        }
-      }
-    },
     "Task finished": {
       "extractionState": "manual",
       "localizations": {
@@ -2228,23 +1684,6 @@
         }
       }
     },
-    "Tethered": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tethered"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bağlı"
-          }
-        }
-      }
-    },
     "The battery lasts about %@, less than the Keep Awake session.": {
       "extractionState": "manual",
       "localizations": {
@@ -2258,23 +1697,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil yaklaşık %@ dayanır; Uyanık Tut oturumundan az."
-          }
-        }
-      }
-    },
-    "Thermal": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thermal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Termal"
           }
         }
       }
@@ -2343,57 +1765,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süre doldu"
-          }
-        }
-      }
-    },
-    "Tip · Auto-Join Hotspot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tip · Auto-Join Hotspot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İpucu · Otomatik Hotspot"
-          }
-        }
-      }
-    },
-    "Tip · Closed Bag Heat": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tip · Closed Bag Heat"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İpucu · Kapalı Çanta Isısı"
-          }
-        }
-      }
-    },
-    "Tip · Until Turned Off": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tip · Until Turned Off"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İpucu · Kapatılana Kadar"
           }
         }
       }
@@ -2479,23 +1850,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güncellendi: %@"
-          }
-        }
-      }
-    },
-    "View Mac": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’i Gör"
           }
         }
       }
@@ -2619,40 +1973,6 @@
         }
       }
     },
-    "%@ to full · %lld mAh": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ to full · %lld mAh"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dolmasına %1$@ · %2$lld mAh"
-          }
-        }
-      }
-    },
-    "%@ years": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ years"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ yıl"
-          }
-        }
-      }
-    },
     "%@ · Awake ∞": {
       "extractionState": "manual",
       "localizations": {
@@ -2704,23 +2024,6 @@
         }
       }
     },
-    "%lld Cycles": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Cycles"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld Döngü"
-          }
-        }
-      }
-    },
     "%lld cycles": {
       "extractionState": "manual",
       "localizations": {
@@ -2734,23 +2037,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld döngü"
-          }
-        }
-      }
-    },
-    "%lld found": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld found"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld bulundu"
           }
         }
       }
@@ -2772,74 +2058,6 @@
         }
       }
     },
-    "%lld mAh · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld mAh · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld mAh · %2$@"
-          }
-        }
-      }
-    },
-    "%lld months": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld months"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld ay"
-          }
-        }
-      }
-    },
-    "%lld%% Health": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%% Health"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%lld Sağlık"
-          }
-        }
-      }
-    },
-    "%lld%% · %lldc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%% · %lldc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%1$lld · %2$lldd"
-          }
-        }
-      }
-    },
     "%lldW": {
       "extractionState": "manual",
       "localizations": {
@@ -2853,23 +2071,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lldW"
-          }
-        }
-      }
-    },
-    "%lldW Adapter": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW Adapter"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lldW Adaptör"
           }
         }
       }
@@ -2908,40 +2109,6 @@
         }
       }
     },
-    "/ %lld Cycles": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/ %lld Cycles"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/ %lld Döngü"
-          }
-        }
-      }
-    },
-    "A Mac must be awake with Battistics open at least once to broadcast its initial state to iCloud. Once connected, Keep Awake works even with the lid closed.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A Mac must be awake with Battistics open at least once to broadcast its initial state to iCloud. Once connected, Keep Awake works even with the lid closed."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'in ilk durumunu iCloud'a yazması için en az bir kez uyanık ve Battistics açık olmalı. Bağlandıktan sonra Uyanık Tut kapak kapalıyken de çalışır."
-          }
-        }
-      }
-    },
     "A full-width Lock Screen widget with charge bar, power, health, cycles and the Keep Awake timer.": {
       "extractionState": "manual",
       "localizations": {
@@ -2972,108 +2139,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adaptör"
-          }
-        }
-      }
-    },
-    "Adapter Current": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adapter Current"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör Akımı"
-          }
-        }
-      }
-    },
-    "Adapter Voltage": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adapter Voltage"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adaptör Voltajı"
-          }
-        }
-      }
-    },
-    "Alerts you when Keep Awake ends, the battery runs low or will not last the session, or a Mac stops answering mid-session.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alerts you when Keep Awake ends, the battery runs low or will not last the session, or a Mac stops answering mid-session."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut bittiğinde, pil azaldığında ya da oturuma yetmeyecekse veya Mac oturum sırasında yanıt vermeyi bıraktığında haber verir."
-          }
-        }
-      }
-    },
-    "Allow closed-lid sessions on the Mac for bag mode.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow closed-lid sessions on the Mac for bag mode."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çanta modu için Mac'te kapak kapalı oturumlara izin ver."
-          }
-        }
-      }
-    },
-    "Amperage": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amperage"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akım"
-          }
-        }
-      }
-    },
-    "App Icon & Logo": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Icon & Logo"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uygulama Simgesi"
           }
         }
       }
@@ -3112,23 +2177,6 @@
         }
       }
     },
-    "Available Space": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available Space"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Boş Alan"
-          }
-        }
-      }
-    },
     "Awake 1h": {
       "extractionState": "manual",
       "localizations": {
@@ -3142,23 +2190,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "1sa Uyanık"
-          }
-        }
-      }
-    },
-    "Awake in Your Bag": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Awake in Your Bag"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çantada Uyanık"
           }
         }
       }
@@ -3180,23 +2211,6 @@
         }
       }
     },
-    "Background Glow": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Background Glow"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Arka Plan Işıltısı"
-          }
-        }
-      }
-    },
     "Bag Ready": {
       "extractionState": "manual",
       "localizations": {
@@ -3210,74 +2224,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çantaya Hazır"
-          }
-        }
-      }
-    },
-    "Bat Battery": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bat Battery"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yarasa Pil"
-          }
-        }
-      }
-    },
-    "Battery Age": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery Age"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Yaşı"
-          }
-        }
-      }
-    },
-    "Battery Capacity": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery Capacity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Kapasitesi"
-          }
-        }
-      }
-    },
-    "Battery Capacity & Chemistry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery Capacity & Chemistry"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Kapasitesi ve Kimyası"
           }
         }
       }
@@ -3299,74 +2245,6 @@
         }
       }
     },
-    "Battery Serial": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery Serial"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Seri Numarası"
-          }
-        }
-      }
-    },
-    "Battery Telemetry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery Telemetry"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Verileri"
-          }
-        }
-      }
-    },
-    "Battery health, cycles, voltages & specs": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery health, cycles, voltages & specs"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil sağlığı, döngü, voltaj ve özellikler"
-          }
-        }
-      }
-    },
-    "Battery lasts about %@, less than this session": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battery lasts about %@, less than this session"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil yaklaşık %@ dayanır, bu oturumdan kısa"
-          }
-        }
-      }
-    },
     "Battery, power, network and Keep Awake controls for your Mac.": {
       "extractionState": "manual",
       "localizations": {
@@ -3384,57 +2262,6 @@
         }
       }
     },
-    "Battistics Remote communicates privately via your personal CloudKit database. Both devices must be logged into the same Apple ID.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics Remote communicates privately via your personal CloudKit database. Both devices must be logged into the same Apple ID."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics Remote yalnızca senin CloudKit veritabanın üzerinden konuşur. İki cihaz da aynı Apple Hesabı ile oturum açmış olmalı."
-          }
-        }
-      }
-    },
-    "Battistics for Mac": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics for Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac için Battistics"
-          }
-        }
-      }
-    },
-    "Board Configuration": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Board Configuration"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kart Yapılandırması"
-          }
-        }
-      }
-    },
     "Both Mac and display stay awake": {
       "extractionState": "manual",
       "localizations": {
@@ -3448,74 +2275,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac ve ekran uyanık kalır"
-          }
-        }
-      }
-    },
-    "CPU Cores": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CPU Cores"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CPU Çekirdekleri"
-          }
-        }
-      }
-    },
-    "Calculated Capacity (%@)": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calculated Capacity (%@)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hesaplanan Kapasite (%@)"
-          }
-        }
-      }
-    },
-    "Calibrate Battery": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calibrate Battery"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pili Ayarla"
-          }
-        }
-      }
-    },
-    "Calibrate Health & Cycles": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calibrate Health & Cycles"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık ve Döngüyü Ayarla"
           }
         }
       }
@@ -3554,23 +2313,6 @@
         }
       }
     },
-    "Changes apply immediately to your widgets and the live previews below.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Changes apply immediately to your widgets and the live previews below."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Değişiklikler widget'lara ve aşağıdaki önizlemelere hemen uygulanır."
-          }
-        }
-      }
-    },
     "Check Again": {
       "extractionState": "manual",
       "localizations": {
@@ -3584,23 +2326,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yeniden Dene"
-          }
-        }
-      }
-    },
-    "Check System Settings › Apple Account › iCloud on both your Mac and iPhone to ensure iCloud Drive and Sync are turned on.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check System Settings › Apple Account › iCloud on both your Mac and iPhone to ensure iCloud Drive and Sync are turned on."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'te ve iPhone'da Ayarlar › Apple Hesabı › iCloud bölümünde iCloud Drive ve eşzamanlamanın açık olduğunu kontrol et."
           }
         }
       }
@@ -3622,40 +2347,6 @@
         }
       }
     },
-    "Choose your preferred Battistics logo style.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose your preferred Battistics logo style."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics simgesini seç."
-          }
-        }
-      }
-    },
-    "Circular Gauge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Circular Gauge"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dairesel Gösterge"
-          }
-        }
-      }
-    },
     "Clean Bar": {
       "extractionState": "manual",
       "localizations": {
@@ -3669,74 +2360,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sade Çubuk"
-          }
-        }
-      }
-    },
-    "Connection & iCloud": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connection & iCloud"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bağlantı ve iCloud"
-          }
-        }
-      }
-    },
-    "Copied Summary": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copied Summary"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Özet Kopyalandı"
-          }
-        }
-      }
-    },
-    "Copy Battery Summary": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy Battery Summary"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil Özetini Kopyala"
-          }
-        }
-      }
-    },
-    "Copy Technical Summary": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy Technical Summary"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Teknik Özeti Kopyala"
           }
         }
       }
@@ -3758,74 +2381,6 @@
         }
       }
     },
-    "Current Maximum": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Current Maximum"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Maksimum"
-          }
-        }
-      }
-    },
-    "Current Stored (%@)": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Current Stored (%@)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Depolanan (%@)"
-          }
-        }
-      }
-    },
-    "Current Stored Charge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Current Stored Charge"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Depolanan Şarj"
-          }
-        }
-      }
-    },
-    "Customization": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Customization"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Özelleştirme"
-          }
-        }
-      }
-    },
     "Cycle Count": {
       "extractionState": "manual",
       "localizations": {
@@ -3843,23 +2398,6 @@
         }
       }
     },
-    "Cycle Limit": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cycle Limit"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Döngü Sınırı"
-          }
-        }
-      }
-    },
     "Dark": {
       "extractionState": "manual",
       "localizations": {
@@ -3873,57 +2411,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Koyu"
-          }
-        }
-      }
-    },
-    "Darwin Kernel": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Darwin Kernel"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Darwin Çekirdeği"
-          }
-        }
-      }
-    },
-    "Dashboard": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dashboard"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pano"
-          }
-        }
-      }
-    },
-    "Design": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Design"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tasarım"
           }
         }
       }
@@ -3962,142 +2449,6 @@
         }
       }
     },
-    "Don’t have a Mac nearby? You can explore this iPhone’s battery health, thermal level, cycles, memory and storage right away.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Don’t have a Mac nearby? You can explore this iPhone’s battery health, thermal level, cycles, memory and storage right away."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yakında Mac yok mu? Bu iPhone'un pil sağlığına, ısı durumuna, döngüsüne, belleğine ve depolamasına hemen bakabilirsin."
-          }
-        }
-      }
-    },
-    "Download Battistics for Mac to monitor your battery and control Keep Awake from your iPhone: %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Download Battistics for Mac to monitor your battery and control Keep Awake from your iPhone: %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pili izlemek ve Uyanık Tut'u iPhone'dan yönetmek için Mac'e Battistics'i indir: %@"
-          }
-        }
-      }
-    },
-    "Download and launch Battistics on macOS 14 Sonoma, macOS 15 Sequoia or later.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Download and launch Battistics on macOS 14 Sonoma, macOS 15 Sequoia or later."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics'i macOS 14 Sonoma, macOS 15 Sequoia veya sonrasında indirip aç."
-          }
-        }
-      }
-    },
-    "Enable Remote Companion": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Remote Companion"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Erişimini Aç"
-          }
-        }
-      }
-    },
-    "Ensure this iPhone and your Mac are signed in to iCloud with the same Apple ID.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ensure this iPhone and your Mac are signed in to iCloud with the same Apple ID."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone ve Mac'in aynı Apple Hesabı ile iCloud'da oturum açtığından emin ol."
-          }
-        }
-      }
-    },
-    "Estimated Full Capacity": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estimated Full Capacity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tahmini Tam Kapasite"
-          }
-        }
-      }
-    },
-    "Estimated Power": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estimated Power"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tahmini Güç"
-          }
-        }
-      }
-    },
-    "Full Dashboard": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Full Dashboard"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tam Pano"
-          }
-        }
-      }
-    },
     "Full Grid": {
       "extractionState": "manual",
       "localizations": {
@@ -4111,23 +2462,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tam Izgara"
-          }
-        }
-      }
-    },
-    "Full Specs": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Full Specs"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tüm Özellikler"
           }
         }
       }
@@ -4183,57 +2517,6 @@
         }
       }
     },
-    "Hardware & Battery Identity": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hardware & Battery Identity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Donanım ve Pil Kimliği"
-          }
-        }
-      }
-    },
-    "Hardware Internals": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hardware Internals"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Donanım Ayrıntıları"
-          }
-        }
-      }
-    },
-    "Home Screen Widgets": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Home Screen Widgets"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ana Ekran Widget'ları"
-          }
-        }
-      }
-    },
     "How to Turn On Hotspot": {
       "extractionState": "manual",
       "localizations": {
@@ -4264,91 +2547,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Boşta"
-          }
-        }
-      }
-    },
-    "In Battistics on Mac › Settings › iPhone, toggle on 'Show this Mac in Battistics Remote'.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In Battistics on Mac › Settings › iPhone, toggle on 'Show this Mac in Battistics Remote'."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'te Battistics › Ayarlar › iPhone bölümünde 'Bu Mac'i Battistics Remote'ta göster'i aç."
-          }
-        }
-      }
-    },
-    "Inline Header": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inline Header"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Satır İçi"
-          }
-        }
-      }
-    },
-    "Install Battistics on your Mac": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Install Battistics on your Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'e Battistics'i yükle"
-          }
-        }
-      }
-    },
-    "Is iCloud Drive enabled?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Is iCloud Drive enabled?"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud Drive açık mı?"
-          }
-        }
-      }
-    },
-    "Is your Mac sleeping or lid closed?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Is your Mac sleeping or lid closed?"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac uykuda mı ya da kapağı kapalı mı?"
           }
         }
       }
@@ -4404,40 +2602,6 @@
         }
       }
     },
-    "Last Boot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last Boot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son Açılış"
-          }
-        }
-      }
-    },
-    "Last reported · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last reported · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son bildirim · %@"
-          }
-        }
-      }
-    },
     "Let my Mac sleep with ${applicationName}": {
       "extractionState": "manual",
       "localizations": {
@@ -4472,23 +2636,6 @@
         }
       }
     },
-    "Lid · No Hotspot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lid · No Hotspot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapak · Hotspot yok"
-          }
-        }
-      }
-    },
     "Light": {
       "extractionState": "manual",
       "localizations": {
@@ -4502,125 +2649,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Açık"
-          }
-        }
-      }
-    },
-    "Live Electrical": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Live Electrical"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anlık Elektrik"
-          }
-        }
-      }
-    },
-    "Live on %@ · iOS %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Live on %@ · iOS %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ üzerinde canlı · iOS %2$@"
-          }
-        }
-      }
-    },
-    "Lock Screen Layout": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lock Screen Layout"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kilit Ekranı Düzeni"
-          }
-        }
-      }
-    },
-    "Lock Screen Widgets": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lock Screen Widgets"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kilit Ekranı Widget'ları"
-          }
-        }
-      }
-    },
-    "Looking for your Mac…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Looking for your Mac…"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac aranıyor…"
-          }
-        }
-      }
-    },
-    "Low %lld%% · High %lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low %lld%% · High %lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En düşük %%%1$lld · En yüksek %%%2$lld"
-          }
-        }
-      }
-    },
-    "Low Power Mode Policy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low Power Mode Policy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düşük Güç Modu Kuralı"
           }
         }
       }
@@ -4710,40 +2738,6 @@
         }
       }
     },
-    "Mac Name": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Name"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Adı"
-          }
-        }
-      }
-    },
-    "Mac Records": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Records"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Kayıtları"
-          }
-        }
-      }
-    },
     "Mac can sleep": {
       "extractionState": "manual",
       "localizations": {
@@ -4778,40 +2772,6 @@
         }
       }
     },
-    "Mac is Offline": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac is Offline"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Çevrimdışı"
-          }
-        }
-      }
-    },
-    "Mac is offline or asleep. Controls return when it answers.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac is offline or asleep. Controls return when it answers."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac çevrimdışı ya da uykuda. Yanıt verince denetimler geri gelir."
-          }
-        }
-      }
-    },
     "Mac not answering": {
       "extractionState": "manual",
       "localizations": {
@@ -4825,23 +2785,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac yanıt vermiyor"
-          }
-        }
-      }
-    },
-    "Machine Identifier": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Machine Identifier"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Makine Kimliği"
           }
         }
       }
@@ -4863,40 +2806,6 @@
         }
       }
     },
-    "Marketing Model": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marketing Model"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Model Adı"
-          }
-        }
-      }
-    },
-    "Max Capacity (%lld%%)": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Max Capacity (%lld%%)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Maks. Kapasite (%%%lld)"
-          }
-        }
-      }
-    },
     "Maximum Capacity": {
       "extractionState": "manual",
       "localizations": {
@@ -4910,23 +2819,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maksimum Kapasite"
-          }
-        }
-      }
-    },
-    "Measured Maximum": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Measured Maximum"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ölçülen Maksimum"
           }
         }
       }
@@ -4948,23 +2840,6 @@
         }
       }
     },
-    "Native Display": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Native Display"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran Çözünürlüğü"
-          }
-        }
-      }
-    },
     "Network & Session": {
       "extractionState": "manual",
       "localizations": {
@@ -4978,40 +2853,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ağ ve Oturum"
-          }
-        }
-      }
-    },
-    "No Device Data": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Device Data"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cihaz Verisi Yok"
-          }
-        }
-      }
-    },
-    "No Macs sharing right now": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Macs sharing right now"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şu an paylaşan Mac yok"
           }
         }
       }
@@ -5084,40 +2925,6 @@
         }
       }
     },
-    "Nominal Voltage": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nominal Voltage"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nominal Voltaj"
-          }
-        }
-      }
-    },
-    "None yet": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "None yet"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Henüz yok"
-          }
-        }
-      }
-    },
     "Not connected": {
       "extractionState": "manual",
       "localizations": {
@@ -5148,40 +2955,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hotspot'ta değil. Mac çantaya girmeden önce aç."
-          }
-        }
-      }
-    },
-    "Not syncing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not syncing"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşzamanlanmıyor"
-          }
-        }
-      }
-    },
-    "Offline (%lld%%)": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline (%lld%%)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çevrimdışı (%%%lld)"
           }
         }
       }
@@ -5288,40 +3061,6 @@
         }
       }
     },
-    "Open This iPhone Dashboard": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open This iPhone Dashboard"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone'un Panosunu Aç"
-          }
-        }
-      }
-    },
-    "Operating System": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Operating System"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İşletim Sistemi"
-          }
-        }
-      }
-    },
     "Original": {
       "extractionState": "manual",
       "localizations": {
@@ -5339,23 +3078,6 @@
         }
       }
     },
-    "Overview": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Overview"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genel Bakış"
-          }
-        }
-      }
-    },
     "Personal Hotspot": {
       "extractionState": "manual",
       "localizations": {
@@ -5369,40 +3091,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kişisel Erişim Noktası"
-          }
-        }
-      }
-    },
-    "Personal Hotspot & Closed-Lid": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Personal Hotspot & Closed-Lid"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kişisel Erişim Noktası ve Kapalı Kapak"
-          }
-        }
-      }
-    },
-    "Picker Preview": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Picker Preview"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seçici Önizlemesi"
           }
         }
       }
@@ -5492,40 +3180,6 @@
         }
       }
     },
-    "Rectangular · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rectangular · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dikdörtgen · %@"
-          }
-        }
-      }
-    },
-    "Same Apple Account": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Same Apple Account"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aynı Apple Hesabı"
-          }
-        }
-      }
-    },
     "See your Mac’s battery and control Keep Awake through your own iCloud.": {
       "extractionState": "manual",
       "localizations": {
@@ -5543,57 +3197,6 @@
         }
       }
     },
-    "Set Mac Wi‑Fi to auto-join Hotspot.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set Mac Wi‑Fi to auto-join Hotspot."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac Wi‑Fi'ını Hotspot'a otomatik katılacak şekilde ayarla."
-          }
-        }
-      }
-    },
-    "Setup & Devices": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Setup & Devices"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kurulum ve Cihazlar"
-          }
-        }
-      }
-    },
-    "Setup Battistics on Mac": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Setup Battistics on Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'te Battistics'i Kur"
-          }
-        }
-      }
-    },
     "Share Link": {
       "extractionState": "manual",
       "localizations": {
@@ -5607,40 +3210,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bağlantıyı Paylaş"
-          }
-        }
-      }
-    },
-    "Show Wi‑Fi / Hotspot Name": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Wi‑Fi / Hotspot Name"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wi‑Fi / Hotspot Adını Göster"
-          }
-        }
-      }
-    },
-    "Shown in the device switcher as Name (%@).": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shown in the device switcher as Name (%@)."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cihaz seçicide Ad (%@) olarak görünür."
           }
         }
       }
@@ -5696,23 +3265,6 @@
         }
       }
     },
-    "Status": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Status"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durum"
-          }
-        }
-      }
-    },
     "Stays awake with lid closed in your bag": {
       "extractionState": "manual",
       "localizations": {
@@ -5760,142 +3312,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac'teki Uyanık Tut oturumunu durdurur."
-          }
-        }
-      }
-    },
-    "Storage Used": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Storage Used"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kullanılan Alan"
-          }
-        }
-      }
-    },
-    "Stored Charge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stored Charge"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Depolanan Şarj"
-          }
-        }
-      }
-    },
-    "Stored Energy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stored Energy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Depolanan Enerji"
-          }
-        }
-      }
-    },
-    "System Uptime": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System Uptime"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Açık Kalma Süresi"
-          }
-        }
-      }
-    },
-    "System on Chip": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System on Chip"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yonga"
-          }
-        }
-      }
-    },
-    "Tap again to run until turned off": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap again to run until turned off"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapatılana kadar sürmesi için yeniden dokun"
-          }
-        }
-      }
-    },
-    "Tap the selected duration again to run until turned off.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap the selected duration again to run until turned off."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapatılana kadar sürmesi için seçili süreye yeniden dokun."
-          }
-        }
-      }
-    },
-    "Telemetry Focus": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Telemetry Focus"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Veri Odağı"
           }
         }
       }
@@ -5951,91 +3367,6 @@
         }
       }
     },
-    "Theme & Visuals": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Theme & Visuals"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tema ve Görünüm"
-          }
-        }
-      }
-    },
-    "Thermal Care pauses Mac if bag warms.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thermal Care pauses Mac if bag warms."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çanta ısınırsa ısı koruması Mac'i durdurur."
-          }
-        }
-      }
-    },
-    "Thermal Pressure": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thermal Pressure"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isı Baskısı"
-          }
-        }
-      }
-    },
-    "Thermal State": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thermal State"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isı Durumu"
-          }
-        }
-      }
-    },
-    "Troubleshooting Guide": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Troubleshooting Guide"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sorun Giderme"
-          }
-        }
-      }
-    },
     "Turn On Personal Hotspot": {
       "extractionState": "manual",
       "localizations": {
@@ -6049,23 +3380,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kişisel Erişim Noktası'nı Aç"
-          }
-        }
-      }
-    },
-    "Turn on Hotspot before leaving Wi‑Fi.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn on Hotspot before leaving Wi‑Fi."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wi‑Fi'dan ayrılmadan önce Hotspot'u aç."
           }
         }
       }
@@ -6104,40 +3418,6 @@
         }
       }
     },
-    "Uptime · Storage": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uptime · Storage"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Açık Kalma · Depolama"
-          }
-        }
-      }
-    },
-    "Using different Apple Accounts?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Using different Apple Accounts?"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Farklı Apple Hesapları mı kullanıyorsun?"
-          }
-        }
-      }
-    },
     "Voltage": {
       "extractionState": "manual",
       "localizations": {
@@ -6151,40 +3431,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voltaj"
-          }
-        }
-      }
-    },
-    "Wait for your Mac to report or select an iPhone.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wait for your Mac to report or select an iPhone."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac'in bildirmesini bekle ya da bir iPhone seç."
-          }
-        }
-      }
-    },
-    "Widget Options": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Widget Options"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Widget Seçenekleri"
           }
         }
       }
@@ -6206,57 +3452,6 @@
         }
       }
     },
-    "Widgets & Lock Screen": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Widgets & Lock Screen"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Widget'lar ve Kilit Ekranı"
-          }
-        }
-      }
-    },
-    "With no Wi‑Fi nearby, turn on Settings › Personal Hotspot › Allow Others to Join. A Mac with Ask to join hotspots set to Automatic connects by itself, and Keep Awake keeps it connected with the lid closed.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "With no Wi‑Fi nearby, turn on Settings › Personal Hotspot › Allow Others to Join. A Mac with Ask to join hotspots set to Automatic connects by itself, and Keep Awake keeps it connected with the lid closed."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yakında Wi‑Fi yoksa Ayarlar › Kişisel Erişim Noktası › Başkalarının Katılmasına İzin Ver'i aç. Hotspot'lara katılmayı sor ayarı Otomatik olan bir Mac kendiliğinden bağlanır, Uyanık Tut da kapak kapalıyken bağlı tutar."
-          }
-        }
-      }
-    },
-    "Working": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Working"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çalışıyor"
-          }
-        }
-      }
-    },
     "Your Mac on your iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -6270,142 +3465,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac'in iPhone'unda"
-          }
-        }
-      }
-    },
-    "Your iPhones": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your iPhones"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone'ların"
-          }
-        }
-      }
-    },
-    "e.g. 42": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "e.g. 42"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ör. 42"
-          }
-        }
-      }
-    },
-    "iCloud Sync": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud Sync"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud Eşzamanlama"
-          }
-        }
-      }
-    },
-    "iOS %@ · %lld mAh": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS %@ · %lld mAh"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS %1$@ · %2$lld mAh"
-          }
-        }
-      }
-    },
-    "iOS sandboxes raw cycle and health counters from third-party apps. Enter the values shown in iOS Settings › Battery › Battery Health so Battistics can calculate your exact mAh and Wh capacity.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS sandboxes raw cycle and health counters from third-party apps. Enter the values shown in iOS Settings › Battery › Battery Health so Battistics can calculate your exact mAh and Wh capacity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS, döngü ve sağlık sayaçlarını diğer uygulamalara göstermez. Battistics'in mAh ve Wh kapasiteni hesaplayabilmesi için Ayarlar › Pil › Pil Sağlığı'ndaki değerleri gir."
-          }
-        }
-      }
-    },
-    "iPhone Battery Health & Cycles": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Battery Health & Cycles"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Pil Sağlığı ve Döngüsü"
-          }
-        }
-      }
-    },
-    "iPhone Identity": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Identity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Kimliği"
-          }
-        }
-      }
-    },
-    "iPhone Name": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Name"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhone Adı"
           }
         }
       }
@@ -6427,19 +3486,1685 @@
         }
       }
     },
-    "~%@ est. · %lld mAh": {
+    "%lld W adapter": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "~%@ est. · %lld mAh"
+            "value": "%lld W adapter"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "~%1$@ tahmini · %2$lld mAh"
+            "value": "%lld W adaptör"
+          }
+        }
+      }
+    },
+    "%lld%% · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld%% · %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%%%1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "24 hours ago": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "24 hours ago"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "24 saat önce"
+          }
+        }
+      }
+    },
+    "Accessories & Apps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessories & Apps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aksesuarlar ve Uygulamalar"
+          }
+        }
+      }
+    },
+    "Add": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekle"
+          }
+        }
+      }
+    },
+    "Allow closed-lid sessions from iPhone on the Mac to use it in a bag.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow closed-lid sessions from iPhone on the Mac to use it in a bag."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çantada kullanmak için Mac'te iPhone'dan kapak kapalı oturumlara izin ver."
+          }
+        }
+      }
+    },
+    "App Icon": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Icon"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama Simgesi"
+          }
+        }
+      }
+    },
+    "Applies to every Battistics widget. Add them from the Home Screen or Lock Screen editor.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applies to every Battistics widget. Add them from the Home Screen or Lock Screen editor."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm Battistics widget'larına uygulanır. Ana Ekran ya da Kilit Ekranı düzenleyicisinden ekleyebilirsin."
+          }
+        }
+      }
+    },
+    "Available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boş"
+          }
+        }
+      }
+    },
+    "Away from Wi‑Fi, turn on Personal Hotspot on this iPhone. A Mac set to join it automatically stays online in a bag with the lid closed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Away from Wi‑Fi, turn on Personal Hotspot on this iPhone. A Mac set to join it automatically stays online in a bag with the lid closed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi yokken bu iPhone'da Kişisel Erişim Noktası'nı aç. Ona otomatik katılan bir Mac, çantada kapak kapalıyken de çevrimiçi kalır."
+          }
+        }
+      }
+    },
+    "Bag Ready on %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bag Ready on %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ile çantaya hazır"
+          }
+        }
+      }
+    },
+    "Bat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bat"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yarasa"
+          }
+        }
+      }
+    },
+    "Battery level unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery level unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil seviyesi okunamıyor"
+          }
+        }
+      }
+    },
+    "Battistics Remote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote"
+          }
+        }
+      }
+    },
+    "Battistics Remote reads only your own private iCloud data, so a Mac on another account never appears.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote reads only your own private iCloud data, so a Mac on another account never appears."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote yalnızca senin özel iCloud verini okur; başka hesaptaki bir Mac hiç görünmez."
+          }
+        }
+      }
+    },
+    "Before the Mac goes in a bag": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before the Mac goes in a bag"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çantaya girmeden önce"
+          }
+        }
+      }
+    },
+    "Capacity: %lld / %lld mAh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capacity: %lld / %lld mAh"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapasite: %1$lld / %2$lld mAh"
+          }
+        }
+      }
+    },
+    "Charge: %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charge: %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj: %%%lld"
+          }
+        }
+      }
+    },
+    "Check": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrol Et"
+          }
+        }
+      }
+    },
+    "Check Settings › Apple Account on this iPhone and System Settings › Apple Account on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check Settings › Apple Account on this iPhone and System Settings › Apple Account on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone'da Ayarlar › Apple Hesabı'nı, Mac'te Sistem Ayarları › Apple Hesabı'nı kontrol et."
+          }
+        }
+      }
+    },
+    "Checked %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checked %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kontrol edildi"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temizle"
+          }
+        }
+      }
+    },
+    "Current": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akım"
+          }
+        }
+      }
+    },
+    "Cycles (entered)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycles (entered)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Döngü (girilen)"
+          }
+        }
+      }
+    },
+    "Cycles: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycles: %lld"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Döngü: %lld"
+          }
+        }
+      }
+    },
+    "Device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz"
+          }
+        }
+      }
+    },
+    "Edit the values from Settings › Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit the values from Settings › Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar › Pil'deki değerleri gir"
+          }
+        }
+      }
+    },
+    "Electrical": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Electrical"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elektrik"
+          }
+        }
+      }
+    },
+    "Free Storage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free Storage"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boş Alan"
+          }
+        }
+      }
+    },
+    "Full Charge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full Charge"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam Şarj"
+          }
+        }
+      }
+    },
+    "Health (entered)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health (entered)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık (girilen)"
+          }
+        }
+      }
+    },
+    "Health: %lld%%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health: %lld%%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık: %%%lld"
+          }
+        }
+      }
+    },
+    "Home Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home Screen"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana Ekran"
+          }
+        }
+      }
+    },
+    "How": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nasıl"
+          }
+        }
+      }
+    },
+    "Identifier": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identifier"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanımlayıcı"
+          }
+        }
+      }
+    },
+    "In Battistics on the Mac, open iPhone and turn on Show this Mac in Battistics Remote.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Battistics on the Mac, open iPhone and turn on Show this Mac in Battistics Remote."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'te Battistics içinde iPhone bölümünü aç ve Bu Mac'i Battistics Remote'ta göster'i aç."
+          }
+        }
+      }
+    },
+    "Install Battistics on the Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install Battistics on the Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'e Battistics'i yükle"
+          }
+        }
+      }
+    },
+    "Is the Mac awake?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is the Mac awake?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uyanık mı?"
+          }
+        }
+      }
+    },
+    "It may be asleep, or away from Wi‑Fi without Personal Hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It may be asleep, or away from Wi‑Fi without Personal Hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uykuda olabilir ya da Kişisel Erişim Noktası olmadan Wi‑Fi'dan uzakta olabilir."
+          }
+        }
+      }
+    },
+    "It reports once Battistics is running and iPhone access is on. After that it keeps reporting while awake, also with the lid closed during Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It reports once Battistics is running and iPhone access is on. After that it keeps reporting while awake, also with the lid closed during Keep Awake."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics açık ve iPhone erişimi açıkken bildirmeye başlar. Sonra uyanık olduğu sürece, Uyanık Tut sırasında kapak kapalıyken de bildirmeye devam eder."
+          }
+        }
+      }
+    },
+    "Keep Awake Until Turned Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake Until Turned Off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapatılana Kadar Uyanık Tut"
+          }
+        }
+      }
+    },
+    "Keep Awake was running when it last answered. If it left Wi‑Fi, turn on Personal Hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake was running when it last answered. If it left Wi‑Fi, turn on Personal Hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son yanıt verdiğinde Uyanık Tut açıktı. Wi‑Fi'dan çıktıysa Kişisel Erişim Noktası'nı aç."
+          }
+        }
+      }
+    },
+    "Keeping Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeping Awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tutuluyor"
+          }
+        }
+      }
+    },
+    "Last reported": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last reported"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son bildirilen"
+          }
+        }
+      }
+    },
+    "Layout": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layout"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düzen"
+          }
+        }
+      }
+    },
+    "Lock Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Screen"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kilit Ekranı"
+          }
+        }
+      }
+    },
+    "Low Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Güç Modu"
+          }
+        }
+      }
+    },
+    "Low Power Mode is on": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power Mode is on"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Güç Modu açık"
+          }
+        }
+      }
+    },
+    "Low Power Mode on the Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power Mode on the Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'te Düşük Güç Modu"
+          }
+        }
+      }
+    },
+    "Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac"
+          }
+        }
+      }
+    },
+    "Mac power settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac power settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac güç ayarları"
+          }
+        }
+      }
+    },
+    "Memory": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bellek"
+          }
+        }
+      }
+    },
+    "Network": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ağ"
+          }
+        }
+      }
+    },
+    "No Mac is sharing with this Apple Account yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Mac is sharing with this Apple Account yet."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Apple Hesabı ile henüz paylaşan Mac yok."
+          }
+        }
+      }
+    },
+    "No accessory reports a battery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No accessory reports a battery."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil bildiren aksesuar yok."
+          }
+        }
+      }
+    },
+    "On": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık"
+          }
+        }
+      }
+    },
+    "On %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ üzerinde"
+          }
+        }
+      }
+    },
+    "Optional": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İsteğe bağlı"
+          }
+        }
+      }
+    },
+    "Processor Cores": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processor Cores"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İşlemci Çekirdeği"
+          }
+        }
+      }
+    },
+    "Refresh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yenile"
+          }
+        }
+      }
+    },
+    "Same Apple Account?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Same Apple Account?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aynı Apple Hesabı mı?"
+          }
+        }
+      }
+    },
+    "Save": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaydet"
+          }
+        }
+      }
+    },
+    "See the battery of the Mac’s keyboard, mouse and headphones, and which apps use the most energy.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See the battery of the Mac’s keyboard, mouse and headphones, and which apps use the most energy."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'in klavye, fare ve kulaklık pillerini ve en çok enerji kullanan uygulamaları gör."
+          }
+        }
+      }
+    },
+    "Set Up a Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Up a Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Kur"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar"
+          }
+        }
+      }
+    },
+    "Share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paylaş"
+          }
+        }
+      }
+    },
+    "Show Network Name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Network Name"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ağ Adını Göster"
+          }
+        }
+      }
+    },
+    "Show This iPhone’s Battery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show This iPhone’s Battery"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone'un Pilini Göster"
+          }
+        }
+      }
+    },
+    "Signed in to iCloud?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in to iCloud?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud'da oturum açık mı?"
+          }
+        }
+      }
+    },
+    "Since Restart": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Since Restart"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yeniden Başlatmadan Beri"
+          }
+        }
+      }
+    },
+    "Start Anyway": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Anyway"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yine de Başlat"
+          }
+        }
+      }
+    },
+    "State": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "State"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durum"
+          }
+        }
+      }
+    },
+    "Still not showing up?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still not showing up?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hâlâ görünmüyor mu?"
+          }
+        }
+      }
+    },
+    "Storage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Depolama"
+          }
+        }
+      }
+    },
+    "System": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem"
+          }
+        }
+      }
+    },
+    "The Mac is offline or asleep. Controls come back when it answers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac is offline or asleep. Controls come back when it answers."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çevrimdışı ya da uykuda. Yanıt verince denetimler geri gelir."
+          }
+        }
+      }
+    },
+    "The Mac is on Wi‑Fi, not Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac is on Wi‑Fi, not Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Hotspot'ta değil, Wi‑Fi'da"
+          }
+        }
+      }
+    },
+    "The Mac stays online with the lid closed, as long as this iPhone is nearby.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac stays online with the lid closed, as long as this iPhone is nearby."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone yakında olduğu sürece Mac kapak kapalıyken de çevrimiçi kalır."
+          }
+        }
+      }
+    },
+    "The battery lasts about %@, less than this session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The battery lasts about %@, less than this session."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil yaklaşık %@ dayanır, bu oturumdan kısa."
+          }
+        }
+      }
+    },
+    "This iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone"
+          }
+        }
+      }
+    },
+    "This iPhone and the Mac must be signed in to iCloud with the same Apple Account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone and the Mac must be signed in to iCloud with the same Apple Account."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone ve Mac aynı Apple Hesabı ile iCloud'da oturum açmış olmalı."
+          }
+        }
+      }
+    },
+    "This iPhone’s Name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone’s Name"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone'un Adı"
+          }
+        }
+      }
+    },
+    "Time is up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time is up"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Süre doldu"
+          }
+        }
+      }
+    },
+    "Turn Off Mac Display": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn Off Mac Display"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Ekranını Kapat"
+          }
+        }
+      }
+    },
+    "Turn on Personal Hotspot here. A Mac set to join it automatically stays online away from Wi‑Fi.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Personal Hotspot here. A Mac set to join it automatically stays online away from Wi‑Fi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burada Kişisel Erişim Noktası'nı aç. Ona otomatik katılan bir Mac, Wi‑Fi'dan uzakta da çevrimiçi kalır."
+          }
+        }
+      }
+    },
+    "Turn on iPhone access": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on iPhone access"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone erişimini aç"
+          }
+        }
+      }
+    },
+    "Updated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updated"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncellendi"
+          }
+        }
+      }
+    },
+    "Use the same Apple Account": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use the same Apple Account"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aynı Apple Hesabını kullan"
+          }
+        }
+      }
+    },
+    "Using the most energy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Using the most energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En çok enerji kullananlar"
+          }
+        }
+      }
+    },
+    "Version": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürüm"
+          }
+        }
+      }
+    },
+    "Waiting for the Mac to confirm.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for the Mac to confirm."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'in onayı bekleniyor."
+          }
+        }
+      }
+    },
+    "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, or the Mac stops answering.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, or the Mac stops answering."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bittiğinde, Mac'in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında veya Mac yanıt vermeyi bıraktığında."
+          }
+        }
+      }
+    },
+    "Wi‑Fi drops once the Mac leaves its range in a bag, and so does remote control. Personal Hotspot keeps it online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi drops once the Mac leaves its range in a bag, and so does remote control. Personal Hotspot keeps it online."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çantada Wi‑Fi menzilinden çıkınca bağlantı ve uzaktan kontrol kopar. Kişisel Erişim Noktası onu çevrimiçi tutar."
+          }
+        }
+      }
+    },
+    "^[%lld Mac](inflect: true) found": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "^[%lld Mac](inflect: true) found"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Mac bulundu"
+          }
+        }
+      }
+    },
+    "iOS %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS %@"
+          }
+        }
+      }
+    },
+    "iOS does not share these with apps. Copy them from Settings › Battery › Battery Health.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS does not share these with apps. Copy them from Settings › Battery › Battery Health."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS bunları uygulamalarla paylaşmaz. Ayarlar › Pil › Pil Sağlığı'ndan kopyala."
+          }
+        }
+      }
+    },
+    "iOS does not tell apps your iPhone’s name. It appears in the device menu as %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS does not tell apps your iPhone’s name. It appears in the device menu as %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS iPhone'unun adını uygulamalara söylemez. Cihaz menüsünde %@ olarak görünür."
+          }
+        }
+      }
+    },
+    "iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone"
+          }
+        }
+      }
+    },
+    "macOS 14 or later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 14 or later."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 14 veya sonrası."
           }
         }
       }

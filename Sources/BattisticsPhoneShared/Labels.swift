@@ -157,6 +157,41 @@ extension RemoteStatus.LowPowerPolicy {
     }
 }
 
+extension RemoteStatus.Battery {
+    var symbol: String {
+        if lowPowerMode == true { return "leaf.fill" }
+        if isCharging { return "bolt.fill" }
+        if onAdapter { return "powerplug.fill" }
+        return "battery.75percent"
+    }
+
+    var headline: String {
+        if isCharging { return String(localized: "Charging") }
+        if onAdapter { return String(localized: "Plugged In") }
+        return String(localized: "On Battery")
+    }
+
+    /// Signed watts while power flows, the adapter rating otherwise.
+    var powerText: String? {
+        if let watts, abs(watts) >= 0.5 {
+            let rounded = Int(watts.rounded())
+            return rounded > 0 ? "+\(rounded) W" : "\(rounded) W"
+        }
+        return adapterWatts.map { "\($0) W" }
+    }
+
+    var temperatureText: String? {
+        temperatureC.map { $0.formatted(.number.precision(.fractionLength(0))) + " °C" }
+    }
+
+    /// "2 hr 10 min left" or "40 min to full", when macOS has an estimate.
+    var timeText: String? {
+        guard let minutesRemaining else { return nil }
+        let time = DurationLabel.long(minutes: minutesRemaining)
+        return isCharging ? String(localized: "\(time) to full") : String(localized: "\(time) left")
+    }
+}
+
 enum PowerPalette {
     static let charging = Color(red: 0.16, green: 0.80, blue: 0.44)
     static let lowPower = Color(red: 0.95, green: 0.72, blue: 0.08)
@@ -178,7 +213,7 @@ enum DurationLabel {
     }
 
     static func long(minutes: Int) -> String {
-        if minutes <= 0 { return String(localized: "Until stopped") }
+        if minutes <= 0 { return String(localized: "Until turned off") }
         return Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
     }
 

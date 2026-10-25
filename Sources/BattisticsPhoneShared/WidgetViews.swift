@@ -32,7 +32,6 @@ extension SharedSnapshot {
                 thermal: .nominal,
                 macModel: "MacBook Pro 14\""
             ),
-            lastSeen: .now,
             reachable: true
         )
     }
