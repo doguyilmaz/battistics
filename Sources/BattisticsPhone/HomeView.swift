@@ -322,45 +322,16 @@ private struct StatusLine: View {
     }
 }
 
-enum NetworkSettingsOpener {
-    static func openWiFi(using openURL: OpenURLAction) {
-        let candidates = [
-            "App-prefs:WIFI",
-            "App-Prefs:root=WIFI",
-            "prefs:root=WIFI"
-        ]
-        openFirst(candidates, using: openURL)
-    }
-
-    static func openHotspot(using openURL: OpenURLAction) {
-        let candidates = [
-            "App-prefs:INTERNET_TETHERING",
-            "App-Prefs:root=INTERNET_TETHERING",
-            "prefs:root=INTERNET_TETHERING"
-        ]
-        openFirst(candidates, using: openURL)
-    }
-
-    static func open(using openURL: OpenURLAction) {
-        openHotspot(using: openURL)
-    }
-
-    private static func openFirst(_ candidates: [String], using openURL: OpenURLAction) {
-        for str in candidates {
-            if let url = URL(string: str) {
-                UIApplication.shared.open(url, options: [:]) { success in
-                    if success { return }
-                }
-                return
-            }
-        }
-        if let fallback = URL(string: UIApplication.openSettingsURLString) {
-            openURL(fallback)
+extension View {
+    /// iOS has no public link to Personal Hotspot settings, so this explains the path instead.
+    func hotspotHelp(isPresented: Binding<Bool>) -> some View {
+        alert(String(localized: "Turn On Personal Hotspot"), isPresented: isPresented) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text("On this iPhone, open Settings › Personal Hotspot and turn on Allow Others to Join. A Mac set to join hotspots automatically connects by itself.")
         }
     }
 }
-
-typealias HotspotOpener = NetworkSettingsOpener
 
 extension View {
     func card(borderColor: Color? = nil) -> some View {

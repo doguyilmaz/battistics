@@ -251,9 +251,6 @@ struct DeviceDetailsSheet: View {
                     LabeledContent("Estimated Power", value: watts > 0 ? String(format: "+%.1f W", watts) : String(format: "%.1f W", watts))
                 }
                 LabeledContent("Cycle Limit", value: "\(phone.specs.designCycleLimit) cycles (80%)")
-                if let temp = phone.ioKitTemperatureC {
-                    LabeledContent("Temperature", value: String(format: "%.1f °C", temp))
-                }
                 LabeledContent("Thermal State", value: phone.thermal.label)
             }
 
@@ -320,13 +317,7 @@ struct DeviceDetailsSheet: View {
     }
 
     private static func uptimeString(_ seconds: TimeInterval) -> String {
-        let mins = max(1, Int(seconds / 60))
-        let d = mins / 1440
-        let h = (mins % 1440) / 60
-        let m = mins % 60
-        if d > 0 { return "\(d)d \(h)h \(m)m" }
-        if h > 0 { return "\(h)h \(m)m" }
-        return "\(m)m"
+        Duration.seconds(max(60, seconds)).formatted(.units(allowed: [.days, .hours, .minutes], width: .narrow))
     }
 
     private func macSummaryReport(mac: MacStore.Mac, status: RemoteStatus) -> String {

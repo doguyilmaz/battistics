@@ -34,14 +34,6 @@ final class LocalPhoneMonitor {
     private(set) var availableStorageBytes: Int64 = 0
     private(set) var chargeHistory: [RemoteStatus.ChargePoint] = []
 
-    // Optional live readings from IOKit if exposed by the OS runtime
-    private(set) var ioKitVoltageMV: Int?
-    private(set) var ioKitAmperageMA: Int?
-    private(set) var ioKitTemperatureC: Double?
-    private(set) var ioKitCycleCount: Int?
-    private(set) var ioKitHealthPercent: Int?
-    private(set) var ioKitAdapterWatts: Int?
-
     var userHealthPercent: Int {
         didSet {
             UserDefaults.standard.set(userHealthPercent, forKey: Self.healthKey)
@@ -85,11 +77,11 @@ final class LocalPhoneMonitor {
     var shortModelName: String { specs.shortModelName }
 
     var effectiveHealthPercent: Int {
-        ioKitHealthPercent ?? max(50, min(100, userHealthPercent))
+        max(50, min(100, userHealthPercent))
     }
 
     var effectiveCycleCount: Int? {
-        ioKitCycleCount ?? userCycleCount
+        userCycleCount
     }
 
     var effectiveMaxCapacityMah: Int {
@@ -108,12 +100,7 @@ final class LocalPhoneMonitor {
         (Double(effectiveMaxCapacityMah) * effectiveVoltageV) / 1000.0
     }
 
-    var effectiveVoltageV: Double {
-        if let mv = ioKitVoltageMV, mv > 2500 {
-            return Double(mv) / 1000.0
-        }
-        return specs.nominalVoltageV
-    }
+    var effectiveVoltageV: Double { specs.nominalVoltageV }
 
     /// Hourly charge slope (%/h) over recent history when meaningful.
     var chargeRatePerHour: Double? {
@@ -128,10 +115,6 @@ final class LocalPhoneMonitor {
     }
 
     var estimatedWatts: Double? {
-        if let mv = ioKitVoltageMV, let ma = ioKitAmperageMA {
-            let w = (Double(mv) * Double(ma)) / 1_000_000.0
-            if abs(w) >= 0.1 { return w }
-        }
         guard let rate = chargeRatePerHour else { return nil }
         return (rate / 100.0) * effectiveMaxEnergyWh
     }
@@ -272,46 +255,7 @@ final class LocalPhoneMonitor {
             availableStorageBytes = values.volumeAvailableCapacityForImportantUsage ?? 0
         }
 
-        probeIOKitBattery()
         recordChargeSample(percent: Double(percent))
-    }
-
-    private func probeIOKitBattery() {
-        guard let handle = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY) else { return }
-        defer { dlclose(handle) }
-
-        typealias CopyInfoFn = @convention(c) () -> Unmanaged<CFTypeRef>?
-        typealias CopyListFn = @convention(c) (CFTypeRef) -> Unmanaged<CFArray>?
-        typealias GetDescFn = @convention(c) (CFTypeRef, CFTypeRef) -> Unmanaged<CFDictionary>?
-
-        if let copyInfoSym = dlsym(handle, "IOPSCopyPowerSourcesInfoPrecise") ?? dlsym(handle, "IOPSCopyPowerSourcesInfo"),
-           let copyListSym = dlsym(handle, "IOPSCopyPowerSourcesList"),
-           let getDescSym = dlsym(handle, "IOPSGetPowerSourceDescription") {
-            let copyInfo = unsafeBitCast(copyInfoSym, to: CopyInfoFn.self)
-            let copyList = unsafeBitCast(copyListSym, to: CopyListFn.self)
-            let getDesc = unsafeBitCast(getDescSym, to: GetDescFn.self)
-
-            if let blob = copyInfo()?.takeRetainedValue(),
-               let list = copyList(blob)?.takeRetainedValue() as? [CFTypeRef] {
-                for source in list {
-                    if let dict = getDesc(blob, source)?.takeUnretainedValue() as? [String: Any] {
-                        if let v = dict["Voltage"] as? Int, v > 1000 { ioKitVoltageMV = v }
-                        if let a = (dict["Current"] as? Int) ?? (dict["InstantAmperage"] as? Int) { ioKitAmperageMA = a }
-                        if let c = dict["CycleCount"] as? Int, c > 0 { ioKitCycleCount = c }
-                        if let h = dict["MaximumCapacityPercent"] as? Int, (50...110).contains(h) {
-                            ioKitHealthPercent = min(100, h)
-                        }
-                        if let temp = dict["Temperature"] as? Int, temp > 0 {
-                            ioKitTemperatureC = temp > 100 ? Double(temp) / 100.0 : Double(temp)
-                        }
-                        if let details = dict["AdapterDetails"] as? [String: Any],
-                           let w = details["Watts"] as? Int, w > 0 {
-                            ioKitAdapterWatts = w
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private func recordChargeSample(percent: Double) {
@@ -402,7 +346,7 @@ final class LocalPhoneMonitor {
 
 struct LocalPhoneDashboard: View {
     @Environment(MacStore.self) private var store
-    @Environment(\.openURL) private var openURL
+    @State private var showingHotspotHelp = false
     @State private var phone = LocalPhoneMonitor.shared
     @Binding var showingDetails: Bool
     @State private var showCyclesMetric = false
@@ -578,8 +522,8 @@ struct LocalPhoneDashboard: View {
                 .buttonStyle(.plain)
 
                 phoneMetricPill(
-                    label: phone.ioKitTemperatureC != nil ? String(localized: "Temp") : String(localized: "Thermal"),
-                    value: phone.ioKitTemperatureC.map { String(format: "%.1f°C", $0) } ?? phone.thermal.label,
+                    label: String(localized: "Thermal"),
+                    value: phone.thermal.label,
                     symbol: "thermometer.medium",
                     tint: phone.thermal == .nominal ? .secondary : phone.thermal.tint
                 )
@@ -765,17 +709,18 @@ struct LocalPhoneDashboard: View {
 
         return LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
             Button {
-                HotspotOpener.open(using: openURL)
+                showingHotspotHelp = true
             } label: {
                 phoneTile(
                     title: String(localized: "Personal Hotspot"),
-                    value: macReading?.status?.network == .hotspot ? String(localized: "Tethered") : String(localized: "Settings"),
+                    value: macReading?.status?.network == .hotspot ? String(localized: "Tethered") : String(localized: "Off"),
                     symbol: "personalhotspot",
                     tint: PowerPalette.hotspot,
                     highlighted: macReading?.status?.network == .hotspot
                 )
             }
             .buttonStyle(.plain)
+            .hotspotHelp(isPresented: $showingHotspotHelp)
 
             phoneTile(
                 title: String(localized: "Power Mode"),
@@ -923,13 +868,8 @@ struct LocalPhoneDashboard: View {
     }
 
     private func formattedUptime(_ seconds: TimeInterval) -> String {
-        let totalMinutes = max(1, Int(seconds / 60))
-        let days = totalMinutes / 1440
-        let hours = (totalMinutes % 1440) / 60
-        let mins = totalMinutes % 60
-        if days > 0 { return "\(days)d \(hours)h" }
-        if hours > 0 { return "\(hours)h \(mins)m" }
-        return "\(mins)m"
+        Duration.seconds(max(60, seconds))
+            .formatted(.units(allowed: [.days, .hours, .minutes], width: .narrow, maximumUnitCount: 2))
     }
 }
 

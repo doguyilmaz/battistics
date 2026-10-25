@@ -10,7 +10,6 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @AppStorage(Notifications.enabledKey) private var notify = true
     @AppStorage("phoneAppIconStyle") private var appIconRaw = PhoneIconStyle.original.rawValue
-    @AppStorage("phoneThemePreference") private var themeRaw = "automatic"
     @State private var permission: UNAuthorizationStatus = .notDetermined
     @State private var phone = LocalPhoneMonitor.shared
     @State private var widgetPrefs = WidgetPreferences.load()
@@ -177,12 +176,6 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Button {
-                        HotspotOpener.open(using: openURL)
-                    } label: {
-                        Label("Open Personal Hotspot Settings", systemImage: "personalhotspot")
-                            .foregroundStyle(PowerPalette.hotspot)
-                    }
                     Text("With no Wi‑Fi nearby, turn on Settings › Personal Hotspot › Allow Others to Join. A Mac with Ask to join hotspots set to Automatic connects by itself, and Keep Awake keeps it connected with the lid closed.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -213,12 +206,11 @@ struct SettingsView: View {
                 permission = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
             }
         }
-        .preferredColorScheme(PhoneThemeManager.colorScheme(for: themeRaw))
-        .onAppear { PhoneThemeManager.apply(themeRaw) }
-        .onChange(of: themeRaw) { PhoneThemeManager.apply(themeRaw) }
     }
 }
 
+/// The window override reaches sheets too, unlike `preferredColorScheme(nil)`,
+/// which never hands a presented sheet back to the system appearance.
 @MainActor
 enum PhoneThemeManager {
     static func apply(_ themeRaw: String) {
@@ -234,14 +226,6 @@ enum PhoneThemeManager {
             for window in windowScene.windows {
                 window.overrideUserInterfaceStyle = style
             }
-        }
-    }
-
-    static func colorScheme(for themeRaw: String) -> ColorScheme? {
-        switch themeRaw {
-        case "light": .light
-        case "dark": .dark
-        default: nil
         }
     }
 }
@@ -320,7 +304,7 @@ struct PhoneAppearanceSettingsView: View {
                     Text("Dark").tag("dark")
                 }
 
-                Toggle("Ambient Energy Glow", isOn: $showAmbientBackdrop)
+                Toggle("Background Glow", isOn: $showAmbientBackdrop)
             }
 
             Section {
@@ -342,24 +326,20 @@ struct PhoneAppearanceSettingsView: View {
         }
         .navigationTitle("Appearance")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(PhoneThemeManager.colorScheme(for: themeRaw))
         .onAppear {
             nameInput = phone.customDeviceName
-            PhoneThemeManager.apply(themeRaw)
-        }
-        .onChange(of: themeRaw) {
-            PhoneThemeManager.apply(themeRaw)
+            let current = UIApplication.shared.alternateIconName
+            appIconRaw = (PhoneIconStyle.allCases.first { $0.alternateIconName == current } ?? .original).rawValue
         }
     }
 
     private func iconCard(_ style: PhoneIconStyle) -> some View {
         let selected = (appIconRaw == style.rawValue)
         return Button {
-            withAnimation(.snappy(duration: 0.2)) {
-                appIconRaw = style.rawValue
-            }
-            if UIApplication.shared.supportsAlternateIcons {
-                UIApplication.shared.setAlternateIconName(style.alternateIconName)
+            Task {
+                guard UIApplication.shared.supportsAlternateIcons,
+                      (try? await UIApplication.shared.setAlternateIconName(style.alternateIconName)) != nil else { return }
+                withAnimation(.snappy(duration: 0.2)) { appIconRaw = style.rawValue }
             }
         } label: {
             VStack(spacing: 8) {
@@ -442,10 +422,10 @@ struct PhoneWidgetSettingsView: View {
                 Text("Changes apply immediately to your widgets and the live previews below.")
             }
 
-            Section("Lock Screen Widgets (Swipe Horizontally)") {
+            Section("Lock Screen Widgets") {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 14) {
-                        BlueprintCard(title: "Rectangular (\(prefs.lockScreenLayout.label))", badge: "ACCESSORY 2×1", width: 220, canvasHeight: 96) {
+                        BlueprintCard(title: "Rectangular · \(prefs.lockScreenLayout.label)", badge: "RECTANGULAR", width: 220, canvasHeight: 96) {
                             MacLockScreenDetailView(entry: entry, familyOverride: .accessoryRectangular)
                                 .padding(10)
                                 .frame(width: 180, height: 80)
@@ -459,7 +439,7 @@ struct PhoneWidgetSettingsView: View {
                                 )
                         }
 
-                        BlueprintCard(title: "Circular Gauge", badge: "CIRCULAR 1×1", width: 140, canvasHeight: 96) {
+                        BlueprintCard(title: "Circular Gauge", badge: "CIRCULAR", width: 140, canvasHeight: 96) {
                             MacLockScreenDetailView(entry: entry, familyOverride: .accessoryCircular)
                                 .frame(width: 78, height: 78)
                                 .background(
@@ -496,10 +476,10 @@ struct PhoneWidgetSettingsView: View {
                 .listRowBackground(Color.clear)
             }
 
-            Section("Home Screen Widgets (Swipe Horizontally)") {
+            Section("Home Screen Widgets") {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 14) {
-                        BlueprintCard(title: "Dashboard", badge: "MEDIUM · 2×2", width: 330, canvasHeight: 168) {
+                        BlueprintCard(title: "Dashboard", badge: "MEDIUM · 4×2", width: 330, canvasHeight: 168) {
                             MacWidgetView(entry: entry, familyOverride: .systemMedium)
                                 .padding(12)
                                 .frame(width: 306, height: 148)
@@ -511,7 +491,7 @@ struct PhoneWidgetSettingsView: View {
                                 )
                         }
 
-                        BlueprintCard(title: "Dashboard", badge: "SMALL · 2×1", width: 180, canvasHeight: 168) {
+                        BlueprintCard(title: "Dashboard", badge: "SMALL · 2×2", width: 180, canvasHeight: 168) {
                             MacWidgetView(entry: entry, familyOverride: .systemSmall)
                                 .padding(12)
                                 .frame(width: 148, height: 148)
@@ -523,7 +503,7 @@ struct PhoneWidgetSettingsView: View {
                                 )
                         }
 
-                        BlueprintCard(title: "Battery Telemetry", badge: "MEDIUM · 2×2", width: 330, canvasHeight: 168) {
+                        BlueprintCard(title: "Battery Telemetry", badge: "MEDIUM · 4×2", width: 330, canvasHeight: 168) {
                             MacTelemetryWidgetView(entry: entry, familyOverride: .systemMedium)
                                 .padding(12)
                                 .frame(width: 306, height: 148)
@@ -535,7 +515,7 @@ struct PhoneWidgetSettingsView: View {
                                 )
                         }
 
-                        BlueprintCard(title: "Battery Telemetry", badge: "SMALL · 2×1", width: 180, canvasHeight: 168) {
+                        BlueprintCard(title: "Battery Telemetry", badge: "SMALL · 2×2", width: 180, canvasHeight: 168) {
                             MacTelemetryWidgetView(entry: entry, familyOverride: .systemSmall)
                                 .padding(12)
                                 .frame(width: 148, height: 148)
@@ -602,14 +582,14 @@ private struct BlueprintGridPattern: Shape {
 }
 
 private struct BlueprintCard<Content: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     let badge: String
     let cardWidth: CGFloat
     let canvasHeight: CGFloat
     let content: Content
 
     init(
-        title: String,
+        title: LocalizedStringKey,
         badge: String,
         width: CGFloat,
         canvasHeight: CGFloat,
@@ -630,7 +610,7 @@ private struct BlueprintCard<Content: View>: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Spacer(minLength: 4)
-                Text(badge)
+                Text(verbatim: badge)
                     .font(.system(size: 8, weight: .heavy, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 6)

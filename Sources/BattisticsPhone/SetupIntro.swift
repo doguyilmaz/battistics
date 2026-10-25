@@ -51,11 +51,11 @@ struct SetupIntro: View {
             }
             .padding(.top, 4)
 
-            Text("Your Mac, from your pocket")
+            Text("Your Mac on your iPhone")
                 .font(.title2.weight(.bold))
                 .multilineTextAlignment(.center)
 
-            Text("Realtime battery health, charging status, and Keep Awake controls via iCloud.")
+            Text("See your Mac’s battery and control Keep Awake through your own iCloud.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -188,13 +188,13 @@ struct SetupIntro: View {
             VStack(spacing: 8) {
                 diagnosticRow(
                     label: String(localized: "iCloud Sync"),
-                    status: store.problem == nil ? String(localized: "Active") : String(localized: "Attention Required"),
+                    status: store.problem == nil ? String(localized: "Working") : String(localized: "Not syncing"),
                     isOk: store.problem == nil
                 )
 
                 diagnosticRow(
                     label: String(localized: "Mac Records"),
-                    status: store.macs.isEmpty ? String(localized: "No Macs broadcasted yet") : String(localized: "\(store.macs.count) Mac(s) found"),
+                    status: store.macs.isEmpty ? String(localized: "None yet") : String(localized: "\(store.macs.count) found"),
                     isOk: !store.macs.isEmpty
                 )
             }

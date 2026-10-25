@@ -76,9 +76,7 @@ extension RemoteStatus.Network {
 }
 
 extension RemoteStatus {
-    /// Returns the SSID / network name when available, falling back to the
-    /// Resolves the human-readable Wi‑Fi SSID or Hotspot name, checking paired
-    /// Mac metadata and falling back to the phone's own name when on a Personal Hotspot.
+    /// The Wi‑Fi or Hotspot name; on a Hotspot without one, the paired iPhone's name.
     func resolvedNetworkName(fallbackHotspot: String? = nil) -> String? {
         if let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
             return name
