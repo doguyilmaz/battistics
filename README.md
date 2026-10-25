@@ -70,8 +70,9 @@ AI clients use the bundled MCP server to start and stop a named task. See the
 ### iPhone
 
 Battistics Remote shows the Mac's battery and its last day, how long it lasts,
-its connection, lid and heat, and starts or stops Keep Awake, even with the lid
-closed in a bag. Widgets and a Lock Screen countdown come with it. Turn on
+its connection, lid and heat, its accessory batteries and busiest apps, and
+starts or stops Keep Awake, even with the lid closed in a bag. Widgets, a Lock
+Screen countdown and a Control Center control come with it. Turn on
 **iPhone** in Battistics; any iPhone on the same Apple ID finds the Mac through
 your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
 to join hotspots automatically uses the iPhone's hotspot. See
@@ -103,7 +104,8 @@ Run `make gen` and open `Battistics.xcodeproj` to work in Xcode.
 The MCP dependency requires Swift 6.1 or later. After a debug build,
 `scripts/test-cli.py`, `scripts/test-mcp-stdio.py` and
 `scripts/test-automation.py` (`--tour`, `--remote`) run the integration checks.
-The iPhone app is the `BattisticsPhone` scheme.
+The iPhone app is the `BattisticsPhone` scheme; launch a Debug build with `-demo`
+to try it in Simulator with sample Macs.
 
 ## Privacy
 
