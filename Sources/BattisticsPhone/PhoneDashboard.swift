@@ -7,7 +7,7 @@ struct PhoneDashboard: View {
     @State private var editingHealth = false
 
     var body: some View {
-        DashboardPage(glow: Glow(battery: phone.batteryStatus.map(PowerPalette.batteryTint) ?? .accentColor), refresh: {
+        DashboardPage(glow: Glow(battery: phone.batteryStatus.map(PowerPalette.batteryTint) ?? .accentColor), fills: true, refresh: {
             phone.refresh()
             await store.refreshAll()
         }) {
@@ -131,7 +131,7 @@ struct PhoneDashboard: View {
                 Spacer(minLength: 0)
             }
             if phone.chargeHistory.count > 1 {
-                ChargeSparkline(points: phone.chargeHistory, tint: tint)
+                ChargeSparkline(points: phone.chargeHistory, tint: tint, height: nil)
                 if totals.gained + totals.used > 0 {
                     HStack(spacing: 14) {
                         Label(String(localized: "\(totals.gained)% charged"), systemImage: "arrow.up")
@@ -169,6 +169,7 @@ struct PhoneDashboard: View {
             }
             .buttonStyle(.plain)
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .card(border: phone.isCharging || phone.lowPowerMode ? tint.opacity(0.35) : nil)
     }
 

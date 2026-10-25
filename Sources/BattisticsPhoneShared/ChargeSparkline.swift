@@ -7,7 +7,8 @@ import SwiftUI
 struct ChargeSparkline: View {
     let points: [RemoteStatus.ChargePoint]
     let tint: Color
-    var height: CGFloat = 48
+    /// Nil grows to the space it is given.
+    var height: CGFloat? = 48
     var showsLabels = true
 
     var body: some View {
@@ -27,7 +28,7 @@ struct ChargeSparkline: View {
             .chartYScale(domain: 0...100)
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
-            .frame(height: height)
+            .frame(minHeight: height ?? 48, maxHeight: height ?? .infinity)
             if showsLabels {
                 HStack {
                     Text("24 hours ago")
