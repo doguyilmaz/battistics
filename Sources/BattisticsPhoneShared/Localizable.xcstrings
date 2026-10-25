@@ -5096,7 +5096,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj Seviyesi"
+            "value": "Şarj Olunca Bildir"
           }
         }
       }
