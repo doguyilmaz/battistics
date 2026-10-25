@@ -50,9 +50,9 @@ final class MacStore {
         #if DEBUG
         if DemoData.isEnabled { readings = DemoData.readings }
         #endif
-        RemoteIntentBridge.startOneHour = { [weak self] in
+        RemoteIntentBridge.start = { [weak self] mode, minutes in
             guard let self, let mac = self.selected else { return }
-            await Notifications.report(await self.start(mac, mode: .displayMaySleep, minutes: 60), for: mac)
+            await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] id in
             guard let self, let mac = self.mac(id) else { return }

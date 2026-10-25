@@ -4557,57 +4557,6 @@
         }
       }
     },
-    "Can Sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Can Sleep"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyuyabilir"
-          }
-        }
-      }
-    },
-    "Keeps the Mac you picked in Battistics Remote awake for an hour.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keeps the Mac you picked in Battistics Remote awake for an hour."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics Remote’ta seçtiğin Mac’i bir saat uyanık tutar."
-          }
-        }
-      }
-    },
-    "Keeps your Mac awake for an hour, or lets it sleep again.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keeps your Mac awake for an hour, or lets it sleep again."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’ini bir saat uyanık tutar ya da yeniden uyumasına izin verir."
-          }
-        }
-      }
-    },
     "%lld W": {
       "extractionState": "manual",
       "localizations": {
@@ -5675,6 +5624,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "· %lld döngü"
+          }
+        }
+      }
+    },
+    "Choose the mode and how long this control keeps your Mac awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the mode and how long this control keeps your Mac awake."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu kontrolün Mac’inizi hangi modda ve ne kadar uyanık tutacağını seçin."
+          }
+        }
+      }
+    },
+    "Keeps the Mac you picked in Battistics Remote awake, in the mode and for the time you choose.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeps the Mac you picked in Battistics Remote awake, in the mode and for the time you choose."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote’ta seçtiğiniz Mac’i, seçtiğiniz modda ve sürede uyanık tutar."
+          }
+        }
+      }
+    },
+    "Keeps your Mac awake, or lets it sleep again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeps your Mac awake, or lets it sleep again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inizi uyanık tutar ya da yeniden uyumasına izin verir."
           }
         }
       }

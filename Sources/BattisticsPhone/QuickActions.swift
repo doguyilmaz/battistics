@@ -30,7 +30,7 @@ enum QuickActions {
         _ = MacStore.shared
         Task {
             switch Kind(rawValue: shortcut.type) {
-            case .start: await RemoteIntentBridge.startOneHour?()
+            case .start: await RemoteIntentBridge.start?(.displayMaySleep, 60)
             case .extend: await RemoteIntentBridge.extend?(nil, 30)
             case .stop: await RemoteIntentBridge.stop?(nil)
             case nil: break
