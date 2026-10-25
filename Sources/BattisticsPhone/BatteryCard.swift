@@ -77,12 +77,7 @@ struct BatteryCard: View {
                     Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
                 }
             } label: {
-                Label {
-                    Text("Low Power Mode on the Mac")
-                    if let policy = battery.lowPowerPolicy { Text(policy.label) }
-                } icon: {
-                    Image(systemName: "leaf")
-                }
+                Label("Low Power Mode on the Mac", systemImage: "leaf")
             }
             .pickerStyle(.menu)
             Button {
