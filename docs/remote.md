@@ -7,6 +7,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Everything goes through the user's private CloudKit database, container `iCloud.com.doguyilmaz.Battistics`, zone `Remote`. No server, no open port, no pairing code: a Mac and an iPhone on the same Apple Account see each other.
 - One `MacStatus` record per Mac and short-lived `Command` records from phones. Payloads are JSON (`RemoteWire`) in `encryptedValues["payload"]`.
 - Sharing is off by default (`Battistics › iPhone › Show this Mac in Battistics Remote`). Turning it off deletes the Mac's record; a publish already in flight deletes it again when it lands.
+- Each queued command gets its own answer published before the next one runs.
 - The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s during a Keep Awake session or for 2 minutes after a command, every 15 s otherwise. macOS throttles silent pushes, so a push only triggers an extra poll.
 - `publish` builds the cheap status first and compares it with the last one sent. History and `pmset` are read only when something changed or the heartbeat is due. The heartbeat is published even when reading commands fails, and CloudKit's `retryAfter` is honoured.
 - Handled command ids are remembered until their records are deleted, so a failed delete never runs a command twice.
@@ -15,7 +16,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 - The Mac writes `heartbeatSeconds` into every status: 120 s during a session, 600 s otherwise. A phone treats a reading as stale after 4 (session) or 2 missed heartbeats (`RemoteStatus.staleDate`). Only a real fetch may call a Mac offline.
 - iOS throttles the silent pushes that wake the phone, so surfaces that cannot fetch wait longer:
-  - The watchdog notification ("No word from the Mac since 10:42") fires after `RemoteStatus.watchdogDelay`: just past the stale window while background pushes arrive steadily, up to 30 minutes when iOS is throttling them. `DeliveryCadence` records when background pushes actually arrived.
+  - The watchdog notification ("No word from the Mac since 10:42") fires after `RemoteStatus.watchdogDelay`: just past the stale window once background pushes have arrived steadily for at least 15 minutes, otherwise up to 30 minutes. `DeliveryCadence` records when background pushes actually arrived.
   - Widgets add a timeline entry at `unheardDate` (at least 30 minutes after the reading) that shows the Mac offline.
   - The Live Activity uses `unheardDate` as its stale date and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Alerts are delivered once per change and awaited before a background task completes. Lid and unplug warnings are cleared when the Mac moves to Hotspot.
