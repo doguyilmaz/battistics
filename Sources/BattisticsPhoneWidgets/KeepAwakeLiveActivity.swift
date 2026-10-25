@@ -247,6 +247,7 @@ private struct LiveActions: View {
             .tint(.orange)
         }
         .controlSize(size)
+        .fixedSize()
         .disabled(context.state.offline == true)
     }
 }
@@ -270,6 +271,6 @@ private struct LiveFreshness: View {
         }
         .font(.caption)
         .lineLimit(1)
-        .minimumScaleFactor(0.85)
+        .minimumScaleFactor(0.75)
     }
 }
