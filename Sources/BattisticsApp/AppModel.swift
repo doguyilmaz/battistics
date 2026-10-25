@@ -405,3 +405,31 @@ final class AppModel {
         }
     }
 }
+
+extension AppModel {
+    func timeOnBattery(at date: Date) -> String {
+        guard let unplugged = lastUnplugDate else { return String(localized: "N/A") }
+        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
+    }
+}
+
+extension BatterySnapshot {
+    /// The one line under the charge in the popover and the dashboard.
+    var statusLine: String {
+        if isCharging {
+            if let minutes = timeRemainingMin {
+                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
+            }
+            return String(localized: "Charging")
+        }
+        if externalConnected {
+            return fullyCharged || percent >= 100
+                ? String(localized: "Fully charged · plugged in")
+                : String(localized: "Plugged in · charging on hold")
+        }
+        if let minutes = timeRemainingMin {
+            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
+        }
+        return String(localized: "On battery")
+    }
+}

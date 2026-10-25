@@ -255,17 +255,17 @@ extension Color {
     /// matters more than "you are in Low Power Mode".
     static func charge(percent: Double, lowPower: Bool = false) -> Color {
         switch percent {
-        case ..<10: .red
-        case ..<20: .orange
+        case ...10: .red
+        case ...20: .orange
         default: lowPower ? .lowPower : .green
         }
     }
 
     static func health(percent: Double) -> Color {
-        switch percent {
-        case 80...: .green
-        case 60..<80: .orange
-        default: .red
+        switch HealthStatus(healthPercent: percent) {
+        case .good: .green
+        case .fair: .orange
+        case .poor: .red
         }
     }
 

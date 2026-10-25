@@ -35,8 +35,6 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public var currentCapacityMah: Int?
         /// Smoothed full-charge capacity in mAh.
         public var maxCapacityMah: Int?
-        /// Instantaneous measured full-charge capacity in mAh.
-        public var rawMaxCapacityMah: Int?
         /// Original factory design capacity in mAh.
         public var designCapacityMah: Int?
         /// Battery pack voltage in millivolts.
@@ -45,14 +43,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public var amperageMA: Int?
         /// Connected power adapter name/description.
         public var adapterName: String?
-        /// Adapter voltage in millivolts.
-        public var adapterVoltageMV: Int?
-        /// Adapter current rating in milliamps.
-        public var adapterAmperageMA: Int?
         /// Battery pack manufacture date when available.
         public var manufactureDate: Date?
-        /// Battery pack serial number when available.
-        public var serialNumber: String?
 
         public init(
             percent: Int,
@@ -69,15 +61,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             designCycleCount: Int? = nil,
             currentCapacityMah: Int? = nil,
             maxCapacityMah: Int? = nil,
-            rawMaxCapacityMah: Int? = nil,
             designCapacityMah: Int? = nil,
             voltageMV: Int? = nil,
             amperageMA: Int? = nil,
             adapterName: String? = nil,
-            adapterVoltageMV: Int? = nil,
-            adapterAmperageMA: Int? = nil,
-            manufactureDate: Date? = nil,
-            serialNumber: String? = nil
+            manufactureDate: Date? = nil
         ) {
             self.percent = percent
             self.isCharging = isCharging
@@ -93,15 +81,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.designCycleCount = designCycleCount
             self.currentCapacityMah = currentCapacityMah
             self.maxCapacityMah = maxCapacityMah
-            self.rawMaxCapacityMah = rawMaxCapacityMah
             self.designCapacityMah = designCapacityMah
             self.voltageMV = voltageMV
             self.amperageMA = amperageMA
             self.adapterName = adapterName
-            self.adapterVoltageMV = adapterVoltageMV
-            self.adapterAmperageMA = adapterAmperageMA
             self.manufactureDate = manufactureDate
-            self.serialNumber = serialNumber
         }
     }
 
@@ -170,14 +154,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public struct Protection: Codable, Sendable, Equatable {
         public var stopAtPercent: Int?
         public var warnAtPercent: Int?
-        public var stopOnThermal: Bool
         public var closedLidAllowed: Bool
 
-        public init(stopAtPercent: Int? = nil, warnAtPercent: Int? = nil,
-                    stopOnThermal: Bool = false, closedLidAllowed: Bool = false) {
+        public init(stopAtPercent: Int? = nil, warnAtPercent: Int? = nil, closedLidAllowed: Bool = false) {
             self.stopAtPercent = stopAtPercent
             self.warnAtPercent = warnAtPercent
-            self.stopOnThermal = stopOnThermal
             self.closedLidAllowed = closedLidAllowed
         }
     }

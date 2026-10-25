@@ -15,9 +15,9 @@ git push origin v1.0.1
 
 The `Release` workflow stamps the version into `project.yml`, runs the core
 tests, builds and signs the app, notarizes and staples the DMG, generates a
-Sparkle-signed `appcast.xml` and publishes both to a GitHub release. The
-`SUFeedURL` points at `releases/latest/download/appcast.xml`, so the feed URL
-never changes between releases.
+Sparkle-signed `appcast-2.xml` and publishes them to a GitHub release. The
+`SUFeedURL` points at `releases/latest/download/appcast-2.xml`, so the feed URL
+never changes between releases (see "Two appcasts" below).
 
 ## Required repository secrets
 

@@ -47,7 +47,7 @@ struct PopoverView: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                Text(statusText(snapshot))
+                Text(snapshot.statusLine)
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
@@ -426,16 +426,11 @@ struct PopoverView: View {
     @ViewBuilder private var timeOnBatteryRow: some View {
         if windowVisible, let unplugged = model.lastUnplugDate {
             TimelineView(.periodic(from: unplugged, by: 60)) { context in
-                StatRow(label: "Time on Battery", value: timeOnBattery(at: context.date))
+                StatRow(label: "Time on Battery", value: model.timeOnBattery(at: context.date))
             }
         } else {
-            StatRow(label: "Time on Battery", value: timeOnBattery(at: Date()))
+            StatRow(label: "Time on Battery", value: model.timeOnBattery(at: Date()))
         }
-    }
-
-    private func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = model.lastUnplugDate else { return String(localized: "N/A") }
-        return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 
     private var nearestSparklinePoint: SeriesPoint? {
@@ -446,23 +441,6 @@ struct PopoverView: View {
         }
     }
 
-    private func statusText(_ snapshot: BatterySnapshot) -> String {
-        if snapshot.isCharging {
-            if let minutes = snapshot.timeRemainingMin {
-                return String(localized: "Charging · \(Formatting.clock(minutes: minutes)) until full")
-            }
-            return String(localized: "Charging")
-        }
-        if snapshot.externalConnected {
-            return snapshot.fullyCharged || snapshot.percent >= 100
-                ? String(localized: "Fully charged · plugged in")
-                : String(localized: "Plugged in · charging on hold")
-        }
-        if let minutes = snapshot.timeRemainingMin {
-            return String(localized: "On battery · \(Formatting.clock(minutes: minutes)) remaining")
-        }
-        return String(localized: "On battery")
-    }
 
 
     private func statusWord(_ status: HealthStatus) -> String {

@@ -429,15 +429,11 @@ final class RemoteAccessModel {
                 designCycleCount: snapshot.designCycleCount,
                 currentCapacityMah: snapshot.rawCurrentCapacity > 0 ? snapshot.rawCurrentCapacity : nil,
                 maxCapacityMah: snapshot.currentMaxCapacity > 0 ? snapshot.currentMaxCapacity : nil,
-                rawMaxCapacityMah: snapshot.rawMaxCapacity > 0 ? snapshot.rawMaxCapacity : nil,
                 designCapacityMah: snapshot.designCapacity > 0 ? snapshot.designCapacity : nil,
                 voltageMV: snapshot.voltageMV,
                 amperageMA: snapshot.amperageMA,
                 adapterName: snapshot.adapter?.name,
-                adapterVoltageMV: snapshot.adapter?.voltageMV,
-                adapterAmperageMA: snapshot.adapter?.amperageMA,
-                manufactureDate: snapshot.manufactureDate,
-                serialNumber: snapshot.serialNumber
+                manufactureDate: snapshot.manufactureDate
             )
         }
         let session = awake.session.map { session in
@@ -460,7 +456,6 @@ final class RemoteAccessModel {
             protection: .init(
                 stopAtPercent: protection.stopOnLowBattery ? protection.effectiveStopPercent : nil,
                 warnAtPercent: protection.warnOnLowBattery ? protection.effectiveWarningPercent : nil,
-                stopOnThermal: protection.stopOnThermalPressure,
                 closedLidAllowed: closedLidAllowed
             ),
             macModel: Self.hardwareModel,

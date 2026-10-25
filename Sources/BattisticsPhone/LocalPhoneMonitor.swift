@@ -48,7 +48,6 @@ final class LocalPhoneMonitor {
         enteredCycles = defaults.object(forKey: Self.cyclesKey) as? Int
         customName = defaults.string(forKey: Self.nameKey) ?? ""
         hotspotName = defaults.string(forKey: Self.hotspotKey)
-        defaults.removeObject(forKey: "localPhoneDiscoveredName")
         chargeHistory = Self.loadHistory()
 
         UIDevice.current.isBatteryMonitoringEnabled = true

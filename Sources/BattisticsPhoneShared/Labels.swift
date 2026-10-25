@@ -91,13 +91,6 @@ extension RemoteStatus {
         }
         return nil
     }
-
-    func networkDisplayLabel(fallbackHotspot: String? = nil) -> String {
-        if let name = resolvedNetworkName(fallbackHotspot: fallbackHotspot) {
-            return "\(network.label) · \(name)"
-        }
-        return network.label
-    }
 }
 
 extension RemoteStatus.Thermal {
@@ -126,15 +119,6 @@ extension RemoteStatus.LowPowerPolicy {
         case .onlyOnBattery: String(localized: "Only on Battery")
         case .onlyOnAdapter: String(localized: "Only on Power Adapter")
         case .always: String(localized: "Always")
-        }
-    }
-
-    var shortBadge: String {
-        switch self {
-        case .never: String(localized: "LPM Off")
-        case .onlyOnBattery: String(localized: "LPM Battery")
-        case .onlyOnAdapter: String(localized: "LPM Adapter")
-        case .always: String(localized: "LPM On")
         }
     }
 
