@@ -134,6 +134,12 @@ targets:
         NSLocationUsageDescription: >-
           Battistics reads the current Wi‑Fi or Personal Hotspot network name so
           Battistics Remote on your iPhone can show which network your Mac is on.
+        NSLocationWhenInUseUsageDescription: >-
+          Battistics reads the current Wi‑Fi or Personal Hotspot network name so
+          Battistics Remote on your iPhone can show which network your Mac is on.
+        NSLocationAlwaysAndWhenInUseUsageDescription: >-
+          Battistics reads the current Wi‑Fi or Personal Hotspot network name so
+          Battistics Remote on your iPhone can show which network your Mac is on.
         LSApplicationCategoryType: public.app-category.utilities
         NSHumanReadableCopyright: "© 2026 Dogu Yilmaz · MIT License"
         CFBundleURLTypes:
@@ -173,6 +179,7 @@ targets:
       - path: Sources/BattisticsPhone
       - path: Sources/BattisticsPhoneShared
       - path: Sources/BattisticsApp/Resources/AppIcon.icon
+      - path: Sources/BattisticsApp/Resources/AppIcons
     dependencies:
       - package: BattisticsCore
         product: BattisticsRemote
@@ -194,11 +201,26 @@ targets:
         CFBundleShortVersionString: "0.1.0"
         CFBundleVersion: "1"
         LSApplicationCategoryType: public.app-category.utilities
+        LSApplicationQueriesSchemes: [App-Prefs, app-prefs, prefs]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UIBackgroundModes: [fetch, remote-notification]
         NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers: [com.doguyilmaz.Battistics.Remote.refresh]
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleIconFiles: [original]
+            UIPrerenderedIcon: true
+          CFBundleAlternateIcons:
+            gauge:
+              CFBundleIconFiles: [gauge]
+              UIPrerenderedIcon: true
+            batbattery:
+              CFBundleIconFiles: [batbattery]
+              UIPrerenderedIcon: true
+            stats:
+              CFBundleIconFiles: [stats]
+              UIPrerenderedIcon: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote
