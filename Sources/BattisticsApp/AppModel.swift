@@ -34,7 +34,7 @@ final class AppModel {
     @ObservationIgnored private let alertDispatcher = AlertDispatcher.shared
     @ObservationIgnored private var alertState = AlertState()
     @ObservationIgnored private var monitorTask: Task<Void, Never>?
-    @ObservationIgnored private var powerSamplingTask: Task<Void, Never>?
+    @ObservationIgnored private var lastPowerSampleAt: Date?
     @ObservationIgnored private var visibleSamplingTask: Task<Void, Never>?
     @ObservationIgnored private var visibleSamplingInterval: Duration?
     @ObservationIgnored private var visibleSensorConsumers: [UUID: Duration] = [:]
@@ -165,6 +165,7 @@ final class AppModel {
         }
         evaluateAlerts(for: current)
         maybeRecordDailyHealth(current)
+        maybeRecordPowerSample(current)
 
         let changed =
             previous == nil
@@ -234,33 +235,28 @@ final class AppModel {
 
     // MARK: - Background power sampling (single coalesced tick, toggleable)
 
+    /// Power samples ride on the sensor reads that already happen, at least
+    /// every 15 seconds, instead of a second timer reading the battery again.
     func restartPowerSampling() {
-        powerSamplingTask?.cancel()
-        powerSamplingTask = nil
-        let defaults = UserDefaults.standard
-        guard defaults.bool(forKey: Prefs.powerSamplingEnabled) else { return }
-        let interval = max(defaults.double(forKey: Prefs.powerSamplingInterval), 30)
-        powerSamplingTask = Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(
-                    for: .seconds(interval), tolerance: .seconds(interval * 0.25))
-                guard !Task.isCancelled else { break }
-                await self?.recordPowerSample()
-            }
-        }
+        lastPowerSampleAt = nil
     }
 
-    private func recordPowerSample() async {
-        guard let current = batteryProvider() else { return }
-        ingest(current)
-        guard current.batteryInstalled, let watts = current.watts else { return }
-        await history.recordPowerSample(
-            date: current.timestamp,
-            watts: abs(watts),
-            volts: current.voltageMV.map { Double($0) / 1000 },
-            amps: current.amperageMA.map { Double($0) / 1000 },
-            temperatureC: current.temperatureC
-        )
+    private func maybeRecordPowerSample(_ current: BatterySnapshot) {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: Prefs.powerSamplingEnabled),
+              current.batteryInstalled, let watts = current.watts else { return }
+        let interval = max(defaults.double(forKey: Prefs.powerSamplingInterval), 30)
+        if let last = lastPowerSampleAt, current.timestamp.timeIntervalSince(last) < interval * 0.9 { return }
+        lastPowerSampleAt = current.timestamp
+        Task { [weak self] in
+            await self?.history.recordPowerSample(
+                date: current.timestamp,
+                watts: abs(watts),
+                volts: current.voltageMV.map { Double($0) / 1000 },
+                amps: current.amperageMA.map { Double($0) / 1000 },
+                temperatureC: current.temperatureC
+            )
+        }
     }
 
     // MARK: - Alerts and health snapshots
