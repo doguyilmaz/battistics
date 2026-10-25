@@ -112,24 +112,7 @@ struct OverviewPane: View {
         GlassCard {
             VStack(spacing: 7) {
                 SectionHeader(title: "Live")
-                StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
-                if let temperature = snapshot.temperatureC {
-                    StatRow(
-                        label: "Temperature",
-                        value: Formatting.temperature(temperature, unit: temperatureUnit))
-                }
-                if let watts = snapshot.watts {
-                    StatRow(
-                        label: "Power",
-                        value: Formatting.watts(watts, signed: true),
-                        valueColor: watts < 0 ? .orange : nil)
-                }
-                if let amperage = snapshot.amperageMA {
-                    StatRow(label: "Amperage", value: Formatting.milliamps(amperage))
-                }
-                if let voltage = snapshot.voltageMV {
-                    StatRow(label: "Voltage", value: Formatting.volts(millivolts: voltage))
-                }
+                LiveBatteryRows(snapshot: snapshot, temperatureUnit: temperatureUnit)
                 timeOnBatteryRow
             }
         }

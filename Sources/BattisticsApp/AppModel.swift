@@ -419,7 +419,7 @@ final class AppModel {
 
 extension AppModel {
     func timeOnBattery(at date: Date) -> String {
-        guard let unplugged = lastUnplugDate else { return String(localized: "N/A") }
+        guard let unplugged = lastUnplugDate else { return "—" }
         return Formatting.duration(minutes: max(Int(date.timeIntervalSince(unplugged) / 60), 0))
     }
 }

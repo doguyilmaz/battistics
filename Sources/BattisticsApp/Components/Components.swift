@@ -147,6 +147,27 @@ struct StatRow: View {
     }
 }
 
+/// The battery's live readings. Every row stays, with a dash for a value
+/// IOKit has not reported, so a card keeps its height as readings come and go.
+struct LiveBatteryRows: View {
+    let snapshot: BatterySnapshot
+    let temperatureUnit: TemperatureUnit
+
+    var body: some View {
+        let dash = "—"
+        StatRow(label: "Cycles", value: "\(snapshot.cycleCount)")
+        StatRow(
+            label: "Temperature",
+            value: snapshot.temperatureC.map { Formatting.temperature($0, unit: temperatureUnit) } ?? dash)
+        StatRow(
+            label: "Power",
+            value: snapshot.watts.map { Formatting.watts($0, signed: true) } ?? dash,
+            valueColor: (snapshot.watts ?? 0) < 0 ? .orange : nil)
+        StatRow(label: "Amperage", value: snapshot.amperageMA.map { Formatting.milliamps($0) } ?? dash)
+        StatRow(label: "Voltage", value: snapshot.voltageMV.map { Formatting.volts(millivolts: $0) } ?? dash)
+    }
+}
+
 /// Section title with an optional "?" popover explaining every stat in
 /// plain language.
 struct SectionHeader: View {
