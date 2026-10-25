@@ -33,6 +33,13 @@ struct RemoteTests {
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 
+    @Test func anOperationFromANewerPhoneDecodesAsUnknown() throws {
+        var json = try JSONSerialization.jsonObject(with: RemoteWire.encode(RemoteRequest(operation: .stop))) as! [String: Any]
+        json["operation"] = "hibernate"
+        let request = try RemoteWire.decode(RemoteRequest.self, from: JSONSerialization.data(withJSONObject: json))
+        #expect(request.operation == .unknown)
+    }
+
     @Test func allowedDurationsIncludeUntilTurnedOffAndTelemetryRoundTrips() throws {
         #expect(RemoteRequest.allowedDurations.contains(0))
         #expect(RemoteRequest.allowedDurations == [0, 15, 30, 60, 120, 240, 360, 720])

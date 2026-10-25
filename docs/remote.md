@@ -8,6 +8,9 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - One `MacStatus` record per Mac and short-lived `Command` records from phones. Payloads are JSON (`RemoteWire`) in `encryptedValues["payload"]`.
 - Sharing is off by default (`Battistics › iPhone › Show this Mac in Battistics Remote`). Turning it off deletes the Mac's record; a publish already in flight deletes it again when it lands.
 - Each queued command gets its own answer published before the next one runs.
+- A phone that stops waiting (no answer, a fetch error or a cancelled intent) deletes its command first, so a late Mac does not run it. A Mac also deletes expired commands addressed to Macs that no longer exist.
+- Turning sharing off while offline keeps retrying the delete until it lands, so phones never keep a ghost of the Mac.
+- A status or command written by a newer build stays readable: an unknown operation is answered as an invalid request ("Update Battistics"), and a status the phone cannot decode keeps that Mac's last reading instead of removing it.
 - The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s during a Keep Awake session or for 2 minutes after a command, every 15 s otherwise. macOS throttles silent pushes, so a push only triggers an extra poll.
 - `publish` builds the cheap status first and compares it with the last one sent. History and `pmset` are read only when something changed or the heartbeat is due. The heartbeat is published even when reading commands fails, and CloudKit's `retryAfter` is honoured.
 - Handled command ids are remembered until their records are deleted, so a failed delete never runs a command twice.
@@ -41,6 +44,8 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - The Live Activity merges mode and lid into one line ("Lid closed", "Ready to close lid") and ends with a freshness line and Stop.
 - Keep Mac Awake is a Control Center and Action Button control on iOS 18 (`KeepAwakeControl`).
 - Shortcuts and Siri: Keep Awake, Let Sleep, Check Mac, Mac Low Power and Display Off (`Intents.swift`).
+- Live Activities are matched to a Mac by its id, so two Macs with the same name never share one.
+- A refused or unanswered command from a widget, the Live Activity or the control arrives as a notification, since those surfaces cannot show a reply.
 - Starting Keep Awake from a widget, Shortcut or control requires an unlocked iPhone. Stopping from the Live Activity or a Shortcut does not; the Control Center toggle asks in both directions, since a control has one policy.
 
 ## Safety
@@ -48,6 +53,8 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - A closed-lid session started from a phone, timed or open-ended, always stops at 10% battery (or the user's higher stop) and under thermal pressure (`KeepAwakeSafetyPolicy.Configuration.unattended`).
 - Requests from a phone never install, re-register or repair the root power helper (`PowerHelperClient.requireCurrent`). Only someone at the Mac does that.
 - Low Power Mode changes from the phone go through the installed helper and update the Mac's own power settings view.
+- A probe of the helper that times out (it may be inside a pmset run) never invalidates the connection holding a closed-lid lease, and Repair and Remove are disabled while that lease is held.
+- If the system-wide `disablesleep` override is on with no closed-lid session, Power shows "Sleep is turned off" with Allow Sleep, which the helper refuses while a lease holds the override.
 
 ## Network name
 
