@@ -57,7 +57,8 @@ struct SetMacLowPowerIntent: AppIntent {
     static let title: LocalizedStringResource = "Set Mac Low Power Mode"
     static let description = IntentDescription("Chooses when your Mac uses Low Power Mode.")
 
-    @Parameter(title: "Low Power Mode", default: .onlyOnBattery) var setting: IntentLowPower
+    /// No default, so Siri and the shortcut tile ask instead of overwriting the Mac's choice.
+    @Parameter(title: "Low Power Mode") var setting: IntentLowPower
 
     static var parameterSummary: some ParameterSummary {
         Summary("Set Mac Low Power Mode to \(\.$setting)")

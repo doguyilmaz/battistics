@@ -31,6 +31,11 @@ enum WidgetBridge {
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        // Its Stop acts on the selected Mac, so an activity for any other Mac must go.
+        for activity in Activity<KeepAwakeActivityAttributes>.activities where activity.attributes.macName != mac.name {
+            let id = activity.id
+            Task { await end(id) }
+        }
         guard let status = reading?.status, let session = status.session else {
             // Only a Mac that is answering can tell us its session ended.
             if reading?.reachable == true { endActivities() }

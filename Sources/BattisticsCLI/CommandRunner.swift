@@ -54,9 +54,10 @@ final class CommandRunner {
     }
 
     /// Dies from the command's signal when it had one, so a shell loop
-    /// around `battistics run` stops on Ctrl-C as it would without it.
+    /// around `battistics run` stops on Ctrl-C as it would without it. A
+    /// crash signal is not repeated, or macOS reports battistics as crashed.
     func finish(_ code: Int32) -> Never {
-        if let childSignal {
+        if let childSignal, [SIGINT, SIGTERM, SIGHUP, SIGPIPE, SIGQUIT].contains(childSignal) {
             signal(childSignal, SIG_DFL)
             kill(getpid(), childSignal)
         }
