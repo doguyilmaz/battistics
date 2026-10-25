@@ -43,7 +43,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Safety
 
-- A phone can start an open-ended closed-lid session, but that session always stops at 10% battery (or the user's higher stop) and under thermal pressure (`KeepAwakeSafetyPolicy.Configuration.unattended`).
+- A closed-lid session started from a phone, timed or open-ended, always stops at 10% battery (or the user's higher stop) and under thermal pressure (`KeepAwakeSafetyPolicy.Configuration.unattended`).
 - Requests from a phone never install, re-register or repair the root power helper (`PowerHelperClient.requireCurrent`). Only someone at the Mac does that.
 - Low Power Mode changes from the phone go through the installed helper and update the Mac's own power settings view.
 

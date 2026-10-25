@@ -76,6 +76,12 @@ final class KeepAwakeModel {
         set { duration = newValue }
     }
 
+    /// A closed-lid session started from a phone runs in a bag with nobody
+    /// watching, however long it was set for.
+    static func isUnattended(origin: RemoteStatus.Origin?, mode: KeepAwakeMode) -> Bool {
+        origin == .phone && mode == .lidClosed
+    }
+
     init(helper: PowerHelperClient) {
         self.helper = helper
         safety = KeepAwakeSafetyMonitor(notice: notice)
@@ -83,7 +89,7 @@ final class KeepAwakeModel {
         duration = KeepAwakeDuration(rawValue: UserDefaults.standard.integer(forKey: Prefs.keepAwakeDuration)) ?? .indefinite
         safety.isUnattended = { [weak self] in
             guard let self, let session = self.session else { return false }
-            return self.sessionOrigin == .phone && session.mode == .lidClosed && session.duration == .indefinite
+            return Self.isUnattended(origin: self.sessionOrigin, mode: session.mode)
         }
         safety.onStop = { [weak self] event in
             guard let self else { return }
@@ -114,7 +120,7 @@ final class KeepAwakeModel {
                id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
                origin: RemoteStatus.Origin = .manual) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
-        let unattended = origin == .phone && mode == .lidClosed && duration == .indefinite
+        let unattended = Self.isUnattended(origin: origin, mode: mode)
         if let event = safety.blockingEvent(unattended: unattended) {
             let wasActive = isActive
             if wasActive { stop(reason: event == .thermalStop ? .thermal : .battery) }

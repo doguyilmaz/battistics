@@ -365,7 +365,7 @@ final class RemoteAccessModel {
         await task?.value
         guard awake.sessionIdentifier == id, awake.isActive else {
             let message = awake.errorMessage ?? String(localized: "Keep Awake could not start.")
-            let unattended = mode == .lidClosed && duration == .indefinite
+            let unattended = KeepAwakeModel.isUnattended(origin: .phone, mode: mode)
             return .init(awake.safety.blockingEvent(unattended: unattended) == nil ? .startFailed : .protection, message)
         }
         return nil
