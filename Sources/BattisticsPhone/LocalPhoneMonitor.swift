@@ -36,7 +36,7 @@ final class LocalPhoneMonitor {
     private static let healthKey = "localPhoneCalibratedHealthPercent"
     private static let cyclesKey = "localPhoneCalibratedCycleCount"
     private static let nameKey = "localPhoneCustomDeviceName"
-    private static let hotspotKey = "localPhoneDiscoveredName"
+    private static let hotspotKey = "localPhoneHotspotName"
 
     private init() {
         identifier = Self.machineIdentifier()
@@ -48,6 +48,7 @@ final class LocalPhoneMonitor {
         enteredCycles = defaults.object(forKey: Self.cyclesKey) as? Int
         customName = defaults.string(forKey: Self.nameKey) ?? ""
         hotspotName = defaults.string(forKey: Self.hotspotKey)
+        defaults.removeObject(forKey: "localPhoneDiscoveredName")
         chargeHistory = Self.loadHistory()
 
         UIDevice.current.isBatteryMonitoringEnabled = true
@@ -67,7 +68,10 @@ final class LocalPhoneMonitor {
         return hotspotName ?? String(localized: "This iPhone")
     }
 
-    var pickerName: String { "\(displayName) (\(shortModelName))" }
+    /// "Dogu’s iPhone (16e)", without repeating a model the name already ends with.
+    var pickerName: String {
+        displayName.hasSuffix(shortModelName) ? displayName : "\(displayName) (\(shortModelName))"
+    }
 
     /// How the Mac labels sessions started here; not localized, since the Mac shows it as a name.
     var commandName: String {
