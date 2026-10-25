@@ -13,11 +13,13 @@ struct BatteryCard: View {
             let tint = reachable ? PowerPalette.batteryTint(battery) : .secondary
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 14) {
-                    BatteryGauge(percent: battery.percent, symbol: battery.symbol, tint: tint)
+                    BatteryGauge(percent: battery.percent, symbol: battery.symbol, tint: tint,
+                                 charging: reachable && battery.isCharging)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(reachable ? battery.headline : String(localized: "Last reported"))
                             .font(.headline)
-                        Text(subtitle(battery))
+                            .contentTransition(.opacity)
+                        subtitle(battery)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .lineLimit(2)
@@ -43,25 +45,25 @@ struct BatteryCard: View {
                 }
 
                 if let history = status.chargeHistory, history.count > 1 {
-                    ChargeSparkline(points: history, tint: tint)
+                    ChargeSparkline(points: history, tint: tint, height: 40)
                 }
             }
             .card(border: reachable && (battery.isCharging || battery.lowPowerMode == true) ? tint.opacity(0.35) : nil)
+            .animation(.snappy, value: battery.lowPowerMode)
+            .animation(.snappy, value: battery.isCharging)
         } else {
             Label("This Mac has no battery", systemImage: "powerplug")
                 .card()
         }
     }
 
-    private func subtitle(_ battery: RemoteStatus.Battery) -> String {
-        if !reachable {
-            return String(localized: "\(battery.percent)% · \(status.readAt.formatted(.relative(presentation: .named)))")
-        }
-        if let time = battery.timeText { return time }
+    private func subtitle(_ battery: RemoteStatus.Battery) -> Text {
+        if !reachable { return Ago.text(status.readAt) }
+        if let time = battery.timeText { return Text(time) }
         if battery.onAdapter {
-            return battery.percent >= 100 ? String(localized: "Fully charged") : String(localized: "Not charging")
+            return Text(battery.percent >= 100 ? String(localized: "Fully charged") : String(localized: "Not charging"))
         }
-        return battery.headline
+        return Text(battery.headline)
     }
 
     private func powerMenu(_ battery: RemoteStatus.Battery) -> some View {
@@ -83,8 +85,13 @@ struct BatteryCard: View {
                 Label("Turn Off Mac Display", systemImage: "moon.zzz.fill")
             }
         } label: {
-            Label(lowPower ? String(localized: "Low Power") : (battery.lowPowerPolicy?.compactBadge ?? String(localized: "Power")),
-                  systemImage: lowPower ? "leaf.fill" : (battery.lowPowerPolicy?.symbol ?? "bolt.circle"))
+            Label {
+                Text(lowPower ? String(localized: "Low Power") : (battery.lowPowerPolicy?.compactBadge ?? String(localized: "Power")))
+                    .contentTransition(.interpolate)
+            } icon: {
+                Image(systemName: lowPower ? "leaf.fill" : (battery.lowPowerPolicy?.symbol ?? "bolt.circle"))
+                    .contentTransition(.symbolEffect(.replace))
+            }
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
                 .padding(.horizontal, 10)

@@ -37,51 +37,88 @@ struct HotspotCard: View {
     @State private var showingHelp = false
 
     var body: some View {
-        let (symbol, tint, title, detail) = content
+        let ready = reachable && status.isBagReady
+        let (symbol, tint, title, detail) = content(ready: ready)
         HStack(spacing: 12) {
             Image(systemName: symbol)
-                .font(.title3.weight(.semibold))
+                .font(.headline)
                 .foregroundStyle(tint)
-                .frame(width: 40, height: 40)
+                .contentTransition(.symbolEffect(.replace))
+                .symbolEffect(.variableColor.iterative, isActive: reachable && status.network == .hotspot && !ready)
+                .frame(width: 36, height: 36)
                 .background(tint.opacity(0.14), in: .circle)
+                .background { ReadyPulse(tint: tint, ready: ready) }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .lineLimit(2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
                 Text(detail)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                    .lineLimit(3)
+                    .lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            if !(reachable && status.isBagReady) {
+            if !ready {
                 Button("How") { showingHelp = true }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
             }
         }
-        .card(border: reachable && status.network == .hotspot ? PowerPalette.hotspot.opacity(0.4) : nil)
+        .card(border: ready ? tint.opacity(0.5) : (reachable && status.network == .hotspot ? tint.opacity(0.3) : nil))
+        .animation(.snappy, value: ready)
+        .animation(.snappy, value: status.network)
+        .sensoryFeedback(trigger: ready) { _, ready in ready ? .success : nil }
         .hotspotHelp(isPresented: $showingHelp)
     }
 
-    private var content: (String, Color, String, String) {
+    private func content(ready: Bool) -> (String, Color, String, String) {
         if !reachable {
             return ("antenna.radiowaves.left.and.right.slash", .orange,
                     String(localized: "Can’t reach \(mac.name)"),
                     status.session == nil
-                        ? String(localized: "It may be asleep, or away from Wi‑Fi without Personal Hotspot.")
-                        : String(localized: "Keep Awake was running when it last answered. If it left Wi‑Fi, turn on Personal Hotspot."))
+                        ? String(localized: "Asleep, or away from Wi‑Fi without Hotspot.")
+                        : String(localized: "It was keeping awake. If it left Wi‑Fi, turn on Hotspot."))
         }
         if status.network == .hotspot {
             let name = status.resolvedNetworkName() ?? String(localized: "Personal Hotspot")
-            return ("personalhotspot", PowerPalette.hotspot,
-                    status.protection.closedLidAllowed ? String(localized: "Bag Ready on \(name)") : String(localized: "On \(name)"),
-                    status.protection.closedLidAllowed
-                        ? String(localized: "The Mac stays online with the lid closed, as long as this iPhone is nearby.")
-                        : String(localized: "Allow closed-lid sessions from iPhone on the Mac to use it in a bag."))
+            return ready
+                ? ("checkmark.seal.fill", PowerPalette.hotspot, String(localized: "Bag Ready"),
+                   String(localized: "Online on \(name), even with the lid closed."))
+                : ("personalhotspot", PowerPalette.hotspot, String(localized: "On \(name)"),
+                   String(localized: "Allow closed-lid sessions from iPhone on the Mac."))
         }
         return ("personalhotspot", .accentColor,
                 String(localized: "Before the Mac goes in a bag"),
-                String(localized: "Turn on Personal Hotspot here. A Mac set to join it automatically stays online away from Wi‑Fi."))
+                String(localized: "Turn on Personal Hotspot. A Mac set to join it stays online."))
+    }
+}
+
+/// One ring that spreads from the icon when the Mac becomes Bag Ready.
+private struct ReadyPulse: View {
+    let tint: Color
+    let ready: Bool
+
+    var body: some View {
+        Circle()
+            .stroke(tint, lineWidth: 2)
+            .keyframeAnimator(initialValue: Ring(), trigger: ready) { ring, value in
+                ring.scaleEffect(value.scale).opacity(value.opacity)
+            } keyframes: { _ in
+                KeyframeTrack(\.scale) {
+                    LinearKeyframe(1, duration: 0.01)
+                    SpringKeyframe(2.2, duration: 0.9)
+                }
+                KeyframeTrack(\.opacity) {
+                    LinearKeyframe(ready ? 0.9 : 0, duration: 0.01)
+                    LinearKeyframe(0, duration: 0.9)
+                }
+            }
+            .allowsHitTesting(false)
+    }
+
+    private struct Ring {
+        var scale = 1.0
+        var opacity = 0.0
     }
 }

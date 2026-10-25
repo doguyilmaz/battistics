@@ -10,15 +10,16 @@ struct MacDashboard: View {
         let reading = store.reading(for: mac)
         let reachable = reading?.reachable == true
 
-        DashboardPage(refresh: { await store.refreshAll() }) {
+        DashboardPage(glow: reading?.status.map { Glow($0, reachable: reachable) } ?? .offline,
+                      refresh: { await store.refreshAll() }) {
             StatusLine(reading: reading, problem: store.problem)
             if let status = reading?.status {
                 Group {
                     BatteryCard(mac: mac, status: status, reachable: reachable, message: $message)
                     KeepAwakeCard(mac: mac, status: status, reachable: reachable, message: $message)
-                    HotspotCard(mac: mac, status: status, reachable: reachable)
                     ConditionsGrid(status: status)
                         .opacity(reachable ? 1 : 0.6)
+                    HotspotCard(mac: mac, status: status, reachable: reachable)
                     MacExtrasCard(mac: mac, status: status, reachable: reachable)
                 }
                 .animation(.snappy, value: reachable)
@@ -42,10 +43,10 @@ private struct StatusLine: View {
             if let problem {
                 Text(problem)
             } else if let readAt = reading?.status?.readAt {
-                TimelineView(.periodic(from: .now, by: 30)) { _ in
-                    Text(reading?.reachable == true
-                         ? String(localized: "Updated \(readAt.formatted(.relative(presentation: .named)))")
-                         : String(localized: "Last seen \(readAt.formatted(.relative(presentation: .named)))"))
+                if reading?.reachable == true {
+                    Text("Updated \(Ago.text(readAt))")
+                } else {
+                    Text("Last seen \(Ago.text(readAt))")
                 }
             } else {
                 Text("Connecting…")

@@ -212,6 +212,18 @@ enum PowerPalette {
     }
 }
 
+enum Ago {
+    /// "7 minutes ago", then "1 hour ago": whole units that stay current in
+    /// widgets and Live Activities, never seconds.
+    static func text(_ date: Date) -> Text {
+        if #available(iOS 18, *) {
+            Text(.currentDate, format: .reference(to: date, allowedFields: [.day, .hour, .minute], maxFieldCount: 1))
+        } else {
+            Text(date.formatted(date: .omitted, time: .shortened))
+        }
+    }
+}
+
 enum DurationLabel {
     static func short(_ minutes: Int) -> String {
         if minutes <= 0 { return "∞" }

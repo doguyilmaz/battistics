@@ -251,7 +251,7 @@ private struct LiveFreshness: View {
                     Label("No update since \(last.formatted(date: .omitted, time: .shortened))", systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 } else {
-                    Label { Text("Updated \(last, style: .relative) ago") } icon: { Image(systemName: "checkmark.icloud") }
+                    Label { Text("Updated \(Ago.text(last))") } icon: { Image(systemName: "checkmark.icloud") }
                         .foregroundStyle(.white.opacity(0.72))
                 }
             }

@@ -65,7 +65,7 @@ struct MacExtrasCard: View {
                         .font(.subheadline)
                     }
                 }
-                Text("Checked \(extras.sampledAt.formatted(.relative(presentation: .named)))")
+                Text("Checked \(Ago.text(extras.sampledAt))")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             } else {

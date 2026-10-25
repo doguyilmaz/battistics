@@ -22,12 +22,18 @@ struct KeepAwakeCard: View {
         let operation = store.pending[mac.id]
         let pending = operation == .start || operation == .stop
 
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label(session == nil ? String(localized: "Keep Awake") : String(localized: "Keeping Awake"),
-                      systemImage: session == nil ? "cup.and.saucer" : "cup.and.saucer.fill")
-                    .font(.headline)
-                    .foregroundStyle(session == nil ? Color.primary : .orange)
+                Label {
+                    Text(session == nil ? String(localized: "Keep Awake") : String(localized: "Keeping Awake"))
+                        .contentTransition(.opacity)
+                } icon: {
+                    Image(systemName: session == nil ? "cup.and.saucer" : "cup.and.saucer.fill")
+                        .contentTransition(.symbolEffect(.replace))
+                        .symbolEffect(.bounce, value: session != nil)
+                }
+                .font(.headline)
+                .foregroundStyle(session == nil ? Color.primary : .orange)
                 Spacer()
                 if let session {
                     Label(session.mode.label, systemImage: session.mode.symbol)
@@ -36,6 +42,7 @@ struct KeepAwakeCard: View {
                         .padding(.vertical, 4)
                         .background(.orange.opacity(0.15), in: .capsule)
                         .foregroundStyle(.orange)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
                 }
             }
 
@@ -52,7 +59,8 @@ struct KeepAwakeCard: View {
 
             feedback
                 .font(.footnote)
-                .lineLimit(2, reservesSpace: true)
+                .lineLimit(1, reservesSpace: true)
+                .minimumScaleFactor(0.85)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             actionButton(session: session, pending: pending)
@@ -114,20 +122,20 @@ struct KeepAwakeCard: View {
     @ViewBuilder
     private var feedback: some View {
         if !reachable {
-            Text("The Mac is offline or asleep. Controls come back when it answers.")
+            Text("Offline. Controls return when the Mac answers.")
                 .foregroundStyle(.secondary)
         } else if let message {
             Label(message, systemImage: "exclamationmark.circle.fill")
                 .foregroundStyle(.orange)
         } else if status.batteryRunsOutFirst, let left = status.battery?.minutesRemaining {
-            Label("The battery lasts about \(DurationLabel.long(minutes: left)), less than this session.",
+            Label("Battery lasts about \(DurationLabel.long(minutes: left)), less than this.",
                   systemImage: "battery.25percent")
                 .foregroundStyle(.orange)
         } else if status.needsHotspot(for: status.session?.mode ?? chosenMode) {
-            Label("Not on Hotspot. Turn it on before the Mac goes in a bag.", systemImage: "personalhotspot")
+            Label("Turn on Hotspot before the Mac goes in a bag.", systemImage: "personalhotspot")
                 .foregroundStyle(.secondary)
         } else if let session = status.session {
-            Text("\(session.mode.subtitle) · \(session.origin.label)")
+            Text(session.origin.label)
                 .foregroundStyle(.secondary)
         } else {
             Text(chosenMode.subtitle)
@@ -188,29 +196,80 @@ private struct RunningView: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
-            VStack(alignment: .leading, spacing: 8) {
-                if let range = session.countdownRange, session.isActive(at: context.date) {
-                    Text(timerInterval: range, countsDown: true)
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .monospacedDigit()
+            let active = session.isActive(at: context.date)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Group {
+                        if let range = session.countdownRange, active {
+                            Text(timerInterval: range, countsDown: true)
+                        } else if session.deadline == nil {
+                            Text(session.startedAt, style: .timer)
+                        } else {
+                            Text("Time is up")
+                        }
+                    }
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    Spacer(minLength: 8)
+                    caption(active: active)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                if let range = session.countdownRange, active {
                     ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                         .tint(.orange)
-                } else if session.deadline == nil {
-                    Text(session.startedAt, style: .timer)
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                    Label("Until turned off", systemImage: "infinity")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.orange)
                 } else {
-                    Text("Time is up")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                    Text("Waiting for the Mac to confirm.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    FlowingBar(running: session.deadline == nil)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
+    }
+
+    @ViewBuilder
+    private func caption(active: Bool) -> some View {
+        if let deadline = session.deadline {
+            if active {
+                Text("Ends \(deadline.formatted(date: .omitted, time: .shortened))")
+            } else {
+                Text("Waiting for the Mac")
+            }
+        } else {
+            Label("No limit", systemImage: "infinity")
+        }
+    }
+}
+
+/// The track under an open-ended session: light moving along it while the Mac is kept awake.
+private struct FlowingBar: View {
+    let running: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Capsule()
+            .fill(.orange.opacity(0.18))
+            .overlay {
+                if running, !reduceMotion {
+                    PhaseAnimator([0.0, 1.0]) { phase in
+                        GeometryReader { proxy in
+                            Capsule()
+                                .fill(.linearGradient(colors: [.orange.opacity(0), .orange, .orange.opacity(0)],
+                                                      startPoint: .leading, endPoint: .trailing))
+                                .frame(width: proxy.size.width * 0.35)
+                                .offset(x: -proxy.size.width * 0.35 + phase * proxy.size.width * 1.35)
+                        }
+                    } animation: { phase in
+                        phase == 1 ? .linear(duration: 2.2) : nil
+                    }
+                } else if running {
+                    Capsule().fill(.orange.opacity(0.6))
+                }
+            }
+            .clipShape(.capsule)
+            .frame(height: 4)
+            .accessibilityHidden(true)
     }
 }

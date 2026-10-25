@@ -2704,23 +2704,6 @@
         }
       }
     },
-    "Not on Hotspot. Turn it on before the Mac goes in a bag.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not on Hotspot. Turn it on before the Mac goes in a bag."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hotspot’ta değil. Mac çantaya girmeden önce aç."
-          }
-        }
-      }
-    },
     "On Battery": {
       "extractionState": "manual",
       "localizations": {
@@ -3146,23 +3129,6 @@
         }
       }
     },
-    "Updated %@ ago": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Updated %@ ago"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ önce güncellendi"
-          }
-        }
-      }
-    },
     "Voltage": {
       "extractionState": "manual",
       "localizations": {
@@ -3231,23 +3197,6 @@
         }
       }
     },
-    "%lld%% · %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%% · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%1$lld · %2$@"
-          }
-        }
-      }
-    },
     "24 hours ago": {
       "extractionState": "manual",
       "localizations": {
@@ -3295,23 +3244,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ekle"
-          }
-        }
-      }
-    },
-    "Allow closed-lid sessions from iPhone on the Mac to use it in a bag.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow closed-lid sessions from iPhone on the Mac to use it in a bag."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çantada kullanmak için Mac’te iPhone’dan kapak kapalı oturumlara izin ver."
           }
         }
       }
@@ -3380,23 +3312,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wi‑Fi yokken bu iPhone’da Kişisel Erişim Noktası’nı aç. Ona otomatik katılan bir Mac, çantada kapak kapalıyken de çevrimiçi kalır."
-          }
-        }
-      }
-    },
-    "Bag Ready on %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bag Ready on %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ ile çantaya hazır"
           }
         }
       }
@@ -3860,23 +3775,6 @@
         }
       }
     },
-    "It may be asleep, or away from Wi‑Fi without Personal Hotspot.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It may be asleep, or away from Wi‑Fi without Personal Hotspot."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uykuda olabilir ya da Kişisel Erişim Noktası olmadan Wi‑Fi’dan uzakta olabilir."
-          }
-        }
-      }
-    },
     "It reports once Battistics is running and iPhone access is on. After that it keeps reporting while awake, also with the lid closed during Keep Awake.": {
       "extractionState": "manual",
       "localizations": {
@@ -3907,23 +3805,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapatılana Kadar Uyanık Tut"
-          }
-        }
-      }
-    },
-    "Keep Awake was running when it last answered. If it left Wi‑Fi, turn on Personal Hotspot.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep Awake was running when it last answered. If it left Wi‑Fi, turn on Personal Hotspot."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Son yanıt verdiğinde Uyanık Tut açıktı. Wi‑Fi’dan çıktıysa Kişisel Erişim Noktası’nı aç."
           }
         }
       }
@@ -4489,23 +4370,6 @@
         }
       }
     },
-    "The Mac is offline or asleep. Controls come back when it answers.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The Mac is offline or asleep. Controls come back when it answers."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac çevrimdışı ya da uykuda. Yanıt verince denetimler geri gelir."
-          }
-        }
-      }
-    },
     "The Mac is on Wi‑Fi, not Hotspot": {
       "extractionState": "manual",
       "localizations": {
@@ -4519,40 +4383,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac Hotspot’ta değil, Wi‑Fi’da"
-          }
-        }
-      }
-    },
-    "The Mac stays online with the lid closed, as long as this iPhone is nearby.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The Mac stays online with the lid closed, as long as this iPhone is nearby."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone yakında olduğu sürece Mac kapak kapalıyken de çevrimiçi kalır."
-          }
-        }
-      }
-    },
-    "The battery lasts about %@, less than this session.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The battery lasts about %@, less than this session."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pil yaklaşık %@ dayanır, bu oturumdan kısa."
           }
         }
       }
@@ -4642,23 +4472,6 @@
         }
       }
     },
-    "Turn on Personal Hotspot here. A Mac set to join it automatically stays online away from Wi‑Fi.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn on Personal Hotspot here. A Mac set to join it automatically stays online away from Wi‑Fi."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Burada Kişisel Erişim Noktası’nı aç. Ona otomatik katılan bir Mac, Wi‑Fi’dan uzakta da çevrimiçi kalır."
-          }
-        }
-      }
-    },
     "Turn on iPhone access": {
       "extractionState": "manual",
       "localizations": {
@@ -4740,23 +4553,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sürüm"
-          }
-        }
-      }
-    },
-    "Waiting for the Mac to confirm.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Waiting for the Mac to confirm."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’in onayı bekleniyor."
           }
         }
       }
@@ -5165,6 +4961,193 @@
           "stringUnit": {
             "state": "translated",
             "value": "Son güncelleme %@. iOS güncellemeleri bazen geciktirir, bir sorun olmayabilir. Mac sessiz kalırsa uyarı alırsın."
+          }
+        }
+      }
+    },
+    "Allow closed-lid sessions from iPhone on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow closed-lid sessions from iPhone on the Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te iPhone’dan kapak kapalı oturumlara izin ver."
+          }
+        }
+      }
+    },
+    "Asleep, or away from Wi‑Fi without Hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asleep, or away from Wi‑Fi without Hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uykuda ya da Hotspot olmadan Wi‑Fi’dan uzakta."
+          }
+        }
+      }
+    },
+    "Battery lasts about %@, less than this.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery lasts about %@, less than this."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil yaklaşık %@ dayanır, bu süreden kısa."
+          }
+        }
+      }
+    },
+    "Ends %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ends %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitiş %@"
+          }
+        }
+      }
+    },
+    "It was keeping awake. If it left Wi‑Fi, turn on Hotspot.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It was keeping awake. If it left Wi‑Fi, turn on Hotspot."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık tutuyordu. Wi‑Fi’dan çıktıysa Hotspot’u aç."
+          }
+        }
+      }
+    },
+    "No limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No limit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sınırsız"
+          }
+        }
+      }
+    },
+    "Offline. Controls return when the Mac answers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline. Controls return when the Mac answers."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çevrimdışı. Mac yanıt verince kontroller geri gelir."
+          }
+        }
+      }
+    },
+    "Online on %@, even with the lid closed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online on %@, even with the lid closed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalıyken de %@ üzerinden çevrimiçi."
+          }
+        }
+      }
+    },
+    "Turn on Hotspot before the Mac goes in a bag.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Hotspot before the Mac goes in a bag."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çantaya girmeden Hotspot’u aç."
+          }
+        }
+      }
+    },
+    "Turn on Personal Hotspot. A Mac set to join it stays online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Personal Hotspot. A Mac set to join it stays online."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kişisel Erişim Noktası’nı aç. Ona katılan Mac çevrimiçi kalır."
+          }
+        }
+      }
+    },
+    "Waiting for the Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for the Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac bekleniyor"
           }
         }
       }

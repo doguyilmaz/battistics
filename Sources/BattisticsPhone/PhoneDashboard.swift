@@ -7,7 +7,7 @@ struct PhoneDashboard: View {
     @State private var editingHealth = false
 
     var body: some View {
-        DashboardPage(refresh: {
+        DashboardPage(glow: Glow(battery: phone.batteryStatus.map(PowerPalette.batteryTint) ?? .accentColor), refresh: {
             phone.refresh()
             await store.refreshAll()
         }) {
@@ -47,7 +47,8 @@ struct PhoneDashboard: View {
         let tint = battery.map(PowerPalette.batteryTint) ?? .secondary
         return VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 14) {
-                BatteryGauge(percent: phone.percent, symbol: battery?.symbol ?? "battery.0percent", tint: tint)
+                BatteryGauge(percent: phone.percent, symbol: battery?.symbol ?? "battery.0percent", tint: tint,
+                             charging: phone.isCharging)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(battery?.headline ?? String(localized: "Battery level unavailable"))
                         .font(.headline)
