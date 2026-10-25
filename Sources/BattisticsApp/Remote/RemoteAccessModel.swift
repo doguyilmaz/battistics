@@ -311,12 +311,7 @@ final class RemoteAccessModel {
 
     private func sleepDisplay() async -> RemoteFailure? {
         do {
-            _ = try await BoundedCommand.run(
-                executable: "/usr/bin/pmset",
-                arguments: ["displaysleepnow"],
-                timeout: 5,
-                maximumOutputBytes: 16_384
-            )
+            try await DisplaySleep.now()
             return nil
         } catch {
             return .init(.startFailed, String(localized: "macOS could not put the display to sleep."))
@@ -464,14 +459,8 @@ final class RemoteAccessModel {
     private static let hardwareModel = macHardwareModel()
 
     private static func macHardwareModel() -> String? {
-        var size: Int = 0
-        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0, size > 1 else { return nil }
-        var buffer = [CChar](repeating: 0, count: size)
-        guard sysctlbyname("hw.model", &buffer, &size, nil, 0) == 0 else { return nil }
-        let raw = buffer.withUnsafeBufferPointer { ptr in
-            ptr.baseAddress.map { String(cString: $0) } ?? ""
-        }
-        guard !raw.isEmpty else { return nil }
+        let raw = IssueReporter.hardwareModel
+        guard raw != "unknown" else { return nil }
         let friendly: String? = switch raw {
         case "Mac14,9", "Mac14,5": "MacBook Pro 14\""
         case "Mac14,10", "Mac14,6": "MacBook Pro 16\""

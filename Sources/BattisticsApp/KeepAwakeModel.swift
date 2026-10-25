@@ -332,9 +332,7 @@ final class KeepAwakeModel {
         Task {
             let success: Bool
             do {
-                _ = try await BoundedCommand.run(
-                    executable: "/usr/bin/pmset", arguments: ["displaysleepnow"],
-                    timeout: 5, maximumOutputBytes: 16_384)
+                try await DisplaySleep.now()
                 success = true
             } catch { success = false }
             // A late display command must not replace the retained reason for
