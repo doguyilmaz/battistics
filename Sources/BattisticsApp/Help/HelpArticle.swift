@@ -56,12 +56,12 @@ enum HelpArticle: String, CaseIterable, Identifiable {
 
     private var keywords: String {
         switch self {
-        case .keepAwake: "awake sleep lid display mode duration uyku uyanık kapak ekran süre mod"
+        case .keepAwake: "awake sleep lid display mode duration open uyku uyanık uyu kapak kapağ kapat açık tut ekran süre mod"
         case .lowBattery: "battery percent shutdown stop charge pil batarya yüzde kapat durdur şarj"
         case .warnings: "warning notification sudden off sleep shut uyarı bildirim aniden kapandı uyudu"
         case .heat: "fan hot heat temperature thermal cool sıcak ısın ısı soğut termal"
         case .helper: "helper permission admin repair power yardımcı izin yönetici onar yetki"
-        case .health: "health capacity cycle wear calibration sağlık kapasite döngü aşınma kalibrasyon"
+        case .health: "health capacity cycle wear calibration pil sağlık sağlığ kapasite döngü aşınma kalibrasyon"
         case .history: "history csv export import data energy geçmiş veri dışa içe aktar enerji"
         case .privacy: "assistant intelligence ai privacy offline local asistan zeka gizlilik çevrimdışı yerel"
         case .automation: "mcp agent task project code build terminal automation görev proje otomasyon iş"
@@ -79,9 +79,14 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         var ranked: [(article: HelpArticle, score: Int)] = []
         for article in allCases {
             let primary = "\(article.title) \(article.keywords)"
+            let stems = primary.lowercased().split(separator: " ").map(String.init).filter { $0.count >= 3 }
             var score = 0
             for word in words {
-                if primary.localizedCaseInsensitiveContains(word) { score += 3 }
+                let lowered = word.lowercased()
+                // Turkish adds suffixes, so "kapağı" or "uyuyor" match the stems "kapağ" and "uyu".
+                if primary.localizedCaseInsensitiveContains(word) || stems.contains(where: { lowered.hasPrefix($0) }) {
+                    score += 3
+                }
                 if article.answer.localizedCaseInsensitiveContains(word) { score += 1 }
             }
             if score > 0 { ranked.append((article, score)) }

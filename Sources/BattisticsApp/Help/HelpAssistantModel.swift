@@ -89,7 +89,9 @@ final class HelpAssistantModel {
                         to: question, generating: HelpAnswerSelection.self,
                         options: .init(temperature: 0, maximumResponseTokens: 80))
                     guard !Task.isCancelled, self?.requestID == id else { return }
-                    let index = response.content.articleNumber - 1
+                    var index = response.content.articleNumber - 1
+                    // The model sometimes declines an article the keywords clearly point to.
+                    if !candidates.indices.contains(index), !matches.isEmpty { index = 0 }
                     guard candidates.indices.contains(index) else {
                         if matches.isEmpty { self?.sources = [] }
                         self?.errorMessage = String(localized: "No matching guide article. Try asking about Keep Awake, battery protection, heat, history, or privacy.")
