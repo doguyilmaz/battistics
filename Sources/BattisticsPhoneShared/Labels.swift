@@ -192,6 +192,11 @@ extension RemoteStatus.Battery {
     }
 }
 
+extension Int {
+    /// "57%", or "%57" where the locale puts the sign first.
+    var percentText: String { (Double(self) / 100).formatted(.percent.precision(.fractionLength(0))) }
+}
+
 enum PowerPalette {
     static let charging = Color(red: 0.16, green: 0.80, blue: 0.44)
     static let lowPower = Color(red: 0.95, green: 0.72, blue: 0.08)

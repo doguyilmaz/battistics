@@ -260,7 +260,7 @@ struct MacTelemetryWidgetView: View {
                 } else {
                     HStack(spacing: 4) {
                         WidgetHelpers.metricBox(String(localized: "Power"), battery.powerText ?? "–")
-                        WidgetHelpers.metricBox(String(localized: "Health"), battery.healthPercent.map { "\($0)%" } ?? "–")
+                        WidgetHelpers.metricBox(String(localized: "Health"), battery.healthPercent.map { $0.percentText } ?? "–")
                     }
                 }
             }

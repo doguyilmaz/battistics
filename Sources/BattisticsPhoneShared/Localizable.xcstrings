@@ -307,23 +307,6 @@
         }
       }
     },
-    "At %lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "At %lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%lld’de"
-          }
-        }
-      }
-    },
     "Battery": {
       "extractionState": "manual",
       "localizations": {
@@ -404,7 +387,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pilde durdurma"
+            "value": "Pil koruması"
           }
         }
       }

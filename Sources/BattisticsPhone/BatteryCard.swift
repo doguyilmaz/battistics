@@ -33,7 +33,7 @@ struct BatteryCard: View {
                                symbol: "bolt.fill",
                                tint: battery.isCharging ? PowerPalette.charging : .accentColor)
                     MetricPill(label: battery.cycleCount.map { String(localized: "\($0) cycles") } ?? String(localized: "Health"),
-                               value: battery.healthPercent.map { "\($0)%" } ?? "–",
+                               value: battery.healthPercent.map { $0.percentText } ?? "–",
                                symbol: "heart.fill",
                                tint: (battery.healthPercent ?? 100) < 80 ? .orange : .accentColor)
                     MetricPill(label: status.thermal.label,
@@ -87,6 +87,7 @@ struct BatteryCard: View {
                 .padding(.vertical, 6)
                 .background(lowPower ? PowerPalette.lowPower.opacity(0.18) : Color(.tertiarySystemFill), in: .capsule)
                 .foregroundStyle(lowPower ? PowerPalette.lowPower : .primary)
+                .fixedSize()
         }
         .disabled(!reachable || store.pending.contains(mac.id))
         .accessibilityLabel(Text("Mac power settings"))

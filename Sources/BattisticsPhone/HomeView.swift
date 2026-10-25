@@ -73,12 +73,12 @@ struct HomeView: View {
             ForEach(store.macs) { mac in
                 let reading = store.reading(for: mac)
                 deviceRow(mac.name, detail: reading?.reachable == true
-                          ? reading?.status?.battery.map { "\($0.percent)%" }
+                          ? reading?.status?.battery.map { $0.percent.percentText }
                           : String(localized: "Offline"),
                           symbol: "laptopcomputer")
                     .tag(Optional(mac.id))
             }
-            deviceRow(phone.pickerName, detail: phone.percent.map { "\($0)%" }, symbol: "iphone")
+            deviceRow(phone.pickerName, detail: phone.percent.map { $0.percentText }, symbol: "iphone")
                 .tag(Optional(MacStore.localPhoneID))
         }
         .pickerStyle(.inline)

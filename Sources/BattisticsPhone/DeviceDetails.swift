@@ -10,8 +10,8 @@ struct MacDetailsView: View {
         List {
             if let battery {
                 Section("Battery") {
-                    LabeledContent("Charge", value: "\(battery.percent)%")
-                    if let health = battery.healthPercent { LabeledContent("Health", value: "\(health)%") }
+                    LabeledContent("Charge", value: battery.percent.percentText)
+                    if let health = battery.healthPercent { LabeledContent("Health", value: health.percentText) }
                     if let cycles = battery.cycleCount {
                         LabeledContent("Cycles", value: battery.designCycleCount.map { "\(cycles) / \($0)" } ?? "\(cycles)")
                     }
@@ -81,11 +81,11 @@ struct PhoneDetailsView: View {
     var body: some View {
         List {
             Section("Battery") {
-                LabeledContent("Charge", value: phone.percent.map { "\($0)%" } ?? "–")
+                LabeledContent("Charge", value: phone.percent.map { $0.percentText } ?? "–")
                 LabeledContent("State", value: phone.batteryStatus?.headline ?? "–")
                 LabeledContent("Low Power Mode", value: phone.lowPowerMode ? String(localized: "On") : String(localized: "Off"))
                 LabeledContent("Heat", value: phone.thermal.label)
-                if let health = phone.enteredHealth { LabeledContent("Health (entered)", value: "\(health)%") }
+                if let health = phone.enteredHealth { LabeledContent("Health (entered)", value: health.percentText) }
                 if let cycles = phone.enteredCycles { LabeledContent("Cycles (entered)", value: "\(cycles)") }
             }
             Section("iPhone") {

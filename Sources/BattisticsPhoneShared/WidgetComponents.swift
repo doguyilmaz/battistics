@@ -170,7 +170,7 @@ enum WidgetHelpers {
     static func metricBoxes(_ battery: RemoteStatus.Battery, _ status: RemoteStatus) -> some View {
         HStack(spacing: 5) {
             metricBox(String(localized: "Power"), battery.powerText ?? "–")
-            metricBox(String(localized: "Health"), battery.healthPercent.map { "\($0)%" } ?? "–")
+            metricBox(String(localized: "Health"), battery.healthPercent.map { $0.percentText } ?? "–")
             metricBox(String(localized: "Cycles"), battery.cycleCount.map(String.init) ?? "–")
             metricBox(status.thermal.label, battery.temperatureText ?? "–")
         }

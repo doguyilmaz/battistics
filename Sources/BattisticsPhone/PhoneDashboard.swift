@@ -64,7 +64,7 @@ struct PhoneDashboard: View {
             } label: {
                 HStack(spacing: 8) {
                     MetricPill(label: String(localized: "Health"),
-                               value: phone.enteredHealth.map { "\($0)%" } ?? String(localized: "Add"),
+                               value: phone.enteredHealth.map { $0.percentText } ?? String(localized: "Add"),
                                symbol: "heart.fill",
                                tint: (phone.enteredHealth ?? 100) < 80 ? .orange : .accentColor)
                     MetricPill(label: String(localized: "Cycles"),
@@ -125,7 +125,7 @@ private struct BatteryHealthSheet: View {
             Form {
                 Section {
                     Stepper(value: $health, in: 50...100) {
-                        LabeledContent("Maximum Capacity", value: "\(health)%")
+                        LabeledContent("Maximum Capacity", value: health.percentText)
                     }
                     LabeledContent("Cycle Count") {
                         TextField("Optional", text: $cycles)

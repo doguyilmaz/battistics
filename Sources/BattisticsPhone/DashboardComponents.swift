@@ -59,8 +59,8 @@ struct StatTile: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(value)
                     .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -135,6 +135,6 @@ struct BatteryGauge: View {
         .scaleEffect(1.2)
         .frame(width: 64, height: 64)
         .accessibilityLabel(Text("Battery"))
-        .accessibilityValue(Text(percent.map { "\($0)%" } ?? "–"))
+        .accessibilityValue(Text(percent.map { $0.percentText } ?? "–"))
     }
 }

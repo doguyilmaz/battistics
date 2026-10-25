@@ -23,7 +23,7 @@ struct ConditionsGrid: View {
                      symbol: status.battery?.onAdapter == true ? "powerplug.fill" : "powerplug",
                      tint: status.battery?.onAdapter == true ? PowerPalette.charging : .accentColor)
             StatTile(title: String(localized: "Battery stop"),
-                     value: status.protection.stopAtPercent.map { String(localized: "At \($0)%") } ?? String(localized: "Off"),
+                     value: status.protection.stopAtPercent?.percentText ?? String(localized: "Off"),
                      symbol: "shield.lefthalf.filled")
         }
     }

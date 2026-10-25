@@ -23,7 +23,7 @@ struct MacLockScreenDetailView: View {
 
     @ViewBuilder
     private func inline(_ status: RemoteStatus) -> some View {
-        let percent = status.battery.map { "\($0.percent)%" } ?? "–"
+        let percent = status.battery.map { $0.percent.percentText } ?? "–"
         if let session = status.session, session.isActive(at: entry.date) {
             Label {
                 Text("\(percent) · \(SessionTimerText.text(session))")
