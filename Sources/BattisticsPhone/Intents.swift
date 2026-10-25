@@ -41,6 +41,36 @@ struct StopKeepAwakeIntent: AppIntent {
     }
 }
 
+enum IntentLowPower: String, AppEnum {
+    case never, onlyOnBattery, onlyOnAdapter, always
+
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Low Power Mode"
+    static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+        .never: "Never", .onlyOnBattery: "Only on Battery", .onlyOnAdapter: "Only on Power Adapter", .always: "Always",
+    ]
+
+    var policy: RemoteStatus.LowPowerPolicy { RemoteStatus.LowPowerPolicy(rawValue: rawValue)! }
+}
+
+struct SetMacLowPowerIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let title: LocalizedStringResource = "Set Mac Low Power Mode"
+    static let description = IntentDescription("Chooses when your Mac uses Low Power Mode.")
+
+    @Parameter(title: "Low Power Mode", default: .onlyOnBattery) var setting: IntentLowPower
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Set Mac Low Power Mode to \(\.$setting)")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.setLowPower(mac, policy: setting.policy) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "Low Power Mode on \(mac.name): \(setting.policy.label).")
+    }
+}
+
 struct TurnOffMacDisplayIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Turn Off Mac Display"

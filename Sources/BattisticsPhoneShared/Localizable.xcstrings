@@ -5151,6 +5151,74 @@
           }
         }
       }
+    },
+    "Set Mac Low Power Mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Mac Low Power Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Düşük Güç Modunu Ayarla"
+          }
+        }
+      }
+    },
+    "Chooses when your Mac uses Low Power Mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chooses when your Mac uses Low Power Mode."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’in Düşük Güç Modunu ne zaman kullanacağını seçer."
+          }
+        }
+      }
+    },
+    "Low Power Mode on %@: %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Power Mode on %@: %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ üzerinde Düşük Güç Modu: %2$@."
+          }
+        }
+      }
+    },
+    "Set Mac Low Power Mode to ${setting}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Mac Low Power Mode to ${setting}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Düşük Güç Modunu ${setting} yap"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
