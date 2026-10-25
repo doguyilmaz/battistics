@@ -80,6 +80,21 @@ struct RemoteTests {
         #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 5)))
     }
 
+    @Test func watchdogFollowsHowReliablyPushesArrive() {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: now, deadline: nil)
+        let status = RemoteStatus(machineName: "Mac", readAt: now, session: session,
+                                  heartbeatSeconds: RemoteStatus.sessionHeartbeat)
+        let stale = RemoteStatus.sessionHeartbeat * 4 + 45
+        let steady = (1...4).map { now.addingTimeInterval(Double(-$0) * 120) }
+        #expect(status.watchdogDelay(backgroundDeliveries: steady, now: now) == stale)
+        let throttled = (1...4).map { now.addingTimeInterval(Double(-$0) * 1500) }
+        #expect(status.watchdogDelay(backgroundDeliveries: throttled, now: now) == RemoteStatus.unheardDelay)
+        let patchy = [-1500, -900, -600, -120].map { now.addingTimeInterval(Double($0)) }
+        #expect(status.watchdogDelay(backgroundDeliveries: patchy, now: now) == 900)
+        #expect(status.watchdogDelay(backgroundDeliveries: [], now: now) == RemoteStatus.unheardDelay)
+    }
+
     @Test func phoneOnlySurfacesWaitLongerThanAFetch() {
         let readAt = Date(timeIntervalSince1970: 1_000_000)
         let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: readAt, deadline: nil)

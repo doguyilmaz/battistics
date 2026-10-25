@@ -33,6 +33,7 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
         -> UIBackgroundFetchResult {
+        if application.applicationState != .active { DeliveryCadence.recordBackgroundDelivery() }
         await MacStore.shared.refreshAll()
         return .newData
     }

@@ -48,10 +48,9 @@ enum Notifications {
     }
 
     /// Maintains a rolling local notification while a Keep Awake session is
-    /// active, for a Mac that goes quiet while the app is suspended. It fires
-    /// at `unheardDate`, not `staleDate`: iOS throttles the silent pushes that
-    /// keep the phone current, so an earlier alert would report a healthy Mac.
-    /// Each fresh reading pushes it forward and clears one already delivered.
+    /// active, for a Mac that goes quiet while the app is suspended. Each
+    /// fresh reading pushes it forward and clears one already delivered; how
+    /// far ahead depends on how reliably pushes reach this phone right now.
     @MainActor
     static func syncWatchdog(for mac: MacStore.Mac, reading: MacStore.Reading?) {
         // Shares the `.unreachable` alert identifier, so a foreground refresh
@@ -74,7 +73,7 @@ enum Notifications {
             return
         }
 
-        let fireAt = status.unheardDate
+        let fireAt = status.readAt.addingTimeInterval(DeliveryCadence.watchdogDelay(for: status))
         if let deadline = session.deadline, deadline <= fireAt { return }
         let delay = max(60, fireAt.timeIntervalSinceNow)
 
@@ -93,6 +92,27 @@ enum Notifications {
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
+    }
+}
+
+/// Remembers when background pushes actually reached this phone, for
+/// `RemoteStatus.watchdogDelay`.
+enum DeliveryCadence {
+    private static let key = "backgroundDeliveries"
+    private static let window: TimeInterval = 90 * 60
+
+    /// Called for every background wake that fetched the Mac's status.
+    static func recordBackgroundDelivery(at date: Date = .now) {
+        let recent = deliveries().filter { date.timeIntervalSince($0) < window }
+        UserDefaults.standard.set((recent + [date]).suffix(8).map(\.timeIntervalSince1970), forKey: key)
+    }
+
+    static func watchdogDelay(for status: RemoteStatus, now: Date = .now) -> TimeInterval {
+        status.watchdogDelay(backgroundDeliveries: deliveries().filter { now.timeIntervalSince($0) < window }, now: now)
+    }
+
+    private static func deliveries() -> [Date] {
+        (UserDefaults.standard.array(forKey: key) as? [Double] ?? []).map(Date.init(timeIntervalSince1970:))
     }
 }
 
