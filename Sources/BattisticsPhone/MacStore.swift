@@ -182,7 +182,8 @@ final class MacStore {
         } catch {
             return Self.describe(error)
         }
-        for _ in 0..<16 {
+        // The Mac polls every 15 s when idle, then needs a fetch and a write.
+        for _ in 0..<24 {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
             // Through refreshAll, so this read and a push's never apply out of order.
             await refreshAll()

@@ -14,6 +14,7 @@ final class RemoteAccessModel {
     var enabled: Bool {
         didSet {
             UserDefaults.standard.set(enabled, forKey: Prefs.remoteEnabled)
+            updateNapActivity()
             if enabled {
                 NSApplication.shared.registerForRemoteNotifications()
                 Task { await sync() }
@@ -58,6 +59,7 @@ final class RemoteAccessModel {
     @ObservationIgnored private var syncing = false
     @ObservationIgnored private var pendingPublish: Task<Void, Never>?
     @ObservationIgnored private var ticker: Task<Void, Never>?
+    @ObservationIgnored private var napActivity: NSObjectProtocol?
     @ObservationIgnored private var pushObserver: NSObjectProtocol?
     @ObservationIgnored private var powerStateObserver: NSObjectProtocol?
     @ObservationIgnored let macID: String
@@ -100,6 +102,7 @@ final class RemoteAccessModel {
         observeSession()
         observePowerSettings()
         startTicker()
+        updateNapActivity()
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
             Task { await sync() }
@@ -268,6 +271,19 @@ final class RemoteAccessModel {
                 }
                 await self.sync()
             }
+        }
+    }
+
+    /// App Nap stretches a windowless app's timers far past the phone's
+    /// wait, so the Mac sits out commands while sharing is on. Idle sleep is
+    /// still allowed.
+    private func updateNapActivity() {
+        if enabled, cloud != nil, napActivity == nil {
+            napActivity = ProcessInfo.processInfo.beginActivity(
+                options: .userInitiatedAllowingIdleSystemSleep, reason: "Answering Battistics Remote")
+        } else if !enabled, let activity = napActivity {
+            ProcessInfo.processInfo.endActivity(activity)
+            napActivity = nil
         }
     }
 
