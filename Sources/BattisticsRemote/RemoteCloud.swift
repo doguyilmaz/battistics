@@ -89,6 +89,7 @@ public actor RemoteCloud {
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             prepared = false
             changeToken = nil
+            statusRecords = [:]
             throw error
         }
     }
@@ -152,7 +153,11 @@ public actor RemoteCloud {
     public func delete(_ recordNames: [String]) async throws {
         guard !recordNames.isEmpty else { return }
         for name in recordNames { statusRecords[name] = nil }
-        _ = try await database.modifyRecords(
+        let result = try await database.modifyRecords(
             saving: [], deleting: recordNames.map { .init(recordName: $0, zoneID: Self.zoneID) })
+        for case .failure(let error) in result.deleteResults.values
+        where (error as? CKError)?.code != .unknownItem {
+            throw error
+        }
     }
 }

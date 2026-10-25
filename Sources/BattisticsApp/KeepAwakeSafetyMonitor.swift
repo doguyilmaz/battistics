@@ -50,11 +50,12 @@ final class KeepAwakeSafetyMonitor {
         notice.dismiss()
     }
 
-    func blockingEvent() -> KeepAwakeSafetyPolicy.Event? {
+    /// `unattended` judges a session that is about to start, before `isUnattended` can see it.
+    func blockingEvent(unattended: Bool = false) -> KeepAwakeSafetyPolicy.Event? {
         thermalState = ProcessInfo.processInfo.thermalState
         return KeepAwakeSafetyPolicy.stopReason(
             snapshot: BatteryReader.read(), thermalPressure: hasThermalPressure,
-            configuration: effectiveConfiguration)
+            configuration: unattended ? configuration.unattended : effectiveConfiguration)
     }
 
     func refresh() {

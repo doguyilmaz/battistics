@@ -114,7 +114,8 @@ final class KeepAwakeModel {
                id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
                origin: RemoteStatus.Origin = .manual) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
-        if let event = safety.blockingEvent() {
+        let unattended = origin == .phone && mode == .lidClosed && duration == .indefinite
+        if let event = safety.blockingEvent(unattended: unattended) {
             let wasActive = isActive
             if wasActive { stop(reason: event == .thermalStop ? .thermal : .battery) }
             showSafetyReason(event, id: UUID().uuidString, starting: !wasActive)
@@ -168,7 +169,7 @@ final class KeepAwakeModel {
                 }
                 // Authorization can take long enough for charge or thermal
                 // conditions to change. Recheck before creating the assertion.
-                if let event = safety.blockingEvent() { throw StartFailure.protection(event) }
+                if let event = safety.blockingEvent(unattended: unattended) { throw StartFailure.protection(event) }
                 let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
                 guard !new.hasExpired(at: Date()),
                     assertion.take(mode: mode, until: new.deadline) else {

@@ -45,7 +45,8 @@ final class RemoteAccessModel {
     @ObservationIgnored private let chargeHistory: @Sendable () async -> [RemoteStatus.ChargePoint]
     /// The app's latest reading, so polls do not each read the battery again.
     @ObservationIgnored private let battery: @MainActor () -> BatterySnapshot?
-    @ObservationIgnored private var lastSent: RemoteStatus?
+    /// The last published status before history and power settings were added, for cheap comparisons.
+    @ObservationIgnored private var lastCheap: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
@@ -97,6 +98,7 @@ final class RemoteAccessModel {
             }
         }
         observeSession()
+        observePowerSettings()
         startTicker()
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
@@ -129,6 +131,8 @@ final class RemoteAccessModel {
                 guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
                 lastCommand = .init(id: command.request.id, failure: await handle(command.request))
                 lastCommandAt = .now
+                // Each answer goes out before the next command replaces it, or that phone waits in vain.
+                if mine.count > 1 { try? await publish(force: true) }
                 handled = true
             }
             try await cloud.delete(Array(handledCommands))
@@ -136,10 +140,12 @@ final class RemoteAccessModel {
         } catch {
             failure = error
         }
-        do {
-            try await publish(force: handled)
-        } catch {
-            failure = error
+        if (failure as? CKError)?.retryAfterSeconds == nil {
+            do {
+                try await publish(force: handled)
+            } catch {
+                failure = error
+            }
         }
         if let seconds = (failure as? CKError)?.retryAfterSeconds {
             retryAt = .now.addingTimeInterval(seconds)
@@ -153,19 +159,17 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        if !force, let lastSent, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
             var compared = status
-            compared.readAt = lastSent.readAt
-            compared.chargeHistory = lastSent.chargeHistory
-            compared.battery?.lowPowerPolicy = lastSent.battery?.lowPowerPolicy
-            compared.battery?.lowPowerMode = lastSent.battery?.lowPowerMode
-            compared.battery?.watts = lastSent.battery?.watts
-            compared.battery?.temperatureC = lastSent.battery?.temperatureC
-            compared.battery?.voltageMV = lastSent.battery?.voltageMV
-            compared.battery?.amperageMA = lastSent.battery?.amperageMA
-            compared.battery?.currentCapacityMah = lastSent.battery?.currentCapacityMah
-            if compared == lastSent { return }
+            compared.readAt = lastCheap.readAt
+            compared.battery?.watts = lastCheap.battery?.watts
+            compared.battery?.temperatureC = lastCheap.battery?.temperatureC
+            compared.battery?.voltageMV = lastCheap.battery?.voltageMV
+            compared.battery?.amperageMA = lastCheap.battery?.amperageMA
+            compared.battery?.currentCapacityMah = lastCheap.battery?.currentCapacityMah
+            if compared == lastCheap { return }
         }
+        let cheap = status
         status = await enriched(status)
         guard enabled else { return }
         try await cloud.publish(status, macID: macID)
@@ -174,19 +178,19 @@ final class RemoteAccessModel {
             try? await cloud.delete([macID])
             return
         }
-        lastSent = status
+        lastCheap = cheap
         lastPublished = Date()
     }
 
     /// Coalesces bursts of changes into one write.
-    private func publishSoon() {
+    private func publishSoon(force: Bool = false) {
         guard enabled, cloud != nil else { return }
         pendingPublish?.cancel()
         pendingPublish = Task { [weak self] in
             try? await Task.sleep(for: .seconds(2))
             guard !Task.isCancelled, let self else { return }
             do {
-                try await self.publish(force: false)
+                try await self.publish(force: force)
                 self.problem = nil
             } catch {
                 self.problem = Self.describe(error)
@@ -197,10 +201,24 @@ final class RemoteAccessModel {
     /// Removes this Mac from the user's phones.
     private func withdraw() async {
         pendingPublish?.cancel()
-        lastSent = nil
+        lastCheap = nil
         lastPublished = nil
         problem = nil
         try? await cloud?.delete([macID])
+    }
+
+    /// Low Power policy changes made in the Mac's own panes post no system notification.
+    private func observePowerSettings() {
+        guard let powerSettings else { return }
+        withObservationTracking {
+            _ = powerSettings.settings
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                self?.cachedPower = nil
+                self?.publishSoon(force: true)
+                self?.observePowerSettings()
+            }
+        }
     }
 
     private func observeSession() {
@@ -345,7 +363,8 @@ final class RemoteAccessModel {
         await task?.value
         guard awake.sessionIdentifier == id, awake.isActive else {
             let message = awake.errorMessage ?? String(localized: "Keep Awake could not start.")
-            return .init(awake.safety.blockingEvent() == nil ? .startFailed : .protection, message)
+            let unattended = mode == .lidClosed && duration == .indefinite
+            return .init(awake.safety.blockingEvent(unattended: unattended) == nil ? .startFailed : .protection, message)
         }
         return nil
     }
