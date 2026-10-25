@@ -2019,7 +2019,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj çubuğu, güç, sağlık, döngü ve Uyanık Tut sayacı olan tam genişlikte Kilit Ekranı widget'ı."
+            "value": "Şarj çubuğu, güç, sağlık, döngü ve Uyanık Tut sayacı olan tam genişlikte Kilit Ekranı widget’ı."
           }
         }
       }
@@ -2138,7 +2138,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'in pili, gücü, ağı ve Uyanık Tut denetimleri."
+            "value": "Mac’in pili, gücü, ağı ve Uyanık Tut denetimleri."
           }
         }
       }
@@ -2223,7 +2223,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac'imi kontrol et"
+            "value": "${applicationName} ile Mac’imi kontrol et"
           }
         }
       }
@@ -2427,7 +2427,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'i 1 Saat Uyanık Tut"
+            "value": "Mac’i 1 Saat Uyanık Tut"
           }
         }
       }
@@ -2444,7 +2444,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac'imi uyanık tut"
+            "value": "${applicationName} ile Mac’imi uyanık tut"
           }
         }
       }
@@ -2461,7 +2461,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac'imi uyut"
+            "value": "${applicationName} ile Mac’imi uyut"
           }
         }
       }
@@ -2699,7 +2699,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut sürerken %@ sonrası Mac'ten haber yok. Wi‑Fi'dan çıktıysa yeniden bağlanabilmesi için Kişisel Erişim Noktası'nı aç."
+            "value": "Uyanık Tut sürerken %@ sonrası Mac’ten haber yok. Wi‑Fi’dan çıktıysa yeniden bağlanabilmesi için Kişisel Erişim Noktası’nı aç."
           }
         }
       }
@@ -2716,7 +2716,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut sürerken %@ sonrası Mac'ten haber yok. Kişisel Erişim Noktası menzilinin dışında olabilir."
+            "value": "Uyanık Tut sürerken %@ sonrası Mac’ten haber yok. Kişisel Erişim Noktası menzilinin dışında olabilir."
           }
         }
       }
@@ -2733,7 +2733,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut sürerken %@ sonrası Mac'ten haber yok. Kontrol etmek için Battistics'i aç."
+            "value": "Uyanık Tut sürerken %@ sonrası Mac’ten haber yok. Kontrol etmek için Battistics’i aç."
           }
         }
       }
@@ -2767,7 +2767,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hotspot'ta değil. Mac çantaya girmeden önce aç."
+            "value": "Hotspot’ta değil. Mac çantaya girmeden önce aç."
           }
         }
       }
@@ -2801,7 +2801,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hotspot'ta, kapak kapatılabilir"
+            "value": "Hotspot’ta, kapak kapatılabilir"
           }
         }
       }
@@ -2818,7 +2818,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu iPhone'da Ayarlar › Kişisel Erişim Noktası'nı açıp Başkalarının Katılmasına İzin Ver'i aç. Hotspot'lara otomatik katılacak şekilde ayarlı bir Mac kendiliğinden bağlanır."
+            "value": "Bu iPhone’da Ayarlar › Kişisel Erişim Noktası’nı açıp Başkalarının Katılmasına İzin Ver’i aç. Hotspot’lara otomatik katılacak şekilde ayarlı bir Mac kendiliğinden bağlanır."
           }
         }
       }
@@ -2835,7 +2835,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics Remote'u Aç"
+            "value": "Battistics Remote’u Aç"
           }
         }
       }
@@ -2852,7 +2852,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Önce Mac'e bağlanmak için Battistics Remote'u aç."
+            "value": "Önce Mac’e bağlanmak için Battistics Remote’u aç."
           }
         }
       }
@@ -2988,7 +2988,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'inin pilini gör ve Uyanık Tut'u kendi iCloud'un üzerinden yönet."
+            "value": "Mac’inin pilini gör ve Uyanık Tut’u kendi iCloud’un üzerinden yönet."
           }
         }
       }
@@ -3022,7 +3022,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te başlatıldı"
+            "value": "Mac’te başlatıldı"
           }
         }
       }
@@ -3039,7 +3039,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te 1 saatlik Uyanık Tut oturumu başlatır."
+            "value": "Mac’te 1 saatlik Uyanık Tut oturumu başlatır."
           }
         }
       }
@@ -3090,7 +3090,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te durduruldu"
+            "value": "Mac’te durduruldu"
           }
         }
       }
@@ -3107,7 +3107,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'teki Uyanık Tut oturumunu durdurur."
+            "value": "Mac’teki Uyanık Tut oturumunu durdurur."
           }
         }
       }
@@ -3175,7 +3175,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kişisel Erişim Noktası'nı Aç"
+            "value": "Kişisel Erişim Noktası’nı Aç"
           }
         }
       }
@@ -3192,7 +3192,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te Battistics içinde iPhone erişimini aç."
+            "value": "Mac’te Battistics içinde iPhone erişimini aç."
           }
         }
       }
@@ -3243,7 +3243,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Widget'lar"
+            "value": "Widget’lar"
           }
         }
       }
@@ -3260,7 +3260,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'in iPhone'unda"
+            "value": "Mac’in iPhone’unda"
           }
         }
       }
@@ -3379,7 +3379,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Çantada kullanmak için Mac'te iPhone'dan kapak kapalı oturumlara izin ver."
+            "value": "Çantada kullanmak için Mac’te iPhone’dan kapak kapalı oturumlara izin ver."
           }
         }
       }
@@ -3413,7 +3413,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tüm Battistics widget'larına uygulanır. Ana Ekran ya da Kilit Ekranı düzenleyicisinden ekleyebilirsin."
+            "value": "Tüm Battistics widget’larına uygulanır. Ana Ekran ya da Kilit Ekranı düzenleyicisinden ekleyebilirsin."
           }
         }
       }
@@ -3447,7 +3447,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wi‑Fi yokken bu iPhone'da Kişisel Erişim Noktası'nı aç. Ona otomatik katılan bir Mac, çantada kapak kapalıyken de çevrimiçi kalır."
+            "value": "Wi‑Fi yokken bu iPhone’da Kişisel Erişim Noktası’nı aç. Ona otomatik katılan bir Mac, çantada kapak kapalıyken de çevrimiçi kalır."
           }
         }
       }
@@ -3617,7 +3617,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu iPhone'da Ayarlar › Apple Hesabı'nı, Mac'te Sistem Ayarları › Apple Hesabı'nı kontrol et."
+            "value": "Bu iPhone’da Ayarlar › Apple Hesabı’nı, Mac’te Sistem Ayarları › Apple Hesabı’nı kontrol et."
           }
         }
       }
@@ -3736,7 +3736,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ayarlar › Pil'deki değerleri gir"
+            "value": "Ayarlar › Pil’deki değerleri gir"
           }
         }
       }
@@ -3889,7 +3889,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te Battistics içinde iPhone bölümünü aç ve Bu Mac'i Battistics Remote'ta göster'i aç."
+            "value": "Mac’te Battistics içinde iPhone bölümünü aç ve Bu Mac’i Battistics Remote’ta göster’i aç."
           }
         }
       }
@@ -3906,7 +3906,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'e Battistics'i yükle"
+            "value": "Mac’e Battistics’i yükle"
           }
         }
       }
@@ -3940,7 +3940,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uykuda olabilir ya da Kişisel Erişim Noktası olmadan Wi‑Fi'dan uzakta olabilir."
+            "value": "Uykuda olabilir ya da Kişisel Erişim Noktası olmadan Wi‑Fi’dan uzakta olabilir."
           }
         }
       }
@@ -3991,7 +3991,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Son yanıt verdiğinde Uyanık Tut açıktı. Wi‑Fi'dan çıktıysa Kişisel Erişim Noktası'nı aç."
+            "value": "Son yanıt verdiğinde Uyanık Tut açıktı. Wi‑Fi’dan çıktıysa Kişisel Erişim Noktası’nı aç."
           }
         }
       }
@@ -4110,7 +4110,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'te Düşük Güç Modu"
+            "value": "Mac’te Düşük Güç Modu"
           }
         }
       }
@@ -4348,7 +4348,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'in klavye, fare ve kulaklık pillerini ve en çok enerji kullanan uygulamaları gör."
+            "value": "Mac’in klavye, fare ve kulaklık pillerini ve en çok enerji kullanan uygulamaları gör."
           }
         }
       }
@@ -4433,7 +4433,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu iPhone'un Pilini Göster"
+            "value": "Bu iPhone’un Pilini Göster"
           }
         }
       }
@@ -4450,7 +4450,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud'da oturum açık mı?"
+            "value": "iCloud’da oturum açık mı?"
           }
         }
       }
@@ -4586,7 +4586,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac Hotspot'ta değil, Wi‑Fi'da"
+            "value": "Mac Hotspot’ta değil, Wi‑Fi’da"
           }
         }
       }
@@ -4654,7 +4654,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu iPhone ve Mac aynı Apple Hesabı ile iCloud'da oturum açmış olmalı."
+            "value": "Bu iPhone ve Mac aynı Apple Hesabı ile iCloud’da oturum açmış olmalı."
           }
         }
       }
@@ -4671,7 +4671,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu iPhone'un Adı"
+            "value": "Bu iPhone’un Adı"
           }
         }
       }
@@ -4722,7 +4722,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Burada Kişisel Erişim Noktası'nı aç. Ona otomatik katılan bir Mac, Wi‑Fi'dan uzakta da çevrimiçi kalır."
+            "value": "Burada Kişisel Erişim Noktası’nı aç. Ona otomatik katılan bir Mac, Wi‑Fi’dan uzakta da çevrimiçi kalır."
           }
         }
       }
@@ -4824,7 +4824,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'in onayı bekleniyor."
+            "value": "Mac’in onayı bekleniyor."
           }
         }
       }
@@ -4841,7 +4841,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut bittiğinde, Mac'in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında veya Mac yanıt vermeyi bıraktığında."
+            "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında veya Mac yanıt vermeyi bıraktığında."
           }
         }
       }
@@ -4909,7 +4909,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iOS bunları uygulamalarla paylaşmaz. Ayarlar › Pil › Pil Sağlığı'ndan kopyala."
+            "value": "iOS bunları uygulamalarla paylaşmaz. Ayarlar › Pil › Pil Sağlığı’ndan kopyala."
           }
         }
       }
@@ -4926,7 +4926,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iOS iPhone'unun adını uygulamalara söylemez. Cihaz menüsünde %@ olarak görünür."
+            "value": "iOS iPhone’unun adını uygulamalara söylemez. Cihaz menüsünde %@ olarak görünür."
           }
         }
       }
@@ -5079,7 +5079,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics Remote'ta seçtiğin Mac'i bir saat uyanık tutar."
+            "value": "Battistics Remote’ta seçtiğin Mac’i bir saat uyanık tutar."
           }
         }
       }
@@ -5096,7 +5096,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac'ini bir saat uyanık tutar ya da yeniden uyumasına izin verir."
+            "value": "Mac’ini bir saat uyanık tutar ya da yeniden uyumasına izin verir."
           }
         }
       }
