@@ -42,6 +42,19 @@ struct HistoryStoreTests {
         return HistoryStore(directory: directory)
     }
 
+    @Test func unreadableFileIsMovedAsideAndHistoryKeepsWorking() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("battistics-tests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data(repeating: 0x42, count: 4096).write(to: directory.appendingPathComponent("history.sqlite"))
+        let store = HistoryStore(directory: directory)
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        await store.recordChargeSample(ChargeSample(date: date, percent: 50, externalConnected: false, isCharging: false))
+        #expect(await store.chargeSamples(from: date.addingTimeInterval(-60), to: date.addingTimeInterval(60)).count == 1)
+        let names = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        #expect(names.contains { $0.hasPrefix("history.sqlite.corrupt-") })
+    }
+
     @Test func recordsAndQueriesChargeSeries() async {
         let store = makeStore()
         let base = Date(timeIntervalSince1970: 1_700_000_000)

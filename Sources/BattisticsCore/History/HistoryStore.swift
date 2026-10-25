@@ -437,6 +437,19 @@ public actor HistoryStore {
 
     private func ensureOpen() -> Bool {
         if connection != nil { return true }
+        switch open() {
+        case .opened: return true
+        case .failed: return false
+        case .unreadable:
+            // Otherwise history stays off for good, retried on every reading.
+            moveAsideUnreadableDatabase()
+            return open() == .opened
+        }
+    }
+
+    private enum OpenResult { case opened, failed, unreadable }
+
+    private func open() -> OpenResult {
         do {
             try FileManager.default.createDirectory(
                 at: databaseURL.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -444,16 +457,26 @@ public actor HistoryStore {
             let flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX
             guard sqlite3_open_v2(databaseURL.path, &handle, flags, nil) == SQLITE_OK, let handle else {
                 if let handle { sqlite3_close_v2(handle) }
-                return false
+                return .failed
             }
             connection = Connection(handle: handle)
             try execute("PRAGMA journal_mode=WAL")
             try execute("PRAGMA synchronous=NORMAL")
             try createSchema()
-            return true
+            return .opened
         } catch {
+            let code = db.map { sqlite3_errcode($0) }
             connection = nil
-            return false
+            return code == SQLITE_NOTADB || code == SQLITE_CORRUPT ? .unreadable : .failed
+        }
+    }
+
+    /// Kept beside the new file rather than deleted, in case it can be recovered.
+    private func moveAsideUnreadableDatabase() {
+        let stamp = Int(Date().timeIntervalSince1970)
+        for suffix in ["", "-wal", "-shm"] {
+            let url = URL(fileURLWithPath: databaseURL.path + suffix)
+            try? FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: url.path + ".corrupt-\(stamp)"))
         }
     }
 
