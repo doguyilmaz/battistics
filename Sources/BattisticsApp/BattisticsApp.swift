@@ -108,20 +108,16 @@ struct BattisticsApp: App {
         (ThemePreference(rawValue: themeRaw) ?? .automatic).colorScheme
     }
 
+    private var appEnvironment: AppEnvironment {
+        AppEnvironment(model: model, updater: updater, keepAwake: keepAwake, automation: automation,
+                       network: network, remote: remote, powerAuth: powerAuth, powerSettings: powerSettings,
+                       powerHelper: powerHelper, bluetooth: bluetooth, colorScheme: colorScheme)
+    }
+
     var body: some Scene {
         MenuBarExtra(isInserted: $showMenuBarIcon) {
             PopoverView()
-                .environment(model)
-                .environment(updater)
-                .environment(keepAwake)
-                .environment(automation)
-                .environment(network)
-                .environment(remote)
-                .environment(powerAuth)
-                .environment(powerSettings)
-                .environment(powerHelper)
-                .environment(bluetooth)
-                .preferredColorScheme(colorScheme)
+                .modifier(appEnvironment)
         } label: {
             MenuBarLabelView(snapshot: model.snapshot, keepAwakeActive: keepAwake.isActive)
         }
@@ -129,17 +125,7 @@ struct BattisticsApp: App {
 
         Window("Battistics", id: "dashboard") {
             DashboardView()
-                .environment(model)
-                .environment(updater)
-                .environment(keepAwake)
-                .environment(automation)
-                .environment(network)
-                .environment(remote)
-                .environment(powerAuth)
-                .environment(powerSettings)
-                .environment(powerHelper)
-                .environment(bluetooth)
-                .preferredColorScheme(colorScheme)
+                .modifier(appEnvironment)
         }
         .windowResizability(.contentSize)
         .handlesExternalEvents(matching: ["dashboard"])
@@ -147,17 +133,7 @@ struct BattisticsApp: App {
         // Compact always-on-top stats window ("pinned popover").
         Window("Battistics", id: "mini") {
             PopoverView(isPinnedWindow: true)
-                .environment(model)
-                .environment(updater)
-                .environment(keepAwake)
-                .environment(automation)
-                .environment(network)
-                .environment(remote)
-                .environment(powerAuth)
-                .environment(powerSettings)
-                .environment(powerHelper)
-                .environment(bluetooth)
-                .preferredColorScheme(colorScheme)
+                .modifier(appEnvironment)
                 .background(WindowLevelConfigurator(keepOnTop: true))
         }
         .windowResizability(.contentSize)
@@ -191,5 +167,35 @@ struct BattisticsApp: App {
                 }
             }
         }
+    }
+}
+
+/// Everything each window reads from the environment, in one place.
+private struct AppEnvironment: ViewModifier {
+    let model: AppModel
+    let updater: UpdaterModel
+    let keepAwake: KeepAwakeModel
+    let automation: AutomationModel
+    let network: NetworkMonitor
+    let remote: RemoteAccessModel
+    let powerAuth: PowerAuthorization
+    let powerSettings: PowerSettingsModel
+    let powerHelper: PowerHelperClient
+    let bluetooth: BluetoothGATTReader
+    let colorScheme: ColorScheme?
+
+    func body(content: Content) -> some View {
+        content
+            .environment(model)
+            .environment(updater)
+            .environment(keepAwake)
+            .environment(automation)
+            .environment(network)
+            .environment(remote)
+            .environment(powerAuth)
+            .environment(powerSettings)
+            .environment(powerHelper)
+            .environment(bluetooth)
+            .preferredColorScheme(colorScheme)
     }
 }
