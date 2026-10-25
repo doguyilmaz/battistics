@@ -64,12 +64,13 @@ enum Notifications {
         // Shares the `.unreachable` alert identifier, so a foreground refresh
         // and the background timer replace each other instead of stacking.
         let id = "\(mac.id).silent"
+        let quietID = "\(mac.id).quiet"
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: [id])
+        center.removePendingNotificationRequests(withIdentifiers: [id, quietID])
 
         guard let reading, reading.reachable else { return }
         // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
-        center.removeDeliveredNotifications(withIdentifiers: [id])
+        center.removeDeliveredNotifications(withIdentifiers: [id, quietID])
         // On Hotspot the lid and unplug warnings no longer apply.
         if reading.status?.network == .hotspot {
             center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).closedlid", "\(mac.id).unplugged"])
@@ -100,6 +101,18 @@ enum Notifications {
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
+
+        // While pushes arrive too unevenly to warn early, a silent note in
+        // Notification Center says only that no update came; the next reading removes it.
+        let quietDelay = status.readAt.addingTimeInterval(status.quietDelay).timeIntervalSinceNow
+        guard quietDelay < delay - 60 else { return }
+        let quiet = UNMutableNotificationContent()
+        quiet.title = mac.name
+        quiet.body = String(localized: "Last update at \(lastSeen). iOS sometimes holds updates back, so this may be nothing. You get an alert if the Mac stays silent.")
+        quiet.interruptionLevel = .passive
+        quiet.threadIdentifier = mac.id
+        let quietTrigger = UNTimeIntervalNotificationTrigger(timeInterval: max(60, quietDelay), repeats: false)
+        center.add(UNNotificationRequest(identifier: quietID, content: quiet, trigger: quietTrigger))
     }
 }
 

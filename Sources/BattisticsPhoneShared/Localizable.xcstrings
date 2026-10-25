@@ -5151,6 +5151,23 @@
           }
         }
       }
+    },
+    "Last update at %@. iOS sometimes holds updates back, so this may be nothing. You get an alert if the Mac stays silent.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last update at %@. iOS sometimes holds updates back, so this may be nothing. You get an alert if the Mac stays silent."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son güncelleme %@. iOS güncellemeleri bazen geciktirir, bir sorun olmayabilir. Mac sessiz kalırsa uyarı alırsın."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

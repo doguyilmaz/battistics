@@ -283,13 +283,17 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         max(staleDate, readAt.addingTimeInterval(Self.unheardDelay))
     }
 
+    /// The earliest a phone that has heard nothing may mention it: just past
+    /// the stale window.
+    public var quietDelay: TimeInterval { staleDate.timeIntervalSince(readAt) + 45 }
+
     /// How long after `readAt` a phone that has heard nothing should warn.
     /// iOS throttles silent pushes by its own rules: while recent background
     /// deliveries arrive steadily the warning comes just past the stale
     /// window, and the longer the gaps, the longer it waits, up to
     /// `unheardDelay`, so a healthy Mac is not reported as silent.
     public func watchdogDelay(backgroundDeliveries: [Date], now: Date) -> TimeInterval {
-        let minimum = staleDate.timeIntervalSince(readAt) + 45
+        let minimum = quietDelay
         let maximum = max(minimum, Self.unheardDelay)
         let times = backgroundDeliveries.sorted() + [now]
         // A short burst says nothing about throttling, which iOS starts after a few pushes.
