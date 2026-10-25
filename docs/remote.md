@@ -56,12 +56,12 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Verified on a device
 
-- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert.
+- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert; the Live Activity and its Stop button; the Lock Screen widget; the Control Center control in both directions.
 
 ## Verified only in Simulator or tests
 
 - Background push cadence and the adaptive watchdog on a locked iPhone.
-- Live Activity stale and offline lines (rendered in Simulator), the Control Center control and Home Screen widget buttons.
+- Live Activity stale and offline lines (rendered in Simulator) and Home Screen widget buttons.
 - Alternate app icons on the Home Screen.
 
 ## Considered and not built
