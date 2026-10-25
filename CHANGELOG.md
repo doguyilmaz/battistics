@@ -27,6 +27,14 @@
 - "Still on Battery" is sent once per unplug, also across a relaunch.
 - Battistics Remote can remove a Mac that no longer answers, and tells you
   when a command from a widget, the Lock Screen or Control Center was refused.
+- Power is now three panes: Keep Awake, Power and, under Developer,
+  Automation. Explanations moved behind info buttons, thresholds sit next to
+  their switch, and every pane fits the window without scrolling.
+- Add Time extends a running Keep Awake from the Mac, the iPhone, the Lock
+  Screen, the large widget or Shortcuts.
+- The Mac sends its alerts to the iPhone through iCloud, so they arrive at
+  once, also while Battistics Remote is closed.
+- The Mac answers the iPhone promptly while its window is closed.
 
 ## 1.4.1
 
