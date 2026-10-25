@@ -1,0 +1,42 @@
+---
+// The app's Wings glyph traced as nested contour lines, for backgrounds.
+interface Props {
+  cx: number;
+  cy: number;
+  start?: number;
+  step?: number;
+  count?: number;
+  class?: string;
+}
+const { cx, cy, start = 520, step = 210, count = 9, class: className } = Astro.props;
+const wing = (s: number) => {
+  const p = (x: number, y: number) => `${(cx + (x - 0.5) * s).toFixed(1)} ${(cy - (y - 0.5) * s * 0.58).toFixed(1)}`;
+  const c = (a: number[], b: number[], e: number[]) => `C${p(a[0], a[1])} ${p(b[0], b[1])} ${p(e[0], e[1])}`;
+  return (
+    `M${p(0.03, 0.6)}` +
+    c([0.13, 0.86], [0.28, 0.84], [0.4, 0.8]) + c([0.41, 0.86], [0.41, 0.93], [0.43, 0.97]) +
+    c([0.46, 0.92], [0.48, 0.86], [0.5, 0.84]) + c([0.52, 0.86], [0.54, 0.92], [0.57, 0.97]) +
+    c([0.59, 0.93], [0.59, 0.86], [0.6, 0.8]) + c([0.72, 0.84], [0.87, 0.86], [0.97, 0.6]) +
+    c([0.88, 0.44], [0.8, 0.36], [0.7, 0.36]) + c([0.64, 0.36], [0.6, 0.3], [0.56, 0.24]) +
+    c([0.53, 0.18], [0.51, 0.1], [0.5, 0.06]) + c([0.49, 0.1], [0.47, 0.18], [0.44, 0.24]) +
+    c([0.4, 0.3], [0.36, 0.36], [0.3, 0.36]) + c([0.2, 0.36], [0.12, 0.44], [0.03, 0.6]) + "Z"
+  );
+};
+const id = `contour-${cx}-${cy}`;
+---
+
+<svg class:list={["contours", className]} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id={id} x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="var(--accent-a)" /><stop offset="1" stop-color="var(--accent-b)" />
+    </linearGradient>
+  </defs>
+  {Array.from({ length: count }, (_, i) => (
+    <path d={wing(start + i * step)} stroke={`url(#${id})`} style={`opacity:${(0.55 - i * (0.45 / count)).toFixed(2)}`} />
+  ))}
+</svg>
+
+<style>
+  .contours { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .contours path { fill: none; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+</style>

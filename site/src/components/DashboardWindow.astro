@@ -11,51 +11,37 @@ import menubar from "../assets/panes/appearance.png";
 import notifications from "../assets/panes/notifications.png";
 import data from "../assets/panes/data.png";
 import help from "../assets/panes/help.png";
-
-// Line icons in the spirit of the SF Symbols the app's sidebar uses.
-const icon = {
-  gauge: '<circle cx="8" cy="8" r="6.2"/><path d="M8 8l3-2.6M3.8 9.6h1M11.2 9.6h1M8 3.4v1"/>',
-  chart: '<path d="M2 13.5h12M2.5 11l3.3-3.8 2.6 2.4 4.9-6"/>',
-  bolt: '<circle cx="8" cy="8" r="6.2"/><path d="M8.9 3.8 5.8 8.6h2.6L7.1 12.2l3.1-4.8H7.6z"/>',
-  keyboard: '<rect x="1.8" y="4.3" width="12.4" height="7.4" rx="1.6"/><path d="M4 6.6h.1M6 6.6h.1M8 6.6h.1M10 6.6h.1M12 6.6h.1M5 9.3h6"/>',
-  toggles: '<rect x="2" y="3" width="12" height="4.2" rx="2.1"/><rect x="2" y="8.8" width="12" height="4.2" rx="2.1"/><circle cx="11.6" cy="5.1" r="1.1"/><circle cx="4.4" cy="10.9" r="1.1"/>',
-  iphone: '<rect x="4.6" y="1.8" width="6.8" height="12.4" rx="1.6"/><path d="M7 3.6h2"/>',
-  gear: '<circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.8M8 12.4v1.8M1.8 8h1.8M12.4 8h1.8M3.6 3.6l1.3 1.3M11.1 11.1l1.3 1.3M3.6 12.4l1.3-1.3M11.1 4.9l1.3-1.3"/>',
-  menubar: '<rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/><path d="M1.8 5.6h12.4"/>',
-  bell: '<path d="M4 11V7.2a4 4 0 0 1 8 0V11l1 1.4H3zM6.6 13.8a1.5 1.5 0 0 0 2.8 0"/>',
-  drive: '<path d="M2.2 9.4 4 4h8l1.8 5.4v2.4a.8.8 0 0 1-.8.8H3a.8.8 0 0 1-.8-.8z M2.2 9.4h11.6M10.6 11h.1M12.2 11h.1"/>',
-  help: '<circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.2v.4M8 11.6h.1"/>',
-};
+import { symbolHTML } from "../lib/symbols";
 
 const groups = [
   {
     title: "Battery",
     panes: [
-      { id: "overview", label: "Overview", icon: icon.gauge, image: overview, about: "Charge, health and cycles at a glance, then every capacity and live reading, and the adapter in use." },
-      { id: "history", label: "History", icon: icon.chart, image: history, about: "Charge, power, temperature and health by day, week, month and year, with time on battery, charging and full." },
-      { id: "energy", label: "Energy", icon: icon.bolt, image: energy, about: "Power coming in, used by the Mac and drawn from the battery, and the apps using the most, measured only while you look." },
-      { id: "peripherals", label: "Peripherals", icon: icon.keyboard, image: peripherals, about: "Keyboards, mice, trackpads and headphones that report a battery." },
+      { id: "overview", label: "Overview", icon: "gauge.with.dots.needle.67percent", image: overview, about: "Charge, health and cycles at a glance, then every capacity and live reading, and the adapter in use." },
+      { id: "history", label: "History", icon: "chart.xyaxis.line", image: history, about: "Charge, power, temperature and health by day, week, month and year, with time on battery, charging and full." },
+      { id: "energy", label: "Energy", icon: "bolt.circle", image: energy, about: "Power coming in, used by the Mac and drawn from the battery, and the apps using the most, measured only while you look." },
+      { id: "peripherals", label: "Peripherals", icon: "keyboard", image: peripherals, about: "Keyboards, mice, trackpads and headphones that report a battery." },
     ],
   },
   {
     title: "Controls",
     panes: [
-      { id: "power", label: "Power", icon: icon.toggles, image: power, about: "Keep Awake with its modes and profiles, session protection, Low Power Mode and the sleep timers." },
-      { id: "iphone", label: "iPhone", icon: icon.iphone, image: phone, about: "Show this Mac in Battistics Remote and let the iPhone start closed-lid sessions." },
+      { id: "power", label: "Power", icon: "switch.2", image: power, about: "Keep Awake with its modes and profiles, session protection, Low Power Mode and the sleep timers." },
+      { id: "iphone", label: "iPhone", icon: "iphone", image: phone, about: "Show this Mac in Battistics Remote and let the iPhone start closed-lid sessions." },
     ],
   },
   {
     title: "Settings",
     panes: [
-      { id: "general", label: "General", icon: icon.gear, image: general, about: "Start at login, Dock and menu bar visibility, theme and the app icon." },
-      { id: "menubar", label: "Menu Bar", icon: icon.menubar, image: menubar, about: "Icon style, the readings beside it and the colours it takes." },
-      { id: "notifications", label: "Notifications", icon: icon.bell, image: notifications, about: "Low battery, full charge, charge limit, heat and health alerts, each with its own threshold." },
-      { id: "data", label: "Data", icon: icon.drive, image: data, about: "Power and temperature recording, CSV export and import, and how much history is on disk." },
+      { id: "general", label: "General", icon: "gearshape", image: general, about: "Start at login, Dock and menu bar visibility, theme and the app icon." },
+      { id: "menubar", label: "Menu Bar", icon: "menubar.rectangle", image: menubar, about: "Icon style, the readings beside it and the colours it takes." },
+      { id: "notifications", label: "Notifications", icon: "bell.badge", image: notifications, about: "Low battery, full charge, charge limit, heat and health alerts, each with its own threshold." },
+      { id: "data", label: "Data", icon: "internaldrive", image: data, about: "Power and temperature recording, CSV export and import, and how much history is on disk." },
     ],
   },
   {
     title: "Help",
-    panes: [{ id: "help", label: "Help & Assistant", icon: icon.help, image: help, about: "A guided tour, built-in answers and, on macOS 26, an on-device assistant that only points to them." }],
+    panes: [{ id: "help", label: "Help & Assistant", icon: "questionmark.circle", image: help, about: "A guided tour, built-in answers and, on macOS 26, an on-device assistant that only points to them." }],
   },
 ];
 const first = groups[0].panes[0];
@@ -73,7 +59,7 @@ const first = groups[0].panes[0];
           <p>{group.title}</p>
           {group.panes.map((pane) => (
             <button type="button" data-pane={pane.id} aria-pressed={pane.id === first.id ? "true" : "false"}>
-              <svg viewBox="0 0 16 16" aria-hidden="true" set:html={pane.icon} />
+              <span class="icon" set:html={symbolHTML(pane.icon, 14)} />
               {pane.label}
             </button>
           ))}
@@ -82,9 +68,9 @@ const first = groups[0].panes[0];
     </nav>
     <div class="content">
       {groups.flatMap((group) => group.panes).map((pane) => (
-        <figure data-pane-view={pane.id} hidden={pane.id !== first.id}>
+        <figure data-pane-view={pane.id} data-active={pane.id === first.id ? "true" : "false"}>
           <div class="shot" role="button" tabindex="0" data-zoom={pane.image.src} data-caption={pane.about} aria-label={`Enlarge the ${pane.label} pane`}>
-            <Image src={pane.image} alt={`The ${pane.label} pane`} loading={pane.id === first.id ? "eager" : "lazy"} />
+            <Image src={pane.image} alt={`The ${pane.label} pane`} quality={95} loading={pane.id === first.id ? "eager" : "lazy"} />
           </div>
           <figcaption>{pane.about}</figcaption>
         </figure>
@@ -99,7 +85,7 @@ const first = groups[0].panes[0];
     --win-side: #1d2022;
     --win-ink: #eceeef;
     --win-ink-2: rgb(236 238 239 / 0.55);
-    max-width: 900px;
+    max-width: 870px;
     margin: 0 auto;
     border-radius: 14px;
     overflow: hidden;
@@ -134,13 +120,15 @@ const first = groups[0].panes[0];
     background: none;
     cursor: pointer;
   }
-  .sidebar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+  .icon { display: flex; justify-content: center; width: 18px; opacity: 0.9; }
+  .sidebar button[aria-pressed="true"] .icon { opacity: 1; }
   .sidebar button:hover { background: rgb(255 255 255 / 0.06); }
   .sidebar button[aria-pressed="true"] { background: #0a63d8; }
   .sidebar button:focus-visible { outline: 2px solid #4b9bff; outline-offset: -2px; }
-  .content { min-width: 0; }
-  figure { margin: 0; }
-  .shot { display: block; aspect-ratio: 668 / 530; background: var(--win-bg); }
+  .content { display: grid; min-width: 0; }
+  figure { grid-area: 1 / 1; margin: 0; visibility: hidden; opacity: 0; transition: opacity 0.15s ease, visibility 0s linear 0.15s; }
+  figure[data-active="true"] { visibility: visible; opacity: 1; transition: opacity 0.15s ease; }
+  .shot { display: block; aspect-ratio: 668 / 530; max-width: 668px; background: var(--win-bg); }
   .shot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
   figcaption { padding: 14px 20px 18px; border-top: 1px solid rgb(255 255 255 / 0.06); color: var(--win-ink-2); font-size: 14px; line-height: 1.5; }
 
@@ -160,7 +148,7 @@ const first = groups[0].panes[0];
     const button = win.querySelector<HTMLButtonElement>(`[data-pane="${id}"]`);
     if (!button) return;
     for (const other of win.querySelectorAll("[data-pane]")) other.setAttribute("aria-pressed", String(other === button));
-    for (const view of win.querySelectorAll<HTMLElement>("[data-pane-view]")) view.hidden = view.dataset.paneView !== id;
+    for (const view of win.querySelectorAll<HTMLElement>("[data-pane-view]")) view.dataset.active = String(view.dataset.paneView === id);
     title.textContent = button.textContent?.trim() ?? "";
   };
   for (const button of win.querySelectorAll<HTMLButtonElement>("[data-pane]")) {

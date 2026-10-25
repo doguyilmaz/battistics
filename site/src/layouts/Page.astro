@@ -51,6 +51,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
   img { max-width: 100%; height: auto; }
   [hidden] { display: none !important; }
+  .sf { display: inline-block; flex: none; background: currentColor; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; vertical-align: -0.15em; }
+  [id] { scroll-margin-top: 44px; }
   a { color: var(--teal-ink); text-underline-offset: 0.18em; }
   a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 3px; }
   @media (prefers-reduced-motion: reduce) {

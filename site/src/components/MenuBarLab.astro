@@ -2,6 +2,7 @@
 import { GLYPH_SHAPES, glyphSVG } from "../lib/glyph";
 import { TEXT_LABELS, defaultState } from "../lib/sim";
 import { statusItemHTML } from "../lib/statusItem";
+import { symbolHTML } from "../lib/symbols";
 
 const previews = [
   { label: "Full", charge: 100, charging: false },
@@ -15,9 +16,7 @@ const previews = [
 <div class="lab" data-lab>
   <div class="stage">
     <div class="strip" aria-hidden="true">
-      <span class="strip-icons">
-        <svg viewBox="0 0 20 16"><path d="M10 13.6 7.6 11.2a3.4 3.4 0 0 1 4.8 0zM4.9 8.5a7.2 7.2 0 0 1 10.2 0l-1.5 1.5a5.1 5.1 0 0 0-7.2 0zM2.2 5.8a11 11 0 0 1 15.6 0l-1.5 1.5a8.9 8.9 0 0 0-12.6 0z" fill="currentColor" /></svg>
-      </span>
+      <span class="strip-icons" set:html={symbolHTML("wifi", 24)} />
       <span class="si big" data-lab-item set:html={statusItemHTML(defaultState)} />
       <span class="strip-clock">9:41</span>
     </div>
@@ -29,56 +28,63 @@ const previews = [
         </figure>
       ))}
     </div>
-    <div class="try">
-      <label class="field">
-        <span>Charge</span>
-        <input type="range" min="1" max="100" value={defaultState.charge} data-lab-charge />
-        <output data-lab-charge-out>{defaultState.charge}%</output>
-      </label>
-      <label class="switch-row"><input type="checkbox" role="switch" data-lab-charging /><span>Charging</span></label>
-      <label class="switch-row"><input type="checkbox" role="switch" data-lab-awake /><span>Keep Awake on</span></label>
-    </div>
     <p class="note">This is the icon in the menu bar at the top of the page. Change it here and watch it there.</p>
   </div>
 
   <form class="settings" onsubmit="return false">
-    <section>
-      <h3>Icon Style</h3>
-      <div class="styles" role="radiogroup" aria-label="Icon style">
-        {GLYPH_SHAPES.map(({ shape, label }) => (
-          <button type="button" role="radio" aria-checked={shape === "bat" ? "true" : "false"} data-style={shape}>
-            <span set:html={glyphSVG({ shape, fraction: 0.57, charging: false })} />
-            {label}
-          </button>
-        ))}
-      </div>
-    </section>
-    <section>
-      <h3>Content</h3>
-      <div class="rows">
-        <label class="row"><span>Show battery glyph</span><input type="checkbox" role="switch" checked data-opt="showGlyph" /></label>
-        <label class="row"><span>Show percentage inside battery</span><input type="checkbox" role="switch" data-opt="percentInside" /></label>
-        <label class="row"><span>Primary text</span>
-          <select data-opt="primary">{Object.entries(TEXT_LABELS).map(([v, l]) => <option value={v} selected={v === "charge"}>{l}</option>)}</select>
-        </label>
-        <label class="row"><span>Secondary text</span>
-          <select data-opt="secondary">{Object.entries(TEXT_LABELS).map(([v, l]) => <option value={v} selected={v === "none"}>{l}</option>)}</select>
-        </label>
-        <label class="row"><span>Show an icon while Keep Awake is on</span><input type="checkbox" role="switch" checked data-opt="awakeIcon" /></label>
-      </div>
-    </section>
-    <section>
-      <h3>Color</h3>
-      <div class="rows">
-        <label class="row"><span>Orange when low, red when critical</span><input type="checkbox" role="switch" checked data-opt="colorLow" /></label>
-        <label class="row slider-row" data-threshold-row>
-          <span>Low threshold: <output data-threshold-out>20%</output></span>
-          <input type="range" min="5" max="50" step="5" value="20" data-opt="lowThreshold" />
-        </label>
-        <label class="row"><span>Green when full</span><input type="checkbox" role="switch" data-opt="colorHigh" /></label>
-        <label class="row"><span>Blue while charging</span><input type="checkbox" role="switch" data-opt="colorCharging" /></label>
-      </div>
-    </section>
+    <div class="col">
+      <section>
+        <h3>Icon Style</h3>
+        <div class="styles" role="radiogroup" aria-label="Icon style">
+          {GLYPH_SHAPES.map(({ shape, label }) => (
+            <button type="button" role="radio" aria-checked={shape === "bat" ? "true" : "false"} data-style={shape}>
+              <span set:html={glyphSVG({ shape, fraction: 0.57, charging: false })} />
+              {label}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section>
+        <h3>Content</h3>
+        <div class="rows">
+          <label class="row"><span>Show battery glyph</span><input type="checkbox" role="switch" checked data-opt="showGlyph" /></label>
+          <label class="row"><span>Show percentage inside battery</span><input type="checkbox" role="switch" data-opt="percentInside" /></label>
+          <label class="row"><span>Primary text</span>
+            <select data-opt="primary">{Object.entries(TEXT_LABELS).map(([v, l]) => <option value={v} selected={v === "charge"}>{l}</option>)}</select>
+          </label>
+          <label class="row"><span>Secondary text</span>
+            <select data-opt="secondary">{Object.entries(TEXT_LABELS).map(([v, l]) => <option value={v} selected={v === "none"}>{l}</option>)}</select>
+          </label>
+          <label class="row"><span>Show an icon while Keep Awake is on</span><input type="checkbox" role="switch" checked data-opt="awakeIcon" /></label>
+        </div>
+      </section>
+    </div>
+    <div class="col">
+      <section>
+        <h3>Color</h3>
+        <div class="rows">
+          <label class="row"><span>Orange when low, red when critical</span><input type="checkbox" role="switch" checked data-opt="colorLow" /></label>
+          <label class="row slider-row" data-threshold-row>
+            <span>Low threshold: <output data-threshold-out>20%</output></span>
+            <input type="range" min="5" max="50" step="5" value="20" data-opt="lowThreshold" />
+          </label>
+          <label class="row"><span>Green when full</span><input type="checkbox" role="switch" data-opt="colorHigh" /></label>
+          <label class="row"><span>Blue while charging</span><input type="checkbox" role="switch" data-opt="colorCharging" /></label>
+        </div>
+      </section>
+      <section>
+        <h3>Try it</h3>
+        <div class="rows">
+          <label class="row field">
+            <span>Charge</span>
+            <input type="range" min="1" max="100" value={defaultState.charge} data-lab-charge />
+            <output data-lab-charge-out>{defaultState.charge}%</output>
+          </label>
+          <label class="row"><span>Charging</span><input type="checkbox" role="switch" data-lab-charging /></label>
+          <label class="row"><span>Keep Awake on</span><input type="checkbox" role="switch" data-lab-awake /></label>
+        </div>
+      </section>
+    </div>
   </form>
 </div>
 
@@ -87,52 +93,43 @@ const previews = [
     --form-bg: color-mix(in oklab, var(--paper-2) 80%, var(--paper));
     --row-line: color-mix(in oklab, var(--ink) 9%, transparent);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: clamp(20px, 3vw, 40px);
-    align-items: start;
+    gap: 28px;
     margin-top: 44px;
   }
-  .stage { position: sticky; top: 56px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; }
   .strip {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 22px;
-    height: 76px;
-    padding: 0 26px;
+    min-height: 104px;
+    padding: 0 28px;
     border-radius: 18px;
     background: linear-gradient(120deg, color-mix(in oklab, var(--accent-a) 30%, var(--paper)), color-mix(in oklab, var(--accent-b) 32%, var(--paper)));
     border: 1px solid var(--line);
     font: 500 24px/1 var(--text);
   }
-  .strip-icons svg { width: 34px; height: 28px; opacity: 0.8; }
+  .strip-icons { display: flex; opacity: 0.85; }
   .strip-clock { font-variant-numeric: tabular-nums; }
-  .si { display: inline-flex; align-items: center; gap: 4px; font: 500 12.5px/1 var(--text); font-variant-numeric: tabular-nums; color: var(--ink); }
+  .si { display: inline-flex; align-items: center; gap: 4px; font: 500 12.5px/1 var(--text); font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
   .si.big { gap: 8px; font-size: 25px; }
   .si :global(.si-glyph) { width: 27px; height: 17px; overflow: visible; }
   .si.big :global(.si-glyph) { width: 54px; height: 34px; }
   .si.big :global(.si-inside) { width: 58px; height: 36px; }
-  .si :global(.si-bolt svg) { width: 7px; height: 11px; display: block; }
-  .si.big :global(.si-bolt svg) { width: 14px; height: 22px; }
-  .si :global(.si-cup svg) { width: 15px; height: 12px; display: block; margin-left: 3px; }
-  .si.big :global(.si-cup svg) { width: 30px; height: 24px; }
+  .si :global(.si-cup) { margin-left: 3px; }
+  .si.big :global(.sf) { zoom: 2; }
   .si.tint-orange { color: var(--sys-orange); }
   .si.tint-red { color: var(--sys-red); }
   .si.tint-green { color: var(--sys-green); }
   .si.tint-blue { color: var(--sys-blue); }
 
-  .states { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 12px; padding: 16px 10px; border-radius: 14px; background: var(--form-bg); border: 1px solid var(--line); }
-  .states figure { margin: 0; display: grid; justify-items: center; gap: 8px; }
-  .states figcaption { display: grid; gap: 1px; text-align: center; font-size: 12px; color: var(--ink-3); }
+  .states { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; gap: 6px; padding: 16px 10px; border-radius: 18px; background: var(--form-bg); border: 1px solid var(--line); }
+  .states figure { margin: 0; display: grid; justify-items: center; gap: 10px; }
+  .states figcaption { font-size: 12px; color: var(--ink-3); }
+  .note { grid-column: 1 / -1; margin: 2px 0 0; font-size: 0.93rem; color: var(--ink-3); }
 
-  .try { display: grid; gap: 10px; margin-top: 18px; }
-  .field { display: flex; align-items: center; gap: 12px; font-weight: 600; }
-  .field input { flex: 1; accent-color: var(--accent-b); }
-  .field output { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
-  .switch-row { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; }
-  .note { margin: 16px 0 0; font-size: 0.93rem; color: var(--ink-3); }
-
-  .settings { display: grid; gap: 20px; }
+  .settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; align-items: start; }
+  .col { display: grid; gap: 20px; }
   .settings h3 { margin: 0 0 8px 4px; font: 600 14px var(--text); }
   .styles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 12px; border-radius: 14px; background: var(--form-bg); border: 1px solid var(--line); }
   .styles button {
@@ -151,10 +148,11 @@ const previews = [
   .styles button[aria-checked="true"] { border-color: var(--sys-blue); box-shadow: 0 0 0 1px var(--sys-blue); color: var(--ink); }
   .styles button:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 2px; }
   .rows { border-radius: 14px; background: var(--form-bg); border: 1px solid var(--line); }
-  .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: 8px 14px; font-size: 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
   .row + .row { border-top: 1px solid var(--row-line); }
-  .row[hidden] { display: none; }
   .slider-row input { width: 46%; accent-color: var(--sys-blue); }
+  .field input { flex: 1; min-width: 0; accent-color: var(--accent-b); }
+  .field output { min-width: 4ch; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
   select {
     min-width: 150px;
     height: 26px;
@@ -194,12 +192,11 @@ const previews = [
   input:focus-visible, select:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 2px; }
 
   @media (max-width: 920px) {
-    .lab { grid-template-columns: minmax(0, 1fr); }
-    .stage { position: static; }
+    .stage, .settings { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 520px) {
     .styles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .strip { gap: 14px; padding: 0 16px; height: 64px; font-size: 19px; }
+    .strip { gap: 14px; padding: 0 16px; min-height: 76px; font-size: 19px; }
     .si.big { font-size: 20px; }
     .slider-row { flex-direction: column; align-items: stretch; }
     .slider-row input { width: 100%; }

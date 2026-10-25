@@ -1,6 +1,7 @@
 ---
 import { defaultState } from "../lib/sim";
 import { statusItemHTML } from "../lib/statusItem";
+import { symbolHTML } from "../lib/symbols";
 
 // The site's navigation, set as a Mac menu bar: each menu opens like one.
 const menus = [
@@ -81,8 +82,8 @@ const menus = [
     ))}
   </ul>
   <div class="extras">
-    <svg class="sys" viewBox="0 0 20 16" aria-hidden="true"><path d="M10 13.6 7.6 11.2a3.4 3.4 0 0 1 4.8 0zM4.9 8.5a7.2 7.2 0 0 1 10.2 0l-1.5 1.5a5.1 5.1 0 0 0-7.2 0zM2.2 5.8a11 11 0 0 1 15.6 0l-1.5 1.5a8.9 8.9 0 0 0-12.6 0z" fill="currentColor" /></svg>
-    <svg class="sys" viewBox="0 0 18 16" aria-hidden="true"><rect x="1.5" y="2.5" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3" /><circle cx="12.6" cy="4.8" r="1.4" fill="currentColor" /><rect x="1.5" y="9" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3" /><circle cx="5.4" cy="11.3" r="1.4" fill="currentColor" /></svg>
+    <span class="sys" set:html={symbolHTML("wifi", 13)} />
+    <span class="sys" set:html={symbolHTML("switch.2", 13)} />
     <button type="button" class="status-item" data-status-item aria-expanded="true" aria-controls="popover" aria-label="Battistics menu">
       <span class="si" data-si set:html={statusItemHTML(defaultState)} />
     </button>
@@ -155,7 +156,7 @@ const menus = [
   .dropdown hr { margin: 4px 8px; border: 0; border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent); }
 
   .extras { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
-  .sys { width: 17px; height: 15px; opacity: 0.85; }
+  .sys { display: flex; opacity: 0.9; }
   .status-item {
     display: inline-flex;
     align-items: center;
@@ -178,8 +179,7 @@ const menus = [
   .si.tint-blue { color: var(--sys-blue); }
   .si :global(.si-glyph) { width: 27px; height: 17px; overflow: visible; }
   .si :global(.si-inside) { width: 29px; height: 18px; }
-  .si :global(.si-bolt svg) { display: block; width: 7px; height: 11px; }
-  .si :global(.si-cup svg) { display: block; width: 15px; height: 12px; margin-left: 3px; }
+  .si :global(.si-cup) { margin-left: 3px; }
   .clock { font-variant-numeric: tabular-nums; }
 
   @media (max-width: 760px) {
