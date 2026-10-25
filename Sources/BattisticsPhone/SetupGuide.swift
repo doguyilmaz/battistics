@@ -41,6 +41,8 @@ struct SetupGuide: View {
                     .buttonStyle(.bordered)
                 }
                 .fontWeight(.semibold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             }
             .card()
 
