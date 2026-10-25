@@ -38,28 +38,6 @@ extension SharedSnapshot {
     }
 }
 
-/// Point sizes WidgetKit uses for each family on the current screen width.
-enum WidgetMetrics {
-    static func size(for family: WidgetFamily, screenWidth: CGFloat) -> CGSize {
-        let small: CGFloat, wide: CGFloat, large: CGFloat, rect: CGSize
-        switch screenWidth {
-        case 428...: small = 170; wide = 364; large = 382; rect = CGSize(width: 172, height: 76)
-        case 414..<428: small = 169; wide = 360; large = 379; rect = CGSize(width: 170, height: 76)
-        case 390..<414: small = 158; wide = 338; large = 354; rect = CGSize(width: 160, height: 72)
-        default: small = 155; wide = 329; large = 345; rect = CGSize(width: 157, height: 70)
-        }
-        switch family {
-        case .systemSmall: return CGSize(width: small, height: small)
-        case .systemMedium: return CGSize(width: wide, height: small)
-        case .systemLarge: return CGSize(width: wide, height: large)
-        case .accessoryRectangular: return rect
-        case .accessoryCircular: return CGSize(width: rect.height, height: rect.height)
-        case .accessoryInline: return CGSize(width: rect.width * 1.45, height: 26)
-        default: return CGSize(width: small, height: small)
-        }
-    }
-}
-
 // MARK: - Mac Dashboard widget
 
 struct MacWidgetView: View {
@@ -269,12 +247,12 @@ struct MacWidgetView: View {
                 .tint(.orange)
                 .controlSize(.small)
             } else {
-                Label(isHotspot ? String(localized: "Bag Ready") : String(localized: "Idle"),
-                      systemImage: isHotspot ? "handbag.fill" : "moon.zzz.fill")
+                Label(snapshot.bagReady ? String(localized: "Bag Ready") : String(localized: "Idle"),
+                      systemImage: snapshot.bagReady ? "handbag.fill" : "moon.zzz.fill")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(isHotspot ? PowerPalette.hotspot : .secondary)
+                    .foregroundStyle(snapshot.bagReady ? PowerPalette.hotspot : .secondary)
                     .lineLimit(1)
-                Text(isHotspot ? String(localized: "On Hotspot") : String(localized: "Mac can sleep"))
+                Text(snapshot.bagReady ? String(localized: "On Hotspot") : String(localized: "Mac can sleep"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -401,10 +379,10 @@ struct MacWidgetView: View {
                         .font(.subheadline.weight(.bold).monospacedDigit())
                         .lineLimit(1)
                     } else {
-                        Text(isHotspot ? String(localized: "Bag Ready") : String(localized: "Keep Awake is off"))
+                        Text(snapshot.bagReady ? String(localized: "Bag Ready") : String(localized: "Keep Awake is off"))
                             .font(.caption.weight(.semibold))
                             .lineLimit(1)
-                        Text(isHotspot ? String(localized: "On Hotspot, safe to close the lid") : String(localized: "Mac can sleep normally"))
+                        Text(snapshot.bagReady ? String(localized: "On Hotspot, safe to close the lid") : String(localized: "Mac can sleep normally"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)

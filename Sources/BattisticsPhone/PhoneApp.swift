@@ -9,19 +9,10 @@ struct PhoneApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("phoneThemePreference") private var themeRaw = "automatic"
 
-    private var colorScheme: ColorScheme? {
-        switch themeRaw {
-        case "light": .light
-        case "dark": .dark
-        default: nil
-        }
-    }
-
     var body: some Scene {
         WindowGroup {
             HomeView()
                 .environment(store)
-                .preferredColorScheme(colorScheme)
                 .onAppear { PhoneThemeManager.apply(themeRaw) }
                 .onChange(of: themeRaw) { PhoneThemeManager.apply(themeRaw) }
         }
@@ -42,8 +33,7 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
         -> UIBackgroundFetchResult {
-        let results = await MacStore.shared.refreshAll()
-        if application.applicationState != .active { await Notifications.deliver(results) }
+        await MacStore.shared.refreshAll()
         return .newData
     }
 }

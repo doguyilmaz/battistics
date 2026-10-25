@@ -47,39 +47,52 @@ enum Notifications {
         }
     }
 
-    /// Maintains a rolling local timer notification while a Keep Awake session
-    /// is active. Each fresh CloudKit reading pushes the timer forward; if the
-    /// Mac loses internet (for example, in a bag after leaving Wi-Fi without
-    /// Personal Hotspot), the timer fires even if the app is suspended.
+    /// Maintains a rolling local notification while a Keep Awake session is
+    /// active, for a Mac that goes quiet while the app is suspended. It fires
+    /// at `unheardDate`, not `staleDate`: iOS throttles the silent pushes that
+    /// keep the phone current, so an earlier alert would report a healthy Mac.
+    /// Each fresh reading pushes it forward and clears one already delivered.
     @MainActor
     static func syncWatchdog(for mac: MacStore.Mac, reading: MacStore.Reading?) {
-        let id = "\(mac.id).watchdog"
+        // Shares the `.unreachable` alert identifier, so a foreground refresh
+        // and the background timer replace each other instead of stacking.
+        let id = "\(mac.id).silent"
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id])
 
+        guard let reading, reading.reachable else { return }
+        // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
+        center.removeDeliveredNotifications(withIdentifiers: [id])
+        // On Hotspot the lid and unplug warnings no longer apply.
+        if reading.status?.network == .hotspot {
+            center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).closedlid", "\(mac.id).unplugged"])
+        }
+
         guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true,
-              let reading, reading.reachable,
               let status = reading.status,
               let session = status.session else {
             return
         }
 
-        let isMobileRisk = session.mode == .lidClosed || status.battery?.onAdapter == false
-        let delay: TimeInterval = (isMobileRisk && status.network != .hotspot) ? 10 * 60 : 18 * 60
-        if let deadline = session.deadline, deadline.timeIntervalSinceNow <= delay {
-            return
-        }
+        let fireAt = status.unheardDate
+        if let deadline = session.deadline, deadline <= fireAt { return }
+        let delay = max(60, fireAt.timeIntervalSinceNow)
 
+        let lastSeen = status.readAt.formatted(date: .omitted, time: .shortened)
         let content = UNMutableNotificationContent()
         content.title = mac.name
-        content.body = status.network == .hotspot
-            ? String(localized: "No response during Keep Awake. Check if your Mac is still within Personal Hotspot range.")
-            : String(localized: "Connection lost while Keep Awake was running. If you have an active task on your Mac, turn on Personal Hotspot or check Wi‑Fi.")
+        if status.network == .hotspot {
+            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. It may be out of Personal Hotspot range.")
+        } else if session.mode == .lidClosed || status.battery?.onAdapter == false {
+            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. If it left Wi‑Fi, turn on Personal Hotspot so it can reconnect.")
+        } else {
+            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. Open Battistics to check it.")
+        }
         content.sound = .default
+        content.threadIdentifier = mac.id
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
-        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-        center.add(request)
+        center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
     }
 }
 

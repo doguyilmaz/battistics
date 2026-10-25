@@ -87,10 +87,10 @@ final class MacStore {
         }
         // A cancelled refresh says nothing about the Macs.
         guard !Task.isCancelled else { return [] }
-        return apply(snapshot)
+        return await apply(snapshot)
     }
 
-    private func apply(_ snapshot: RemoteCloud.Snapshot) -> [(Mac, [RemoteAlert])] {
+    private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
         var alerts: [(Mac, [RemoteAlert])] = []
         for (id, status) in snapshot.statuses {
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
@@ -109,9 +109,8 @@ final class MacStore {
         }
         save()
         LocalPhoneMonitor.shared.ingestPairedPhoneName(from: readings)
-        if !alerts.isEmpty {
-            Task { await Notifications.deliver(alerts) }
-        }
+        // Awaited so a background task does not complete before the alerts are added.
+        await Notifications.deliver(alerts)
         return alerts
     }
 
@@ -144,7 +143,7 @@ final class MacStore {
             for _ in 0..<16 {
                 try await Task.sleep(for: .seconds(1.5))
                 let snapshot = try await cloud.fetch()
-                _ = apply(snapshot)
+                _ = await apply(snapshot)
                 if let result = snapshot.statuses[mac.id]?.lastCommand, result.id == request.id {
                     return result.failure.map(Self.message)
                 }

@@ -8,6 +8,19 @@ struct SharedSnapshot: Codable, Equatable {
     var lastSeen: Date?
     var reachable: Bool
 
+    /// Hotspot keeps a closed Mac online, and the Mac must allow closed-lid sessions.
+    var bagReady: Bool {
+        reachable && status?.network == .hotspot && status?.protection.closedLidAllowed == true
+    }
+
+    /// The snapshot as a widget should show it at `date`: offline once the app
+    /// would have heard from the Mac by then, even with pushes throttled.
+    func asOf(_ date: Date) -> SharedSnapshot {
+        var copy = self
+        if let status, date >= status.unheardDate { copy.reachable = false }
+        return copy
+    }
+
     static let group = "group.com.doguyilmaz.Battistics.Remote"
     private static let key = "snapshot"
 
@@ -57,7 +70,6 @@ struct WidgetPreferences: Codable, Equatable, Sendable {
 
     var metricFocus: MetricFocus = .powerAndHealth
     var lockScreenLayout: LockScreenLayout = .detailedGrid
-    var showSparklineInMedium: Bool = true
     var showNetworkSSID: Bool = true
 
     private static let prefsKey = "widgetPreferences"

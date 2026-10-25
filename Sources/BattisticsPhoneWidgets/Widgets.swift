@@ -24,11 +24,19 @@ struct MacProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<MacEntry>) -> Void) {
-        let entry = MacEntry(date: .now, snapshot: .load(), prefs: .load())
+        let now = Date.now
+        let snapshot = SharedSnapshot.load()
+        let prefs = WidgetPreferences.load()
+        var entries = [MacEntry(date: now, snapshot: snapshot?.asOf(now), prefs: prefs)]
+        // A Mac that stops writing never triggers a reload, so the offline
+        // state is scheduled ahead at the moment the app would show it.
+        if let snapshot, snapshot.reachable, let stale = snapshot.status?.unheardDate, stale > now {
+            entries.append(MacEntry(date: stale, snapshot: snapshot.asOf(stale), prefs: prefs))
+        }
         // Ending sessions change the view without new data; refresh at the deadline.
-        let deadline = entry.snapshot?.status?.session?.deadline
-        let next = deadline.flatMap { $0 > .now ? $0 : nil } ?? .now.addingTimeInterval(15 * 60)
-        completion(Timeline(entries: [entry], policy: .after(next)))
+        let deadline = snapshot?.status?.session?.deadline
+        let next = deadline.flatMap { $0 > now ? $0 : nil } ?? now.addingTimeInterval(15 * 60)
+        completion(Timeline(entries: entries, policy: .after(next)))
     }
 }
 
@@ -126,20 +134,13 @@ struct KeepAwakeActivityWidget: Widget {
                         if let deadline = context.state.deadline {
                             let range = min(context.state.startedAt, deadline)...deadline
                             ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
-                                .tint(context.state.lowPowerMode ? PowerPalette.lowPower : (context.state.isCharging ? PowerPalette.charging : .orange))
+                                .tint(context.state.powerColor)
                         }
                         HStack(spacing: 6) {
-                            Label(context.state.mode.label, systemImage: context.state.mode.symbol)
+                            Text(context.state.offline == true ? String(localized: "Mac not answering") : context.state.headline)
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
-                            if let closed = context.state.lidClosed {
-                                Text("·").foregroundStyle(.secondary)
-                                Text(closed ? String(localized: "Lid closed") : String(localized: "Lid open"))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
                             Spacer(minLength: 6)
                             Button(intent: StopKeepAwakeLiveIntent()) {
                                 Label("Stop", systemImage: "stop.fill")
@@ -209,21 +210,32 @@ private struct LivePowerBadge: View {
     }
 }
 
+private extension KeepAwakeActivityAttributes.ContentState {
+    /// One line for the session, so the mode and the lid never contradict each other.
+    var headline: String {
+        switch mode {
+        case .lidClosed: lidClosed == false ? String(localized: "Ready to close lid") : String(localized: "Lid closed")
+        case .displayOn, .displayMaySleep:
+            lidClosed == true ? String(localized: "\(mode.label) · Lid closed") : mode.label
+        }
+    }
+
+    var powerColor: Color {
+        lowPowerMode ? PowerPalette.lowPower : (isCharging || onAdapter ? PowerPalette.charging : .orange)
+    }
+}
+
 private struct LockScreenLiveActivityView: View {
     let context: ActivityViewContext<KeepAwakeActivityAttributes>
 
     var body: some View {
         let state = context.state
+        // `offline` comes from a real fetch; stale only means the phone heard nothing new.
+        let offline = state.offline == true
         let isHotspot = state.network == .hotspot
-        let powerColor: Color = state.lowPowerMode
-            ? PowerPalette.lowPower
-            : (state.isCharging || state.onAdapter ? PowerPalette.charging : .orange)
 
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 8) {
-                Image(systemName: isHotspot ? "personalhotspot" : "laptopcomputer")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(isHotspot ? PowerPalette.hotspot : powerColor)
                 Text(context.attributes.macName)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.white)
@@ -236,85 +248,58 @@ private struct LockScreenLiveActivityView: View {
             HStack(alignment: .center, spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(Color.orange.opacity(0.20))
+                        .fill((offline ? Color.gray : .orange).opacity(0.20))
                         .frame(width: 36, height: 36)
-                    Image(systemName: state.mode.symbol)
+                    Image(systemName: offline ? "wifi.slash" : state.mode.symbol)
                         .font(.callout.weight(.bold))
-                        .foregroundStyle(.orange)
-                        .symbolEffect(.pulse, isActive: true)
+                        .foregroundStyle(offline ? .gray : .orange)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(state.mode.label)
+                    Text(state.headline)
                         .font(.headline)
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                    HStack(spacing: 5) {
-                        if let closed = state.lidClosed {
-                            Text(closed ? String(localized: "Lid closed") : String(localized: "Lid open"))
-                        }
-                        Text("·")
-                        Text(state.networkName ?? state.network.label)
-                            .foregroundStyle(isHotspot ? PowerPalette.hotspot : .white.opacity(0.72))
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.72))
-                    .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Label(state.networkName ?? state.network.label, systemImage: state.network.symbol)
+                        .font(.caption)
+                        .foregroundStyle(isHotspot ? PowerPalette.hotspot : .white.opacity(0.72))
+                        .lineLimit(1)
                 }
                 .layoutPriority(1)
 
                 Spacer(minLength: 6)
 
-                if let deadline = state.deadline {
-                    let range = min(state.startedAt, deadline)...deadline
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(timerInterval: range, countsDown: true)
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let deadline = state.deadline {
+                        Text(timerInterval: min(state.startedAt, deadline)...deadline, countsDown: true)
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
-                            .foregroundStyle(.orange)
                             .multilineTextAlignment(.trailing)
-                            .frame(width: 90, alignment: .trailing)
                         Text("Remaining")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(.white.opacity(0.65))
-                    }
-                } else {
-                    VStack(alignment: .trailing, spacing: 2) {
+                    } else {
                         Text(state.startedAt, style: .timer)
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
-                            .foregroundStyle(.orange)
                             .multilineTextAlignment(.trailing)
-                            .frame(width: 90, alignment: .trailing)
-                        HStack(spacing: 3) {
-                            Image(systemName: "infinity")
-                                .font(.system(size: 10, weight: .bold))
-                            Text("Until stopped")
-                                .font(.caption2.weight(.medium))
-                        }
-                        .foregroundStyle(.white.opacity(0.65))
+                        Label("Until stopped", systemImage: "infinity")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.65))
                     }
                 }
+                .foregroundStyle(offline ? .gray : .orange)
+                .fixedSize()
             }
 
             if let deadline = state.deadline {
-                let range = min(state.startedAt, deadline)...deadline
-                ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
-                    .tint(powerColor)
+                ProgressView(timerInterval: min(state.startedAt, deadline)...deadline, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
+                    .tint(offline ? .gray : state.powerColor)
             }
 
             HStack(spacing: 8) {
-                HStack(spacing: 5) {
-                    Image(systemName: state.isCharging ? "bolt.fill" : "cup.and.saucer.fill")
-                        .font(.caption2)
-                        .foregroundStyle(powerColor)
-                    Text(state.isCharging
-                         ? String(localized: "Charging on adapter")
-                         : (state.onAdapter ? String(localized: "On power adapter") : String(localized: "Keeping Mac awake")))
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.72))
-                        .lineLimit(1)
-                }
+                LiveFreshness(state: state, quiet: offline || context.isStale)
                 Spacer(minLength: 8)
                 Button(intent: StopKeepAwakeLiveIntent()) {
                     Label("Stop", systemImage: "stop.fill")
@@ -328,5 +313,28 @@ private struct LockScreenLiveActivityView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
+    }
+}
+
+/// "Updated 2 min ago" while readings arrive, "No update since 10:42" once they stopped.
+private struct LiveFreshness: View {
+    let state: KeepAwakeActivityAttributes.ContentState
+    let quiet: Bool
+
+    var body: some View {
+        Group {
+            if let last = state.lastUpdate {
+                if quiet {
+                    Label("No update since \(last.formatted(date: .omitted, time: .shortened))", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                } else {
+                    Label { Text("Updated \(last, style: .relative) ago") } icon: { Image(systemName: "checkmark.icloud") }
+                        .foregroundStyle(.white.opacity(0.72))
+                }
+            }
+        }
+        .font(.caption)
+        .lineLimit(1)
+        .minimumScaleFactor(0.85)
     }
 }

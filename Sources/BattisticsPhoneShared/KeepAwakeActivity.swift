@@ -8,7 +8,6 @@ struct KeepAwakeActivityAttributes: ActivityAttributes {
         var mode: RemoteStatus.Mode
         var startedAt: Date
         var deadline: Date?
-        var sessionName: String?
         var batteryPercent: Int?
         var isCharging: Bool = false
         var onAdapter: Bool = false
@@ -17,6 +16,10 @@ struct KeepAwakeActivityAttributes: ActivityAttributes {
         var lidClosed: Bool?
         var network: RemoteStatus.Network = .wifi
         var networkName: String?
+        /// When the Mac wrote this reading, shown so the user can judge freshness.
+        var lastUpdate: Date?
+        /// Set by the app once the Mac has missed its heartbeat window.
+        var offline: Bool?
     }
 
     var macName: String

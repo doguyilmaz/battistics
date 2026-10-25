@@ -31,21 +31,25 @@ enum WidgetBridge {
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // A silent Mac keeps its countdown; it ends on its own at the deadline.
-        guard reading?.reachable == true else { return }
         guard let status = reading?.status, let session = status.session else {
-            endActivities()
+            // Only a Mac that is answering can tell us its session ended.
+            if reading?.reachable == true { endActivities() }
             return
         }
         if let deadline = session.deadline, deadline <= .now {
             endActivities()
             return
         }
+        let reachable = reading?.reachable == true
+        let current = Activity<KeepAwakeActivityAttributes>.activities
+        let existing = current.first(where: { $0.attributes.macName == mac.name })
+        // Never start a new activity for a Mac that has gone silent.
+        if !reachable && existing == nil { return }
+
         let state = KeepAwakeActivityAttributes.ContentState(
             mode: session.mode,
             startedAt: session.startedAt,
             deadline: session.deadline,
-            sessionName: session.name ?? session.origin.label,
             batteryPercent: status.battery?.percent,
             isCharging: status.battery?.isCharging ?? false,
             onAdapter: status.battery?.onAdapter ?? false,
@@ -53,11 +57,15 @@ enum WidgetBridge {
             watts: status.battery?.watts,
             lidClosed: status.lidClosed,
             network: status.network,
-            networkName: status.resolvedNetworkName(fallbackHotspot: UIDevice.current.name)
+            networkName: status.resolvedNetworkName(fallbackHotspot: UIDevice.current.name),
+            lastUpdate: status.readAt,
+            offline: reachable ? nil : true
         )
-        let content = ActivityContent(state: state, staleDate: session.deadline)
-        let current = Activity<KeepAwakeActivityAttributes>.activities
-        if let activity = current.first(where: { $0.attributes.macName == mac.name }) {
+        // Marks the activity stale even if the app never runs again, late
+        // enough that throttled pushes alone do not trigger it.
+        let staleDate = [session.deadline, status.unheardDate].compactMap { $0 }.min()
+        let content = ActivityContent(state: state, staleDate: staleDate)
+        if let activity = existing {
             let id = activity.id
             if activity.content.state != state { Task { await update(id, content) } }
             endActivities(except: id)
