@@ -24,7 +24,7 @@ There is nothing to pair. The Mac and the iPhone talk through your private iClou
 - Home Screen and Lock Screen widgets
 - A Lock Screen and Dynamic Island countdown with buttons to add 30 minutes or stop
 - A Control Center and Action Button control
-- Siri and Shortcuts: Keep Awake, Let Sleep, Check Mac, Mac Low Power and Display Off
+- Siri and Shortcuts: Keep Awake, Add Time, Let Sleep, Check Mac, Mac Low Power and Display Off
 - Alerts when a session ends, the battery runs low, the Mac stops answering or reaches a charge level you pick. The Mac sends the first ones itself through your iCloud, so they arrive at once, even while the app is closed.
 
 ## Without Wi‑Fi

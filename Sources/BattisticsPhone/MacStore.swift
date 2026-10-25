@@ -105,7 +105,8 @@ final class MacStore {
         // A cancelled refresh says nothing about the Macs.
         guard !Task.isCancelled else { return [] }
         if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
-            await syncAlertSubscription()
+            alertSubscriptionChecked = .now
+            Task { await syncAlertSubscription() }
         }
         return await apply(snapshot)
     }

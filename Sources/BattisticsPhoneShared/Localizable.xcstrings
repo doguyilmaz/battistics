@@ -1594,7 +1594,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat"
+            "value": "Süre"
           }
         }
       }
@@ -5420,6 +5420,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "+%@"
+          }
+        }
+      }
+    },
+    "%@ stays awake %@ longer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ stays awake %@ longer."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@ daha uyanık kalacak."
+          }
+        }
+      }
+    },
+    "Adds time to the Keep Awake session running on your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adds time to the Keep Awake session running on your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inizde çalışan Uyanık Tut oturumuna süre ekler."
           }
         }
       }

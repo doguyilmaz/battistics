@@ -41,6 +41,30 @@ struct StopKeepAwakeIntent: AppIntent {
     }
 }
 
+enum IntentExtension: Int, AppEnum {
+    case fifteen = 15, thirty = 30, hour = 60, twoHours = 120
+
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Time"
+    static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+        .fifteen: "15 minutes", .thirty: "30 minutes", .hour: "1 hour", .twoHours: "2 hours",
+    ]
+}
+
+struct AddKeepAwakeTimeIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
+    static let title: LocalizedStringResource = "Add Time to Keep Awake"
+    static let description = IntentDescription("Adds time to the Keep Awake session running on your Mac.")
+
+    @Parameter(title: "Time", default: .thirty) var time: IntentExtension
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.extend(mac, minutes: time.rawValue) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "\(mac.name) stays awake \(DurationLabel.long(minutes: time.rawValue)) longer.")
+    }
+}
+
 enum IntentLowPower: String, AppEnum {
     case never, onlyOnBattery, onlyOnAdapter, always
 
@@ -114,6 +138,8 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Keep Awake", systemImageName: "cup.and.saucer.fill")
         AppShortcut(intent: StopKeepAwakeIntent(), phrases: ["Let my Mac sleep with \(.applicationName)"],
                     shortTitle: "Let Sleep", systemImageName: "moon.zzz")
+        AppShortcut(intent: AddKeepAwakeTimeIntent(), phrases: ["Keep my Mac awake longer with \(.applicationName)"],
+                    shortTitle: "Add Time", systemImageName: "plus.circle")
         AppShortcut(intent: MacStatusIntent(), phrases: ["Check my Mac with \(.applicationName)"],
                     shortTitle: "Check Mac", systemImageName: "laptopcomputer")
         AppShortcut(intent: SetMacLowPowerIntent(), phrases: ["Set my Mac’s Low Power Mode with \(.applicationName)"],

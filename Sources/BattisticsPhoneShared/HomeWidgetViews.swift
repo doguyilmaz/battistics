@@ -209,7 +209,8 @@ struct MacWidgetView: View {
                     }
                 }
                 Spacer(minLength: 4)
-                KeepAwakeIntentButton(running: activeSession(status) != nil, reachable: snapshot.reachable)
+                KeepAwakeIntentButton(running: activeSession(status) != nil, reachable: snapshot.reachable,
+                                      addsTime: activeSession(status)?.deadline != nil)
                     .font(.caption.weight(.semibold))
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)

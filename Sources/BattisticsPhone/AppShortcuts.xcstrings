@@ -17,6 +17,22 @@
         }
       }
     },
+    "Keep my Mac awake longer with ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep my Mac awake longer with ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imi daha uzun uyanık tut"
+          }
+        }
+      }
+    },
     "Keep my Mac awake with ${applicationName}": {
       "localizations": {
         "en": {
