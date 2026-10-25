@@ -33,6 +33,7 @@ enum RemoteIntentBridge {
 }
 
 struct StartKeepAwakeLiveIntent: LiveActivityIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake for 1 Hour"
     static let description = IntentDescription("Starts a 1-hour Keep Awake session on your Mac.")
 
@@ -57,6 +58,7 @@ struct StopKeepAwakeLiveIntent: LiveActivityIntent {
 /// Backs the Control Center and Action Button toggle; runs in the app, which holds the iCloud connection.
 @available(iOS 18.0, *)
 struct SetKeepAwakeIntent: SetValueIntent, LiveActivityIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake"
     static let description = IntentDescription("Keeps your Mac awake for an hour, or lets it sleep again.")
 
