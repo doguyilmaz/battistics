@@ -41,7 +41,7 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
-    @ObservationIgnored private var alertSubscriptionTried: Date?
+    @ObservationIgnored private var alertSubscriptionChecked: Date?
 
     private init() {
         readings = UserDefaults.standard.data(forKey: "readings")
@@ -104,9 +104,7 @@ final class MacStore {
         }
         // A cancelled refresh says nothing about the Macs.
         guard !Task.isCancelled else { return [] }
-        if !UserDefaults.standard.bool(forKey: Notifications.pushedKey),
-           UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true,
-           alertSubscriptionTried.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
+        if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
             await syncAlertSubscription()
         }
         return await apply(snapshot)
@@ -140,17 +138,22 @@ final class MacStore {
         return alerts
     }
 
-    /// Keeps iCloud's alert subscription in step with the Notifications switch.
-    /// Retried on refresh: iCloud refuses it until a Mac has posted the first
-    /// alert record in a fresh development container.
+    /// Keeps iCloud's alert subscription in step with the Notifications
+    /// switch. The subscription belongs to the account, so it is checked on
+    /// the server rather than remembered: another phone, or iCloud recreating
+    /// the zone, can remove it. Until it is confirmed, this phone raises every
+    /// alert itself.
     func syncAlertSubscription() async {
-        alertSubscriptionTried = .now
+        alertSubscriptionChecked = .now
         let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
         do {
-            if wanted { try await cloud.subscribeToAlerts() } else { try await cloud.unsubscribeFromAlerts() }
+            if wanted {
+                if try await !cloud.hasAlertSubscription() { try await cloud.subscribeToAlerts() }
+            } else {
+                try await cloud.unsubscribeFromAlerts()
+            }
             UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)
         } catch {
-            // The app's own alerts cover every kind until this succeeds.
             UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
         }
     }
@@ -218,7 +221,7 @@ final class MacStore {
         } catch {
             return Self.describe(error)
         }
-        // The Mac polls every 15 s when idle, then needs a fetch and a write.
+        // Long enough for an idle Mac's poll, its fetch and its write.
         for _ in 0..<24 {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
             // Through refreshAll, so this read and a push's never apply out of order.

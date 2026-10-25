@@ -106,7 +106,7 @@ final class AutomationModel {
     }
 
     private func handle(_ request: AutomationRequest, from owner: UUID) async -> AutomationReply {
-        guard enabled else { return .init(code: .disabled, message: "Enable Local automation in Battistics > Power.") }
+        guard enabled else { return .init(code: .disabled, message: "Enable Local automation in Battistics > Automation.") }
         guard connections.contains(owner) else { return .init(code: .unavailable, message: "The client disconnected.") }
         guard request.version == 1 else { return .init(code: .invalidRequest, message: "Unsupported IPC version.") }
         if lease?.isExpired(at: Date()) == true { stopOwnedSession() }
@@ -121,7 +121,7 @@ final class AutomationModel {
                 return .init(code: .busy, message: "A Keep Awake session or helper setup is already in progress. It was left unchanged.")
             }
             if arguments.mode == .lidClosed {
-                guard closedLidAllowed else { return .init(code: .closedLidNotAllowed, message: "Enable closed-lid automation in Battistics > Power first.") }
+                guard closedLidAllowed else { return .init(code: .closedLidNotAllowed, message: "Enable closed-lid automation in Battistics > Automation first.") }
                 helper.refreshStatusIfChanged()
                 guard helper.isInstalled else { return .init(code: .helperUnavailable, message: "Set up the power helper in Battistics before using closed-lid automation.") }
             }

@@ -34,7 +34,7 @@ public enum RemoteAlert: Equatable, Sendable {
 
     /// What the Mac posts after publishing `current` over `previous`.
     public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
-        changes(from: previous, to: current, chargeTarget: nil).filter { pushedKinds.contains($0.kind) }
+        changes(from: previous, to: current, chargeTarget: nil)
     }
 
     /// `current` is nil when the Mac did not answer; `previous` is nil before

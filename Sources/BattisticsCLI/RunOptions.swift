@@ -40,7 +40,7 @@ struct RunOptions {
     Usage: battistics run [--minutes N] [--name NAME] [--mode MODE] -- COMMAND [ARG...]
       N: \(KeepAwakeDuration.finite.map { String($0.rawValue) }.joined(separator: ", ")) (default: 720)
       MODE: displayMaySleep (default), displayOn, lidClosed
-    Open Battistics and enable Local automation in Power first.
+    Open Battistics and enable Local automation in Automation first.
     Keep Awake ends when the direct child exits, or earlier at the time limit,
     a protection stop, or disconnection. Stopping Keep Awake does not kill work.
     Interactive AI tasks should use MCP start/stop; an idle terminal is not task completion.

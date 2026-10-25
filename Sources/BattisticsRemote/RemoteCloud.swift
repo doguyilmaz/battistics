@@ -205,6 +205,17 @@ public actor RemoteCloud {
         _ = try await database.modifySubscriptions(saving: [subscription], deleting: [])
     }
 
+    /// Whether the account still holds the alert subscription; another phone
+    /// or a recreated zone can remove it.
+    public func hasAlertSubscription() async throws -> Bool {
+        do {
+            _ = try await database.subscription(for: Self.alertSubscriptionID)
+            return true
+        } catch let error as CKError where error.code == .unknownItem {
+            return false
+        }
+    }
+
     public func unsubscribeFromAlerts() async throws {
         let result = try await database.modifySubscriptions(saving: [], deleting: [Self.alertSubscriptionID])
         for case .failure(let error) in result.deleteResults.values

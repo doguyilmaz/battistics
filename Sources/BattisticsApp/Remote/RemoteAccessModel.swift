@@ -7,7 +7,7 @@ import Observation
 import SystemConfiguration
 
 /// Shares this Mac with the user's iPhones through their private iCloud
-/// database: a status record out, Start and Stop commands in. Off by default.
+/// database: a status record and alerts out, commands in. Off by default.
 @MainActor
 @Observable
 final class RemoteAccessModel {
@@ -56,7 +56,12 @@ final class RemoteAccessModel {
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
     @ObservationIgnored private var handledCommands: Set<String> = []
+    /// Alert records seen in the zone, by when they were posted.
     @ObservationIgnored private var events: [String: Date] = [:]
+    /// Retried with the next publish until they land or go stale.
+    @ObservationIgnored private var unsentAlerts: [(alert: RemoteAlert, at: Date)] = []
+    @ObservationIgnored private var runtimeAlertSession: Date?
+    @ObservationIgnored private var publishing: Task<Void, Error>?
     @ObservationIgnored private var retryAt: Date?
     @ObservationIgnored private var cachedPower: (settings: PowerSettings?, at: Date)?
     @ObservationIgnored private var syncing = false
@@ -130,6 +135,8 @@ final class RemoteAccessModel {
         var recordMissing = false
         do {
             let snapshot = try await cloud.fetchChanges()
+            // After a relaunch, alerts compare against what the phones last saw.
+            if lastStatus == nil { lastStatus = snapshot.statuses[macID] }
             recordMissing = (snapshot.isFull && snapshot.statuses[macID] == nil)
                 || snapshot.removedStatuses.contains(macID)
             // Left behind by a phone whose delete failed for a Mac that is gone; seen at launch.
@@ -153,10 +160,9 @@ final class RemoteAccessModel {
             // shows each one once, so they are remembered until they expire.
             events.merge(snapshot.events) { $1 }
             let expired = events.filter { -$0.value.timeIntervalSinceNow > 10 * 60 }.keys
-            handledCommands.formUnion(expired)
-            for name in expired { events[name] = nil }
-            try await cloud.delete(Array(handledCommands))
+            try await cloud.delete(Array(handledCommands) + expired)
             handledCommands.removeAll()
+            for name in expired { events[name] = nil }
         } catch {
             failure = error
         }
@@ -175,9 +181,20 @@ final class RemoteAccessModel {
         problem = failure.map(Self.describe)
     }
 
+    /// One at a time, so an older reading never lands after a newer one.
+    private func publish(force: Bool) async throws {
+        let previous = publishing
+        let next = Task { [weak self] in
+            _ = await previous?.result
+            try await self?.publishNow(force: force)
+        }
+        publishing = next
+        try await next.value
+    }
+
     /// Compares the cheap part of the status first, so a poll that changes
     /// nothing costs no history query and no `pmset` spawn.
-    private func publish(force: Bool) async throws {
+    private func publishNow(force: Bool) async throws {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
@@ -203,14 +220,28 @@ final class RemoteAccessModel {
         }
         lastCheap = cheap
         lastPublished = Date()
-        let previous = lastStatus
-        lastStatus = status
-        guard let previous else { return }
-        for alert in RemoteAlert.pushed(from: previous, to: status) {
-            guard let text = alert.pushText else { continue }
-            // A lost alert is not worth failing the heartbeat over.
-            try? await cloud.post(title: text.title, body: text.body, collapseID: "\(macID).\(alert.kind.rawValue)")
+        if let previous = lastStatus {
+            for alert in RemoteAlert.pushed(from: previous, to: status) {
+                // An estimate hovering around the session's end would otherwise ring each time it crosses.
+                if case .batteryRunsOut = alert {
+                    guard runtimeAlertSession != status.session?.startedAt else { continue }
+                    runtimeAlertSession = status.session?.startedAt
+                }
+                unsentAlerts.append((alert, .now))
+            }
         }
+        lastStatus = status
+        unsentAlerts.removeAll { -$0.at.timeIntervalSinceNow > 10 * 60 }
+        var failed: [(alert: RemoteAlert, at: Date)] = []
+        for item in unsentAlerts {
+            guard let text = item.alert.pushText else { continue }
+            do {
+                try await cloud.post(title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
+            } catch {
+                failed.append(item)
+            }
+        }
+        unsentAlerts = failed
     }
 
     /// Coalesces bursts of changes into one write.
@@ -240,7 +271,8 @@ final class RemoteAccessModel {
         guard let cloud else { return }
         let removed: Bool
         do {
-            try await cloud.delete([macID])
+            try await cloud.delete([macID] + events.keys)
+            events.removeAll()
             removed = true
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             removed = true
@@ -404,7 +436,7 @@ final class RemoteAccessModel {
         guard session.deadline != nil else {
             return .init(.startFailed, String(localized: "Keep Awake already runs until it is turned off."))
         }
-        let name = request.deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+        let name = request.senderName
         guard awake.extend(byMinutes: minutes, origin: .phone, name: name ?? String(localized: "iPhone")) else {
             return .init(.startFailed, String(localized: "Keep Awake already lasts the longest it can, 12 hours."))
         }
@@ -432,7 +464,7 @@ final class RemoteAccessModel {
             }
         }
         let id = UUID().uuidString
-        let name = request.deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+        let name = request.senderName
         let task = awake.start(mode: mode, duration: duration, id: id, allowHelperSetup: false,
                                name: name ?? String(localized: "iPhone"), origin: .phone)
         await task?.value

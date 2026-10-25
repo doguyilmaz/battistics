@@ -42,7 +42,7 @@ enum WidgetBridge {
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // Its Stop acts on the selected Mac, so an activity for any other Mac must go.
+        // One activity, for the selected Mac.
         for activity in Activity<KeepAwakeActivityAttributes>.activities where activity.attributes.macID != mac.id {
             let id = activity.id
             changes.append(Task { await end(id) })

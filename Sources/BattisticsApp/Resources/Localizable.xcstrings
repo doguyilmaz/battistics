@@ -556,23 +556,6 @@
         }
       }
     },
-    "Above %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Above %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ üzerinde"
-          }
-        }
-      }
-    },
     "Accessory": {
       "localizations": {
         "tr": {
@@ -637,23 +620,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süre Ekle"
-          }
-        }
-      }
-    },
-    "After %@ hours": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "After %@ hours"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ saat sonra"
           }
         }
       }
@@ -1396,13 +1362,13 @@
         }
       }
     },
-    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Keep Awake → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.": {
+    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Keep Awake → Session Protection you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. The thermal stop is not a hardware diagnosis or a guarantee against overheating.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Uyanık Tut → Isıl Koruma bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl Koruma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
+            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Uyanık Tut → Oturum Koruması bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl durdurma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
           }
         }
       }
@@ -2887,23 +2853,6 @@
         }
       }
     },
-    "Experiments": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Experiments"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deneyler"
-          }
-        }
-      }
-    },
     "Export CSV…": {
       "localizations": {
         "tr": {
@@ -3951,23 +3900,6 @@
         }
       }
     },
-    "Low threshold: %lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low threshold: %lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düşük eşiği: %%%lld"
-          }
-        }
-      }
-    },
     "MCP guide": {
       "extractionState": "manual",
       "localizations": {
@@ -4393,23 +4325,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bildirimler"
-          }
-        }
-      }
-    },
-    "Notify at %lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notify at %lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%lld olunca bildir"
           }
         }
       }
@@ -5008,16 +4923,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu Mac'in uykuya geçmesini engelle"
-          }
-        }
-      }
-    },
-    "Preview": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Önizleme"
           }
         }
       }
@@ -5769,23 +5674,6 @@
         }
       }
     },
-    "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç okumalarını Enerji bölümünde ve açılır panelde gösterir. Varsayılan olarak açıktır; destek Mac'e ve macOS sürümüne göre değişir."
-          }
-        }
-      }
-    },
     "Show the update": {
       "extractionState": "manual",
       "localizations": {
@@ -5940,22 +5828,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kaynak Yazılar"
-          }
-        }
-      }
-    },
-    "Start": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başlat"
           }
         }
       }
@@ -6183,17 +6055,6 @@
         }
       }
     },
-    "Stop at": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durdurma seviyesi"
-          }
-        }
-      }
-    },
     "Stop on Low Battery": {
       "extractionState": "manual",
       "localizations": {
@@ -6345,17 +6206,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sistem tahmini"
-          }
-        }
-      }
-    },
-    "System thermal pressure": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sistemin ısıl durumu"
           }
         }
       }
@@ -6851,17 +6701,6 @@
         }
       }
     },
-    "Thermal Care": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isıl Koruma"
-          }
-        }
-      }
-    },
     "These experimental macOS readings can be delayed or unavailable. Different update times and power losses make the split approximate.": {
       "extractionState": "manual",
       "localizations": {
@@ -7154,16 +6993,6 @@
         }
       }
     },
-    "Units": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birimler"
-          }
-        }
-      }
-    },
     "Unknown": {
       "extractionState": "manual",
       "localizations": {
@@ -7391,17 +7220,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bluetooth bekleniyor…"
-          }
-        }
-      }
-    },
-    "Warn at": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyarı seviyesi"
           }
         }
       }

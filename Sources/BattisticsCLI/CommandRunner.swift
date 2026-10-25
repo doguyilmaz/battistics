@@ -20,7 +20,7 @@ final class CommandRunner {
         let reply: AutomationReply
         do { reply = try await client.request(options.request) }
         catch {
-            report("Cannot connect. Open Battistics and enable Local automation in Power.")
+            report("Cannot connect. Open Battistics and enable Local automation in Automation.")
             await client.close()
             return receivedSignal.map { 128 + $0 } ?? 69
         }

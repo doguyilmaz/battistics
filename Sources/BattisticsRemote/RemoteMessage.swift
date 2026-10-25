@@ -42,6 +42,11 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         self.sentAt = sentAt
     }
 
+    /// The phone's name as the Mac shows it next to a session.
+    public var senderName: String? {
+        deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+    }
+
     /// Finite durations a phone may request; the app and Shortcuts each offer a subset.
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
 

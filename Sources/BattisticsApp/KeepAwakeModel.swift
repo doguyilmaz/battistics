@@ -48,7 +48,7 @@ final class KeepAwakeModel {
             if let session, session.mode != mode {
                 let profile = sessionOrigin == .profile ? sessionName : nil
                 start(mode: mode, duration: session.duration, now: session.startedAt,
-                      name: profile, origin: profile == nil ? .manual : .profile)
+                      name: profile, origin: profile == nil ? .manual : .profile, continuing: session)
             } else if mode != .lidClosed, approvalTask != nil {
                 // Nothing left to wait for once closed-lid is no longer wanted.
                 cancelApprovalWait()
@@ -118,7 +118,8 @@ final class KeepAwakeModel {
     @discardableResult
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
                id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
-               origin: RemoteStatus.Origin = .manual) -> Task<Void, Never>? {
+               origin: RemoteStatus.Origin = .manual,
+               continuing previous: KeepAwakeSession? = nil) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
         let unattended = Self.isUnattended(origin: origin, mode: mode)
         if let event = safety.blockingEvent(unattended: unattended) {
@@ -176,7 +177,7 @@ final class KeepAwakeModel {
                 // Authorization can take long enough for charge or thermal
                 // conditions to change. Recheck before creating the assertion.
                 if let event = safety.blockingEvent(unattended: unattended) { throw StartFailure.protection(event) }
-                let new = KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
+                let new = previous?.switching(to: mode) ?? KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
                 guard !new.hasExpired(at: Date()),
                     assertion.take(mode: mode, until: new.deadline) else {
                     throw CocoaError(.featureUnsupported)
@@ -421,7 +422,7 @@ final class KeepAwakeModel {
     }
 
     /// Seconds left, or nil when the session has no deadline or none is
-    /// running. Derived from `startedAt`, never from a counter, so it stays
+    /// running. Read from the deadline, never from a counter, so it stays
     /// correct through app nap and sleep.
     func remaining(at now: Date = Date()) -> TimeInterval? {
         session?.remaining(at: now)
@@ -441,7 +442,6 @@ final class KeepAwakeModel {
     func extend(byMinutes minutes: Int, origin: RemoteStatus.Origin = .manual, name: String? = nil) -> Bool {
         guard !isChanging, let current = session,
               let new = current.extended(byMinutes: minutes, now: Date()) else { return false }
-        // Taking the assertion again releases the old one first.
         guard assertion.take(mode: new.mode, until: new.deadline) else {
             stop(reason: .failure)
             isStoppedReasonInformational = false

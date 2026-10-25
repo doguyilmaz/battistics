@@ -3,7 +3,7 @@ import Foundation
 import AppKit
 import Observation
 
-/// One copy of macOS's power configuration, shared by the System pane and the
+/// One copy of macOS's power configuration, shared by the Power pane and the
 /// popover so the two can never disagree about what the system says.
 @MainActor
 @Observable
@@ -30,7 +30,7 @@ final class PowerSettingsModel {
         refreshGeneration &+= 1
         let generation = refreshGeneration
         let refreshed = await PowerSettingsReader.fetch()
-        if generation == refreshGeneration {
+        if generation == refreshGeneration, refreshed != settings {
             settings = refreshed
         }
         return refreshed

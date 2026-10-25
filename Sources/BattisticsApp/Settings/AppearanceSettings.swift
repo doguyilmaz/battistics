@@ -132,7 +132,6 @@ struct AppearanceSettings: View {
     }
 }
 
-/// Theme and app icon rows, shown in General.
 struct ThemeAndIconRows: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue

@@ -66,11 +66,16 @@ public struct KeepAwakeSession: Sendable, Equatable {
         deadline = duration.minutes.map { startedAt.addingTimeInterval(TimeInterval($0) * 60) }
     }
 
-    private init(_ session: KeepAwakeSession, deadline: Date) {
-        mode = session.mode
+    private init(_ session: KeepAwakeSession, mode: KeepAwakeMode? = nil, deadline: Date?) {
+        self.mode = mode ?? session.mode
         duration = session.duration
         startedAt = session.startedAt
         self.deadline = deadline
+    }
+
+    /// The same session, same deadline, in another mode.
+    public func switching(to mode: KeepAwakeMode) -> KeepAwakeSession {
+        KeepAwakeSession(self, mode: mode, deadline: deadline)
     }
 
     /// The same session ending later, capped at twelve hours from now. Nil

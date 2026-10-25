@@ -4,6 +4,7 @@ import SwiftUI
 enum DashboardPane: String, CaseIterable, Identifiable {
     case overview
     case history
+    /// Not in the sidebar; kept for battistics://dashboard/details.
     case details
     case peripherals
     case energy
@@ -20,7 +21,6 @@ enum DashboardPane: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    // Not in the sidebar; kept for battistics://dashboard/details.
     static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
     static let controlPanes: [DashboardPane] = [.system, .power, .phone]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]

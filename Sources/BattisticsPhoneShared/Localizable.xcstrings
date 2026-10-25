@@ -2075,23 +2075,6 @@
         }
       }
     },
-    "Check my Mac with ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check my Mac with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile Mac’imi kontrol et"
-          }
-        }
-      }
-    },
     "Clean Bar": {
       "extractionState": "manual",
       "localizations": {
@@ -2292,40 +2275,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’i 1 Saat Uyanık Tut"
-          }
-        }
-      }
-    },
-    "Keep my Mac awake with ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep my Mac awake with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile Mac’imi uyanık tut"
-          }
-        }
-      }
-    },
-    "Let my Mac sleep with ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Let my Mac sleep with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile Mac’imi uyut"
           }
         }
       }
@@ -5118,23 +5067,6 @@
         }
       }
     },
-    "Turn off my Mac’s display with ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn off my Mac’s display with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile Mac’imin ekranını kapat"
-          }
-        }
-      }
-    },
     "Set Mac Low Power Mode": {
       "extractionState": "manual",
       "localizations": {
@@ -5216,23 +5148,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac Düşük Güç"
-          }
-        }
-      }
-    },
-    "Set my Mac’s Low Power Mode with ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set my Mac’s Low Power Mode with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile Mac’imin Düşük Güç Modunu ayarla"
           }
         }
       }

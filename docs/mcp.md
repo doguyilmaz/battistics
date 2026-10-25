@@ -2,7 +2,7 @@
 
 Battistics exposes a local stdio MCP server through the bundled
 `Battistics.app/Contents/MacOS/battistics-mcp` executable. Open Battistics,
-enable **Local automation** in Power, and copy the client configuration
+enable **Local automation** in Automation, and copy the client configuration
 from that section. Automation is off by default. No cloud service, TCP port,
 API key, or history access is involved.
 
