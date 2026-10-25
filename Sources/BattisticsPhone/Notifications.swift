@@ -19,6 +19,7 @@ enum Notifications {
             nonisolated(unsafe) let refresh = task
             schedule()
             let work = Task { @MainActor in
+                LocalPhoneMonitor.shared.refresh()
                 _ = await MacStore.shared.refreshAll()
                 refresh.setTaskCompleted(success: !Task.isCancelled)
             }
