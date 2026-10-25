@@ -28,7 +28,8 @@ struct BatteryCard: View {
                 }
 
                 HStack(spacing: 8) {
-                    MetricPill(label: String(localized: "Power"),
+                    MetricPill(label: (battery.watts.map { abs($0) >= 0.5 } ?? false)
+                                    ? String(localized: "Power") : String(localized: "Adapter"),
                                value: battery.powerText ?? "–",
                                symbol: "bolt.fill",
                                tint: battery.isCharging ? PowerPalette.charging : .accentColor)
