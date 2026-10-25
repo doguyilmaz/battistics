@@ -54,6 +54,7 @@ struct MacDetailsView: View {
                 LabeledContent("Updated", value: status.readAt.formatted(date: .abbreviated, time: .shortened))
             }
         }
+        .topBlur()
         .navigationTitle(mac.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -102,6 +103,7 @@ struct PhoneDetailsView: View {
                 LabeledContent("Available", value: phone.availableStorage.formatted(.byteCount(style: .file)))
             }
         }
+        .topBlur()
         .navigationTitle(phone.pickerName)
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -55,6 +55,7 @@ struct SettingsView: View {
                     LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")
                 }
             }
+            .topBlur()
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -125,6 +126,7 @@ struct AppearanceSettingsView: View {
                 Text("iOS does not tell apps your iPhone’s name. It appears in the device menu as \(phone.pickerName).")
             }
         }
+        .topBlur()
         .navigationTitle("Appearance")
         .navigationBarTitleDisplayMode(.inline)
     }

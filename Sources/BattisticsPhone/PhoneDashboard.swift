@@ -146,6 +146,7 @@ private struct BatteryHealthSheet: View {
                     }
                 }
             }
+            .topBlur()
             .navigationTitle("Battery Health")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

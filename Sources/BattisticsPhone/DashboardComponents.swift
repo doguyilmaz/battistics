@@ -13,13 +13,39 @@ extension View {
             }
     }
 
-    /// The blurred edge under the navigation bar from iOS 26; iOS 27 draws a hard line by default.
+    /// iOS 27 draws a hard line under the navigation bar, and its soft edge
+    /// drops the blur. This keeps the soft edge and puts back a blur that
+    /// fades out, like iOS 26.
     @ViewBuilder
     func softScrollEdge() -> some View {
         if #available(iOS 26, *) {
             scrollEdgeEffectStyle(.soft, for: .top)
         } else {
             self
+        }
+    }
+
+    /// Goes on a scroll view or list, below the bar's buttons. The bar's height
+    /// comes from outside the scroll view, which does not report it.
+    func topBlur() -> some View {
+        GeometryReader { proxy in
+            topBlur(height: proxy.safeAreaInsets.top)
+        }
+    }
+
+    private func topBlur(height: CGFloat) -> some View {
+        overlay(alignment: .top) {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .mask {
+                    LinearGradient(stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.7),
+                                           .init(color: .clear, location: 1)],
+                                   startPoint: .top, endPoint: .bottom)
+                }
+                .frame(height: height)
+                .offset(y: -height)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
         }
     }
 
@@ -46,6 +72,7 @@ struct DashboardPage<Content: View>: View {
                 .padding(.bottom, 16)
         }
         .scrollIndicators(.hidden)
+        .topBlur()
         .background {
             ZStack(alignment: .top) {
                 Color(.systemGroupedBackground)

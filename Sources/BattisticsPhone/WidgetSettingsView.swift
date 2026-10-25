@@ -65,6 +65,7 @@ struct WidgetSettingsView: View {
                 .listRowInsets(EdgeInsets())
             }
         }
+        .topBlur()
         .navigationTitle("Widgets")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: prefs) {
