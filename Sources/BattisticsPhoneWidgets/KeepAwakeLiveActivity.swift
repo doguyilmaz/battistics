@@ -62,13 +62,7 @@ struct KeepAwakeActivityWidget: Widget {
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
                             Spacer(minLength: 6)
-                            Button(intent: StopKeepAwakeLiveIntent()) {
-                                Label("Stop", systemImage: "stop.fill")
-                                    .font(.caption.weight(.semibold))
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.orange)
-                            .controlSize(.mini)
+                            LiveActions(context: context, size: .mini)
                         }
                     }
                 }
@@ -221,18 +215,39 @@ private struct LockScreenLiveActivityView: View {
             HStack(spacing: 8) {
                 LiveFreshness(state: state, quiet: offline || context.isStale)
                 Spacer(minLength: 8)
-                Button(intent: StopKeepAwakeLiveIntent()) {
-                    Label("Stop", systemImage: "stop.fill")
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 4)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.orange)
-                .controlSize(.small)
+                LiveActions(context: context, size: .small)
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
+    }
+}
+
+/// Add Time for a timed session, then Stop; both act on this activity's Mac.
+private struct LiveActions: View {
+    let context: ActivityViewContext<KeepAwakeActivityAttributes>
+    let size: ControlSize
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if context.state.deadline != nil {
+                Button(intent: ExtendKeepAwakeLiveIntent(macID: context.attributes.macID, minutes: 30)) {
+                    Label("30 min", systemImage: "plus")
+                        .font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+                .accessibilityLabel(Text("Add 30 minutes"))
+            }
+            Button(intent: StopKeepAwakeLiveIntent(macID: context.attributes.macID)) {
+                Label("Stop", systemImage: "stop.fill")
+                    .font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.orange)
+        }
+        .controlSize(size)
+        .disabled(context.state.offline == true)
     }
 }
 

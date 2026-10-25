@@ -53,9 +53,13 @@ final class MacStore {
             guard let self, let mac = self.selected else { return }
             await Notifications.report(await self.start(mac, mode: .displayMaySleep, minutes: 60), for: mac)
         }
-        RemoteIntentBridge.stop = { [weak self] in
-            guard let self, let mac = self.selected else { return }
+        RemoteIntentBridge.stop = { [weak self] id in
+            guard let self, let mac = self.mac(id) else { return }
             await Notifications.report(await self.stop(mac), for: mac)
+        }
+        RemoteIntentBridge.extend = { [weak self] id, minutes in
+            guard let self, let mac = self.mac(id) else { return }
+            await Notifications.report(await self.extend(mac, minutes: minutes), for: mac)
         }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
     }
@@ -66,6 +70,11 @@ final class MacStore {
     }
 
     var selected: Mac? { macs.first { $0.id == selectedID } ?? macs.first }
+
+    /// The Mac a widget or Live Activity names, else the selected one.
+    private func mac(_ id: String?) -> Mac? {
+        id.flatMap { id in macs.first { $0.id == id } } ?? selected
+    }
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
 
@@ -150,6 +159,10 @@ final class MacStore {
 
     func stop(_ mac: Mac) async -> String? {
         await send(.init(operation: .stop, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+    }
+
+    func extend(_ mac: Mac, minutes: Int) async -> String? {
+        await send(.init(operation: .extend, durationMinutes: minutes, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
     }
 
     func setLowPower(_ mac: Mac, policy: RemoteStatus.LowPowerPolicy) async -> String? {

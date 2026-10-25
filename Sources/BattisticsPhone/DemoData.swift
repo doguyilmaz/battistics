@@ -56,6 +56,10 @@ enum DemoData {
         case .inspect:
             status.extras = .init(sampledAt: now, accessories: [.init(name: "Magic Keyboard", percent: 88)],
                                   apps: [.init(name: "Final Cut Pro", cpuPercent: 63.4), .init(name: "Mail", cpuPercent: 2.1)])
+        case .extend:
+            if let deadline = status.session?.deadline {
+                status.session?.deadline = max(deadline, now).addingTimeInterval(Double(request.durationMinutes ?? 0) * 60)
+            }
         case .sleepDisplay, .unknown:
             break
         }

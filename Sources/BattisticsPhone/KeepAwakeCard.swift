@@ -145,14 +145,34 @@ struct KeepAwakeCard: View {
 
     @ViewBuilder
     private func actionButton(session: RemoteStatus.Session?, pending: Bool) -> some View {
-        if session != nil {
-            Button(role: .destructive) {
-                run { await store.stop(mac) }
-            } label: {
-                buttonLabel(String(localized: "Stop"), symbol: "stop.fill", pending: pending)
+        if let session {
+            HStack(spacing: 10) {
+                Button(role: .destructive) {
+                    run { await store.stop(mac) }
+                } label: {
+                    buttonLabel(String(localized: "Stop"), symbol: "stop.fill", pending: pending)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+                if session.deadline != nil {
+                    Menu {
+                        ForEach(RemoteRequest.extensions, id: \.self) { value in
+                            Button("+\(DurationLabel.long(minutes: value))") {
+                                run { await store.extend(mac, minutes: value) }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            if store.pending[mac.id] == .extend { ProgressView() } else { Image(systemName: "plus") }
+                            Text("Add Time").fontWeight(.semibold)
+                        }
+                        .frame(minHeight: 30)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.orange)
+                    .transition(.opacity)
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
         } else {
             Button {
                 if status.needsHotspot(for: chosenMode) { confirmingWiFi = true } else { start(chosenMode) }

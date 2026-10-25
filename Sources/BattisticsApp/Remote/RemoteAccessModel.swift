@@ -323,6 +323,8 @@ final class RemoteAccessModel {
         case .inspect:
             extras = await Self.inspect()
             return nil
+        case .extend:
+            return extend(request)
         case .unknown:
             return .init(.invalidRequest)
         }
@@ -371,6 +373,23 @@ final class RemoteAccessModel {
         } catch {
             return .init(.startFailed, String(localized: "macOS could not put the display to sleep."))
         }
+    }
+
+    private func extend(_ request: RemoteRequest) -> RemoteFailure? {
+        guard let minutes = request.durationMinutes, RemoteRequest.extensions.contains(minutes) else {
+            return .init(.invalidRequest)
+        }
+        guard let session = awake.session, !awake.isChanging else {
+            return .init(.startFailed, String(localized: "Keep Awake is not running on this Mac."))
+        }
+        guard session.deadline != nil else {
+            return .init(.startFailed, String(localized: "Keep Awake already runs until it is turned off."))
+        }
+        let name = request.deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+        guard awake.extend(byMinutes: minutes, origin: .phone, name: name ?? String(localized: "iPhone")) else {
+            return .init(.startFailed, String(localized: "Keep Awake already lasts the longest it can, 12 hours."))
+        }
+        return nil
     }
 
     private func start(_ request: RemoteRequest) async -> RemoteFailure? {

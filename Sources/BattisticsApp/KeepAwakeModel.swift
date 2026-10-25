@@ -434,6 +434,30 @@ final class KeepAwakeModel {
                     title: starting ? String(localized: "Keep Awake not started") : String(localized: "Keep Awake stopped"))
     }
 
+    /// Adds time to a timed session. A phone or this Mac extending a task
+    /// started by a command or an AI client takes it over, so the task
+    /// ending no longer ends the session.
+    @discardableResult
+    func extend(byMinutes minutes: Int, origin: RemoteStatus.Origin = .manual, name: String? = nil) -> Bool {
+        guard !isChanging, let current = session,
+              let new = current.extended(byMinutes: minutes, now: Date()) else { return false }
+        // Taking the assertion again releases the old one first.
+        guard assertion.take(mode: new.mode, until: new.deadline) else {
+            stop(reason: .failure)
+            isStoppedReasonInformational = false
+            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            return false
+        }
+        session = new
+        scheduleExpiry(for: new, now: Date())
+        if sessionOrigin == .terminal || sessionOrigin == .ai {
+            sessionOrigin = origin
+            sessionName = name
+            if let sessionID { onOwnershipReleased?(sessionID) }
+        }
+        return true
+    }
+
     /// A new duration counts from now. The closed-lid lease is untouched; it
     /// does not carry a deadline of its own.
     private func retime(_ current: KeepAwakeSession, to duration: KeepAwakeDuration) {

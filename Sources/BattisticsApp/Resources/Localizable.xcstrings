@@ -630,6 +630,17 @@
         }
       }
     },
+    "Add Time": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Süre Ekle"
+          }
+        }
+      }
+    },
     "After %@ hours": {
       "extractionState": "manual",
       "localizations": {
@@ -3353,6 +3364,28 @@
         }
       }
     },
+    "Keep Awake already lasts the longest it can, 12 hours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut zaten en uzun süreye, 12 saate ulaştı."
+          }
+        }
+      }
+    },
+    "Keep Awake already runs until it is turned off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut zaten kapatılana kadar çalışıyor."
+          }
+        }
+      }
+    },
     "Keep Awake cannot start at %lld%% with battery protection enabled. Connect power before starting a session.": {
       "extractionState": "manual",
       "localizations": {
@@ -3426,6 +3459,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geliştirme görevleri boyunca uyanık tutun"
+          }
+        }
+      }
+    },
+    "Keep Awake is not running on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te Uyanık Tut çalışmıyor."
           }
         }
       }

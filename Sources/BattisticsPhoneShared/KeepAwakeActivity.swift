@@ -35,7 +35,9 @@ struct KeepAwakeActivityAttributes: ActivityAttributes {
 @MainActor
 enum RemoteIntentBridge {
     static var startOneHour: (() async -> Void)?
-    static var stop: (() async -> Void)?
+    /// Given the Live Activity's own Mac; nil means the selected one.
+    static var stop: ((String?) async -> Void)?
+    static var extend: ((String?, Int) async -> Void)?
 }
 
 struct StartKeepAwakeLiveIntent: LiveActivityIntent {
@@ -54,9 +56,43 @@ struct StopKeepAwakeLiveIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Stop Keep Awake"
     static let description = IntentDescription("Stops the active Keep Awake session on your Mac.")
 
+    @Parameter(title: "Mac")
+    var macID: String?
+
+    init() {}
+
+    init(macID: String?) {
+        self.macID = macID
+    }
+
     @MainActor
     func perform() async throws -> some IntentResult {
-        await RemoteIntentBridge.stop?()
+        await RemoteIntentBridge.stop?(macID)
+        return .result()
+    }
+}
+
+struct ExtendKeepAwakeLiveIntent: LiveActivityIntent {
+    static let title: LocalizedStringResource = "Add Time to Keep Awake"
+    static let description = IntentDescription("Adds time to the Keep Awake session on your Mac.")
+    static let isDiscoverable = false
+
+    @Parameter(title: "Mac")
+    var macID: String?
+
+    @Parameter(title: "Minutes")
+    var minutes: Int
+
+    init() {}
+
+    init(macID: String?, minutes: Int) {
+        self.macID = macID
+        self.minutes = minutes
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        await RemoteIntentBridge.extend?(macID, minutes)
         return .result()
     }
 }
@@ -73,7 +109,7 @@ struct SetKeepAwakeIntent: SetValueIntent, LiveActivityIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        if value { await RemoteIntentBridge.startOneHour?() } else { await RemoteIntentBridge.stop?() }
+        if value { await RemoteIntentBridge.startOneHour?() } else { await RemoteIntentBridge.stop?(nil) }
         return .result()
     }
 }

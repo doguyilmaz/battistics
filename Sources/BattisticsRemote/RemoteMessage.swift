@@ -9,6 +9,8 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         case sleepDisplay
         /// Samples accessory batteries and the apps using the most energy, on request only.
         case inspect
+        /// Adds `durationMinutes` to the running timed session.
+        case extend
         /// Sent by a newer phone; answered as an invalid request instead of left unread.
         case unknown
 
@@ -42,6 +44,9 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
 
     /// Finite durations a phone may request; the app and Shortcuts each offer a subset.
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
+
+    /// What a phone may add to a running session at once.
+    public static let extensions = [15, 30, 60, 120]
 
     /// All valid duration values including 0 (indefinite / until turned off).
     public static let allowedDurations: Set<Int> = Set(durations + [0])
