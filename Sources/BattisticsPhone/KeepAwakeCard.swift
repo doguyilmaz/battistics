@@ -6,7 +6,7 @@ struct KeepAwakeCard: View {
     let mac: MacStore.Mac
     let status: RemoteStatus
     let reachable: Bool
-    @Binding var message: String?
+    @State private var message: String?
 
     /// 0 is "until turned off".
     @AppStorage("lastDuration") private var minutes = 60

@@ -6,7 +6,8 @@ struct BatteryCard: View {
     let mac: MacStore.Mac
     let status: RemoteStatus
     let reachable: Bool
-    @Binding var message: String?
+    /// Why a Low Power or display command failed, shown here rather than in Keep Awake.
+    @State private var message: String?
 
     var body: some View {
         if let battery = status.battery {
@@ -47,10 +48,19 @@ struct BatteryCard: View {
                 if let history = status.chargeHistory, history.count > 1 {
                     ChargeSparkline(points: history, tint: tint, height: 40)
                 }
+
+                if let message {
+                    Label(message, systemImage: "exclamationmark.circle.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .transition(.opacity)
+                }
             }
             .card(border: reachable && (battery.isCharging || battery.lowPowerMode == true) ? tint.opacity(0.35) : nil)
             .animation(.snappy, value: battery.lowPowerMode)
             .animation(.snappy, value: battery.isCharging)
+            .animation(.snappy, value: message)
+            .onChange(of: battery.lowPowerPolicy) { message = nil }
         } else {
             Label("This Mac has no battery", systemImage: "powerplug")
                 .card()

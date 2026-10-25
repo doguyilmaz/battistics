@@ -4,7 +4,6 @@ import SwiftUI
 struct MacDashboard: View {
     @Environment(MacStore.self) private var store
     let mac: MacStore.Mac
-    @State private var message: String?
 
     var body: some View {
         let reading = store.reading(for: mac)
@@ -15,8 +14,8 @@ struct MacDashboard: View {
             StatusLine(reading: reading, problem: store.problem)
             if let status = reading?.status {
                 Group {
-                    BatteryCard(mac: mac, status: status, reachable: reachable, message: $message)
-                    KeepAwakeCard(mac: mac, status: status, reachable: reachable, message: $message)
+                    BatteryCard(mac: mac, status: status, reachable: reachable)
+                    KeepAwakeCard(mac: mac, status: status, reachable: reachable)
                     ConditionsGrid(status: status)
                         .opacity(reachable ? 1 : 0.6)
                     HotspotCard(mac: mac, status: status, reachable: reachable)
