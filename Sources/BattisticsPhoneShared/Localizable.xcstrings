@@ -5032,6 +5032,74 @@
           }
         }
       }
+    },
+    "Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awake"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık"
+          }
+        }
+      }
+    },
+    "Can Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyuyabilir"
+          }
+        }
+      }
+    },
+    "Keeps the Mac you picked in Battistics Remote awake for an hour.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeps the Mac you picked in Battistics Remote awake for an hour."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote'ta seçtiğin Mac'i bir saat uyanık tutar."
+          }
+        }
+      }
+    },
+    "Keeps your Mac awake for an hour, or lets it sleep again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keeps your Mac awake for an hour, or lets it sleep again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'ini bir saat uyanık tutar ya da yeniden uyumasına izin verir."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

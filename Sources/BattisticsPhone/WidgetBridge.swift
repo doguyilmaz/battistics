@@ -12,16 +12,21 @@ enum WidgetBridge {
     static func publish(_ mac: MacStore.Mac?, reading: MacStore.Reading?) {
         guard let mac else {
             SharedSnapshot.clear()
-            WidgetCenter.shared.reloadAllTimelines()
+            reloadWidgets()
             endActivities()
             return
         }
         let snapshot = SharedSnapshot(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false)
         if snapshot != SharedSnapshot.load() {
             snapshot.save()
-            WidgetCenter.shared.reloadAllTimelines()
+            reloadWidgets()
         }
         syncActivity(mac, reading: reading)
+    }
+
+    private static func reloadWidgets() {
+        WidgetCenter.shared.reloadAllTimelines()
+        if #available(iOS 18.0, *) { ControlCenter.shared.reloadAllControls() }
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {

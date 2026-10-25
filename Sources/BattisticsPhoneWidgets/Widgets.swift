@@ -11,6 +11,33 @@ struct RemoteWidgets: WidgetBundle {
         MacBatteryWidget()
         MacLockScreenDetailWidget()
         KeepAwakeActivityWidget()
+        if #available(iOS 18.0, *) {
+            KeepAwakeControl()
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+struct KeepAwakeControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "mac.keepawake.control", provider: Provider()) { isOn in
+            ControlWidgetToggle("Keep Mac Awake", isOn: isOn, action: SetKeepAwakeIntent()) { on in
+                Label(on ? String(localized: "Awake") : String(localized: "Can Sleep"),
+                      systemImage: on ? "cup.and.saucer.fill" : "cup.and.saucer")
+            }
+            .tint(.orange)
+        }
+        .displayName("Keep Mac Awake")
+        .description("Keeps the Mac you picked in Battistics Remote awake for an hour.")
+    }
+
+    struct Provider: ControlValueProvider {
+        var previewValue: Bool { false }
+
+        func currentValue() async throws -> Bool {
+            guard let snapshot = SharedSnapshot.load(), snapshot.reachable else { return false }
+            return snapshot.status?.session?.isActive(at: .now) ?? false
+        }
     }
 }
 

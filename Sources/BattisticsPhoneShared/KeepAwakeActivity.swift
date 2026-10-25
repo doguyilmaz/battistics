@@ -53,3 +53,19 @@ struct StopKeepAwakeLiveIntent: LiveActivityIntent {
         return .result()
     }
 }
+
+/// Backs the Control Center and Action Button toggle; runs in the app, which holds the iCloud connection.
+@available(iOS 18.0, *)
+struct SetKeepAwakeIntent: SetValueIntent, LiveActivityIntent {
+    static let title: LocalizedStringResource = "Keep Mac Awake"
+    static let description = IntentDescription("Keeps your Mac awake for an hour, or lets it sleep again.")
+
+    @Parameter(title: "Keep Awake")
+    var value: Bool
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if value { await RemoteIntentBridge.startOneHour?() } else { await RemoteIntentBridge.stop?() }
+        return .result()
+    }
+}
