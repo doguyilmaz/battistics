@@ -80,7 +80,7 @@ struct BatteryCard: View {
             }
         } label: {
             Label(lowPower ? String(localized: "Low Power") : (battery.lowPowerPolicy?.compactBadge ?? String(localized: "Power")),
-                  systemImage: lowPower ? "leaf.fill" : "bolt.circle")
+                  systemImage: lowPower ? "leaf.fill" : (battery.lowPowerPolicy?.symbol ?? "bolt.circle"))
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
                 .padding(.horizontal, 10)
