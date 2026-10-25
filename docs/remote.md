@@ -65,7 +65,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 ## Verified only in Simulator or tests
 
 - The adaptive watchdog with steady background pushes (only the throttled case ran on a device).
-- Live Activity stale and offline lines (rendered in Simulator) and Home Screen widget buttons.
+- The Live Activity's offline line after a fetch confirmed the Mac gone (rendered in Simulator; the stale line showed on a device).
 
 ## Considered and not built
 
