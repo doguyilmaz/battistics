@@ -26,16 +26,22 @@ const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
   .download:active { transform: translateY(1px); }
   .download:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
   .download svg { width: 20px; height: 20px; }
+  /* Drawn from the button's own colours, so it reads in either theme. */
   .download small {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     margin-left: auto;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 4px 9px;
+    border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: var(--ink);
-    background: var(--charge);
+    color: inherit;
+    background: color-mix(in oklab, currentColor 12%, transparent);
+    border: 1px solid color-mix(in oklab, currentColor 28%, transparent);
   }
+  .download small::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--charge); }
 
 </style>
 
@@ -48,11 +54,11 @@ const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
     .then((release) => {
       const dmg = release.assets.find((asset) => asset.name.endsWith(".dmg"));
       if (!dmg) return;
-      const megabytes = (dmg.size / 1_000_000).toFixed(1);
+      const megabytes = Math.max(1, Math.round(dmg.size / 1_000_000));
       for (const button of buttons) {
         button.href = dmg.browser_download_url;
         const meta = button.querySelector("[data-download-meta]");
-        if (meta) meta.textContent = `${release.tag_name}, ${megabytes} MB`;
+        if (meta) meta.textContent = `${release.tag_name}, ~${megabytes} MB`;
       }
     })
     .catch(() => {});
