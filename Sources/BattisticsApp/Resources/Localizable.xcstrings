@@ -3962,23 +3962,6 @@
         }
       }
     },
-    "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerekir; bu Mac’te kapak kapalı Uyanık Tut’u bir kez başlatarak kurulur."
-          }
-        }
-      }
-    },
     "Never": {
       "extractionState": "manual",
       "localizations": {
@@ -7700,6 +7683,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "·"
+          }
+        }
+      }
+    },
+    "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone with no end time always stops at 10% battery and under high thermal pressure.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone with no end time always stops at 10% battery and under high thermal pressure."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı gerekir; bu Mac’te kapak kapalı Uyanık Tut’u bir kez başlatarak kurulur. iPhone’dan bitiş zamanı olmadan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
           }
         }
       }

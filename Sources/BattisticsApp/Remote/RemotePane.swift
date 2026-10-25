@@ -28,7 +28,7 @@ struct RemotePane: View {
                             .foregroundStyle(.secondary)
                     }
                     Toggle("Allow closed-lid sessions from iPhone", isOn: $remote.closedLidAllowed)
-                    Text("Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once.")
+                    Text("Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone with no end time always stops at 10% battery and under high thermal pressure.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
