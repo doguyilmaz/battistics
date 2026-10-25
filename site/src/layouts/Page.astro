@@ -1,5 +1,6 @@
 ---
 import "../styles/tokens.css";
+import Lightbox from "../components/Lightbox.astro";
 
 interface Props {
   title: string;
@@ -31,6 +32,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <slot />
+    <Lightbox />
   </body>
 </html>
 
@@ -48,6 +50,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     overflow-x: hidden;
   }
   img { max-width: 100%; height: auto; }
+  [hidden] { display: none !important; }
   a { color: var(--teal-ink); text-underline-offset: 0.18em; }
   a:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 3px; }
   @media (prefers-reduced-motion: reduce) {

@@ -1,12 +1,8 @@
 ---
-interface Props {
-  large?: boolean;
-}
-const { large = false } = Astro.props;
 const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
 ---
 
-<a class:list={["download", { large }]} href={fallback} data-download>
+<a class="download" href={fallback} data-download>
   <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.2M6 8.6l4 4 4-4M4 16h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
   <span>Download for Mac</span>
   <small data-download-meta>DMG</small>
@@ -14,11 +10,11 @@ const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
 
 <style>
   .download {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 10px;
-    height: 48px;
-    padding: 0 20px 0 16px;
+    height: 52px;
+    padding: 0 16px 0 18px;
     border-radius: 12px;
     background: var(--ink);
     color: var(--paper);
@@ -31,7 +27,8 @@ const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
   .download:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
   .download svg { width: 20px; height: 20px; }
   .download small {
-    padding: 4px 7px;
+    margin-left: auto;
+    padding: 4px 8px;
     border-radius: 6px;
     font-size: 0.78rem;
     font-weight: 600;
@@ -39,7 +36,7 @@ const fallback = "https://github.com/doguyilmaz/battistics/releases/latest";
     color: var(--ink);
     background: var(--charge);
   }
-  .large { height: 58px; padding: 0 24px 0 20px; font-size: 1.1rem; border-radius: 14px; }
+
 </style>
 
 <script>

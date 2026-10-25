@@ -1,0 +1,88 @@
+---
+// One shared viewer for every image marked data-zoom: a native <dialog>,
+// no library. Escape, a click outside or the close button dismiss it.
+---
+
+<dialog class="lightbox" data-lightbox aria-label="Image">
+  <button type="button" class="close" data-lightbox-close aria-label="Close">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+  </button>
+  <img alt="" data-lightbox-image />
+  <p data-lightbox-caption></p>
+</dialog>
+
+<style>
+  .lightbox {
+    max-width: min(1200px, 94vw);
+    max-height: 94vh;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    overflow: visible;
+    background: transparent;
+  }
+  .lightbox::backdrop { background: rgb(8 14 11 / 0.72); backdrop-filter: blur(6px); }
+  .lightbox[open] { animation: zoom-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .lightbox[open]::backdrop { animation: fade 0.22s ease; }
+  img {
+    display: block;
+    max-width: min(1200px, 94vw);
+    max-height: 84vh;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  }
+  p { margin: 14px auto 0; max-width: 70ch; text-align: center; color: #e6ece8; font: 15px/1.5 var(--text); }
+  p:empty { display: none; }
+  .close {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    background: rgb(255 255 255 / 0.14);
+    cursor: pointer;
+  }
+  .close svg { width: 16px; height: 16px; }
+  .close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  @keyframes zoom-in { from { opacity: 0; transform: scale(0.96); } }
+  @keyframes fade { from { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox[open], .lightbox[open]::backdrop { animation: none; }
+  }
+  :global([data-zoom]) { cursor: zoom-in; }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]")!;
+  const image = dialog.querySelector<HTMLImageElement>("[data-lightbox-image]")!;
+  const caption = dialog.querySelector<HTMLElement>("[data-lightbox-caption]")!;
+  document.addEventListener("click", (event) => {
+    const target = (event.target as Element).closest<HTMLElement>("[data-zoom]");
+    if (!target) return;
+    const source = target instanceof HTMLImageElement ? target : target.querySelector("img");
+    if (!source) return;
+    event.preventDefault();
+    image.src = target.dataset.zoom || source.currentSrc || source.src;
+    image.alt = source.alt;
+    caption.textContent = target.dataset.caption ?? "";
+    dialog.showModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    const target = (event.target as Element).closest?.<HTMLElement>("[data-zoom]");
+    if (target && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      target.click();
+    }
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog || (event.target as Element).closest("[data-lightbox-close]")) dialog.close();
+  });
+</script>

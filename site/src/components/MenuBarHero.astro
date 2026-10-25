@@ -1,49 +1,44 @@
 ---
-import { glyphSVG } from "../lib/glyph";
+import MenuBar from "./MenuBar.astro";
+import Popover from "./Popover.astro";
 import DownloadButton from "./DownloadButton.astro";
 import BrewCommand from "./BrewCommand.astro";
 
-const charge = 82;
-const health = 86;
-const ring = (value: number) => {
-  const c = 2 * Math.PI * 42;
-  return `stroke-dasharray:${c.toFixed(2)};--ring-offset:${(c * (1 - value / 100)).toFixed(2)}`;
+// Contour lines of the app's Wings glyph, nested like a topographic map.
+const wing = (s: number, cx: number, cy: number) => {
+  const p = (x: number, y: number) => `${(cx + (x - 0.5) * s).toFixed(1)} ${(cy - (y - 0.5) * s * 0.58).toFixed(1)}`;
+  const c = (a: number[], b: number[], e: number[]) => `C${p(a[0], a[1])} ${p(b[0], b[1])} ${p(e[0], e[1])}`;
+  return (
+    `M${p(0.03, 0.6)}` +
+    c([0.13, 0.86], [0.28, 0.84], [0.4, 0.8]) + c([0.41, 0.86], [0.41, 0.93], [0.43, 0.97]) +
+    c([0.46, 0.92], [0.48, 0.86], [0.5, 0.84]) + c([0.52, 0.86], [0.54, 0.92], [0.57, 0.97]) +
+    c([0.59, 0.93], [0.59, 0.86], [0.6, 0.8]) + c([0.72, 0.84], [0.87, 0.86], [0.97, 0.6]) +
+    c([0.88, 0.44], [0.8, 0.36], [0.7, 0.36]) + c([0.64, 0.36], [0.6, 0.3], [0.56, 0.24]) +
+    c([0.53, 0.18], [0.51, 0.1], [0.5, 0.06]) + c([0.49, 0.1], [0.47, 0.18], [0.44, 0.24]) +
+    c([0.4, 0.3], [0.36, 0.36], [0.3, 0.36]) + c([0.2, 0.36], [0.12, 0.44], [0.03, 0.6]) + "Z"
+  );
 };
-// A day on battery and back on the adapter, as the popover's chart draws it.
-const day = [96, 95, 92, 88, 84, 79, 74, 70, 66, 61, 57, 55, 63, 74, 86, 97, 100, 100, 99, 96, 93, 90, 86, 82];
-const sx = (i: number) => (i / (day.length - 1)) * 288;
-const sy = (v: number) => 54 - (v / 100) * 50;
-const line = day.map((v, i) => `${i ? "L" : "M"}${sx(i).toFixed(1)} ${sy(v).toFixed(1)}`).join("");
-const area = `${line}L288 56L0 56Z`;
+const contours = Array.from({ length: 9 }, (_, i) => wing(520 + i * 210, 1060, 470));
 ---
 
-<section class="desk" aria-labelledby="hero-title">
-  <svg class="wallpaper" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <path d="M0 470C240 410 420 420 560 500C640 545 690 610 720 700C750 610 800 545 880 500C1020 420 1200 410 1440 470V760H0Z" />
-    <path d="M0 560C200 520 380 540 520 610C600 650 660 700 720 760C780 700 840 650 920 610C1060 540 1240 520 1440 560V760H0Z" />
-    <path d="M0 650C220 630 420 660 560 720L600 760H840L880 720C1020 660 1220 630 1440 650V760H0Z" />
+<header class="desk" aria-labelledby="hero-title">
+  <svg class="lines" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="contour" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="var(--accent-a)" /><stop offset="1" stop-color="var(--accent-b)" />
+      </linearGradient>
+    </defs>
+    {contours.map((d, i) => <path d={d} style={`opacity:${(0.55 - i * 0.05).toFixed(2)}`} />)}
   </svg>
 
-  <div class="menubar" role="presentation">
-    <div class="menus">
-      <strong>Finder</strong><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span>
-    </div>
-    <div class="extras">
-      <svg class="sys" viewBox="0 0 20 16" aria-hidden="true"><path d="M10 13.6 7.6 11.2a3.4 3.4 0 0 1 4.8 0zM4.9 8.5a7.2 7.2 0 0 1 10.2 0l-1.5 1.5a5.1 5.1 0 0 0-7.2 0zM2.2 5.8a11 11 0 0 1 15.6 0l-1.5 1.5a8.9 8.9 0 0 0-12.6 0z" fill="currentColor"/></svg>
-      <svg class="sys" viewBox="0 0 18 16" aria-hidden="true"><rect x="1.5" y="2.5" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="12.6" cy="4.8" r="1.4" fill="currentColor"/><rect x="1.5" y="9" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="5.4" cy="11.3" r="1.4" fill="currentColor"/></svg>
-      <button class="status-item" type="button" aria-expanded="true" aria-controls="popover" aria-label={`Battistics, ${charge}% charged`}>
-        <Fragment set:html={glyphSVG({ shape: "bat", fraction: charge / 100, charging: false }, 'class="item-glyph"')} />
-        <span>{charge}%</span>
-      </button>
-      <span class="clock" data-clock>Sun 25 Oct 9:41</span>
-    </div>
-  </div>
+  <MenuBar />
 
   <div class="hero">
     <div class="pitch">
+      <p class="free">Free for every Mac. Open source.</p>
       <h1 id="hero-title">Your Mac’s battery, read properly.</h1>
       <p class="lede">
-        Battistics sits in the menu bar and shows what macOS knows about the battery: charge, health, cycles,
+        Battistics lives in the menu bar and shows what macOS knows about the battery: charge, health, cycles,
         temperature and every watt going in or out. When the Mac has to stay up, it keeps it awake, even with the lid
         closed in a bag.
       </p>
@@ -51,286 +46,93 @@ const area = `${line}L288 56L0 56Z`;
         <DownloadButton />
         <BrewCommand />
       </div>
-      <p class="fineprint">Free and open source. macOS 14 or later on Apple Silicon.</p>
+      <p class="fineprint">macOS 14 or later, Apple Silicon. Try the menu bar above: it works.</p>
     </div>
   </div>
 
-  <div class="popover" id="popover" data-open="true">
-      <span class="arrow" aria-hidden="true"></span>
-      <header>
-        <Fragment set:html={glyphSVG({ shape: "bat", fraction: 0.6, charging: false }, 'class="head-glyph"')} />
-        <strong>Battistics</strong>
-        <span class="badge">Good</span>
-      </header>
-      <div class="rings">
-        <figure>
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <defs>
-              <linearGradient id="charge-ring" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="var(--lime)" /><stop offset="1" stop-color="var(--teal)" />
-              </linearGradient>
-            </defs>
-            <circle cx="50" cy="50" r="42" class="track" />
-            <circle cx="50" cy="50" r="42" class="value" stroke="url(#charge-ring)" style={ring(charge)} />
-          </svg>
-          <span class="ring-value">{charge}%</span>
-          <figcaption>Charge</figcaption>
-        </figure>
-        <figure>
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="42" class="track" />
-            <circle cx="50" cy="50" r="42" class="value health" style={ring(health)} />
-          </svg>
-          <span class="ring-value">{health}%</span>
-          <figcaption>Health</figcaption>
-        </figure>
-      </div>
-      <p class="status-line">On battery, 5:48 remaining</p>
-      <dl class="card">
-        <div><dt>Current charge</dt><dd>4,221 mAh</dd></div>
-        <div><dt>Full charge</dt><dd>5,149 mAh</dd></div>
-        <div><dt>Design capacity</dt><dd>6,075 mAh</dd></div>
-        <div><dt>Cycles</dt><dd>156</dd></div>
-        <div><dt>Power</dt><dd class="draw">−9.8 W</dd></div>
-      </dl>
-      <div class="card spark">
-        <span>Last 24 hours</span>
-        <svg viewBox="0 0 288 56" preserveAspectRatio="none" aria-label="Charge over the last 24 hours, from 96% down to 55%, back to full, now 82%">
-          <path d={area} class="spark-area" />
-          <path d={line} class="spark-line" />
-        </svg>
-      </div>
-      <p class="flow">In 0 W<span>Mac 9.8 W</span><span>Battery −9.8 W</span></p>
-  </div>
-</section>
+  <Popover />
+</header>
 
 <style>
   .desk {
     position: relative;
-    overflow: hidden;
-    padding-bottom: clamp(48px, 8vw, 96px);
-    background: linear-gradient(180deg, color-mix(in oklab, var(--teal) 9%, var(--paper)) 0%, var(--paper) 70%);
+    overflow: clip;
+    padding-bottom: clamp(56px, 8vw, 104px);
+    background:
+      radial-gradient(80% 60% at 75% 40%, color-mix(in oklab, var(--accent-b) 12%, transparent), transparent 70%),
+      var(--paper);
   }
-  .wallpaper {
+  .lines {
     position: absolute;
-    inset: auto 0 0 0;
+    inset: 0;
     width: 100%;
-    height: 78%;
+    height: 100%;
     pointer-events: none;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
-    mask-image: linear-gradient(180deg, #000 70%, transparent);
   }
-  .wallpaper path:nth-child(1) { fill: color-mix(in oklab, var(--lime) 16%, var(--paper)); }
-  .wallpaper path:nth-child(2) { fill: color-mix(in oklab, var(--teal) 15%, var(--paper)); }
-  .wallpaper path:nth-child(3) { fill: color-mix(in oklab, var(--teal) 24%, var(--paper)); }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .wallpaper path:nth-child(1) { fill: color-mix(in oklab, var(--teal) 7%, var(--paper)); }
-    :global(:root:not([data-theme="light"])) .wallpaper path:nth-child(2) { fill: color-mix(in oklab, var(--teal) 11%, var(--paper)); }
-    :global(:root:not([data-theme="light"])) .wallpaper path:nth-child(3) { fill: color-mix(in oklab, var(--teal) 16%, var(--paper)); }
-  }
-
-  .menubar {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 30px;
-    padding: 0 14px;
-    font: 500 13.5px/1 var(--text);
-    color: var(--ink);
-    background: color-mix(in oklab, var(--paper) 62%, transparent);
-    backdrop-filter: blur(24px) saturate(1.4);
-    -webkit-backdrop-filter: blur(24px) saturate(1.4);
-    border-bottom: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
-  }
-  .menus { display: flex; gap: 18px; white-space: nowrap; overflow: hidden; }
-  .menus span { font-weight: 400; }
-  .extras { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
-  .sys { width: 17px; height: 15px; opacity: 0.85; }
-  .status-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    height: 24px;
-    padding: 0 7px;
-    margin: 0 -7px;
-    border: 0;
-    border-radius: 5px;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-  }
-  .status-item[aria-expanded="true"] { background: color-mix(in oklab, var(--ink) 13%, transparent); }
-  .status-item:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
-  .status-item :global(.item-glyph) { width: 26px; height: 16px; }
-  .clock { font-variant-numeric: tabular-nums; }
+  .lines path { fill: none; stroke: url(#contour); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 
   .hero {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    min-height: 600px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: clamp(32px, 6vw, 88px);
+    min-height: 700px;
     max-width: var(--page);
     margin: 0 auto;
-    padding: clamp(40px, 7vw, 88px) var(--gutter) 0;
+    padding: clamp(56px, 9vw, 120px) var(--gutter) 0;
+  }
+  .pitch { min-width: 0; }
+  .free {
+    display: inline-block;
+    margin: 0 0 22px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: color-mix(in oklab, var(--accent-a) 22%, var(--paper));
+    border: 1px solid color-mix(in oklab, var(--accent-b) 35%, transparent);
   }
   h1 {
     margin: 0;
     max-width: 12ch;
-    font: 720 clamp(2.75rem, 6.4vw, 5.1rem) / 0.95 var(--display);
-    font-stretch: 80%;
-    letter-spacing: -0.018em;
+    font: 720 clamp(2.9rem, 6.6vw, 5.4rem) / 0.96 var(--display);
+    font-stretch: 86%;
+    letter-spacing: -0.022em;
     text-wrap: balance;
   }
-  .pitch { min-width: 0; }
-  .lede {
-    max-width: 52ch;
-    margin: 28px 0 0;
-    font-size: 1.15rem;
-    line-height: 1.55;
-    color: var(--ink-2);
-  }
-  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 36px; }
-  .fineprint { margin: 18px 0 0; font-size: 0.9rem; color: var(--ink-3); }
+  .lede { max-width: 50ch; margin: 28px 0 0; font-size: 1.16rem; line-height: 1.56; color: var(--ink-2); }
+  .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin-top: 36px; }
+  .fineprint { margin: 16px 0 0; font-size: 0.92rem; color: var(--ink-3); }
 
-  .popover {
-    --pop-bg: color-mix(in oklab, #fff 82%, transparent);
-    --pop-card: color-mix(in oklab, var(--ink) 5%, transparent);
-    position: absolute;
-    z-index: 3;
-    top: 38px;
-    right: var(--pop-right, 60px);
-    width: 340px;
-    padding: 16px;
-    border-radius: 18px;
-    background: var(--pop-bg);
-    backdrop-filter: blur(30px) saturate(1.6);
-    -webkit-backdrop-filter: blur(30px) saturate(1.6);
-    border: 1px solid color-mix(in oklab, var(--ink) 9%, transparent);
-    box-shadow: 0 1px 1px rgb(20 40 30 / 0.06), 0 24px 60px -18px rgb(20 50 40 / 0.35);
-    font: 13px/1.35 var(--text);
-    transform-origin: calc(100% - var(--arrow-right, 96px)) -10px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .popover { --pop-bg: color-mix(in oklab, #1d2420 84%, transparent); --pop-card: rgb(255 255 255 / 0.06); }
-  }
-  :global(:root[data-theme="dark"]) .popover { --pop-bg: color-mix(in oklab, #1d2420 84%, transparent); --pop-card: rgb(255 255 255 / 0.06); }
-  .popover[data-open="false"] { visibility: hidden; }
-  .arrow {
-    position: absolute;
-    top: -8px;
-    right: var(--arrow-right, 96px);
-    width: 16px;
-    height: 16px;
-    rotate: 45deg;
-    background: inherit;
-    border-left: inherit;
-    border-top: inherit;
-    border-radius: 3px 0 0 0;
-  }
-  .popover header { display: flex; align-items: center; gap: 8px; font-size: 15px; }
-  .popover :global(.head-glyph) { width: 28px; height: 17px; }
-  .badge {
-    margin-left: auto;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-weight: 600;
-    color: #1f8a3f;
-    background: color-mix(in oklab, var(--sys-green) 18%, transparent);
-  }
-  .rings { display: flex; justify-content: center; gap: 22px; margin-top: 14px; }
-  figure { position: relative; margin: 0; width: 108px; text-align: center; }
-  figure svg { width: 108px; height: 108px; rotate: -90deg; }
-  .track { fill: none; stroke: color-mix(in oklab, var(--ink) 9%, transparent); stroke-width: 9; }
-  .value {
-    fill: none;
-    stroke-width: 9;
-    stroke-linecap: round;
-    stroke-dashoffset: var(--ring-offset);
-  }
-  .value.health { stroke: var(--sys-green); }
-  .ring-value {
-    position: absolute;
-    top: 54px;
-    left: 0;
-    right: 0;
-    translate: 0 -50%;
-    font: 650 25px/1 var(--text);
-    font-variant-numeric: tabular-nums;
-  }
-  figcaption { margin-top: 4px; color: var(--ink-2); }
-  .status-line { margin: 10px 0 12px; text-align: center; color: var(--ink-2); }
-  .card { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; background: var(--pop-card); }
-  dl.card div { display: flex; justify-content: space-between; padding: 3px 0; }
-  dt { color: var(--ink-2); }
-  dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-  dd.draw { color: #d97706; }
-  .spark span { display: block; margin-bottom: 6px; font-weight: 600; color: var(--ink-2); }
-  .spark svg { display: block; width: 100%; height: 56px; }
-  .spark-area { fill: color-mix(in oklab, var(--sys-green) 20%, transparent); }
-  .spark-line { fill: none; stroke: var(--sys-green); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-  .flow { display: flex; gap: 10px; justify-content: center; margin: 2px 0 0; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .popover[data-open="true"] { animation: drop 0.62s cubic-bezier(0.2, 0.9, 0.25, 1.08) 0.35s both; }
-    .popover[data-open="true"] .value { animation: fill 1.1s cubic-bezier(0.3, 0.7, 0.2, 1) 0.7s both; }
-  }
-  @keyframes drop {
-    from { opacity: 0; transform: translateY(-14px) scale(0.94); }
-    to { opacity: 1; transform: none; }
-  }
-  @keyframes fill {
-    from { stroke-dashoffset: 263.89; }
-  }
-
-  @media (max-width: 860px) {
-    .hero { grid-template-columns: 1fr; min-height: 0; }
-    .popover { position: relative; top: auto; right: auto; margin: 40px auto 0; width: min(340px, calc(100% - 2 * var(--gutter))); }
-    .arrow { display: none; }
-    .menus span { display: none; }
-  }
-  @media (max-width: 480px) {
-    .sys { display: none; }
-    .clock { font-size: 12.5px; }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .desk :global(.pop) { position: relative; top: auto; right: auto; margin: 48px auto 0; width: min(340px, calc(100% - 2 * var(--gutter))); }
+    .desk :global(.pop .arrow) { display: none; }
   }
 </style>
 
 <script>
-  const item = document.querySelector<HTMLButtonElement>(".status-item");
-  const popover = document.getElementById("popover");
-  item?.addEventListener("click", () => {
-    const open = item.getAttribute("aria-expanded") !== "true";
-    item.setAttribute("aria-expanded", String(open));
-    popover?.setAttribute("data-open", String(open));
-  });
   // Hang the popover under the status item, as macOS does.
-  const desk = document.querySelector<HTMLElement>(".desk");
+  const desk = document.querySelector<HTMLElement>(".desk")!;
+  const pop = document.getElementById("popover")!;
   const place = () => {
-    if (!item || !popover || !desk || matchMedia("(max-width: 860px)").matches) return;
+    const item = document.querySelector<HTMLElement>("[data-status-item]");
+    if (!item || matchMedia("(max-width: 900px)").matches) return;
     const box = item.getBoundingClientRect();
     const deskBox = desk.getBoundingClientRect();
     const center = box.left + box.width / 2 - deskBox.left;
-    const right = Math.max(12, Math.min(deskBox.width - center - 96, deskBox.width - 352));
+    const right = Math.max(12, Math.min(deskBox.width - center - 90, deskBox.width - 352));
     desk.style.setProperty("--pop-right", `${right}px`);
-    popover.style.setProperty("--arrow-right", `${deskBox.width - right - center - 8}px`);
+    pop.style.setProperty("--arrow-right", `${deskBox.width - right - center - 7}px`);
   };
   place();
   addEventListener("resize", place);
   document.fonts?.ready.then(place);
-  const clock = document.querySelector("[data-clock]");
-  const tick = () => {
-    if (!clock) return;
-    const now = new Date();
-    const day = now.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
-    const time = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-    clock.textContent = `${day} ${time}`;
+  document.addEventListener("place-popover", place);
+  document.addEventListener("open-popover", () => {
     place();
-  };
-  tick();
-  setInterval(tick, 30_000);
+    if (scrollY > 240) scrollTo({ top: 0, behavior: "smooth" });
+  });
 </script>

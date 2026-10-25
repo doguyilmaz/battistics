@@ -9,16 +9,17 @@ const command = "brew install --cask doguyilmaz/tap/battistics";
 
 <style>
   .brew {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     max-width: 100%;
-    height: 48px;
-    padding: 0 6px 0 14px;
+    height: 52px;
+    padding: 0 8px 0 16px;
     border-radius: 12px;
     border: 1px solid var(--line);
     background: color-mix(in oklab, var(--paper) 70%, transparent);
   }
   code {
+    flex: 1;
     min-width: 0;
     overflow-x: auto;
     white-space: nowrap;
@@ -29,9 +30,10 @@ const command = "brew install --cask doguyilmaz/tap/battistics";
   code span { color: var(--ink-3); }
   button {
     flex: none;
+    width: 74px;
     margin-left: 10px;
-    height: 34px;
-    padding: 0 12px;
+    height: 36px;
+    padding: 0;
     border: 0;
     border-radius: 8px;
     font: 600 13px/1 var(--text);
@@ -50,7 +52,7 @@ const command = "brew install --cask doguyilmaz/tap/battistics";
         button.textContent = "Copied";
         setTimeout(() => (button.textContent = "Copy"), 1600);
       } catch {
-        button.textContent = "Select and copy";
+        button.textContent = "⌘C";
       }
     });
   }

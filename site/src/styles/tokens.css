@@ -19,6 +19,9 @@
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+@property --accent-a { syntax: "<color>"; inherits: true; initial-value: #a9cf2e; }
+@property --accent-b { syntax: "<color>"; inherits: true; initial-value: #1f9e8e; }
+
 :root {
   --paper: #f2f5f0;
   --paper-2: #e8ede6;
@@ -29,7 +32,9 @@
   --lime: #a9cf2e;
   --teal: #1f9e8e;
   --teal-ink: #0d6f62;
-  --charge: linear-gradient(90deg, var(--lime), var(--teal));
+  --accent-a: var(--lime);
+  --accent-b: var(--teal);
+  --charge: linear-gradient(90deg, var(--accent-a), var(--accent-b));
   --sys-green: #34c759;
   --sys-orange: #ff9500;
   --sys-red: #ff3b30;
@@ -63,4 +68,11 @@
   --ink-3: #74827a;
   --line: #26302b;
   --teal-ink: #5fd0bf;
+}
+
+/* Low Power Mode in the demo turns the page the app's Low Power yellow. */
+:root { transition: --accent-a 0.6s ease, --accent-b 0.6s ease; }
+:root[data-low-power="true"] {
+  --accent-a: #f7d44a;
+  --accent-b: #e3a008;
 }

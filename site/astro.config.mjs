@@ -8,7 +8,7 @@ export default defineConfig({
     starlight({
       title: "Battistics",
       description: "Battery statistics and Keep Awake for the Mac.",
-      logo: { src: "./src/assets/icon.png", alt: "" },
+      logo: { src: "./src/assets/icons/original.png", alt: "" },
       favicon: "/favicon.png",
       head: [
         { tag: "link", attrs: { rel: "apple-touch-icon", href: "/apple-touch-icon.png" } },

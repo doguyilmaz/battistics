@@ -1,0 +1,291 @@
+---
+const durations = [
+  [15, "15m"], [30, "30m"], [60, "1h"], [120, "2h"], [240, "4h"], [720, "12h"], [0, "∞"],
+] as const;
+
+const modes = [
+  {
+    id: "displayOn",
+    name: "Display on",
+    line: "Screen lit, Mac awake. For a talk, a dashboard or a recipe.",
+    same: "caffeinate -d",
+  },
+  {
+    id: "displayMaySleep",
+    name: "Display may sleep",
+    line: "The screen sleeps on its timer, the Mac keeps working. For builds, downloads and AI tasks.",
+    same: "caffeinate -i",
+  },
+  {
+    id: "lidClosed",
+    name: "Lid closed",
+    line: "Close the lid and put it in a bag. The Mac keeps running, and gives sleep back when the session ends.",
+    same: "caffeinate -i + pmset disablesleep 1",
+  },
+];
+---
+
+<section class="night" id="awake" aria-labelledby="awake-title">
+  <div class="inner">
+    <div class="intro">
+      <h2 id="awake-title">Keep it awake. Lid open or closed.</h2>
+      <p>
+        Three modes, from 15 minutes to 12 hours or until you turn it off, started from the menu bar, a profile, the
+        terminal, an AI client or your iPhone. Pick one below and it runs right here, in the menu bar above.
+      </p>
+      <p class="free-line">No trial, no subscription, no Pro version. Keep Awake is free, like the rest of Battistics.</p>
+    </div>
+
+    <div class="durations" role="radiogroup" aria-label="Duration">
+      <span>For</span>
+      {durations.map(([minutes, label]) => (
+        <button type="button" role="radio" aria-checked={minutes === 60 ? "true" : "false"} data-ka-duration={minutes}>{label}</button>
+      ))}
+    </div>
+
+    <div class="modes">
+      {modes.map((mode) => (
+        <article class="mode" data-ka-mode={mode.id}>
+          <div class="art" aria-hidden="true">
+            {mode.id === "displayOn" && (
+              <svg viewBox="0 0 220 140">
+                <defs><linearGradient id="lit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-a)" /><stop offset="1" stop-color="var(--accent-b)" /></linearGradient></defs>
+                <ellipse cx="110" cy="118" rx="96" ry="10" class="glow" />
+                <rect x="46" y="16" width="128" height="86" rx="7" class="lid" />
+                <rect x="52" y="22" width="116" height="74" rx="3" fill="url(#lit)" class="screen-on" />
+                <path d="M64 40h52M64 52h80M64 64h36" class="ui-lines" />
+                <path d="M30 104h160l-10 10H40z" class="base" />
+              </svg>
+            )}
+            {mode.id === "displayMaySleep" && (
+              <svg viewBox="0 0 220 140">
+                <rect x="46" y="16" width="128" height="86" rx="7" class="lid" />
+                <rect x="52" y="22" width="116" height="74" rx="3" class="screen-off" />
+                <text x="122" y="56" class="zz">z</text><text x="134" y="46" class="zz small">z</text>
+                <g class="activity"><circle cx="92" cy="72" r="3" /><circle cx="104" cy="72" r="3" /><circle cx="116" cy="72" r="3" /></g>
+                <path d="M30 104h160l-10 10H40z" class="base" />
+              </svg>
+            )}
+            {mode.id === "lidClosed" && (
+              <svg viewBox="0 0 220 140">
+                <path d="M84 40c0-14 52-14 52 0" class="strap" />
+                <rect x="38" y="40" width="144" height="84" rx="16" class="bag" />
+                <rect x="58" y="64" width="104" height="10" rx="5" class="closed" />
+                <g class="waves"><path d="M150 26a12 12 0 0 1 17 0" /><path d="M145 20a20 20 0 0 1 27 0" /><circle cx="158.5" cy="31" r="2.2" /></g>
+                <path d="M68 96h84" class="seam" />
+              </svg>
+            )}
+          </div>
+          <h3>{mode.name}</h3>
+          <p>{mode.line}</p>
+          <code>{mode.same}</code>
+          <button type="button" class="start" data-ka-start={mode.id}>
+            <span data-ka-label>Start</span>
+          </button>
+        </article>
+      ))}
+    </div>
+
+    <div class="safety">
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="16" height="10" rx="2.5" /><path d="M21 10.5v3" /><path d="M6 10v4" class="low" /></svg>
+        <h3>Stops before the battery runs out</h3>
+        <p>Pick 5 to 50%. It ends the session, never the Mac, and a warning comes first.</p>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.5a3.5 3.5 0 1 1-3 0V6a1.5 1.5 0 0 1 3 0" /><path d="M15 6h3M15 9h3M15 12h2" /></svg>
+        <h3>Stops when it runs hot</h3>
+        <p>Heavy thermal pressure warns you and can end the session. A bag traps heat; this watches for it.</p>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2-4.9" /><path d="M5 4v4h4" /></svg>
+        <h3>Always gives sleep back</h3>
+        <p>On the timer, on a stop, or within 45 seconds if Battistics quits. With the lid still shut, the Mac then sleeps.</p>
+      </div>
+    </div>
+
+    <details class="compare">
+      <summary>Compare the three modes in detail</summary>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Display on</th><th scope="col">Display may sleep</th><th scope="col">Lid closed</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Display</th><td>Stays lit</td><td>Sleeps on its timer</td><td>Off while shut</td></tr>
+            <tr><th scope="row">Closing the lid</th><td>Mac sleeps</td><td>Mac sleeps</td><td>Mac keeps running</td></tr>
+            <tr><th scope="row">Screen locks</th><td>When you lock it</td><td>When the display sleeps</td><td>When the lid closes</td></tr>
+            <tr><th scope="row">Apple menu › Sleep</th><td>Works</td><td>Works</td><td>Waits for the session</td></tr>
+            <tr><th scope="row">Battery use</th><td>Highest</td><td>Low</td><td>Low, watch the heat</td></tr>
+            <tr><th scope="row">Setup</th><td>None</td><td>None</td><td>A helper, approved once</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<style>
+  .night {
+    --n-ink: #e9efea;
+    --n-ink-2: #a9b8b0;
+    --n-line: rgb(255 255 255 / 0.1);
+    position: relative;
+    margin-top: clamp(80px, 12vw, 140px);
+    padding: clamp(64px, 9vw, 110px) var(--gutter);
+    color: var(--n-ink);
+    background:
+      radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--accent-b) 28%, transparent), transparent 70%),
+      radial-gradient(50% 40% at 0% 100%, color-mix(in oklab, var(--accent-a) 16%, transparent), transparent 70%),
+      #0d1311;
+    overflow: hidden;
+  }
+  .inner { max-width: var(--page); margin: 0 auto; }
+  h2 {
+    margin: 0;
+    max-width: 14ch;
+    font: 720 clamp(2.4rem, 5vw, 4rem) / 0.98 var(--display);
+    font-stretch: 86%;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .intro p { max-width: 60ch; margin: 22px 0 0; font-size: 1.1rem; line-height: 1.55; color: var(--n-ink-2); }
+  .intro .free-line { color: var(--n-ink); font-weight: 600; }
+
+  .durations { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 40px; }
+  .durations span { margin-right: 6px; color: var(--n-ink-2); }
+  .durations button {
+    min-width: 48px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--n-line);
+    border-radius: 999px;
+    font: 600 14px var(--text);
+    color: var(--n-ink);
+    background: rgb(255 255 255 / 0.04);
+    cursor: pointer;
+  }
+  .durations button[aria-checked="true"] { background: var(--n-ink); color: #0d1311; border-color: transparent; }
+  .durations button:focus-visible, .start:focus-visible { outline: 2px solid var(--accent-a); outline-offset: 2px; }
+
+  .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+  .mode {
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid var(--n-line);
+    background: rgb(255 255 255 / 0.035);
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .mode[data-running="true"] { border-color: color-mix(in oklab, var(--accent-a) 70%, transparent); background: rgb(255 255 255 / 0.06); }
+  .art { height: 150px; display: grid; place-items: center; }
+  .art svg { width: 100%; max-width: 240px; height: 140px; overflow: visible; }
+  .lid { fill: #2a3330; stroke: #4a5752; }
+  .screen-off { fill: #0a0f0d; }
+  .base { fill: #3a4541; }
+  .ui-lines { stroke: rgb(13 30 24 / 0.55); stroke-width: 5; stroke-linecap: round; }
+  .glow { fill: color-mix(in oklab, var(--accent-b) 40%, transparent); filter: blur(12px); }
+  .zz { fill: var(--n-ink-2); font: 700 16px var(--text); }
+  .zz.small { font-size: 11px; }
+  .activity circle { fill: var(--accent-a); }
+  .bag { fill: #26302c; stroke: #55635d; stroke-width: 1.5; }
+  .strap { fill: none; stroke: #55635d; stroke-width: 6; stroke-linecap: round; }
+  .closed { fill: #4a5752; }
+  .seam { stroke: #3a4541; stroke-width: 2; stroke-dasharray: 4 5; }
+  .waves path { fill: none; stroke: var(--accent-a); stroke-width: 2.4; stroke-linecap: round; }
+  .waves circle { fill: var(--accent-a); }
+  @media (prefers-reduced-motion: no-preference) {
+    .mode[data-running="true"] .activity circle { animation: pulse 1.2s ease-in-out infinite; }
+    .mode[data-running="true"] .activity circle:nth-child(2) { animation-delay: 0.2s; }
+    .mode[data-running="true"] .activity circle:nth-child(3) { animation-delay: 0.4s; }
+    .mode[data-running="true"] .waves path { animation: pulse 1.6s ease-in-out infinite; }
+    .mode[data-running="true"] .waves path:nth-child(2) { animation-delay: 0.3s; }
+    .mode[data-running="true"] .screen-on { animation: breathe 3s ease-in-out infinite; }
+  }
+  @keyframes pulse { 50% { opacity: 0.25; } }
+  @keyframes breathe { 50% { opacity: 0.8; } }
+
+  .mode h3 { margin: 14px 0 0; font: 700 1.35rem/1.1 var(--display); font-stretch: 90%; }
+  .mode p { flex: 1; margin: 8px 0 0; color: var(--n-ink-2); line-height: 1.5; }
+  .mode code { align-self: flex-start; margin-top: 14px; padding: 4px 8px; border-radius: 6px; font: 12px var(--mono); color: var(--n-ink-2); background: rgb(255 255 255 / 0.06); }
+  .start {
+    margin-top: 18px;
+    height: 44px;
+    border: 0;
+    border-radius: 12px;
+    font: 600 15px var(--text);
+    color: #0d1311;
+    background: var(--charge);
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .mode[data-running="true"] .start { color: var(--n-ink); background: rgb(255 255 255 / 0.1); }
+
+  .safety { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 56px; padding-top: 36px; border-top: 1px solid var(--n-line); }
+  .safety svg { width: 28px; height: 28px; fill: none; stroke: var(--accent-a); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .safety .low { stroke: var(--sys-orange); stroke-width: 2.2; }
+  .safety h3 { margin: 12px 0 6px; font-size: 1.05rem; }
+  .safety p { margin: 0; color: var(--n-ink-2); line-height: 1.5; }
+
+  .compare { margin-top: 44px; }
+  .compare summary { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; list-style: none; }
+  .compare summary::-webkit-details-marker { display: none; }
+  .compare summary::before { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; rotate: -45deg; transition: rotate 0.2s; }
+  .compare[open] summary::before { rotate: 45deg; }
+  .table-wrap { margin-top: 18px; overflow-x: auto; }
+  table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.97rem; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--n-line); }
+  thead th { color: var(--n-ink); font-weight: 650; }
+  tbody th { color: var(--n-ink-2); font-weight: 500; white-space: nowrap; }
+  td { color: var(--n-ink); }
+
+  @media (max-width: 900px) {
+    .modes, .safety { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  import { remainingSeconds, startSession, stopSession, subscribe, type AwakeMode } from "../lib/sim";
+
+  const root = document.getElementById("awake")!;
+  let minutes = 60;
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-ka-duration]")) {
+    button.addEventListener("click", () => {
+      minutes = Number(button.dataset.kaDuration);
+      for (const other of root.querySelectorAll("[data-ka-duration]")) other.setAttribute("aria-checked", String(other === button));
+    });
+  }
+  let running: AwakeMode | null = null;
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-ka-start]")) {
+    button.addEventListener("click", () => {
+      const mode = button.dataset.kaStart as AwakeMode;
+      if (running === mode) stopSession();
+      else startSession(mode, minutes);
+    });
+  }
+  let ticker: number | undefined;
+  subscribe((s) => {
+    running = s.session?.mode ?? null;
+    clearInterval(ticker);
+    for (const card of root.querySelectorAll<HTMLElement>("[data-ka-mode]")) {
+      const active = card.dataset.kaMode === running;
+      card.dataset.running = String(active);
+      const label = card.querySelector<HTMLElement>("[data-ka-label]")!;
+      if (!active || !s.session) {
+        label.textContent = "Start";
+        continue;
+      }
+      const session = s.session;
+      const draw = () => {
+        const left = remainingSeconds(session);
+        if (left === 0) return stopSession();
+        label.textContent = left === null
+          ? "Running until you stop it · Stop"
+          : `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")} left · Stop`;
+      };
+      draw();
+      ticker = window.setInterval(draw, 1000);
+    }
+  });
+</script>

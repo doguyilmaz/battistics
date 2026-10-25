@@ -1,0 +1,269 @@
+---
+import { defaultState } from "../lib/sim";
+import { statusItemHTML } from "../lib/statusItem";
+
+// The site's navigation, set as a Mac menu bar: each menu opens like one.
+const menus = [
+  {
+    id: "app",
+    label: "Battistics",
+    bold: true,
+    items: [
+      { label: "About Battistics", href: "#download" },
+      { label: "What's New", href: "https://github.com/doguyilmaz/battistics/blob/main/CHANGELOG.md" },
+      { divider: true },
+      { label: "Source on GitHub", href: "https://github.com/doguyilmaz/battistics" },
+    ],
+  },
+  {
+    id: "features",
+    label: "Features",
+    items: [
+      { label: "Battery Readings", href: "#window", hint: "Health, cycles, power" },
+      { label: "History", href: "#window", pane: "history", hint: "Day to year" },
+      { label: "Menu Bar Icon", href: "#menubar", hint: "Five styles" },
+      { label: "Accessories", href: "#window", pane: "peripherals", hint: "Mice, keyboards, AirPods" },
+      { label: "Notifications", href: "#window", pane: "notifications" },
+    ],
+  },
+  {
+    id: "awake",
+    label: "Keep Awake",
+    items: [
+      { label: "Three Modes", href: "#awake" },
+      { label: "Closed-Lid Mode", href: "/docs/keep-awake/closed-lid/" },
+      { label: "Session Protection", href: "/docs/keep-awake/protection/" },
+      { divider: true },
+      { label: "Terminal and AI Tasks", href: "#developers" },
+    ],
+  },
+  {
+    id: "iphone",
+    label: "iPhone",
+    items: [
+      { label: "Battistics Remote", href: "#iphone" },
+      { label: "Bag Mode", href: "#iphone", hint: "Lid closed, on Hotspot" },
+      { label: "Setting Up", href: "/docs/iphone/" },
+    ],
+  },
+  {
+    id: "help",
+    label: "Help",
+    items: [
+      { label: "Documentation", href: "/docs/" },
+      { label: "Install", href: "/docs/install/" },
+      { label: "Troubleshooting", href: "/docs/troubleshooting/" },
+      { divider: true },
+      { label: "Report a Problem…", href: "https://github.com/doguyilmaz/battistics/issues" },
+    ],
+  },
+];
+---
+
+<nav class="menubar" aria-label="Battistics">
+  <ul class="menus" data-menubar>
+    {menus.map((menu) => (
+      <li>
+        <button type="button" class:list={["title", { bold: menu.bold }]} aria-haspopup="menu" aria-expanded="false" data-bar-menu={menu.id}>{menu.label}</button>
+        <div class="dropdown" role="menu" hidden data-bar-dropdown={menu.id}>
+          {menu.items.map((item) =>
+            "divider" in item ? (
+              <hr />
+            ) : (
+              <a role="menuitem" href={item.href} data-pane-link={item.pane}>
+                <span>{item.label}</span>
+                {item.hint && <small>{item.hint}</small>}
+              </a>
+            ),
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+  <div class="extras">
+    <svg class="sys" viewBox="0 0 20 16" aria-hidden="true"><path d="M10 13.6 7.6 11.2a3.4 3.4 0 0 1 4.8 0zM4.9 8.5a7.2 7.2 0 0 1 10.2 0l-1.5 1.5a5.1 5.1 0 0 0-7.2 0zM2.2 5.8a11 11 0 0 1 15.6 0l-1.5 1.5a8.9 8.9 0 0 0-12.6 0z" fill="currentColor" /></svg>
+    <svg class="sys" viewBox="0 0 18 16" aria-hidden="true"><rect x="1.5" y="2.5" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3" /><circle cx="12.6" cy="4.8" r="1.4" fill="currentColor" /><rect x="1.5" y="9" width="15" height="4.6" rx="2.3" fill="none" stroke="currentColor" stroke-width="1.3" /><circle cx="5.4" cy="11.3" r="1.4" fill="currentColor" /></svg>
+    <button type="button" class="status-item" data-status-item aria-expanded="true" aria-controls="popover" aria-label="Battistics menu">
+      <span class="si" data-si set:html={statusItemHTML(defaultState)} />
+    </button>
+    <span class="clock" data-clock>Sun 25 Oct 9:41</span>
+  </div>
+</nav>
+
+<style>
+  .menubar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+    padding: 0 10px;
+    font: 500 13.5px/1 var(--text);
+    color: var(--ink);
+    background: color-mix(in oklab, var(--paper) 70%, transparent);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border-bottom: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+  }
+  .menus { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .menus li { position: relative; }
+  .title {
+    height: 24px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 5px;
+    font: 400 13.5px/1 var(--text);
+    color: inherit;
+    background: none;
+    cursor: default;
+  }
+  .title.bold { font-weight: 700; }
+  .title[aria-expanded="true"],
+  .title:hover { background: color-mix(in oklab, var(--ink) 11%, transparent); }
+  .title:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: -2px; }
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 230px;
+    padding: 5px;
+    border-radius: 9px;
+    background: color-mix(in oklab, var(--paper) 97%, transparent);
+    backdrop-filter: blur(30px) saturate(1.6);
+    -webkit-backdrop-filter: blur(30px) saturate(1.6);
+    border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+    box-shadow: 0 14px 40px rgb(10 30 20 / 0.22);
+  }
+  .dropdown a {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font: 400 13.5px/1.2 var(--text);
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .dropdown small { color: var(--ink-3); font-size: 12px; }
+  .dropdown a:hover,
+  .dropdown a:focus-visible { background: var(--sys-blue); color: #fff; outline: none; }
+  .dropdown a:hover small,
+  .dropdown a:focus-visible small { color: rgb(255 255 255 / 0.75); }
+  .dropdown hr { margin: 4px 8px; border: 0; border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent); }
+
+  .extras { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
+  .sys { width: 17px; height: 15px; opacity: 0.85; }
+  .status-item {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 7px;
+    margin: 0 -7px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    cursor: default;
+  }
+  .status-item[aria-expanded="true"] { background: color-mix(in oklab, var(--ink) 13%, transparent); }
+  .status-item:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 1px; }
+  .si { display: inline-flex; align-items: center; gap: 4px; font: 500 12.5px/1 var(--text); font-variant-numeric: tabular-nums; }
+  .si.tint-orange { color: var(--sys-orange); }
+  .si.tint-red { color: var(--sys-red); }
+  .si.tint-green { color: var(--sys-green); }
+  .si.tint-blue { color: var(--sys-blue); }
+  .si :global(.si-glyph) { width: 27px; height: 17px; overflow: visible; }
+  .si :global(.si-inside) { width: 29px; height: 18px; }
+  .si :global(.si-bolt svg) { display: block; width: 7px; height: 11px; }
+  .si :global(.si-cup svg) { display: block; width: 15px; height: 12px; margin-left: 3px; }
+  .clock { font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 760px) {
+    .menus li:not(:first-child) { display: none; }
+    .sys { display: none; }
+  }
+</style>
+
+<script>
+  import { subscribe } from "../lib/sim";
+  import { applyTint, statusItemHTML } from "../lib/statusItem";
+
+  const bar = document.querySelector<HTMLElement>("[data-menubar]")!;
+  const titles = [...bar.querySelectorAll<HTMLButtonElement>("[data-bar-menu]")];
+  let open: string | null = null;
+  const show = (id: string | null) => {
+    open = id;
+    for (const title of titles) {
+      const dropdown = bar.querySelector<HTMLElement>(`[data-bar-dropdown="${title.dataset.barMenu}"]`)!;
+      const isOpen = title.dataset.barMenu === id;
+      dropdown.hidden = !isOpen;
+      title.setAttribute("aria-expanded", String(isOpen));
+    }
+  };
+  for (const title of titles) {
+    title.addEventListener("click", (event) => {
+      event.stopPropagation();
+      show(open === title.dataset.barMenu ? null : title.dataset.barMenu!);
+      if (open) bar.querySelector<HTMLElement>(`[data-bar-dropdown="${open}"] a`)?.focus();
+    });
+    // As on a Mac, once a menu is open, moving across the bar opens the others.
+    title.addEventListener("pointerenter", () => open && show(title.dataset.barMenu!));
+    title.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      const next = titles[(titles.indexOf(title) + (event.key === "ArrowRight" ? 1 : titles.length - 1)) % titles.length];
+      next.focus();
+      if (open) show(next.dataset.barMenu!);
+    });
+  }
+  bar.addEventListener("keydown", (event) => {
+    if (!open || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return;
+    event.preventDefault();
+    const items = [...bar.querySelectorAll<HTMLElement>(`[data-bar-dropdown="${open}"] a`)];
+    const index = items.indexOf(document.activeElement as HTMLElement);
+    items[(index + (event.key === "ArrowDown" ? 1 : items.length - 1)) % items.length]?.focus();
+  });
+  document.addEventListener("click", () => show(null));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && open) {
+      const title = titles.find((t) => t.dataset.barMenu === open);
+      show(null);
+      title?.focus();
+    }
+  });
+  for (const link of bar.querySelectorAll<HTMLAnchorElement>("[data-pane-link]")) {
+    link.addEventListener("click", () => {
+      if (link.dataset.paneLink) document.dispatchEvent(new CustomEvent("show-pane", { detail: link.dataset.paneLink }));
+    });
+  }
+
+  const item = document.querySelector<HTMLButtonElement>("[data-status-item]")!;
+  const si = document.querySelector<HTMLElement>("[data-si]")!;
+  const popover = document.getElementById("popover");
+  item.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const opening = item.getAttribute("aria-expanded") !== "true";
+    item.setAttribute("aria-expanded", String(opening));
+    if (popover) popover.dataset.open = String(opening);
+    if (opening) document.dispatchEvent(new Event("open-popover"));
+  });
+  subscribe((state) => {
+    si.innerHTML = statusItemHTML(state);
+    applyTint(si, state);
+    document.dispatchEvent(new Event("place-popover"));
+  });
+
+  const clock = document.querySelector("[data-clock]");
+  const tick = () => {
+    if (!clock) return;
+    const now = new Date();
+    const day = now.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+    const time = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    clock.textContent = `${day} ${time}`;
+  };
+  tick();
+  setInterval(tick, 30_000);
+</script>

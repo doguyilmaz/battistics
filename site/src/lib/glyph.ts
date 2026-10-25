@@ -9,6 +9,8 @@ export interface GlyphState {
   /** 0...1 */
   fraction: number;
   charging: boolean;
+  /** Drawn inside the glyph in place of the level, as "percentage inside". */
+  percentage?: number;
 }
 
 const W = 34;
@@ -104,8 +106,10 @@ const strokeAttrs = (w: number) =>
 let maskSeed = 0;
 
 /** Inner SVG markup in a 34×20 y-up box; wrap with `glyphSVG`. */
-export function glyphBody({ shape, fraction, charging }: GlyphState): string {
-  const level = Math.min(Math.max(fraction, 0), 1);
+export function glyphBody({ shape, fraction, charging: chargingState, percentage }: GlyphState): string {
+  const level = percentage === undefined ? Math.min(Math.max(fraction, 0), 1) : 0;
+  // The percentage replaces the level and the bolt; the menu bar draws the bolt beside it.
+  const charging = percentage === undefined && chargingState;
   if (shape === "bat" || shape === "classic") {
     const m = metrics(shape === "bat");
     const outline = shape === "bat" ? batOutline(m) : roundedRect(m.left, m.bottom, m.bodyWidth, m.top - m.bottom, m.radius);
@@ -175,8 +179,29 @@ export function glyphTone(fraction: number, charging: boolean): "charging" | "cr
   return "plain";
 }
 
+/** Where each shape fits its digits, y-up, as in BatGlyph.drawPercentage. */
+function percentBox(shape: GlyphShape): [number, number, number, number] {
+  if (shape === "gauge") {
+    const stroke = Math.max(H * 0.09, 1.3);
+    const r = Math.min(W / 2, H * 0.8) - stroke;
+    return [W / 2 - r * 0.7, H * 0.16 + stroke * 0.25, r * 1.4, r * 0.58];
+  }
+  if (shape === "wings") return [W * 0.24, H * 0.405, W * 0.52, H * 0.375];
+  const m = metrics(shape === "bat");
+  return [m.left + m.stroke, m.bottom + m.stroke / 2, m.bodyWidth - m.stroke * 2, m.top - m.bottom - m.stroke];
+}
+
+function percentText(shape: GlyphShape, value: number): string {
+  const digits = String(Math.min(Math.max(Math.round(value), 0), 100));
+  const [x, y, w, h] = percentBox(shape);
+  // SF digits are about 0.6em wide and 0.72em tall.
+  const size = Math.min(H * (11 / 17), w / (0.6 * digits.length), h / 0.72);
+  return `<text x="${f(x + w / 2)}" y="${f(H - (y + h / 2))}" font-size="${f(size)}" font-weight="600" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif" style="font-variant-numeric: tabular-nums">${digits}</text>`;
+}
+
 export function glyphSVG(state: GlyphState, attrs = ""): string {
-  return `<svg viewBox="-1 -1 ${W + 2} ${H + 2}" ${attrs} aria-hidden="true"><g transform="translate(0 ${H}) scale(1 -1)">${glyphBody(state)}</g></svg>`;
+  const text = state.percentage === undefined ? "" : percentText(state.shape, state.percentage);
+  return `<svg viewBox="-1 -1 ${W + 2} ${H + 2}" ${attrs} aria-hidden="true"><g transform="translate(0 ${H}) scale(1 -1)">${glyphBody(state)}</g>${text}</svg>`;
 }
 
 export const GLYPH_SHAPES: { shape: GlyphShape; label: string }[] = [
