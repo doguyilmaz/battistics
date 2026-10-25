@@ -7,6 +7,8 @@
 <p align="center">Battery statistics for the Mac. Free, open source, native.<br>
 macOS 14+ · Apple Silicon</p>
 
+<p align="center"><a href="https://battistics.apps.doguyilmaz.com"><b>battistics.apps.doguyilmaz.com</b></a> · <a href="https://battistics.apps.doguyilmaz.com/docs/">Documentation</a></p>
+
 ![Dashboard](docs/overview.png)
 
 <p align="center">
@@ -76,7 +78,7 @@ Screen countdown and a Control Center control come with it. Turn on
 **iPhone** in Battistics; any iPhone on the same Apple ID finds the Mac through
 your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
 to join hotspots automatically uses the iPhone's hotspot. See
-[remote companion](docs/remote.md).
+[remote companion](docs/remote.md) and the [iPhone guide](https://battistics.apps.doguyilmaz.com/docs/iphone/).
 
 ## Light by design
 
@@ -88,9 +90,13 @@ Uses power-change notifications with a low-frequency battery refresh fallback. D
 brew install --cask doguyilmaz/tap/battistics
 ```
 
-Or download the DMG from [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications.
+Or download the DMG from [the website](https://battistics.apps.doguyilmaz.com/#download) or [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications.
 
 Either way updates arrive in-app: Battistics updates itself, so Homebrew is told to leave it alone once installed.
+
+## Website
+
+The site and its documentation live in `site/` (Astro and Starlight, built with Bun) and deploy to Cloudflare from `.github/workflows/site.yml` whenever `site/` changes on `main`. App changes never trigger it, and site changes never trigger CI or a release. Run it locally with `cd site && bun install && bun run dev`.
 
 ## Build
 

@@ -18,6 +18,11 @@ struct HelpPane: View {
                 }
                 Text("Learn the controls in a short guided tour, or find an answer below.")
                     .font(.caption).foregroundStyle(.secondary)
+                if let url = URL(string: "https://battistics.apps.doguyilmaz.com/docs/") {
+                    Link(destination: url) {
+                        Label("Read the Documentation Online", systemImage: "book")
+                    }
+                }
             }
             Section("Ask Battistics") {
                 TextField("Search help or ask a question", text: $query, axis: .vertical)

@@ -4925,6 +4925,23 @@
         }
       }
     },
+    "Read the Documentation Online": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read the Documentation Online"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belgeleri Çevrimiçi Oku"
+          }
+        }
+      }
+    },
     "Reading levels over Bluetooth.": {
       "extractionState": "manual",
       "localizations": {

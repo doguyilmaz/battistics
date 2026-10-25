@@ -5372,6 +5372,23 @@
           }
         }
       }
+    },
+    "Website and Help": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Website and Help"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web Sitesi ve Yardım"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

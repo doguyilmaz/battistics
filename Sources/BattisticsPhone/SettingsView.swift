@@ -53,6 +53,9 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")
+                    Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com")!) {
+                        Label("Website and Help", systemImage: "safari")
+                    }
                 }
             }
             .topBlur()
