@@ -51,7 +51,7 @@
 				<string>original</string>
 			</array>
 			<key>UIPrerenderedIcon</key>
-			<false/>
+			<true/>
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
@@ -73,12 +73,6 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>App-Prefs</string>
-		<string>app-prefs</string>
-		<string>prefs</string>
-	</array>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIBackgroundModes</key>
