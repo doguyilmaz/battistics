@@ -43,6 +43,8 @@ final class RemoteAccessModel {
     @ObservationIgnored private let powerSettings: PowerSettingsModel?
     @ObservationIgnored private let cloud: RemoteCloud?
     @ObservationIgnored private let chargeHistory: @Sendable () async -> [RemoteStatus.ChargePoint]
+    /// The app's latest reading, so polls do not each read the battery again.
+    @ObservationIgnored private let battery: @MainActor () -> BatterySnapshot?
     @ObservationIgnored private var lastSent: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
@@ -62,6 +64,7 @@ final class RemoteAccessModel {
     init(awake: KeepAwakeModel, automation: AutomationModel, helper: PowerHelperClient,
          network: NetworkMonitor, powerSettings: PowerSettingsModel? = nil,
          cloud: RemoteCloud? = RemoteCloud.isEntitled ? RemoteCloud() : nil,
+         battery: @escaping @MainActor () -> BatterySnapshot? = { BatteryReader.read() },
          chargeHistory: @escaping @Sendable () async -> [RemoteStatus.ChargePoint] = { [] }) {
         self.awake = awake
         self.automation = automation
@@ -70,6 +73,7 @@ final class RemoteAccessModel {
         self.powerSettings = powerSettings
         self.cloud = cloud
         self.chargeHistory = chargeHistory
+        self.battery = battery
         if let saved = UserDefaults.standard.string(forKey: Prefs.remoteMacID) {
             macID = saved
         } else {
@@ -389,7 +393,7 @@ final class RemoteAccessModel {
     }
 
     func status(at now: Date = Date()) -> RemoteStatus {
-        let snapshot = BatteryReader.read()
+        let snapshot = battery()
         let lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
         let battery = snapshot.flatMap { snapshot -> RemoteStatus.Battery? in
             guard snapshot.batteryInstalled else { return nil }

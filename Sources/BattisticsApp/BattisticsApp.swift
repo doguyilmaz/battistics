@@ -96,6 +96,7 @@ struct BattisticsApp: App {
         _powerSettings = State(initialValue: powerSettings)
         _remote = State(initialValue: RemoteAccessModel(
             awake: awake, automation: automation, helper: helper, network: network, powerSettings: powerSettings,
+            battery: { [weak model] in model?.snapshot },
             chargeHistory: {
                 let now = Date()
                 return await history.chargeSeries(from: now.addingTimeInterval(-86_400), to: now, bucketSeconds: 1800)
