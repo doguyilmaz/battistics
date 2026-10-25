@@ -124,7 +124,8 @@ final class RemoteAccessModel {
         var recordMissing = false
         do {
             let snapshot = try await cloud.fetchChanges()
-            recordMissing = snapshot.isFull && snapshot.statuses[macID] == nil
+            recordMissing = (snapshot.isFull && snapshot.statuses[macID] == nil)
+                || snapshot.removedStatuses.contains(macID)
             // Left behind by a phone whose delete failed for a Mac that is gone; seen at launch.
             for command in snapshot.commands where command.macID != macID
                 && -command.request.sentAt.timeIntervalSinceNow > 10 * 60 {

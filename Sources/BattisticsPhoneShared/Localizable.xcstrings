@@ -5253,6 +5253,57 @@
           }
         }
       }
+    },
+    "Remove Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'i Kaldır"
+          }
+        }
+      }
+    },
+    "For a Mac you erased or no longer use. A Mac that is still sharing comes back with its next update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For a Mac you erased or no longer use. A Mac that is still sharing comes back with its next update."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sildiğin ya da artık kullanmadığın bir Mac için. Hâlâ paylaşan bir Mac bir sonraki güncellemesiyle geri gelir."
+          }
+        }
+      }
+    },
+    "Remove %@ from your iPhones?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove %@ from your iPhones?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ iPhone'larından kaldırılsın mı?"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -123,6 +123,20 @@ final class MacStore {
         return alerts
     }
 
+    /// For a Mac that was erased or sold. One that still shares publishes
+    /// again as soon as it sees its record gone.
+    func forget(_ mac: Mac) async -> String? {
+        do {
+            try await cloud.delete([mac.id])
+        } catch {
+            return Self.describe(error)
+        }
+        readings[mac.id] = nil
+        Notifications.syncWatchdog(for: mac, reading: nil)
+        save()
+        return nil
+    }
+
     // MARK: Commands
 
     /// Returns a message to show when the Mac refused or did not answer.

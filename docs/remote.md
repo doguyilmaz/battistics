@@ -10,6 +10,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Each queued command gets its own answer published before the next one runs.
 - A phone that stops waiting (no answer, a fetch error or a cancelled intent) deletes its command first, so a late Mac does not run it. A Mac also deletes expired commands addressed to Macs that no longer exist.
 - Turning sharing off while offline keeps retrying the delete until it lands, so phones never keep a ghost of the Mac.
+- Details › Remove Mac, offered while a Mac is not answering, deletes its record for an erased or sold Mac. A Mac that still shares sees the deletion in its next change read and publishes again at once.
 - A status or command written by a newer build stays readable: an unknown operation is answered as an invalid request ("Update Battistics"), and a status the phone cannot decode keeps that Mac's last reading instead of removing it.
 - The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s during a Keep Awake session or for 2 minutes after a command, every 15 s otherwise. macOS throttles silent pushes, so a push only triggers an extra poll.
 - `publish` builds the cheap status first and compares it with the last one sent. History and `pmset` are read only when something changed or the heartbeat is due. The heartbeat is published even when reading commands fails, and CloudKit's `retryAfter` is honoured.

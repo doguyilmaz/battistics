@@ -4,6 +4,10 @@ import SwiftUI
 struct MacDetailsView: View {
     let mac: MacStore.Mac
     let status: RemoteStatus
+    @Environment(MacStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    @State private var confirmingRemoval = false
+    @State private var removalFailure: String?
 
     var body: some View {
         let battery = status.battery
@@ -52,6 +56,21 @@ struct MacDetailsView: View {
                     LabeledContent("Network", value: status.network.label)
                 }
                 LabeledContent("Updated", value: status.readAt.formatted(date: .abbreviated, time: .shortened))
+            }
+            if store.reading(for: mac)?.reachable != true {
+                Section {
+                    Button("Remove Mac", role: .destructive) { confirmingRemoval = true }
+                } footer: {
+                    Text(removalFailure ?? String(localized: "For a Mac you erased or no longer use. A Mac that is still sharing comes back with its next update."))
+                }
+            }
+        }
+        .confirmationDialog("Remove \(mac.name) from your iPhones?", isPresented: $confirmingRemoval, titleVisibility: .visible) {
+            Button("Remove Mac", role: .destructive) {
+                Task {
+                    removalFailure = await store.forget(mac)
+                    if removalFailure == nil { dismiss() }
+                }
             }
         }
         .topBlur()

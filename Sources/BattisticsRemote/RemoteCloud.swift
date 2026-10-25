@@ -14,6 +14,8 @@ public actor RemoteCloud {
         public var statuses: [String: RemoteStatus] = [:]
         /// Status records written by a newer build that this one cannot read.
         public var unreadable: Set<String> = []
+        /// Status records deleted since the previous read, such as a Mac a phone removed.
+        public var removedStatuses: Set<String> = []
         public var commands: [Command] = []
         /// Read from the start rather than as changes, so a missing record is really missing.
         public var isFull = false
@@ -126,6 +128,10 @@ public actor RemoteCloud {
                     }
                 default: break
                 }
+            }
+            for deletion in changes.deletions where deletion.recordType == Self.statusType {
+                statusRecords[deletion.recordID.recordName] = nil
+                snapshot.removedStatuses.insert(deletion.recordID.recordName)
             }
             token = changes.changeToken
             if !changes.moreComing { break }
