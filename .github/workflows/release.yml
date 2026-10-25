@@ -7,6 +7,8 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    # Ignored for tag pushes; keeps website-only commits from starting a release run.
+    paths-ignore: ["site/**", ".github/workflows/site.yml"]
 
 permissions:
   contents: write

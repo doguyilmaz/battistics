@@ -1,0 +1,19 @@
+{
+  "name": "battistics-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "astro build && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.6",
+    "astro": "7.3.8",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "wrangler": "4.152.0"
+  }
+}

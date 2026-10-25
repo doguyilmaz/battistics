@@ -1,0 +1,42 @@
+/* Starlight in Battistics colours: graphite and the icon's lime to teal. */
+:root {
+  --sl-font: var(--text);
+  --sl-font-system-mono: var(--mono);
+  --sl-color-accent-low: #12302b;
+  --sl-color-accent: #1f9e8e;
+  --sl-color-accent-high: #b9f0e6;
+  --sl-color-white: #eef3ef;
+  --sl-color-gray-1: #d7e0da;
+  --sl-color-gray-2: #b0bdb5;
+  --sl-color-gray-3: #85948b;
+  --sl-color-gray-4: #56645c;
+  --sl-color-gray-5: #36423c;
+  --sl-color-gray-6: #1f2824;
+  --sl-color-black: #0f1412;
+}
+:root[data-theme="light"] {
+  --sl-color-accent-low: #cfeee7;
+  --sl-color-accent: #0d6f62;
+  --sl-color-accent-high: #0a4a41;
+  --sl-color-white: #16201b;
+  --sl-color-gray-1: #26302b;
+  --sl-color-gray-2: #3f4b45;
+  --sl-color-gray-3: #66746c;
+  --sl-color-gray-4: #9aa7a0;
+  --sl-color-gray-5: #cfd8d1;
+  --sl-color-gray-6: #e6ece6;
+  --sl-color-gray-7: #f0f4ef;
+  --sl-color-black: #f7f9f6;
+}
+
+h1#_top,
+.sl-markdown-content :is(h2, h3) {
+  font-family: var(--display);
+  font-stretch: 82%;
+  letter-spacing: -0.015em;
+}
+h1#_top { font-weight: 720; }
+.sl-markdown-content h2 { font-weight: 700; }
+
+.site-title img { border-radius: 8px; }
+.sl-markdown-content table { font-size: 0.94em; }
