@@ -143,7 +143,6 @@ final class MacStore {
 
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
-        // Inspecting runs alongside the controls instead of locking them.
         let locks = request.operation != .inspect
         if locks { pending.insert(mac.id) }
         defer { if locks { pending.remove(mac.id) } }
