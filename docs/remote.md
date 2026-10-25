@@ -50,22 +50,35 @@ Because Macs do not have cellular modems, a Mac on stationary Wi‑Fi will lose 
 ### Remote Mac Power Mode, Display Sleep & Cycle Count (`BatteryCard`)
 - **Power Mode Menu:** Top-right capsule inside `BatteryCard` displays the Mac's active Low Power Mode state or configured policy (`LPM Battery`, `LPM Off`, `Low Power`). Tapping opens a menu to set macOS Low Power Mode (`Never`, `Only on Battery`, `Only on Power Adapter`, `Always`) via `BattisticsPowerHelper` without password prompts, or trigger **`Sleep Mac Display Now`** (`pmset displaysleepnow`).
 - **Interactive Health & Cycle Count Pill:** Displays `86%` with `Health · <N>c` subtitle; tapping toggles between health percentage and cycle count as the primary metric.
+- **Offline / Sleeping Mac State:** When the Mac is unreachable or offline, `BatteryCard` shows "Offline (XX%)" with a clear "Last reported · X ago" timestamp instead of live charging animations. The power mode menu and keep awake controls are cleanly disabled with an informative "Mac is Offline" button and feedback indicator.
 
-### Local iPhone Dashboard (`LocalPhoneDashboard` / `This iPhone`)
-- Selecting **This iPhone (`iPhone 16e`)** from the top device switcher or `Devices & Settings` sheet opens a dedicated single-page dashboard for the phone itself:
-  - Live battery percentage, charging/adapter state, iPhone Low Power Mode status, and a locally recorded 24-hour iPhone charge sparkline.
-  - Exact hardware marketing model (`iPhone 16e` / `iPhone17,5`), CPU core count, physical RAM (`8 GB`), thermal state, system uptime, and live disk storage usage (`used / total GB` + `free GB`).
-  - Quick one-tap switch back to the paired Mac from either the 2x2 grid or the bottom companion dock.
+### Zero-Permission SSID & Hotspot Network Resolution
+- On macOS 14/15/26, CoreWLAN `interface()?.ssid()` requires Location Services authorization. Battistics implements zero-permission fallback extraction directly from macOS `SCDynamicStore` by parsing the 802.11 Information Element tag #0 from `CachedScanRecord`, resolving the active Wi-Fi SSID immediately without prompts.
+- When tethered to Personal Hotspot, `RemoteAccessModel` and `RemoteStatus` automatically resolve the paired iPhone's name (e.g. `Dogu’s iPhone 16e`).
+- Tapping the Network tile on the phone opens the target iOS settings screen directly via `NetworkSettingsOpener`: Wi-Fi settings when on Wi-Fi, and Personal Hotspot settings when on Hotspot.
 
-### Ambient Energy & Connection Themes (`PowerPalette` & `AmbientEnergyBackdrop`)
-1. **Charging / Adapter (`PowerPalette.charging`, Emerald Green):** Radial light rays, green border glow, pulsing `bolt.fill`, and live wattage (`+42W`, `65W`).
-2. **Low Power Mode (`PowerPalette.lowPower`, Warm Amber):** Amber light rays, amber battery tint, and `leaf.fill` `Low Power` capsule badge.
-3. **Normal Battery Discharge:** Clean neutral background.
-4. **Hotspot Paired / Pocket Mode (`PowerPalette.hotspot`, Electric Cyan):** Cyan wireless aura, `Hotspot Paired` header indicator, and `Bag 1h` quick action in the bottom dock.
+### Setup & Connection Diagnostics (`SetupIntro.swift`)
+- When no Macs have reported to iCloud yet, `SetupIntro` provides a comprehensive onboarding experience:
+  1. **This iPhone Instant Launch:** A prominent card lets the user immediately open their local iPhone battery, thermal, voltage, and hardware telemetry dashboard.
+  2. **Mac App Links & AirDrop Share:** Direct buttons to download Battistics for Mac or share the link with their Mac via AirDrop with one tap.
+  3. **Live Diagnostics:** Interactive iCloud authentication status check, network availability, and Mac records probe.
+  4. **Troubleshooting Guide:** Built-in guidance for matching Apple IDs, waking sleeping Macs, and configuring iCloud Drive.
+
+### Blueprint Widget Showcase (`PhoneWidgetSettingsView`)
+- In `SettingsView › Widgets & Lock Screen`, all widgets are displayed inside architectural Blueprint Containers (`BlueprintCard`):
+  - Every Home Screen card shares an identical uniform height (218pt) with blueprint grid lines, technical size badges (`MEDIUM · 2×2`, `SMALL · 2×1`, `LARGE · 4×4`), and live previews. The Large widget scales proportionally to eliminate dead vertical space.
+  - Every Lock Screen card shares an identical uniform height (146pt) with wallpaper glass backdrops and badges (`ACCESSORY 2×1`, `CIRCULAR 1×1`, `INLINE`).
+  - Interactive options (Layout, Telemetry focus, SSID toggle) update the live blueprint previews in real time.
+
+### Solid App Icons & Dynamic Theme Synchronization
+- Alternate app icons (`batbattery`, `gauge`, `stats`) are 100% opaque without alpha channels and marked `UIPrerenderedIcon: true` in `Info.plist`, preventing SpringBoard multitasking background white artifacts.
+- `PhoneThemeManager` synchronizes both SwiftUI's `preferredColorScheme` and UIKit's `window.overrideUserInterfaceStyle` across all window scenes so that Appearance modal sheets and background views switch dark/light mode simultaneously without reload.
 
 ---
 
 ## 3. Widgets & Live Activity (`Sources/BattisticsPhoneWidgets`)
+
+- **Separation of Families:** `MacWidget` is restricted to Home Screen (`.systemSmall`, `.systemMedium`, `.systemLarge`), while `MacLockScreenDetailWidget` is dedicated to Lock Screen (`.accessoryRectangular`, `.accessoryCircular`, `.accessoryInline`), resolving widget picker duplicate listings.
 
 - **3-Row Non-Truncating Lock Screen Live Activity (`LockScreenLiveActivityView`):**
   - **Row 1:** Full Mac name (`layoutPriority(1)`) on the left, power/battery capsule (`100%`) on the right.
