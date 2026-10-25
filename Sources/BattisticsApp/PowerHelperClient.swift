@@ -222,6 +222,10 @@ final class PowerHelperClient {
             }
             return code == 0 ? .current : .outdated
         } catch {
+            // The helper answers one connection at a time and may be inside a
+            // pmset run. Invalidating a lease's connection would end the
+            // closed-lid session, and a lease proves the helper is there.
+            if asked === leaseConnection { return isOutdated ? .outdated : .current }
             // A connection made before launchd (re)started the daemon stays
             // dead. Drop it so the next question reaches the new process.
             if connection === asked {
@@ -454,6 +458,8 @@ final class PowerHelperClient {
                 proxy.setSleepTimer(
                     timer.wireCode, minutes: interval.rawValue, source: source.wireCode,
                     reply: done)
+            case .allowSleep:
+                proxy.allowSleep(reply: done)
             }
         }
         guard code == 0 else { throw Failure.rejected(code) }

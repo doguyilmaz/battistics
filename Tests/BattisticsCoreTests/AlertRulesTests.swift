@@ -142,6 +142,27 @@ struct AlertRulesTests {
         }
     }
 
+    @Test func onBatteryDurationStaysSentAcrossARelaunchForTheSameUnplug() throws {
+        var state = AlertState()
+        let config = AlertConfig(onBatteryDurationEnabled: true, onBatteryDurationHours: 3)
+        let start = Date(timeIntervalSince1970: 1_700_000_000.4)
+        _ = AlertRules.evaluate(snapshot: snapshot(percent: 90), config: config, state: &state, now: start)
+        _ = AlertRules.evaluate(
+            snapshot: snapshot(percent: 60), config: config, state: &state, now: start.addingTimeInterval(3.1 * 3600))
+
+        var relaunched = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        relaunched.restoreUnplug(Date(timeIntervalSince1970: 1_700_000_000))
+        #expect(AlertRules.evaluate(
+            snapshot: snapshot(percent: 55), config: config, state: &relaunched,
+            now: start.addingTimeInterval(3.5 * 3600)).isEmpty)
+
+        var later = try JSONDecoder().decode(AlertState.self, from: JSONEncoder().encode(state))
+        later.restoreUnplug(start.addingTimeInterval(5 * 3600))
+        #expect(AlertRules.evaluate(
+            snapshot: snapshot(percent: 50), config: config, state: &later,
+            now: start.addingTimeInterval(8.2 * 3600)).count == 1)
+    }
+
     @Test func healthDropDetection() {
         #expect(
             AlertRules.healthDropAlert(baseline: [90, 90, 90], current: 85, enabled: true)

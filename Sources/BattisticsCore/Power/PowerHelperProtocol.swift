@@ -31,6 +31,8 @@ public let powerHelperBuild = "5"
     func setLowPowerMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setEnergyMode(_ code: Int, reply: @escaping (Int32) -> Void)
     func setSleepTimer(_ timer: Int, minutes: Int, source: Int, reply: @escaping (Int32) -> Void)
+    /// Turns a leftover `disablesleep` override off; refused while a lease holds it.
+    func allowSleep(reply: @escaping @Sendable (Int32) -> Void)
     /// So the app can tell a stale daemon from a current one after an update.
     func version(reply: @escaping (String) -> Void)
 }

@@ -27,8 +27,7 @@ struct KeepAwakeActivityWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     VStack(alignment: .trailing, spacing: 2) {
-                        if let deadline = context.state.deadline {
-                            let range = min(context.state.startedAt, deadline)...deadline
+                        if let range = context.state.countdownRange {
                             Text(timerInterval: range, countsDown: true)
                                 .font(.system(.subheadline, design: .rounded, weight: .bold))
                                 .monospacedDigit()
@@ -53,8 +52,7 @@ struct KeepAwakeActivityWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(spacing: 8) {
-                        if let deadline = context.state.deadline {
-                            let range = min(context.state.startedAt, deadline)...deadline
+                        if let range = context.state.countdownRange {
                             ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                                 .tint(context.state.powerColor)
                         }
@@ -85,8 +83,7 @@ struct KeepAwakeActivityWidget: Widget {
                     }
                 }
             } compactTrailing: {
-                if let deadline = context.state.deadline {
-                    let range = min(context.state.startedAt, deadline)...deadline
+                if let range = context.state.countdownRange {
                     Text(timerInterval: range, countsDown: true)
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.orange)
@@ -193,8 +190,8 @@ private struct LockScreenLiveActivityView: View {
                 Spacer(minLength: 6)
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    if let deadline = state.deadline {
-                        Text(timerInterval: min(state.startedAt, deadline)...deadline, countsDown: true)
+                    if let range = state.countdownRange {
+                        Text(timerInterval: range, countsDown: true)
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
                             .multilineTextAlignment(.trailing)
@@ -216,8 +213,8 @@ private struct LockScreenLiveActivityView: View {
                 .frame(width: 100, alignment: .trailing)
             }
 
-            if let deadline = state.deadline {
-                ProgressView(timerInterval: min(state.startedAt, deadline)...deadline, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
+            if let range = state.countdownRange {
+                ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                     .tint(offline ? .gray : state.powerColor)
             }
 

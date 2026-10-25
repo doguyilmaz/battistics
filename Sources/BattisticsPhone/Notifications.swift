@@ -59,6 +59,18 @@ enum Notifications {
         }
     }
 
+    /// Why a widget, Live Activity or Control Center button did nothing; those
+    /// surfaces cannot show a reply themselves.
+    @MainActor
+    static func report(_ failure: String?, for mac: MacStore.Mac) async {
+        guard let failure else { return }
+        let content = UNMutableNotificationContent()
+        content.title = mac.name
+        content.body = failure
+        try? await UNUserNotificationCenter.current()
+            .add(UNNotificationRequest(identifier: "\(mac.id).command", content: content, trigger: nil))
+    }
+
     /// Maintains a rolling local notification while a Keep Awake session is
     /// active, for a Mac that goes quiet while the app is suspended. Each
     /// fresh reading pushes it forward and clears one already delivered; how

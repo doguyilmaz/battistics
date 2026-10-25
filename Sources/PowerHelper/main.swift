@@ -101,6 +101,10 @@ final class PowerHelper: NSObject, NSXPCListenerDelegate, PowerHelperProtocol {
         reply(run(PowerSettingsWriter.arguments(for: timer, interval: interval, source: source)))
     }
 
+    func allowSleep(reply: @escaping @Sendable (Int32) -> Void) {
+        LidSleepController.shared.allowSleep(reply: reply)
+    }
+
     func version(reply: @escaping (String) -> Void) {
         reply(powerHelperBuild)
     }

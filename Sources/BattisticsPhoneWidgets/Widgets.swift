@@ -35,7 +35,7 @@ struct KeepAwakeControl: ControlWidget {
         var previewValue: Bool { false }
 
         func currentValue() async throws -> Bool {
-            guard let snapshot = SharedSnapshot.load(), snapshot.reachable else { return false }
+            guard let snapshot = SharedSnapshot.load()?.asOf(.now), snapshot.reachable else { return false }
             return snapshot.status?.session?.isActive(at: .now) ?? false
         }
     }

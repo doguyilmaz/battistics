@@ -12,6 +12,8 @@ public actor RemoteCloud {
 
     public struct Snapshot: Sendable {
         public var statuses: [String: RemoteStatus] = [:]
+        /// Status records written by a newer build that this one cannot read.
+        public var unreadable: Set<String> = []
         public var commands: [Command] = []
         /// Read from the start rather than as changes, so a missing record is really missing.
         public var isFull = false
@@ -76,7 +78,9 @@ public actor RemoteCloud {
             do {
                 result = try await self.read(since: self.changeToken)
             } catch let error as CKError where error.code == .changeTokenExpired {
-                // Also what another device recreating the zone looks like.
+                // Also what another device recreating the zone looks like,
+                // which took this zone's subscription with the old one.
+                self.subscribed = false
                 self.statusRecords = [:]
                 result = try await self.read(since: nil)
             }
@@ -92,6 +96,7 @@ public actor RemoteCloud {
             return try await body()
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             prepared = false
+            subscribed = false
             changeToken = nil
             statusRecords = [:]
             throw error
@@ -111,6 +116,8 @@ public actor RemoteCloud {
                     statusRecords[record.recordID.recordName] = record
                     if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
                         snapshot.statuses[record.recordID.recordName] = status
+                    } else {
+                        snapshot.unreadable.insert(record.recordID.recordName)
                     }
                 case Self.commandType:
                     if let request = try? RemoteWire.decode(RemoteRequest.self, from: payload),

@@ -62,10 +62,6 @@ struct KeepAwakeIntentButton: View {
 }
 
 enum WidgetHelpers {
-    static func isSessionActive(_ status: RemoteStatus, now: Date) -> Bool {
-        status.session?.isActive(at: now) ?? false
-    }
-
     @ViewBuilder
     static func powerIcon(_ battery: RemoteStatus.Battery) -> some View {
         if battery.lowPowerMode == true {

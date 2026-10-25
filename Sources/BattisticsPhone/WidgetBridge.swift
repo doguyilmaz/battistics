@@ -9,6 +9,15 @@ import WidgetKit
 /// background refresh runs; the countdown itself runs on the system clock.
 @MainActor
 enum WidgetBridge {
+    /// Activity updates still running, which a background task awaits before it completes.
+    private static var changes: [Task<Void, Never>] = []
+
+    static func settle() async {
+        let running = changes
+        changes.removeAll()
+        for change in running { await change.value }
+    }
+
     static func publish(_ mac: MacStore.Mac?, reading: MacStore.Reading?) {
         guard let mac else {
             SharedSnapshot.clear()
@@ -32,9 +41,9 @@ enum WidgetBridge {
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         // Its Stop acts on the selected Mac, so an activity for any other Mac must go.
-        for activity in Activity<KeepAwakeActivityAttributes>.activities where activity.attributes.macName != mac.name {
+        for activity in Activity<KeepAwakeActivityAttributes>.activities where activity.attributes.macID != mac.id {
             let id = activity.id
-            Task { await end(id) }
+            changes.append(Task { await end(id) })
         }
         guard let status = reading?.status, let session = status.session else {
             // Only a Mac that is answering can tell us its session ended.
@@ -47,7 +56,7 @@ enum WidgetBridge {
         }
         let reachable = reading?.reachable == true
         let current = Activity<KeepAwakeActivityAttributes>.activities
-        let existing = current.first(where: { $0.attributes.macName == mac.name })
+        let existing = current.first(where: { $0.attributes.macID == mac.id })
         // Never start a new activity for a Mac that has gone silent.
         if !reachable && existing == nil { return }
 
@@ -71,17 +80,17 @@ enum WidgetBridge {
         let content = ActivityContent(state: state, staleDate: status.unheardDate)
         if let activity = existing {
             let id = activity.id
-            if activity.content.state != state { Task { await update(id, content) } }
+            if activity.content.state != state { changes.append(Task { await update(id, content) }) }
             endActivities(except: id)
         } else {
             endActivities()
-            _ = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name), content: content)
+            _ = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
         }
     }
 
     private static func endActivities(except kept: String? = nil) {
         for id in Activity<KeepAwakeActivityAttributes>.activities.map(\.id) where id != kept {
-            Task { await end(id) }
+            changes.append(Task { await end(id) })
         }
     }
 

@@ -80,6 +80,15 @@ struct SystemPane: View {
 
             Section {
                 if let power = powerModel.settings {
+                    if power.sleepDisabled == true, !holdsLidSleep {
+                        LabeledContent {
+                            Button("Allow Sleep") { apply(.allowSleep) }
+                        } label: {
+                            Label("Sleep is turned off", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                            Text("This Mac will not sleep, not even with the lid closed, and it stays this way after a restart.")
+                        }
+                    }
                     if let mode = power.lowPowerMode {
                         Picker("Low Power Mode", selection: lowPowerBinding(mode)) {
                             ForEach(LowPowerModeSetting.allCases, id: \.self) { option in
@@ -132,6 +141,13 @@ struct SystemPane: View {
             helper.refreshStatus()
             await powerModel.refresh()
         }
+        // The helper turns sleep back on as a closed-lid session ends; read
+        // it again once that has landed, or the warning above shows stale.
+        .task(id: holdsLidSleep) {
+            guard !holdsLidSleep, powerModel.settings?.sleepDisabled == true else { return }
+            try? await Task.sleep(for: .seconds(3))
+            await powerModel.refresh()
+        }
     }
 
     // MARK: - Permission
@@ -156,15 +172,20 @@ struct SystemPane: View {
             // Silent or outdated: re-registering fixes it, removing does not.
             Button("Repair") { repairHelper() }
                 .controlSize(.small)
-                .disabled(isRepairing)
+                .disabled(isRepairing || holdsLidSleep)
         } else if helper.isInstalled {
             Button("Remove Helper") { removeHelper() }
                 .controlSize(.small)
-                .disabled(keepAwake.session?.mode == .lidClosed)
+                .disabled(holdsLidSleep)
         } else {
             Button("Never Ask Again…") { installHelper() }
                 .controlSize(.small)
         }
+    }
+
+    /// Re-registering or removing the helper ends a closed-lid session it holds.
+    private var holdsLidSleep: Bool {
+        keepAwake.session?.mode == .lidClosed || keepAwake.isChanging
     }
 
     private var permissionIcon: String {

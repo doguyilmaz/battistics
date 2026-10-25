@@ -125,6 +125,11 @@ final class RemoteAccessModel {
         do {
             let snapshot = try await cloud.fetchChanges()
             recordMissing = snapshot.isFull && snapshot.statuses[macID] == nil
+            // Left behind by a phone whose delete failed for a Mac that is gone; seen at launch.
+            for command in snapshot.commands where command.macID != macID
+                && -command.request.sentAt.timeIntervalSinceNow > 10 * 60 {
+                handledCommands.insert(command.recordName)
+            }
             let mine = snapshot.commands
                 .filter { $0.macID == macID && !handledCommands.contains($0.recordName) }
                 .sorted { $0.request.sentAt < $1.request.sentAt }
@@ -208,7 +213,18 @@ final class RemoteAccessModel {
         lastCheap = nil
         lastPublished = nil
         problem = nil
-        try? await cloud?.delete([macID])
+        // Retried by the ticker until it lands, or phones keep a ghost of this Mac.
+        guard let cloud else { return }
+        let removed: Bool
+        do {
+            try await cloud.delete([macID])
+            removed = true
+        } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
+            removed = true
+        } catch {
+            removed = false
+        }
+        UserDefaults.standard.set(!removed && !enabled, forKey: Prefs.remoteWithdrawPending)
     }
 
     /// Low Power policy changes made in the Mac's own panes post no system notification.
@@ -246,6 +262,9 @@ final class RemoteAccessModel {
                 let interval = self?.pollInterval ?? 15
                 try? await Task.sleep(for: .seconds(interval))
                 guard let self, !Task.isCancelled else { return }
+                if !self.enabled, UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) {
+                    await self.withdraw()
+                }
                 await self.sync()
             }
         }
@@ -287,6 +306,8 @@ final class RemoteAccessModel {
         case .inspect:
             extras = await Self.inspect()
             return nil
+        case .unknown:
+            return .init(.invalidRequest)
         }
     }
 

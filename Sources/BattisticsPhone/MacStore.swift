@@ -32,8 +32,7 @@ final class MacStore {
     var selectedID: String? {
         didSet {
             UserDefaults.standard.set(selectedID, forKey: "selectedMac")
-            let widgetMac = selected ?? macs.first
-            WidgetBridge.publish(widgetMac, reading: widgetMac.flatMap { readings[$0.id] })
+            WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         }
     }
 
@@ -52,11 +51,11 @@ final class MacStore {
         #endif
         RemoteIntentBridge.startOneHour = { [weak self] in
             guard let self, let mac = self.selected else { return }
-            _ = await self.start(mac, mode: .displayMaySleep, minutes: 60)
+            await Notifications.report(await self.start(mac, mode: .displayMaySleep, minutes: 60), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] in
             guard let self, let mac = self.selected else { return }
-            _ = await self.stop(mac)
+            await Notifications.report(await self.stop(mac), for: mac)
         }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
     }
@@ -75,7 +74,11 @@ final class MacStore {
     /// Reads every Mac and returns the alerts their changes call for.
     @discardableResult
     func refreshAll() async -> [(Mac, [RemoteAlert])] {
-        guard !refreshing else { return [] }
+        // A push during a refresh may carry a newer change, and its handler
+        // must not complete before that change is read.
+        while refreshing {
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return [] }
+        }
         #if DEBUG
         if DemoData.isEnabled { return [] }
         #endif
@@ -108,11 +111,12 @@ final class MacStore {
             Notifications.syncWatchdog(for: mac, reading: reading)
         }
         // A Mac that stopped sharing is gone, not silent.
-        for id in readings.keys where snapshot.statuses[id] == nil {
+        for id in readings.keys where snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {
             readings[id] = nil
             Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
         }
         save()
+        await WidgetBridge.settle()
         LocalPhoneMonitor.shared.learnHotspotName(from: readings)
         // Awaited so a background task does not complete before the alerts are added.
         await Notifications.deliver(alerts)
@@ -157,20 +161,22 @@ final class MacStore {
         #endif
         do {
             _ = try await cloud.send(request, to: mac.id)
-            for _ in 0..<16 {
-                try await Task.sleep(for: .seconds(1.5))
-                let snapshot = try await cloud.fetch()
-                _ = await apply(snapshot)
-                if let result = snapshot.statuses[mac.id]?.lastCommand, result.id == request.id {
-                    return result.failure.map(Self.message)
-                }
-            }
-            // Never run a command the user has stopped waiting for.
-            try? await cloud.delete([request.id])
-            return String(localized: "\(mac.name) did not answer. It may be asleep or offline.")
         } catch {
             return Self.describe(error)
         }
+        for _ in 0..<16 {
+            do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
+            guard let snapshot = try? await cloud.fetch() else { continue }
+            _ = await apply(snapshot)
+            if let result = snapshot.statuses[mac.id]?.lastCommand, result.id == request.id {
+                return result.failure.map(Self.message)
+            }
+        }
+        // Never run a command the user has stopped waiting for, also when the
+        // caller was cancelled, which would cancel a delete made in its task.
+        let cloud = cloud
+        await Task { try? await cloud.delete([request.id]) }.value
+        return String(localized: "\(mac.name) did not answer. It may be asleep or offline.")
     }
 
     private func save() {

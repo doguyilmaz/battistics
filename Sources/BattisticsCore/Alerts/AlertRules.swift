@@ -60,13 +60,23 @@ public struct AlertState: Sendable, Equatable, Codable {
     public var highTemperatureFired = false
     public var unpluggedAt: Date?
     public var onBatteryDurationFired = false
+    /// The unplug the on-battery alert was sent for, kept across relaunches.
+    var durationAlertUnplug: Date?
 
     public init() {}
+
+    /// Starts from the unplug moment history found at launch. The alert
+    /// counts as sent only if it was sent for that same unplug.
+    public mutating func restoreUnplug(_ date: Date) {
+        unpluggedAt = date
+        onBatteryDurationFired = durationAlertUnplug.map { abs($0.timeIntervalSince(date)) < 60 } ?? false
+    }
 
     /// The unplug session is rebuilt from history at launch; a stored one
     /// could predate a charge that happened while the app was not running.
     private enum CodingKeys: String, CodingKey {
         case lowBatteryFired, lastDropNotifiedPercent, chargeLimitFired, fullChargeFired, highTemperatureFired
+        case durationAlertUnplug
     }
 }
 
@@ -147,6 +157,7 @@ public enum AlertRules {
             let hours = now.timeIntervalSince(unpluggedAt) / 3600
             if hours >= config.onBatteryDurationHours, !state.onBatteryDurationFired {
                 state.onBatteryDurationFired = true
+                state.durationAlertUnplug = unpluggedAt
                 alerts.append(.onBatteryDuration(hours: hours))
             }
         }

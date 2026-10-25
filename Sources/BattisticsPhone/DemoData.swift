@@ -56,7 +56,7 @@ enum DemoData {
         case .inspect:
             status.extras = .init(sampledAt: now, accessories: [.init(name: "Magic Keyboard", percent: 88)],
                                   apps: [.init(name: "Final Cut Pro", cpuPercent: 63.4), .init(name: "Mail", cpuPercent: 2.1)])
-        case .sleepDisplay:
+        case .sleepDisplay, .unknown:
             break
         }
         status.lastCommand = .init(id: request.id, failure: nil)

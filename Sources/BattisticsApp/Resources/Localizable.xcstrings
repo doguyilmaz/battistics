@@ -652,6 +652,23 @@
         }
       }
     },
+    "Allow Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uykuya İzin Ver"
+          }
+        }
+      }
+    },
     "Allow closed-lid sessions from iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -5616,6 +5633,23 @@
         }
       }
     },
+    "Sleep is turned off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep is turned off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku kapalı"
+          }
+        }
+      }
+    },
     "Some devices publish their level only over Bluetooth. macOS asks for access once.": {
       "extractionState": "manual",
       "localizations": {
@@ -6526,6 +6560,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu Mac çevrimdışı. Bağlanınca paylaşım devam eder."
+          }
+        }
+      }
+    },
+    "This Mac will not sleep, not even with the lid closed, and it stays this way after a restart.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Mac will not sleep, not even with the lid closed, and it stays this way after a restart."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac kapağı kapalıyken bile uyumaz ve yeniden başlattıktan sonra da böyle kalır."
           }
         }
       }

@@ -42,7 +42,8 @@ public actor HistoryStore {
     public func recordChargeSample(_ sample: ChargeSample) {
         guard ensureOpen() else { return }
         run(
-            "INSERT OR IGNORE INTO charge_samples (ts, percent, external, charging) VALUES (?,?,?,?)",
+            // The later of two readings in one second is the settled state.
+            "INSERT OR REPLACE INTO charge_samples (ts, percent, external, charging) VALUES (?,?,?,?)",
             bind: [
                 .int(Int64(sample.date.timeIntervalSince1970)),
                 .int(Int64(sample.percent)),

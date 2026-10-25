@@ -70,8 +70,10 @@ final class PowerSettingsModel {
             } catch {
                 // Registered but not answering — launchd refuses to spawn an
                 // unnotarized binary, for one. Fall through to asking for a
-                // password rather than silently doing nothing.
+                // password rather than silently doing nothing, and probe it
+                // again so later changes do not each wait out the timeout.
                 helperHandledIt = false
+                helper.refreshStatus()
             }
         }
         if !helperHandledIt {

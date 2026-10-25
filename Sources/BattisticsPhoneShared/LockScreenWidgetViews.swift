@@ -38,7 +38,7 @@ struct MacLockScreenDetailView: View {
     }
 
     private func circular(_ status: RemoteStatus) -> some View {
-        let symbol = WidgetHelpers.isSessionActive(status, now: entry.date)
+        let symbol = status.session?.isActive(at: entry.date) == true
             ? "cup.and.saucer.fill"
             : (status.battery?.symbol ?? "laptopcomputer")
         return Gauge(value: Double(status.battery?.percent ?? 0), in: 0...100) {

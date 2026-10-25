@@ -70,7 +70,6 @@ final class AppModel {
 
         refreshSensors()
         startMonitoring()
-        restartPowerSampling()
         observeWake()
         observeDefaults()
         observePaneLinks()
@@ -94,7 +93,7 @@ final class AppModel {
                 // the UI and for the on-battery duration alert. A live AC
                 // transition while reading history starts a different session.
                 self.lastUnplugDate = storedUnplug
-                self.alertState.unpluggedAt = storedUnplug
+                self.alertState.restoreUnplug(storedUnplug)
             }
         }
     }

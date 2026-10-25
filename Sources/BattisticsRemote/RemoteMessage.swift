@@ -9,6 +9,12 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         case sleepDisplay
         /// Samples accessory batteries and the apps using the most energy, on request only.
         case inspect
+        /// Sent by a newer phone; answered as an invalid request instead of left unread.
+        case unknown
+
+        public init(from decoder: Decoder) throws {
+            self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .unknown
+        }
     }
 
     public var id: String
