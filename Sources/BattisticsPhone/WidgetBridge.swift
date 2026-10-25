@@ -13,9 +13,11 @@ enum WidgetBridge {
     private static var changes: [Task<Void, Never>] = []
 
     static func settle() async {
-        let running = changes
-        changes.removeAll()
-        for change in running { await change.value }
+        // Changes made while waiting are awaited too.
+        while let change = changes.first {
+            await change.value
+            changes.removeAll { $0 == change }
+        }
     }
 
     static func publish(_ mac: MacStore.Mac?, reading: MacStore.Reading?) {

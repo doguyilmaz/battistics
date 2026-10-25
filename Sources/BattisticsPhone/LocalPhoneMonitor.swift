@@ -51,7 +51,9 @@ final class LocalPhoneMonitor {
         enteredCycles = defaults.object(forKey: Self.cyclesKey) as? Int
         customName = defaults.string(forKey: Self.nameKey) ?? ""
         hotspotName = defaults.string(forKey: Self.hotspotKey)
-        unpluggedAt = defaults.object(forKey: Self.unpluggedKey) as? Date
+        // An unplug from before the last restart may have been followed by a charge this app never saw.
+        let booted = Date.now.addingTimeInterval(-ProcessInfo.processInfo.systemUptime)
+        unpluggedAt = (defaults.object(forKey: Self.unpluggedKey) as? Date).flatMap { $0 > booted ? $0 : nil }
         chargeHistory = Self.loadHistory()
 
         UIDevice.current.isBatteryMonitoringEnabled = true
