@@ -221,11 +221,12 @@ final class PowerHelperClient {
                 proxy.version { @Sendable version in done(version == powerHelperBuild ? 0 : 1) }
             }
             return code == 0 ? .current : .outdated
+        } catch Failure.unreachable where asked === leaseConnection {
+            // A timeout only: the helper answers one connection at a time and
+            // may be inside a pmset run. Invalidating a lease's connection
+            // would end the closed-lid session.
+            return isOutdated ? .outdated : .current
         } catch {
-            // The helper answers one connection at a time and may be inside a
-            // pmset run. Invalidating a lease's connection would end the
-            // closed-lid session, and a lease proves the helper is there.
-            if asked === leaseConnection { return isOutdated ? .outdated : .current }
             // A connection made before launchd (re)started the daemon stays
             // dead. Drop it so the next question reaches the new process.
             if connection === asked {

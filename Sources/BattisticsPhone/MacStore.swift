@@ -126,6 +126,10 @@ final class MacStore {
     /// For a Mac that was erased or sold. One that still shares publishes
     /// again as soon as it sees its record gone.
     func forget(_ mac: Mac) async -> String? {
+        // A refresh already under way would put the Mac back after this.
+        while refreshing { try? await Task.sleep(for: .milliseconds(200)) }
+        refreshing = true
+        defer { refreshing = false }
         do {
             try await cloud.delete([mac.id])
         } catch {
@@ -180,9 +184,9 @@ final class MacStore {
         }
         for _ in 0..<16 {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
-            guard let snapshot = try? await cloud.fetch() else { continue }
-            _ = await apply(snapshot)
-            if let result = snapshot.statuses[mac.id]?.lastCommand, result.id == request.id {
+            // Through refreshAll, so this read and a push's never apply out of order.
+            await refreshAll()
+            if let result = readings[mac.id]?.status?.lastCommand, result.id == request.id {
                 return result.failure.map(Self.message)
             }
         }
