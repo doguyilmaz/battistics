@@ -47,6 +47,7 @@ final class MacStore {
         readings = UserDefaults.standard.data(forKey: "readings")
             .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
+        LocalPhoneMonitor.shared.ingestPairedPhoneName(from: readings)
         RemoteIntentBridge.startOneHour = { [weak self] in
             guard let self, let mac = self.selected else { return }
             _ = await self.start(mac, mode: .displayMaySleep, minutes: 60)
@@ -107,6 +108,7 @@ final class MacStore {
             Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
         }
         save()
+        LocalPhoneMonitor.shared.ingestPairedPhoneName(from: readings)
         if !alerts.isEmpty {
             Task { await Notifications.deliver(alerts) }
         }
