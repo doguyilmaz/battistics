@@ -29,7 +29,7 @@ struct StartKeepAwakeIntent: AppIntent {
 }
 
 struct StopKeepAwakeIntent: AppIntent {
-    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Let Mac Sleep"
     static let description = IntentDescription("Stops Keep Awake on your Mac.")
 

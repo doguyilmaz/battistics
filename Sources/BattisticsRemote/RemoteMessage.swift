@@ -34,7 +34,7 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         self.sentAt = sentAt
     }
 
-    /// Finite duration presets offered on the phone (tapping the active pill deselects it for "Until turned off", rawValue 0).
+    /// Finite durations a phone may request; the app and Shortcuts each offer a subset.
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
 
     /// All valid duration values including 0 (indefinite / until turned off).

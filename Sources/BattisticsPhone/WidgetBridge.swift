@@ -63,8 +63,7 @@ enum WidgetBridge {
         )
         // Marks the activity stale even if the app never runs again, late
         // enough that throttled pushes alone do not trigger it.
-        let staleDate = [session.deadline, status.unheardDate].compactMap { $0 }.min()
-        let content = ActivityContent(state: state, staleDate: staleDate)
+        let content = ActivityContent(state: state, staleDate: status.unheardDate)
         if let activity = existing {
             let id = activity.id
             if activity.content.state != state { Task { await update(id, content) } }

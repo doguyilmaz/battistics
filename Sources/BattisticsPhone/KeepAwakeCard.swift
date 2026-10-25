@@ -48,7 +48,7 @@ struct KeepAwakeCard: View {
 
             // Both layouts stay laid out so starting or stopping never changes the card's height.
             ZStack {
-                RunningView(session: session ?? Self.placeholder)
+                RunningView(session: session ?? Self.placeholder, live: reachable && session != nil)
                     .opacity(session == nil ? 0 : 1)
                     .accessibilityHidden(session == nil)
                 idleControls
@@ -59,7 +59,7 @@ struct KeepAwakeCard: View {
 
             feedback
                 .font(.footnote)
-                .lineLimit(1, reservesSpace: true)
+                .lineLimit(message == nil ? 1 : 2, reservesSpace: true)
                 .minimumScaleFactor(0.85)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -193,6 +193,7 @@ struct KeepAwakeCard: View {
 
 private struct RunningView: View {
     let session: RemoteStatus.Session
+    let live: Bool
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
@@ -222,7 +223,7 @@ private struct RunningView: View {
                     ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                         .tint(.orange)
                 } else {
-                    FlowingBar(running: session.deadline == nil)
+                    FlowingBar(running: session.deadline == nil, animated: live)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -246,13 +247,14 @@ private struct RunningView: View {
 /// The track under an open-ended session: light moving along it while the Mac is kept awake.
 private struct FlowingBar: View {
     let running: Bool
+    let animated: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Capsule()
             .fill(.orange.opacity(0.18))
             .overlay {
-                if running, !reduceMotion {
+                if running, animated, !reduceMotion, !ProcessInfo.processInfo.isLowPowerModeEnabled {
                     PhaseAnimator([0.0, 1.0]) { phase in
                         GeometryReader { proxy in
                             Capsule()

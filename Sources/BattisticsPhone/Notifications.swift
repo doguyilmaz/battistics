@@ -43,14 +43,18 @@ enum Notifications {
     @MainActor
     static func deliver(_ results: [(MacStore.Mac, [RemoteAlert])]) async {
         guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true else { return }
+        let center = UNUserNotificationCenter.current()
+        let delivered = Set(await center.deliveredNotifications().map(\.request.identifier))
         for (mac, alerts) in results {
             for alert in alerts {
+                let id = "\(mac.id).\(alert.kind)"
+                // The watchdog already said so under this identifier; adding it again sounds twice.
+                if alert == .unreachable, delivered.contains(id) { continue }
                 let content = UNMutableNotificationContent()
                 content.title = mac.name
                 content.body = alert.message
                 content.sound = .default
-                let request = UNNotificationRequest(identifier: "\(mac.id).\(alert.kind)", content: content, trigger: nil)
-                try? await UNUserNotificationCenter.current().add(request)
+                try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             }
         }
     }

@@ -44,7 +44,6 @@ struct HotspotCard: View {
                 .font(.headline)
                 .foregroundStyle(tint)
                 .contentTransition(.symbolEffect(.replace))
-                .symbolEffect(.variableColor.iterative, isActive: reachable && status.network == .hotspot && !ready)
                 .frame(width: 36, height: 36)
                 .background(tint.opacity(0.14), in: .circle)
                 .background { ReadyPulse(tint: tint, ready: ready) }

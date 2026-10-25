@@ -20,7 +20,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
   - While the watchdog waits longer than the stale window, a passive note ("Last update at 10:42 ...", no sound) lands in Notification Center at `RemoteStatus.quietDelay`. It says only that no update came, and the next fetch removes it whatever it finds.
   - Neither is scheduled when the session ends before the watchdog would fire.
   - Widgets add a timeline entry at `unheardDate` (at least 30 minutes after the reading) that shows the Mac offline.
-  - The Live Activity uses `unheardDate` as its stale date and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
+  - The Live Activity uses `unheardDate` as its stale date, also for timed sessions, and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Settings › Notifications › When Charged To reports once when a charging Mac reaches 80, 90 or 100%. It is evaluated on the phone, so it arrives with the next update the phone receives.
 - Alerts are delivered once per change and awaited before a background task completes. Lid and unplug warnings are cleared when the Mac moves to Hotspot.
 
@@ -39,7 +39,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Home Screen: Mac (small, medium, large) and Mac Battery (small, medium). Lock Screen: rectangular, circular, inline. One preference set in Settings › Widgets applies to all of them.
 - The Live Activity merges mode and lid into one line ("Lid closed", "Ready to close lid") and ends with a freshness line and Stop.
 - Keep Mac Awake is a Control Center and Action Button control on iOS 18 (`KeepAwakeControl`).
-- Starting Keep Awake from a widget or control requires an unlocked iPhone. Stopping does not.
+- Starting Keep Awake from a widget, Shortcut or control requires an unlocked iPhone. Stopping from the Live Activity or a Shortcut does not; the Control Center toggle asks in both directions, since a control has one policy.
 
 ## Safety
 

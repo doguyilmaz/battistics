@@ -140,9 +140,11 @@ final class RemoteAccessModel {
         } catch {
             failure = error
         }
+        // A recreated zone has no status record, however unchanged this Mac is.
+        let zoneGone = [.zoneNotFound, .userDeletedZone].contains((failure as? CKError)?.code)
         if (failure as? CKError)?.retryAfterSeconds == nil {
             do {
-                try await publish(force: handled)
+                try await publish(force: handled || zoneGone)
             } catch {
                 failure = error
             }
