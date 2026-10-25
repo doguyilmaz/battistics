@@ -23,7 +23,9 @@ public actor RemoteCloud {
 
     private let database: CKDatabase
     private var prepared = false
+    private var subscribed = false
     private var statusRecords: [String: CKRecord] = [:]
+    private var changeToken: CKServerChangeToken?
 
     public init() {
         database = CKContainer(identifier: Self.containerID).privateCloudDatabase
@@ -50,22 +52,54 @@ public actor RemoteCloud {
     /// Subscriptions belong to the account, not the device, so every device
     /// saves the same one.
     public func prepare() async throws {
-        guard !prepared else { return }
-        let zones = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Self.zoneID)], deleting: [])
-        for result in zones.saveResults.values { _ = try result.get() }
+        if !prepared {
+            let zones = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Self.zoneID)], deleting: [])
+            for result in zones.saveResults.values { _ = try result.get() }
+            prepared = true
+        }
+        // Polling still works without pushes, so a failed subscription only retries.
+        guard !subscribed else { return }
         let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: "remote-zone")
         let info = CKSubscription.NotificationInfo()
         info.shouldSendContentAvailable = true
         subscription.notificationInfo = info
-        _ = try? await database.modifySubscriptions(saving: [subscription], deleting: [])
-        prepared = true
+        subscribed = (try? await database.modifySubscriptions(saving: [subscription], deleting: [])) != nil
     }
 
     /// The whole zone is a handful of small records, so it is read in full.
     public func fetch() async throws -> Snapshot {
+        try await guarded { try await self.read(since: nil).snapshot }
+    }
+
+    /// Only what changed since the previous call, for callers that poll often.
+    public func fetchChanges() async throws -> Snapshot {
+        try await guarded {
+            let result: (snapshot: Snapshot, token: CKServerChangeToken?)
+            do {
+                result = try await self.read(since: self.changeToken)
+            } catch let error as CKError where error.code == .changeTokenExpired {
+                result = try await self.read(since: nil)
+            }
+            self.changeToken = result.token
+            return result.snapshot
+        }
+    }
+
+    /// Sets the zone up again on the next call after iCloud lost it.
+    private func guarded<T>(_ body: () async throws -> T) async throws -> T {
         try await prepare()
+        do {
+            return try await body()
+        } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
+            prepared = false
+            changeToken = nil
+            throw error
+        }
+    }
+
+    private func read(since start: CKServerChangeToken?) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
         var snapshot = Snapshot()
-        var token: CKServerChangeToken?
+        var token = start
         repeat {
             let changes = try await database.recordZoneChanges(inZoneWith: Self.zoneID, since: token)
             for case .success(let modification) in changes.modificationResultsByID.values {
@@ -88,7 +122,7 @@ public actor RemoteCloud {
             token = changes.changeToken
             if !changes.moreComing { break }
         } while true
-        return snapshot
+        return (snapshot, token)
     }
 
     public func publish(_ status: RemoteStatus, macID: String) async throws {

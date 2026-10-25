@@ -24,9 +24,6 @@ final class NetworkMonitor: NSObject, @MainActor CLLocationManagerDelegate {
         super.init()
         locationManager.delegate = self
         preferredHotspotPhoneName = Self.readPreferredHotspotName()
-        if locationManager.authorizationStatus == .notDetermined {
-            locationManager.requestWhenInUseAuthorization()
-        }
         refreshSSID()
         monitor.pathUpdateHandler = { [weak self] path in
             let state = Self.state(for: path)

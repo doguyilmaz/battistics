@@ -199,9 +199,41 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// The Mac writes at least this often while it is awake and sharing.
     public static let heartbeat: TimeInterval = 600
 
+    /// During a Keep Awake session the Mac writes more often, so the phone can
+    /// tell a silent Mac from a quiet one within minutes instead of a quarter hour.
+    public static let sessionHeartbeat: TimeInterval = 120
+
+    /// How long a phone that cannot fetch (a pending notification, a widget, a
+    /// Live Activity) waits before saying it has not heard from the Mac. iOS
+    /// throttles the silent pushes that wake the phone to a few per hour, so a
+    /// shorter wait reports a healthy Mac as silent.
+    public static let unheardDelay: TimeInterval = 30 * 60
+
+    /// The write interval the Mac promised in this reading. Missing means a Mac
+    /// build from before the field existed, which wrote every `heartbeat`.
+    public var heartbeatSeconds: TimeInterval?
+
+    public static func heartbeat(duringSession: Bool) -> TimeInterval {
+        duringSession ? sessionHeartbeat : heartbeat
+    }
+
+    public var expectedHeartbeat: TimeInterval { heartbeatSeconds ?? Self.heartbeat }
+
+    /// After this moment, a fetch that returns no newer reading means the Mac
+    /// is unreachable. Only a real fetch may conclude that; see `unheardDate`.
+    public var staleDate: Date {
+        let missed: Double = session == nil ? 2 : 4
+        return readAt.addingTimeInterval(expectedHeartbeat * missed)
+    }
+
+    /// When surfaces that cannot fetch stop presenting this reading as live.
+    public var unheardDate: Date {
+        max(staleDate, readAt.addingTimeInterval(Self.unheardDelay))
+    }
+
     /// Whether this reading is recent enough to call the Mac reachable.
     public func isFresh(at now: Date = Date()) -> Bool {
-        now.timeIntervalSince(readAt) < Self.heartbeat * 2
+        now < staleDate
     }
 
     public init(
@@ -217,12 +249,14 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         protection: Protection = .init(),
         macModel: String? = nil,
         osVersion: String? = nil,
-        pairedPhoneName: String? = nil
+        pairedPhoneName: String? = nil,
+        heartbeatSeconds: TimeInterval? = nil
     ) {
         self.machineName = machineName
         self.macModel = macModel
         self.osVersion = osVersion
         self.pairedPhoneName = pairedPhoneName
+        self.heartbeatSeconds = heartbeatSeconds
         self.readAt = readAt
         self.battery = battery
         self.session = session

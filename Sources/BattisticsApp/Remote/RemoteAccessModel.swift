@@ -42,6 +42,12 @@ final class RemoteAccessModel {
     @ObservationIgnored private let chargeHistory: @Sendable () async -> [RemoteStatus.ChargePoint]
     @ObservationIgnored private var lastSent: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
+    @ObservationIgnored private var lastCommandAt: Date?
+    /// Ran but not yet deleted, so a failed delete neither runs a command
+    /// twice nor leaves its record behind: the delete is retried next sync.
+    @ObservationIgnored private var handledCommands: Set<String> = []
+    @ObservationIgnored private var retryAt: Date?
+    @ObservationIgnored private var cachedPower: (settings: PowerSettings?, at: Date)?
     @ObservationIgnored private var syncing = false
     @ObservationIgnored private var pendingPublish: Task<Void, Never>?
     @ObservationIgnored private var ticker: Task<Void, Never>?
@@ -75,7 +81,10 @@ final class RemoteAccessModel {
         powerStateObserver = NotificationCenter.default.addObserver(
             forName: .NSProcessInfoPowerStateDidChange, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.publishSoon() }
+            MainActor.assumeIsolated {
+                self?.cachedPower = nil
+                self?.publishSoon()
+            }
         }
         observeSession()
         startTicker()
@@ -93,31 +102,49 @@ final class RemoteAccessModel {
 
     // MARK: iCloud
 
-    /// Runs commands addressed to this Mac, then publishes the result.
+    /// Runs commands addressed to this Mac, then publishes the result. The
+    /// heartbeat goes out even when reading commands fails, so a fetch error
+    /// never makes a running Mac look offline on the phone.
     func sync() async {
         guard enabled, let cloud, !syncing else { return }
+        if let retryAt, retryAt > .now { return }
         syncing = true
         defer { syncing = false }
+        var failure: Error?
+        var handled = false
         do {
-            try await cloud.prepare()
-            let snapshot = try await cloud.fetch()
-            let mine = snapshot.commands.filter { $0.macID == macID }.sorted { $0.request.sentAt < $1.request.sentAt }
-            for command in mine where -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime {
+            let snapshot = try await cloud.fetchChanges()
+            let mine = snapshot.commands
+                .filter { $0.macID == macID && !handledCommands.contains($0.recordName) }
+                .sorted { $0.request.sentAt < $1.request.sentAt }
+            for command in mine {
+                handledCommands.insert(command.recordName)
+                guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
                 lastCommand = .init(id: command.request.id, failure: await handle(command.request))
+                lastCommandAt = .now
+                handled = true
             }
-            try await cloud.delete(mine.map(\.recordName))
-            try await publish(force: !mine.isEmpty)
-            problem = nil
+            try await cloud.delete(Array(handledCommands))
+            handledCommands.removeAll()
         } catch {
-            problem = Self.describe(error)
+            failure = error
         }
+        do {
+            try await publish(force: handled)
+        } catch {
+            failure = error
+        }
+        if let seconds = (failure as? CKError)?.retryAfterSeconds {
+            retryAt = .now.addingTimeInterval(seconds)
+        }
+        problem = failure.map(Self.describe)
     }
 
     private func publish(force: Bool) async throws {
         guard enabled, let cloud else { return }
         var status = await fullStatus()
         status.lastCommand = lastCommand
-        if !force, let lastSent, let lastPublished, -lastPublished.timeIntervalSinceNow < RemoteStatus.heartbeat {
+        if !force, let lastSent, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
             var compared = status
             compared.readAt = lastSent.readAt
             compared.chargeHistory = lastSent.chargeHistory
@@ -128,6 +155,8 @@ final class RemoteAccessModel {
             compared.battery?.currentCapacityMah = lastSent.battery?.currentCapacityMah
             if compared == lastSent { return }
         }
+        // Sharing may have been turned off while the status was being read.
+        guard enabled else { return }
         try await cloud.publish(status, macID: macID)
         lastSent = status
         lastPublished = Date()
@@ -170,17 +199,23 @@ final class RemoteAccessModel {
         }
     }
 
-    /// Polls the CloudKit zone every few seconds while awake so phone commands
-    /// execute within seconds even when macOS throttles silent push delivery,
-    /// and publishes local battery/thermal changes whenever they differ.
+    /// Polls for phone commands because macOS throttles silent pushes: every
+    /// few seconds while a session runs or right after a command, otherwise
+    /// slower. Each poll is a delta fetch, so an idle zone costs one small request.
     private func startTicker() {
         ticker = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(4))
+                let interval = self?.pollInterval ?? 15
+                try? await Task.sleep(for: .seconds(interval))
                 guard let self, !Task.isCancelled else { return }
                 await self.sync()
             }
         }
+    }
+
+    private var pollInterval: TimeInterval {
+        let recentCommand = lastCommandAt.map { -$0.timeIntervalSinceNow < 120 } ?? false
+        return awake.isActive || recentCommand ? 4 : 15
     }
 
     private static func describe(_ error: Error) -> String {
@@ -224,9 +259,14 @@ final class RemoteAccessModel {
         case .onlyOnAdapter: .onlyOnPowerAdapter
         case .always: .always
         }
+        // A phone may change a setting through an installed helper, never install or repair one.
+        helper.refreshStatus()
+        guard helper.canApply, !helper.isOutdated else {
+            return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
+        }
         do {
-            try await helper.prepareForLidSleep()
             try await helper.apply(.lowPowerMode(setting))
+            cachedPower = nil
         } catch {
             return .init(.helperUnavailable, String(localized: "Set up the power helper on the Mac first: start closed-lid Keep Awake there once."))
         }
@@ -285,11 +325,20 @@ final class RemoteAccessModel {
 
     // MARK: Status
 
+    /// `pmset` is a process spawn, so its answer is reused for a minute unless
+    /// the power state changed.
+    private func powerSettings() async -> PowerSettings? {
+        if let cachedPower, -cachedPower.at.timeIntervalSinceNow < 60 { return cachedPower.settings }
+        let settings = await PowerSettingsReader.fetch()
+        cachedPower = (settings, .now)
+        return settings
+    }
+
     func fullStatus() async -> RemoteStatus {
         var status = status()
         async let historyTask = chargeHistory()
-        async let powerTask = PowerSettingsReader.fetch()
-        let (history, power) = await (historyTask, powerTask)
+        let power = await powerSettings()
+        let history = await historyTask
         status.chargeHistory = history.isEmpty ? nil : history
         if let power, var battery = status.battery {
             battery.lowPowerPolicy = switch power.lowPowerMode {
@@ -366,7 +415,8 @@ final class RemoteAccessModel {
             ),
             macModel: Self.macHardwareModel(),
             osVersion: osString,
-            pairedPhoneName: network.preferredHotspotPhoneName
+            pairedPhoneName: network.preferredHotspotPhoneName,
+            heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
     }
 

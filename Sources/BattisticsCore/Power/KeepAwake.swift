@@ -43,7 +43,7 @@ public enum KeepAwakeDuration: Int, Sendable, CaseIterable, Identifiable {
         self == .indefinite ? nil : rawValue
     }
 
-    /// What automation and the iPhone may ask for: never open-ended.
+    /// What automation may ask for: never open-ended.
     public static let finite = allCases.filter { $0 != .indefinite }
 }
 
