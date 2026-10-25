@@ -36,6 +36,6 @@ done
 if [ -f "$APP/Contents/Helpers/battistics" ]; then
     codesign "${FLAGS[@]}" "$APP/Contents/Helpers/battistics"
 fi
-codesign "${FLAGS[@]}" "$APP"
+codesign "${FLAGS[@]}" --preserve-metadata=entitlements "$APP"
 codesign --verify --deep --strict "$APP"
 echo "Signed $APP with $IDENTITY"

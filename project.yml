@@ -158,8 +158,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics
         PRODUCT_NAME: Battistics
-        # Empty unless `make run-icloud` sets it: iCloud entitlements need a
-        # provisioning profile, and ad-hoc or Developer ID builds have none.
+        # `make run-icloud` swaps in the iCloud set; iCloud entitlements need a
+        # provisioning profile, which ad-hoc and Developer ID builds lack.
+        BATTISTICS_ENTITLEMENTS: Sources/BattisticsApp/Support/Battistics-Base.entitlements
         CODE_SIGN_ENTITLEMENTS: $(BATTISTICS_ENTITLEMENTS)
         DEVELOPMENT_TEAM: 5MYT4VYJFC
         CODE_SIGN_IDENTITY: "Apple Development"

@@ -47,7 +47,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Network name
 
-- The Mac reads the Wi‑Fi or Hotspot name through CoreWLAN when Location is allowed and otherwise from the SystemConfiguration scan cache. Location is requested only from the button in the Mac's iPhone pane. On Hotspot, the network name is the iPhone's name, which is how the phone learns what to call itself.
+- The Mac reads the Wi‑Fi or Hotspot name through CoreWLAN when Location is allowed and otherwise from the SystemConfiguration scan cache. Location is requested only from the button in the Mac's iPhone pane; every build carries the hardened runtime Location entitlement (`Battistics-Base.entitlements`), without which macOS denies the request. On Hotspot, the network name is the iPhone's name, which is how the phone learns what to call itself.
 
 ## Signing and release
 
