@@ -54,11 +54,14 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Mac iCloud signing is opt-in: `make run-icloud` sets `BATTISTICS_ENTITLEMENTS` and team `5MYT4VYJFC`. CI, `make build`, `make app` and Developer ID builds have no iCloud and show "not signed for iCloud" in the iPhone pane.
 - A release with iCloud needs: a Developer ID provisioning profile with iCloud and Push embedded in the app, release entitlements with `aps-environment` production and container environment Production, `scripts/sign-app.sh` passing `--entitlements` for the app, the `MacStatus` and `Command` schema deployed to Production in CloudKit Console, and phone and Mac builds in the same environment.
 
+## Verified on a device
+
+- iPhone 16e and a MacBook through the real CloudKit container: readings arrive within seconds; Keep Awake start and stop; an open-ended closed-lid session through the installed helper, showing the 10% unattended stop; Accessories & Apps; a Low Power policy change and its revert.
+
 ## Verified only in Simulator or tests
 
-- Mac and iPhone through the real CloudKit container: a Mac reading reached the iPhone within seconds (checked on a device). Commands from the phone, Accessories & Apps, and Low Power changes still need a check on a device.
 - Background push cadence and the adaptive watchdog on a locked iPhone.
-- Live Activity stale and offline lines, the Control Center control and widget buttons.
+- Live Activity stale and offline lines (rendered in Simulator), the Control Center control and Home Screen widget buttons.
 - Alternate app icons on the Home Screen.
 
 ## Considered and not built
