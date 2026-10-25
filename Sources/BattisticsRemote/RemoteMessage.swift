@@ -7,6 +7,8 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         case stop
         case setLowPower
         case sleepDisplay
+        /// Samples accessory batteries and the apps using the most energy, on request only.
+        case inspect
     }
 
     public var id: String

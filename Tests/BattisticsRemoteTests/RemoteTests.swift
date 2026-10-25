@@ -159,6 +159,11 @@ struct RemoteAlertTests {
         closedOnWiFi.lidClosed = true
         #expect(RemoteAlert.alerts(from: unpluggedWiFi, to: closedOnWiFi) == [.closedLidWithoutHotspot])
 
+        var lowAndClosed = unpluggedWiFi
+        lowAndClosed.lidClosed = true
+        lowAndClosed.battery?.percent = 18
+        #expect(RemoteAlert.alerts(from: unpluggedWiFi, to: lowAndClosed) == [.batteryLow(percent: 18), .closedLidWithoutHotspot])
+
         var unpluggedHotspot = unpluggedWiFi
         unpluggedHotspot.network = .hotspot
         #expect(RemoteAlert.alerts(from: pluggedWiFi, to: unpluggedHotspot).isEmpty)

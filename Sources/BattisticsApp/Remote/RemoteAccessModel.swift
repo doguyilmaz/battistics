@@ -46,6 +46,7 @@ final class RemoteAccessModel {
     @ObservationIgnored private var lastSent: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
+    @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
     @ObservationIgnored private var handledCommands: Set<String> = []
@@ -257,7 +258,27 @@ final class RemoteAccessModel {
             return await setLowPower(request)
         case .sleepDisplay:
             return await sleepDisplay()
+        case .inspect:
+            extras = await Self.inspect()
+            return nil
         }
+    }
+
+    /// Accessory batteries and the busiest apps, measured only when a phone asks.
+    private static func inspect() async -> RemoteStatus.Extras {
+        async let hid = PeripheralBatteryReader.read()
+        async let bluetooth = BluetoothBatteryReader.fetch()
+        async let samples = ProcessEnergySampler.sample(over: .seconds(3), limit: 5)
+        var accessories: [String: PeripheralBattery] = [:]
+        for battery in await hid + bluetooth { accessories[battery.id] = battery }
+        return .init(
+            sampledAt: .now,
+            accessories: accessories.values
+                .sorted { ($0.name, $0.detail ?? "") < ($1.name, $1.detail ?? "") }
+                .map { .init(name: $0.name == PeripheralBattery.unknownName ? String(localized: "Accessory") : $0.name,
+                             percent: $0.percent, detail: $0.detail) },
+            apps: await samples.map { .init(name: $0.name, cpuPercent: ($0.cpuPercent * 10).rounded() / 10,
+                                            energyShare: $0.energyShare) })
     }
 
     private func setLowPower(_ request: RemoteRequest) async -> RemoteFailure? {
@@ -406,7 +427,7 @@ final class RemoteAccessModel {
                 startedAt: session.startedAt, deadline: session.deadline)
         }
         let protection = awake.safety.effectiveConfiguration
-        return RemoteStatus(
+        var status = RemoteStatus(
             machineName: SCDynamicStoreCopyComputerName(nil, nil) as String? ?? "Mac",
             readAt: now,
             battery: battery,
@@ -427,6 +448,8 @@ final class RemoteAccessModel {
             pairedPhoneName: network.preferredHotspotPhoneName,
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
+        status.extras = extras
+        return status
     }
 
     private static let osVersion: String = {

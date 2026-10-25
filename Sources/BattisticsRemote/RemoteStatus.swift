@@ -127,6 +127,20 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.startedAt = startedAt
             self.deadline = deadline
         }
+
+        public var countdownRange: ClosedRange<Date>? {
+            deadline.map { RemoteStatus.countdownRange(startedAt: startedAt, deadline: $0) }
+        }
+
+        /// False once a timed session's deadline passed, before the Mac reports it ended.
+        public func isActive(at date: Date) -> Bool {
+            deadline.map { $0 > date } ?? true
+        }
+    }
+
+    /// The countdown's span, safe against a deadline earlier than the start.
+    public static func countdownRange(startedAt: Date, deadline: Date) -> ClosedRange<Date> {
+        min(startedAt, deadline)...deadline
     }
 
     public struct ChargePoint: Codable, Sendable, Equatable {
@@ -168,6 +182,43 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         }
     }
 
+    /// Sampled on the Mac only when a phone asks, since measuring costs a few seconds of work.
+    public struct Extras: Codable, Sendable, Equatable {
+        public struct Accessory: Codable, Sendable, Equatable {
+            public var name: String
+            public var percent: Int
+            /// Which cell for multi-battery devices: Left, Right, Case.
+            public var detail: String?
+            public init(name: String, percent: Int, detail: String? = nil) {
+                self.name = name
+                self.percent = percent
+                self.detail = detail
+            }
+        }
+
+        public struct App: Codable, Sendable, Equatable {
+            public var name: String
+            public var cpuPercent: Double
+            /// Share of the energy the sampled apps used, 0...1, when macOS reports it.
+            public var energyShare: Double?
+            public init(name: String, cpuPercent: Double, energyShare: Double? = nil) {
+                self.name = name
+                self.cpuPercent = cpuPercent
+                self.energyShare = energyShare
+            }
+        }
+
+        public var sampledAt: Date
+        public var accessories: [Accessory]
+        public var apps: [App]
+
+        public init(sampledAt: Date, accessories: [Accessory], apps: [App]) {
+            self.sampledAt = sampledAt
+            self.accessories = accessories
+            self.apps = apps
+        }
+    }
+
     public var machineName: String
     /// Hardware marketing or model identifier for the Mac (e.g. "MacBook Pro (14-inch, M2 Pro)").
     public var macModel: String?
@@ -189,6 +240,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var chargeHistory: [ChargePoint]?
     /// The outcome of the newest phone command the Mac handled.
     public var lastCommand: CommandResult?
+    public var extras: Extras?
 
     public struct CommandResult: Codable, Sendable, Equatable {
         public var id: String
@@ -281,6 +333,17 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         self.lidClosed = lidClosed
         self.thermal = thermal
         self.protection = protection
+    }
+
+    /// Personal Hotspot keeps a closed Mac online away from Wi‑Fi, and the Mac
+    /// must allow closed-lid sessions from the phone.
+    public var isBagReady: Bool {
+        network == .hotspot && protection.closedLidAllowed
+    }
+
+    /// Whether this mode needs Personal Hotspot to stay online in a bag.
+    public func needsHotspot(for mode: Mode) -> Bool {
+        mode == .lidClosed && network != .hotspot
     }
 
     /// On battery, whether the charge runs out before the session ends; an

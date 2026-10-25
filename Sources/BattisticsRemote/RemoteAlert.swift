@@ -32,7 +32,7 @@ public enum RemoteAlert: Equatable, Sendable {
             if current.batteryRunsOutFirst, !previous.batteryRunsOutFirst, let minutes = battery.minutesRemaining {
                 alerts.append(.batteryRunsOut(minutesLeft: minutes))
             }
-            if alerts.isEmpty, current.session != nil, current.network == .wifi {
+            if current.session != nil, current.network == .wifi {
                 if previous.battery?.onAdapter == true,
                    current.session?.mode == .lidClosed || current.lidClosed == true {
                     alerts.append(.unpluggedWithoutHotspot)

@@ -68,10 +68,15 @@ struct RemoteHarness {
         let stopped = await remote.fullStatus()
         precondition(stopped.session == nil && stopped.lastEnd?.reason == .phone && !awake.isActive)
 
+        precondition(stopped.extras == nil)
+        let inspected = await command(.inspect)
+        let extras = try require(await remote.fullStatus().extras)
+        precondition(inspected == nil && abs(extras.sampledAt.timeIntervalSinceNow) < 30 && extras.apps.count <= 5)
+
         remote.enabled = false
         let off = await command(.stop)
         precondition(off?.code == .unavailable)
-        print("PASS: start limits, busy, closed-lid gate, phone stop reason, history, disabled")
+        print("PASS: start limits, busy, closed-lid gate, phone stop reason, history, inspect, disabled")
     }
 
     private static func require<T>(_ value: T?) throws -> T {
