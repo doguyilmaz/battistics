@@ -16,6 +16,16 @@ public enum RemoteAlert: Equatable, Sendable {
 
     public enum Kind: String, Sendable {
         case ended, battery, runtime, unplugged, closedlid, hot, bagready, charged, silent
+
+        /// Whether stopping Keep Awake answers this alert. A low battery is
+        /// also reported without a session, when there is nothing to stop.
+        public func offersStop(sessionRunning: Bool) -> Bool {
+            switch self {
+            case .runtime, .hot, .unplugged, .closedlid: true
+            case .battery: sessionRunning
+            default: false
+            }
+        }
     }
 
     /// One notification per kind and Mac: a newer one replaces the older.

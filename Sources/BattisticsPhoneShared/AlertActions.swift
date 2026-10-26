@@ -12,19 +12,10 @@ enum AlertActions {
         return [UNNotificationCategory(identifier: stopCategory, actions: [stop], intentIdentifiers: [])]
     }
 
-    /// `status` is the Mac's latest known reading. A low battery is also
-    /// reported without a session, when there is nothing to stop.
-    static func category(for kind: RemoteAlert.Kind, status: RemoteStatus?) -> String? {
-        switch kind {
-        case .runtime, .hot, .unplugged, .closedlid: stopCategory
-        case .battery: status?.session != nil ? stopCategory : nil
-        default: nil
-        }
-    }
-
-    /// Marks an alert with its Mac and button.
+    /// Marks an alert with its Mac and, when there is a session to stop by
+    /// the Mac's latest known `status`, the button.
     static func tag(_ content: UNMutableNotificationContent, macID: String, kind: RemoteAlert.Kind, status: RemoteStatus?) {
         content.userInfo["macID"] = macID
-        if let category = category(for: kind, status: status) { content.categoryIdentifier = category }
+        if kind.offersStop(sessionRunning: status?.session != nil) { content.categoryIdentifier = stopCategory }
     }
 }

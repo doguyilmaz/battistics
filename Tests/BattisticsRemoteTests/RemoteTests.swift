@@ -222,6 +222,16 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: wifi, to: displayOn).isEmpty)
     }
 
+    @Test func onlyAlertsAboutARunningSessionOfferStop() {
+        #expect(RemoteAlert.batteryRunsOut(minutesLeft: 30).kind.offersStop(sessionRunning: false))
+        #expect(RemoteAlert.runningHot.kind.offersStop(sessionRunning: false))
+        #expect(RemoteAlert.batteryLow(percent: 10).kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.batteryLow(percent: 10).kind.offersStop(sessionRunning: false))
+        #expect(!RemoteAlert.sessionEnded(.timer).kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.bagReady.kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.unreachable.kind.offersStop(sessionRunning: true))
+    }
+
     @Test func heatAlertsOnceWhenASessionRunsHot() {
         var hot = status()
         hot.thermal = .serious
