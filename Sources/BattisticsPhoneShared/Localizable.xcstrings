@@ -1441,7 +1441,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizde Uyanık Tut’u durdurur."
+            "value": "Mac’inde Uyanık Tut’u durdurur."
           }
         }
       }
@@ -1475,7 +1475,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizin pilini ve uyanık tutulup tutulmadığını söyler."
+            "value": "Mac’inin pilini ve uyanık tutulup tutulmadığını söyler."
           }
         }
       }
@@ -1611,7 +1611,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’teki Battistics’i veya bu uygulamayı güncelleyin."
+            "value": "Mac’teki Battistics’i veya bu uygulamayı güncelle."
           }
         }
       }
@@ -5198,7 +5198,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizdeki Uyanık Tut oturumuna süre ekler."
+            "value": "Mac’indeki Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5266,7 +5266,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizde çalışan Uyanık Tut oturumuna süre ekler."
+            "value": "Mac’inde çalışan Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5589,7 +5589,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizi uyanık tutar ya da yeniden uyumasına izin verir."
+            "value": "Mac’ini uyanık tutar ya da yeniden uyumasına izin verir."
           }
         }
       }
