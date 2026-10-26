@@ -37,7 +37,7 @@ settingGroups:
   # The iPhone app and its extensions must carry the same version.
   Phone:
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "3"
+    CURRENT_PROJECT_VERSION: "4"
 
 targets:
   BattisticsCLI:
