@@ -82,7 +82,13 @@ jobs:
       - name: Build signed DMG
         env:
           SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        run: make dmg
+          PROFILE_BASE64: ${{ secrets.MACOS_PROVISIONING_PROFILE }}
+        run: |
+          if [ -n "$PROFILE_BASE64" ]; then
+            export PROFILE="$RUNNER_TEMP/battistics.provisionprofile"
+            echo "$PROFILE_BASE64" | base64 --decode > "$PROFILE"
+          fi
+          make dmg
 
       - name: Notarize and staple
         env:

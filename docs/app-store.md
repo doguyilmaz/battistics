@@ -35,9 +35,7 @@ the app's `-demo` launch argument on a 6.9" simulator.
 
 ## Before submitting
 
-- A Mac release that can reach the App Store app: a Developer ID profile with
-  iCloud and Push for `com.doguyilmaz.Battistics`, Production entitlements in
-  the Release build, and that build shipped first. See [remote.md](remote.md).
-- The CloudKit schema (MacStatus, Command, Event and their indexes) deployed
-  to Production.
+- A Mac release that can reach the App Store app, shipped first: set the
+  `MACOS_PROVISIONING_PROFILE` secret (see RELEASING.md) before tagging it.
+  The CloudKit schema is already in Production.
 - One end-to-end check with TestFlight against that Mac build.
