@@ -329,7 +329,7 @@ final class MacStore {
             return Self.describe(error)
         }
         // Long enough for an idle Mac's poll, its fetch and its write.
-        for _ in 0..<24 {
+        for _ in 0..<Int(RemoteRequest.answerWait / 1.5) {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
             // Through refreshAll, so this read and a push's never apply out of order.
             await refreshAll()

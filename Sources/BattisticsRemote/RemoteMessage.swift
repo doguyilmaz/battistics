@@ -54,8 +54,12 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
     /// All valid duration values including 0 (indefinite / until turned off).
     public static let allowedDurations: Set<Int> = Set(durations + [0])
 
-    /// A command older than this is dropped unread: the phone has given up.
-    public static let lifetime: TimeInterval = 120
+    /// How long a phone waits for the Mac's answer before saying it did not come.
+    public static let answerWait: TimeInterval = 36
+
+    /// A command older than this is dropped unread: the phone has given up,
+    /// and the margin covers two clocks a little apart.
+    public static let lifetime: TimeInterval = answerWait + 24
 }
 
 public struct RemoteFailure: Codable, Sendable, Equatable {
