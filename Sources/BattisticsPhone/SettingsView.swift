@@ -25,7 +25,7 @@ struct SettingsView: View {
                         }
                     }
                     if notify, permission == .denied {
-                        Button("Allow Notifications in Settings") {
+                        Button("Open Notification Settings") {
                             openURL(URL(string: UIApplication.openNotificationSettingsURLString)!)
                         }
                     }
@@ -56,6 +56,9 @@ struct SettingsView: View {
                     LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")
                     Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com")!) {
                         Label("Website and Help", systemImage: "safari")
+                    }
+                    Link(destination: URL(string: "https://www.doguyilmaz.com/legal/privacy/battistics")!) {
+                        Label("Privacy Policy", systemImage: "hand.raised")
                     }
                 }
             }

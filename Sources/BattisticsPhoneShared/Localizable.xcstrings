@@ -256,23 +256,6 @@
         }
       }
     },
-    "Allow Notifications in Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow Notifications in Settings"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar’dan Bildirimlere İzin Ver"
-          }
-        }
-      }
-    },
     "Allow closed-lid sessions from iPhone in Battistics on the Mac.": {
       "extractionState": "manual",
       "localizations": {
@@ -1357,23 +1340,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ekran Açık"
-          }
-        }
-      }
-    },
-    "Sign in to iCloud on this iPhone with the same Apple ID as your Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign in to iCloud on this iPhone with the same Apple ID as your Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone’da Mac’inizle aynı Apple ID ile iCloud’a giriş yapın."
           }
         }
       }
@@ -5675,6 +5641,125 @@
           "stringUnit": {
             "state": "translated",
             "value": "Henüz görülmedi"
+          }
+        }
+      }
+    },
+    "Privacy Policy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gizlilik Politikası"
+          }
+        }
+      }
+    },
+    "Open Notification Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Notification Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirim Ayarlarını Aç"
+          }
+        }
+      }
+    },
+    "Try a Sample Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try a Sample Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek Bir Mac ile Dene"
+          }
+        }
+      }
+    },
+    "Sample Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek Mac"
+          }
+        }
+      }
+    },
+    "Made-up readings. Every control works.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made-up readings. Every control works."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek değerler. Tüm denetimler çalışır."
+          }
+        }
+      }
+    },
+    "Exit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çık"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to iCloud on this iPhone with the same Apple Account as your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone’da Mac’inle aynı Apple Hesabı ile iCloud’a giriş yap."
           }
         }
       }

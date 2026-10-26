@@ -27,6 +27,41 @@ struct MacDashboard: View {
                     .frame(maxWidth: .infinity, minHeight: 240)
             }
         }
+        .safeAreaInset(edge: .bottom) {
+            if store.isSample { SampleBar() }
+        }
+    }
+}
+
+/// Stays in view while the Macs on screen are made up.
+private struct SampleBar: View {
+    @Environment(MacStore.self) private var store
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Sample Mac")
+                    .font(.subheadline.weight(.semibold))
+                Text("Made-up readings. Every control works.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Button("Exit") {
+                withAnimation(.snappy) { store.endSample() }
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .fontWeight(.semibold)
+        }
+        .padding(.leading, 18)
+        .padding(.trailing, 10)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: .capsule)
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .accessibilityElement(children: .contain)
     }
 }
 

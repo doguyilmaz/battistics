@@ -31,11 +31,12 @@ final class MacStore {
     private(set) var problem: String?
     var selectedID: String? {
         didSet {
-            UserDefaults.standard.set(selectedID, forKey: "selectedMac")
-            WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
-            QuickActions.update(selected.flatMap { readings[$0.id] })
+            if !isSample { UserDefaults.standard.set(selectedID, forKey: "selectedMac") }
+            publishSelected()
         }
     }
+    /// Trying the app with made-up Macs, held in memory only.
+    private(set) var isSample = DemoData.isEnabled
 
     var isLocalPhoneSelected: Bool {
         selectedID == Self.localPhoneID
@@ -45,12 +46,8 @@ final class MacStore {
     @ObservationIgnored private var alertSubscriptionChecked: Date?
 
     private init() {
-        readings = UserDefaults.standard.data(forKey: "readings")
-            .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
+        readings = DemoData.isEnabled ? DemoData.readings : Self.savedReadings()
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
-        #if DEBUG
-        if DemoData.isEnabled { readings = DemoData.readings }
-        #endif
         RemoteIntentBridge.start = { [weak self] mode, minutes in
             guard let self, let mac = self.selected else { return }
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
@@ -80,6 +77,27 @@ final class MacStore {
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
 
+    // MARK: Sample
+
+    func showSample() {
+        isSample = true
+        problem = nil
+        readings = DemoData.readings
+        selectedID = DemoData.firstID
+    }
+
+    func endSample() {
+        isSample = false
+        readings = Self.savedReadings()
+        selectedID = UserDefaults.standard.string(forKey: "selectedMac")
+        Task { await refreshAll() }
+    }
+
+    private static func savedReadings() -> [String: Reading] {
+        UserDefaults.standard.data(forKey: "readings")
+            .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
+    }
+
     // MARK: Reading
 
     /// Reads every Mac and returns the alerts their changes call for.
@@ -90,9 +108,7 @@ final class MacStore {
         while refreshing {
             do { try await Task.sleep(for: .milliseconds(200)) } catch { return [] }
         }
-        #if DEBUG
-        if DemoData.isEnabled { return [] }
-        #endif
+        if isSample { return [] }
         refreshing = true
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
@@ -100,11 +116,12 @@ final class MacStore {
             snapshot = try await cloud.fetch()
             problem = nil
         } catch {
-            if !Task.isCancelled { problem = Self.describe(error) }
+            if !Task.isCancelled && !isSample { problem = Self.describe(error) }
             return []
         }
-        // A cancelled refresh says nothing about the Macs.
-        guard !Task.isCancelled else { return [] }
+        // A cancelled refresh says nothing about the Macs, nor one that ended
+        // after the sample replaced them.
+        guard !Task.isCancelled, !isSample else { return [] }
         if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
             alertSubscriptionChecked = .now
             Task { await syncAlertSubscription() }
@@ -210,14 +227,14 @@ final class MacStore {
         let locks = request.operation != .inspect
         if locks { pending[mac.id] = request.operation }
         defer { if locks { pending[mac.id] = nil } }
-        #if DEBUG
-        if DemoData.isEnabled, var status = readings[mac.id]?.status {
+        if isSample, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
+            guard isSample else { return nil }
             DemoData.apply(request, to: &status)
             readings[mac.id] = .init(status: status, reachable: true)
+            publishSelected()
             return nil
         }
-        #endif
         do {
             _ = try await cloud.send(request, to: mac.id)
         } catch {
@@ -241,6 +258,10 @@ final class MacStore {
 
     private func save() {
         UserDefaults.standard.set(try? RemoteWire.encode(readings), forKey: "readings")
+        publishSelected()
+    }
+
+    private func publishSelected() {
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         QuickActions.update(selected.flatMap { readings[$0.id] })
     }
@@ -260,7 +281,7 @@ final class MacStore {
     private static func describe(_ error: Error) -> String {
         switch (error as? CKError)?.code {
         case .notAuthenticated:
-            String(localized: "Sign in to iCloud on this iPhone with the same Apple ID as your Mac.")
+            String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
         case .networkUnavailable, .networkFailure:
             String(localized: "This iPhone is offline.")
         default:

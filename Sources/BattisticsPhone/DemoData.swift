@@ -1,10 +1,10 @@
-#if DEBUG
 import BattisticsRemote
 import Foundation
 
-/// Sample Macs for Simulator and UI checks, enabled with the `-demo` launch argument.
+/// Made-up Macs to try the app without one, also for screenshots with the `-demo` launch argument.
 enum DemoData {
     static let isEnabled = ProcessInfo.processInfo.arguments.contains("-demo")
+    static let firstID = "demo-desk"
 
     static var readings: [String: MacStore.Reading] {
         let now = Date()
@@ -66,4 +66,3 @@ enum DemoData {
         status.lastCommand = .init(id: request.id, failure: nil)
     }
 }
-#endif
