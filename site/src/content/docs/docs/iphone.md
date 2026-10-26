@@ -21,7 +21,7 @@ There is nothing to pair. The Mac and the iPhone talk through your private iClou
 
 ## On the iPhone
 
-- Home Screen and Lock Screen widgets, including one that lists every Mac
+- Home Screen and Lock Screen widgets, including one that lists every Mac and opens the one you tap
 - A Lock Screen and Dynamic Island countdown with buttons to add 30 minutes or stop
 - A Control Center and Action Button control
 - Quick actions on the app icon to start, extend or stop Keep Awake
