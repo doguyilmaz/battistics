@@ -44,6 +44,8 @@
   Screen tapping a Mac in it opens that Mac, and every other widget and the
   Live Activity open the Mac they show.
 - Try a Sample Mac shows the iPhone app before a Mac is set up.
+- Battistics Remote widgets move up a Smart Stack while Keep Awake runs or
+  the battery runs low, and show a desktop Mac's network and heat.
 - Switching a running session to closed-lid keeps the Mac awake while the
   power helper is set up.
 
