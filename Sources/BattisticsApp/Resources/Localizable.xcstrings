@@ -1141,7 +1141,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağlayın."
+            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağla."
           }
         }
       }
@@ -1949,7 +1949,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
+            "value": "Mac’i yanına alıyorsan Kişisel Erişim Noktası’na bağla."
           }
         }
       }
@@ -6669,7 +6669,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Belirlediğiniz süre doldu."
+            "value": "Belirlediğin süre doldu."
           }
         }
       }
@@ -6961,7 +6961,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı açın ki görevleri çevrimiçi kalsın."
+            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı aç ki görevleri çevrimiçi kalsın."
           }
         }
       }
