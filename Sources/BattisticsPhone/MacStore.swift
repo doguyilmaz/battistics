@@ -303,6 +303,10 @@ final class MacStore {
         await send(.init(operation: .sleepDisplay), to: mac)
     }
 
+    func sleep(_ mac: Mac) async -> String? {
+        await send(.init(operation: .sleep), to: mac)
+    }
+
     func inspect(_ mac: Mac) async -> String? {
         await send(.init(operation: .inspect), to: mac)
     }

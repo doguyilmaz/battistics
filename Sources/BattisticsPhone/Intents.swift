@@ -158,6 +158,21 @@ struct TurnOffMacDisplayIntent: AppIntent {
     }
 }
 
+struct SleepMacIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let title: LocalizedStringResource = "Put Mac to Sleep"
+    static let description = IntentDescription("Ends Keep Awake and puts your computer to sleep. It answers again once woken.")
+
+    @Parameter(title: "Mac") var target: MacEntity?
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.sleep(mac) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "\(mac.name) is going to sleep.")
+    }
+}
+
 struct MacStatusIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Check Mac"
@@ -248,6 +263,8 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Mac Low Power", systemImageName: "leaf")
         AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my computer’s display with \(.applicationName)"],
                     shortTitle: "Display Off", systemImageName: "display")
+        AppShortcut(intent: SleepMacIntent(), phrases: ["Put my computer to sleep with \(.applicationName)"],
+                    shortTitle: "Sleep Mac", systemImageName: "powersleep")
         AppShortcut(intent: OpenMacIntent(), phrases: ["Open \(\.$target) in \(.applicationName)",
                                                        "Open my computer in \(.applicationName)"],
                     shortTitle: "Open Mac", systemImageName: "arrow.up.forward.app")

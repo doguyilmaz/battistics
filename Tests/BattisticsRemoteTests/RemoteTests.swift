@@ -30,6 +30,8 @@ struct RemoteTests {
         let sleepRequest = RemoteRequest(operation: .sleepDisplay, deviceName: "iPhone",
                                          sentAt: Date(timeIntervalSince1970: 1_000_000))
         #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(sleepRequest)) == sleepRequest)
+        let macSleep = RemoteRequest(operation: .sleep, sentAt: Date(timeIntervalSince1970: 1_000_000))
+        #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(macSleep)).operation == .sleep)
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 

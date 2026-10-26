@@ -6243,6 +6243,125 @@
           }
         }
       }
+    },
+    "Put Mac to Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Put Mac to Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i Uyut"
+          }
+        }
+      }
+    },
+    "Put %@ to sleep?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Put %@ to sleep?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uyutulsun mu?"
+          }
+        }
+      }
+    },
+    "Sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyut"
+          }
+        }
+      }
+    },
+    "Keep Awake stops, and the Mac stops answering until it is woken on the Mac itself.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake stops, and the Mac stops answering until it is woken on the Mac itself."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut durur ve Mac, kendi üzerinden uyandırılana kadar yanıt vermez."
+          }
+        }
+      }
+    },
+    "Ends Keep Awake and puts your computer to sleep. It answers again once woken.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ends Keep Awake and puts your computer to sleep. It answers again once woken."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u bitirir ve bilgisayarını uyutur. Uyandırılınca yeniden yanıt verir."
+          }
+        }
+      }
+    },
+    "%@ is going to sleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is going to sleep."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uyku moduna geçiyor."
+          }
+        }
+      }
+    },
+    "Sleep Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i Uyut"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

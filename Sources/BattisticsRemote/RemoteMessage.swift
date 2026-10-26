@@ -11,6 +11,8 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         case inspect
         /// Adds `durationMinutes` to the running timed session.
         case extend
+        /// Ends any Keep Awake session and sleeps the Mac once it has answered.
+        case sleep
         /// Sent by a newer phone; answered as an invalid request instead of left unread.
         case unknown
 

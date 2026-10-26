@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Battistics Remote can put the Mac to sleep. Keep Awake ends first, so a
+  closed-lid session no longer holds the Mac awake.
+
 ## 1.5.1
 
 - Battistics Remote says Bag Ready when a closed-lid session reaches

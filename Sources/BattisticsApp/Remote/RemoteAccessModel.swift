@@ -57,6 +57,8 @@ final class RemoteAccessModel {
     @ObservationIgnored private var lastStatus: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
+    /// A phone asked the Mac to sleep; it does once the answer is out.
+    @ObservationIgnored private var sleepRequested = false
     @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
@@ -179,6 +181,18 @@ final class RemoteAccessModel {
             retryAt = .now.addingTimeInterval(seconds)
         }
         problem = failure.map(Self.describe)
+        if sleepRequested {
+            sleepRequested = false
+            await sleepNow()
+        }
+    }
+
+    /// Waits for a stopping session to give back macOS's sleep setting,
+    /// which a closed-lid session overrides.
+    private func sleepNow() async {
+        let deadline = Date.now.addingTimeInterval(10)
+        while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(250)) }
+        try? await SystemSleep.now()
     }
 
     /// One at a time, so an older reading never lands after a newer one.
@@ -381,6 +395,10 @@ final class RemoteAccessModel {
             return nil
         case .extend:
             return extend(request)
+        case .sleep:
+            if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
+            sleepRequested = true
+            return nil
         case .unknown:
             return .init(.invalidRequest)
         }

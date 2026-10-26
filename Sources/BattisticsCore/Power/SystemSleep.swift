@@ -5,6 +5,13 @@ import IOKit
 /// While it is on the Mac never sleeps, not even with the lid closed, and
 /// pmset keeps it across restarts.
 public enum SystemSleep {
+    /// Puts the Mac to sleep now; needs no privileges, but does nothing while
+    /// the override is on.
+    public static func now() async throws {
+        _ = try await BoundedCommand.run(executable: PowerSettingsWriter.executable, arguments: ["sleepnow"],
+                                         timeout: 5, maximumOutputBytes: 16_384)
+    }
+
     /// Reads the root-domain property without spawning a process. The kernel
     /// only publishes it once something has set it since boot, so when it is
     /// absent this asks pmset, which reports powerd's copy. Absent from both
