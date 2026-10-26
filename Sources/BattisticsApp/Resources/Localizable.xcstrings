@@ -718,6 +718,23 @@
         }
       }
     },
+    "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı oturumlara izin vermek, gereken güç yardımcısını kurar. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
+          }
+        }
+      }
+    },
     "Allow…": {
       "extractionState": "manual",
       "localizations": {
@@ -1885,6 +1902,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı Uyanık Tut modu, yönetici yetkisi isteyen bir sistem uyku ayarını geçici olarak değiştirir. İstendiğinde Sistem Ayarları → Genel → Giriş Öğeleri ve Genişletmeler bölümünden güç yardımcısını onaylayın. Yardımcı oturumdan sonra ayarı geri yükler; Battistics kapanır veya çökerse oturumun yetkisi yaklaşık 45 saniye içinde sona erer. Başka bir uygulamanın yaptığı değişikliğe dokunulmaz. Yardımcı çalışmıyorsa Güç bölümünden Onar’ı kullanın. İmzalama takımı olmayan geliştirici derlemeleri yardımcıyı kaydedemez."
+          }
+        }
+      }
+    },
+    "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı görevler için güç yardımcısı gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
           }
         }
       }
@@ -3678,17 +3712,6 @@
         }
       }
     },
-    "Learn the controls in a short guided tour, or find an answer below.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kısa tanıtımla kontrolleri öğrenin veya aşağıda yanıt arayın."
-          }
-        }
-      }
-    },
     "Left": {
       "extractionState": "manual",
       "localizations": {
@@ -3971,17 +3994,6 @@
         }
       }
     },
-    "Make yourself at home": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics’i keşfedin"
-          }
-        }
-      }
-    },
     "Manufacture Date": {
       "localizations": {
         "tr": {
@@ -4085,23 +4097,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ay"
-          }
-        }
-      }
-    },
-    "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerekir; bu Mac’te kapak kapalı Uyanık Tut’u bir kez başlatarak kurulur. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
           }
         }
       }
@@ -5341,23 +5336,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bildirilen yük"
-          }
-        }
-      }
-    },
-    "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısının önceden kurulmuş olması gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
           }
         }
       }
