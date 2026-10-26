@@ -87,8 +87,8 @@ import Scribble from "../components/Scribble.astro";
   .ending > :global(*:not(.contours)) { position: relative; }
   .ending :global(.ending-lines) {
     opacity: 0.7;
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%);
-    mask-image: linear-gradient(180deg, transparent, #000 30%);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent 88%);
+    mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent 88%);
   }
   main { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
   .band { padding-top: clamp(72px, 10vw, 128px); }
@@ -120,7 +120,9 @@ import Scribble from "../components/Scribble.astro";
     gap: 16px;
     max-width: var(--page);
     margin: 0 auto;
-    padding: 48px var(--gutter) 56px;
+    margin-top: 48px;
+    padding: 28px var(--gutter) 56px;
+    border-top: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
     color: var(--ink-3);
     font-size: 0.93rem;
   }
@@ -129,5 +131,8 @@ import Scribble from "../components/Scribble.astro";
   footer p { margin: 0; }
   @media (max-width: 860px) {
     .head { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    footer nav { display: grid; grid-template-columns: repeat(2, max-content); gap: 12px 32px; }
   }
 </style>
