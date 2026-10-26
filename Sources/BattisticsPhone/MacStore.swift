@@ -146,6 +146,11 @@ final class MacStore {
         if let dot = identifier.lastIndex(of: ".") { select(String(identifier[..<dot])) }
     }
 
+    func isShowing(alert identifier: String) -> Bool {
+        guard !isLocalPhoneSelected, let dot = identifier.lastIndex(of: ".") else { return false }
+        return selected?.id == String(identifier[..<dot])
+    }
+
     // MARK: Sample
 
     func showSample() {
