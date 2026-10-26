@@ -18,14 +18,14 @@ enum DemoData {
                            lowPowerMode: false, lowPowerPolicy: .onlyOnBattery, watts: 41.6, adapterWatts: 96,
                            temperatureC: 33.4, cycleCount: 212, designCycleCount: 1000, currentCapacityMah: 5240,
                            maxCapacityMah: 6390, designCapacityMah: 6249, voltageMV: 12_870, amperageMA: 3240),
-            network: .wifi, networkName: "Home", lidClosed: false,
+            network: .wifi, networkName: String(localized: "Home", comment: "A sample Wi‑Fi name"), lidClosed: false,
             protection: .init(stopAtPercent: 10, warnAtPercent: 20, closedLidAllowed: true),
             macModel: "MacBook Pro 14\" (Mac15,6)", osVersion: "macOS 26.1",
             heartbeatSeconds: RemoteStatus.heartbeat)
         desk.chargeHistory = history
         desk.extras = .init(sampledAt: now.addingTimeInterval(-300),
                             accessories: [.init(name: "Magic Mouse", percent: 64),
-                                          .init(name: "AirPods Pro", percent: 12, detail: "Left")],
+                                          .init(name: "AirPods Pro", percent: 12, detail: String(localized: "Left", comment: "The left AirPod"))],
                             apps: [.init(name: "Xcode", cpuPercent: 48.2), .init(name: "Safari", cpuPercent: 9.6)])
         let bag = RemoteStatus(
             machineName: "MacBook Air", readAt: now.addingTimeInterval(-90),
@@ -33,7 +33,7 @@ enum DemoData {
                            lowPowerMode: true, lowPowerPolicy: .onlyOnBattery, watts: -6.2, temperatureC: 30.1, cycleCount: 88),
             session: .init(mode: .lidClosed, origin: .phone, name: "iPhone", startedAt: now.addingTimeInterval(-1500),
                            deadline: now.addingTimeInterval(3900)),
-            network: .hotspot, networkName: "Ada’s iPhone", lidClosed: true,
+            network: .hotspot, networkName: String(localized: "Ada’s iPhone", comment: "A sample iPhone name"), lidClosed: true,
             protection: .init(warnAtPercent: 20, closedLidAllowed: true),
             heartbeatSeconds: RemoteStatus.sessionHeartbeat)
         let mini = RemoteStatus(machineName: "Mac mini", readAt: now.addingTimeInterval(-25), network: .wired,

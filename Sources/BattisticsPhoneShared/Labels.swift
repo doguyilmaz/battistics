@@ -214,9 +214,13 @@ enum DurationLabel {
         return minutes < 60 ? String(localized: "\(minutes)m") : String(localized: "\(minutes / 60)h")
     }
 
+    /// "1 hr, 20 min"; spelled out here because iOS abbreviates Turkish as "1sa. 20dk.".
     static func long(minutes: Int) -> String {
         if minutes <= 0 { return String(localized: "Until turned off") }
-        return Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        let hours = minutes / 60, rest = minutes % 60
+        if hours == 0 { return String(localized: "\(rest) min") }
+        if rest == 0 { return String(localized: "\(hours) hr") }
+        return String(localized: "\(hours) hr, \(rest) min")
     }
 
     static func spoken(minutes: Int) -> String {

@@ -4620,7 +4620,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "3 saniyede kullanılan enerjideki pay"
+            "value": "Son 3 saniyedeki enerji payı"
           }
         }
       }
@@ -4807,7 +4807,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kişisel Erişim Noktası’nı aç. Ona katılan Mac çevrimiçi kalır."
+            "value": "Kişisel Erişim Noktası’nı aç. Ona bağlanan Mac çevrimiçi kalır."
           }
         }
       }
@@ -6066,6 +6066,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yanıt Veriyor"
+          }
+        }
+      }
+    },
+    "%lld min": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld dk"
+          }
+        }
+      }
+    },
+    "%lld hr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld hr"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld sa"
+          }
+        }
+      }
+    },
+    "%lld hr, %lld min": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld hr, %lld min"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld sa %2$lld dk"
+          }
+        }
+      }
+    },
+    "Home": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev"
+          }
+        }
+      }
+    },
+    "Left": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sol"
+          }
+        }
+      }
+    },
+    "Ada’s iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ada’s iPhone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ada’nın iPhone’u"
           }
         }
       }
