@@ -17,6 +17,22 @@ enum Notifications {
         let value = UserDefaults.standard.integer(forKey: chargeTargetKey)
         return value > 0 ? value : nil
     }
+    /// Macs already reported at the charge target during this charge.
+    private static let chargedKey = "chargeAlerted"
+
+    static func latchCharge(_ alerts: [RemoteAlert], macID: String, status: RemoteStatus?) -> [RemoteAlert] {
+        var latched = Set(UserDefaults.standard.stringArray(forKey: chargedKey) ?? [])
+        if let status, let chargeTarget, RemoteAlert.chargeAlertRearms(at: status, target: chargeTarget) {
+            latched.remove(macID)
+        }
+        var alerts = alerts
+        if alerts.contains(where: { $0.kind == .charged }) {
+            if latched.contains(macID) { alerts.removeAll { $0.kind == .charged } } else { latched.insert(macID) }
+        }
+        UserDefaults.standard.set(Array(latched), forKey: chargedKey)
+        return alerts
+    }
+
     static let refreshTask = "com.doguyilmaz.Battistics.Remote.refresh"
     static let extendAction = "extend30"
     private static let endingCategory = "keepawake.ending"

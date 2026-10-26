@@ -47,6 +47,14 @@ public enum RemoteAlert: Equatable, Sendable {
     /// setting, and only a phone can tell that the Mac stopped answering.
     public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot, .bagready]
 
+    /// A Mac held at a charge limit tops up across the target again and
+    /// again, so after one charge alert the next waits for the charge to fall
+    /// 5 points below the target or for the adapter to be unplugged.
+    public static func chargeAlertRearms(at status: RemoteStatus, target: Int) -> Bool {
+        guard let battery = status.battery else { return false }
+        return !battery.onAdapter || battery.percent <= target - 5
+    }
+
     /// What the Mac posts after publishing `current` over `previous`.
     public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
         changes(from: previous, to: current, chargeTarget: nil)

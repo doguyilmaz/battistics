@@ -217,8 +217,9 @@ final class MacStore {
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
             let pushed = UserDefaults.standard.bool(forKey: Notifications.pushedKey)
-            let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil,
-                                               chargeTarget: Notifications.chargeTarget)
+            let macAlerts = Notifications.latchCharge(
+                RemoteAlert.alerts(from: previous, to: fresh ? status : nil, chargeTarget: Notifications.chargeTarget),
+                macID: id, status: fresh ? status : nil)
                 .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
             alerts.append((mac, macAlerts))
             Notifications.syncWatchdog(for: mac, reading: reading)

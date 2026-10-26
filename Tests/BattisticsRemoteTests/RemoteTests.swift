@@ -276,6 +276,12 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(), to: nil, now: now.addingTimeInterval(7300)).isEmpty)
     }
 
+    @Test func chargeAlertRearmsOnlyWellBelowTheTargetOrUnplugged() {
+        #expect(!RemoteAlert.chargeAlertRearms(at: status(percent: 79, adapter: true), target: 80))
+        #expect(RemoteAlert.chargeAlertRearms(at: status(percent: 75, adapter: true), target: 80))
+        #expect(RemoteAlert.chargeAlertRearms(at: status(percent: 80, adapter: false), target: 80))
+    }
+
     @Test func anEndReportedLongAfterItHappenedStaysSilent() {
         var late = status(session: false, ended: .timer)
         late.readAt = now.addingTimeInterval(3 * 3600)
