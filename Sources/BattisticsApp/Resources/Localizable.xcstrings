@@ -3949,6 +3949,17 @@
         }
       }
     },
+    "Mac is running hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ısınıyor"
+          }
+        }
+      }
+    },
     "Mac unplugged on Wi‑Fi": {
       "extractionState": "manual",
       "localizations": {
@@ -4606,6 +4617,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Üstte kalan ayrı bir pencere olarak aç"
+          }
+        }
+      }
+    },
+    "Open the lid and keep the vents clear, or stop Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapağı aç ve hava deliklerini açık bırak ya da Uyanık Tut’u durdur."
           }
         }
       }

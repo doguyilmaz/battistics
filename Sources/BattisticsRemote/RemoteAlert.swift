@@ -8,11 +8,12 @@ public enum RemoteAlert: Equatable, Sendable {
     case batteryRunsOut(minutesLeft: Int)
     case unpluggedWithoutHotspot
     case closedLidWithoutHotspot
+    case runningHot
     case chargeReached(percent: Int)
     case unreachable
 
     public enum Kind: String, Sendable {
-        case ended, battery, runtime, unplugged, closedlid, charged, silent
+        case ended, battery, runtime, unplugged, closedlid, hot, charged, silent
     }
 
     /// One notification per kind and Mac: a newer one replaces the older.
@@ -23,6 +24,7 @@ public enum RemoteAlert: Equatable, Sendable {
         case .batteryRunsOut: .runtime
         case .unpluggedWithoutHotspot: .unplugged
         case .closedLidWithoutHotspot: .closedlid
+        case .runningHot: .hot
         case .chargeReached: .charged
         case .unreachable: .silent
         }
@@ -30,7 +32,7 @@ public enum RemoteAlert: Equatable, Sendable {
 
     /// Kinds the Mac notices itself. The charge target is the phone's own
     /// setting, and only a phone can tell that the Mac stopped answering.
-    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid]
+    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot]
 
     /// What the Mac posts after publishing `current` over `previous`.
     public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
@@ -57,6 +59,9 @@ public enum RemoteAlert: Equatable, Sendable {
         }
         if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
             alerts.append(.sessionEnded(current.lastEnd?.reason))
+        }
+        if current.session != nil, current.thermal.isHot, !previous.thermal.isHot {
+            alerts.append(.runningHot)
         }
         if let battery = current.battery, !battery.onAdapter {
             let threshold = current.protection.warnAtPercent ?? 20

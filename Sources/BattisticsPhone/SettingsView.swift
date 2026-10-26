@@ -30,7 +30,7 @@ struct SettingsView: View {
                         }
                     }
                 } footer: {
-                    Text("When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
+                    Text("Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
                 }
 
                 Section {

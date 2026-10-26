@@ -181,6 +181,19 @@ struct RemoteAlertTests {
         #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
     }
 
+    @Test func heatAlertsOnceWhenASessionRunsHot() {
+        var hot = status()
+        hot.thermal = .serious
+        #expect(RemoteAlert.alerts(from: status(), to: hot) == [.runningHot])
+        var hotter = hot
+        hotter.thermal = .critical
+        #expect(RemoteAlert.alerts(from: hot, to: hotter).isEmpty)
+        var idleHot = status(session: false)
+        idleHot.thermal = .critical
+        #expect(RemoteAlert.alerts(from: status(session: false), to: idleHot).isEmpty)
+        #expect(RemoteAlert.pushed(from: status(), to: hot) == [.runningHot])
+    }
+
     @Test func silenceAlertsOnlyWhileASessionRan() {
         #expect(RemoteAlert.alerts(from: status(), to: nil) == [.unreachable])
         #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)

@@ -46,6 +46,21 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         notification.request.identifier.hasSuffix(".command") ? [.banner, .sound] : []
     }
 
+    /// Add 30 Minutes on the "ends in 5 minutes" reminder, also from the Lock Screen.
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                            didReceive response: UNNotificationResponse) async {
+        guard response.actionIdentifier == Notifications.extendAction,
+              let macID = response.notification.request.content.userInfo["macID"] as? String else { return }
+        await Self.extend(macID)
+    }
+
+    @MainActor
+    private static func extend(_ macID: String) async {
+        // Also on a launch for this action alone, before anything else has created the store.
+        _ = MacStore.shared
+        await RemoteIntentBridge.extend?(macID, 30)
+    }
+
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
                      options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)

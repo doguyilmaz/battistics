@@ -149,6 +149,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
 
     public enum Thermal: String, Codable, Sendable {
         case nominal, fair, serious, critical
+
+        public var isHot: Bool { self == .serious || self == .critical }
     }
 
     public struct Protection: Codable, Sendable, Equatable {

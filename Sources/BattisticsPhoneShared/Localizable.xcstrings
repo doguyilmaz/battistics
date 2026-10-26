@@ -4591,23 +4591,6 @@
         }
       }
     },
-    "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
-          }
-        }
-      }
-    },
     "Fully charged": {
       "extractionState": "manual",
       "localizations": {
@@ -5760,6 +5743,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu iPhone’da Mac’inle aynı Apple Hesabı ile iCloud’a giriş yap."
+          }
+        }
+      }
+    },
+    "Keep Awake ends in 5 minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake ends in 5 minutes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut 5 dakika içinde bitiyor."
+          }
+        }
+      }
+    },
+    "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut sırasında ısınıyor. Kapağı aç ve hava deliklerini açık bırak ya da Uyanık Tut’u durdur."
+          }
+        }
+      }
+    },
+    "Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bitmeden beş dakika önce, süre eklemek için bir düğmeyle. Ayrıca bittiğinde, Mac ısındığında, pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
           }
         }
       }
