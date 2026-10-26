@@ -291,6 +291,10 @@ struct AllMacsEntry: TimelineEntry {
     static let kind = "mac.all"
     let date: Date
     let snapshots: [SharedSnapshot]
+
+    var relevance: TimelineEntryRelevance? {
+        TimelineEntryRelevance(score: snapshots.map { $0.relevance(at: date) }.max() ?? 0)
+    }
 }
 
 /// One row per Mac: charge, or the Keep Awake countdown while one runs.
