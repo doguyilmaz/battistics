@@ -6396,6 +6396,108 @@
           }
         }
       }
+    },
+    "Asleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uykuda"
+          }
+        }
+      }
+    },
+    "Went to sleep %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Went to sleep %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uykuya geçti"
+          }
+        }
+      }
+    },
+    "%@ is asleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is asleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uykuda"
+          }
+        }
+      }
+    },
+    "It answers again once it wakes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It answers again once it wakes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanınca yeniden yanıt verir."
+          }
+        }
+      }
+    },
+    "Asleep. Controls return when the Mac wakes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asleep. Controls return when the Mac wakes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uykuda. Mac uyanınca kontroller geri gelir."
+          }
+        }
+      }
+    },
+    "Went to sleep while Keep Awake was on. To keep a closed Mac awake, use Lid Closed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Went to sleep while Keep Awake was on. To keep a closed Mac awake, use Lid Closed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açıkken uykuya geçti. Kapağı kapalı bir Mac’i uyanık tutmak için Kapak Kapalı modunu kullan."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

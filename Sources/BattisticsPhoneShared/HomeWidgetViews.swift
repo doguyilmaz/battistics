@@ -105,7 +105,7 @@ struct MacWidgetView: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
             } else {
-                Label("Offline", systemImage: "wifi.slash")
+                Label(status.silentLabel, systemImage: status.sleptAt != nil ? "moon.zzz.fill" : "wifi.slash")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
@@ -161,7 +161,7 @@ struct MacWidgetView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(snapshot.bagReady ? PowerPalette.hotspot : .secondary)
                     .lineLimit(1)
-                Text(snapshot.reachable ? String(localized: "Mac can sleep") : String(localized: "Offline"))
+                Text(snapshot.reachable ? String(localized: "Mac can sleep") : status.silentLabel)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -225,7 +225,7 @@ struct MacWidgetView: View {
                             .font(.subheadline.weight(.bold).monospacedDigit())
                             .frame(maxWidth: 90, alignment: .leading)
                     } else if !snapshot.reachable {
-                        Text("Offline")
+                        Text(status.silentLabel)
                             .font(.caption.weight(.semibold))
                     } else {
                         Text(snapshot.bagReady ? String(localized: "Bag Ready") : String(localized: "Keep Awake is off"))
@@ -265,7 +265,7 @@ struct MacTelemetryWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 4) {
                     if !snapshot.reachable {
-                        Image(systemName: "laptopcomputer.slash").font(.caption2.weight(.bold))
+                        Image(systemName: status.macSymbol(reachable: false)).font(.caption2.weight(.bold))
                     }
                     Text(snapshot.macName)
                         .font(.caption.weight(.bold))
@@ -283,7 +283,7 @@ struct MacTelemetryWidgetView: View {
                         Text(battery.percent.percentText)
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(tint)
-                        Text(snapshot.reachable ? WidgetHelpers.subtitle(battery) : String(localized: "Offline"))
+                        Text(snapshot.reachable ? WidgetHelpers.subtitle(battery) : status.silentLabel)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -400,7 +400,7 @@ private struct AllMacsRow: View {
                     .lineLimit(1)
                 Group {
                     if !snapshot.reachable {
-                        Text("Offline")
+                        Text(snapshot.status?.silentLabel ?? String(localized: "Offline"))
                     } else if let session {
                         HStack(spacing: 3) {
                             Image(systemName: "cup.and.saucer.fill")

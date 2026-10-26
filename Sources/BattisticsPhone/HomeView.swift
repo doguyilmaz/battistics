@@ -76,7 +76,7 @@ struct HomeView: View {
                 let reading = store.reading(for: mac)
                 deviceRow(mac.name, detail: reading?.reachable == true
                           ? reading?.status?.battery.map { $0.percent.percentText }
-                          : String(localized: "Offline"),
+                          : reading?.status?.silentLabel ?? String(localized: "Offline"),
                           symbol: reading?.status?.macSymbol ?? "laptopcomputer")
                     .tag(Optional(mac.id))
             }

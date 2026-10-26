@@ -23,6 +23,12 @@ final class NotificationService: UNNotificationServiceExtension {
         }
         if let kind = RemoteAlert.Kind(rawValue: String(collapse[collapse.index(after: dot)...])) {
             AlertActions.tag(content, macID: macID, kind: kind, status: snapshot?.status)
+            // The Mac said why it goes quiet, so a warning that it did would be wrong.
+            if kind == .asleep || kind == .ended {
+                let reminders = AlertActions.reminderIDs(macID: macID)
+                UNUserNotificationCenter.current()
+                    .removePendingNotificationRequests(withIdentifiers: [reminders.silent, reminders.quiet, reminders.ending])
+            }
         }
         contentHandler(content)
     }

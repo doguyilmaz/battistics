@@ -61,6 +61,11 @@ enum WidgetBridge {
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
+        // A sleeping Mac is not kept awake, whatever its last session said.
+        if reading?.status?.sleptAt != nil {
+            endActivities(of: mac.id)
+            return
+        }
         guard let status = reading?.status, let session = status.session else {
             // Only a Mac that is answering can tell us its session ended.
             if reading?.reachable == true { endActivities(of: mac.id) }

@@ -11,11 +11,12 @@ public enum RemoteAlert: Equatable, Sendable {
     case runningHot
     /// A closed-lid session reached Personal Hotspot while the lid is still open.
     case bagReady
+    case sleptDuringSession
     case chargeReached(percent: Int)
     case unreachable
 
     public enum Kind: String, Sendable {
-        case ended, battery, runtime, unplugged, closedlid, hot, bagready, charged, silent
+        case ended, battery, runtime, unplugged, closedlid, hot, bagready, asleep, charged, silent
 
         /// Whether stopping Keep Awake answers this alert. A low battery is
         /// also reported without a session, when there is nothing to stop.
@@ -38,6 +39,7 @@ public enum RemoteAlert: Equatable, Sendable {
         case .closedLidWithoutHotspot: .closedlid
         case .runningHot: .hot
         case .bagReady: .bagready
+        case .sleptDuringSession: .asleep
         case .chargeReached: .charged
         case .unreachable: .silent
         }
@@ -45,7 +47,7 @@ public enum RemoteAlert: Equatable, Sendable {
 
     /// Kinds the Mac notices itself. The charge target is the phone's own
     /// setting, and only a phone can tell that the Mac stopped answering.
-    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot, .bagready]
+    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot, .bagready, .asleep]
 
     /// A Mac held at a charge limit tops up across the target again and
     /// again, so after one charge alert the next waits for the charge to fall
@@ -67,13 +69,20 @@ public enum RemoteAlert: Equatable, Sendable {
     public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?,
                               chargeTarget: Int? = nil, now: Date = Date()) -> [RemoteAlert] {
         switch (previous, current) {
-        case (.some(.some(let previous)), .some(let current)): changes(from: previous, to: current, chargeTarget: chargeTarget)
-        case (.some(.some(let previous)), .none): previous.session?.isActive(at: now) == true ? [.unreachable] : []
-        default: []
+        case (.some(.some(let previous)), .some(let current)):
+            // Nobody needs to hear that the Mac went to sleep hours ago.
+            if current.sleptAt != nil, now.timeIntervalSince(current.readAt) > 10 * 60 { return [] }
+            return changes(from: previous, to: current, chargeTarget: chargeTarget)
+        case (.some(.some(let previous)), .none): return previous.session?.isActive(at: now) == true ? [.unreachable] : []
+        default: return []
         }
     }
 
     private static func changes(from previous: RemoteStatus, to current: RemoteStatus, chargeTarget: Int?) -> [RemoteAlert] {
+        // Sleeping says it all; a lid closing at the same moment is why.
+        if current.sleptAt != nil, previous.sleptAt == nil, current.session?.isActive(at: current.readAt) == true {
+            return [.sleptDuringSession]
+        }
         var alerts: [RemoteAlert] = []
         if let chargeTarget, let battery = current.battery, battery.onAdapter,
            battery.percent >= chargeTarget, let before = previous.battery, before.percent < chargeTarget {

@@ -123,7 +123,9 @@ struct KeepAwakeCard: View {
     @ViewBuilder
     private var feedback: some View {
         if !reachable {
-            Text("Offline. Controls return when the Mac answers.")
+            Text(status.sleptAt != nil
+                 ? String(localized: "Asleep. Controls return when the Mac wakes.")
+                 : String(localized: "Offline. Controls return when the Mac answers."))
                 .foregroundStyle(.secondary)
         } else if let message {
             Label(message, systemImage: "exclamationmark.circle.fill")

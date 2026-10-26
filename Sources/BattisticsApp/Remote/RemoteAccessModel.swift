@@ -59,6 +59,9 @@ final class RemoteAccessModel {
     @ObservationIgnored private var lastCommandAt: Date?
     /// A phone asked the Mac to sleep; it does once the answer is out.
     @ObservationIgnored private var sleepRequested = false
+    /// Published as the Mac's last word before sleeping.
+    @ObservationIgnored private var sleptAt: Date?
+    @ObservationIgnored private var sleepWatcher: SleepWatcher?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
@@ -111,6 +114,10 @@ final class RemoteAccessModel {
         }
         observeSession()
         observePowerSettings()
+        if cloud != nil {
+            sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
+                                        didWake: { [weak self] in self?.woke() })
+        }
         startTicker()
         updateNapActivity()
         if enabled, cloud != nil {
@@ -186,6 +193,20 @@ final class RemoteAccessModel {
             sleepRequested = false
             await sleepNow()
         }
+    }
+
+    /// Phones then show the Mac asleep instead of silent, and are told if it
+    /// slept during Keep Awake.
+    private func goingToSleep() async {
+        guard enabled, cloud != nil else { return }
+        sleptAt = .now
+        try? await publish(force: true)
+    }
+
+    private func woke() {
+        guard sleptAt != nil else { return }
+        sleptAt = nil
+        publishSoon(force: true)
     }
 
     /// Waits for a stopping session to give back macOS's sleep setting,
@@ -581,6 +602,7 @@ final class RemoteAccessModel {
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras
+        status.sleptAt = sleptAt
         return status
     }
 

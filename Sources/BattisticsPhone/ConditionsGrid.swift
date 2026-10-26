@@ -78,6 +78,10 @@ struct HotspotCard: View {
     }
 
     private func content(ready: Bool) -> (String, Color, String, String) {
+        if !reachable, status.sleptAt != nil {
+            return ("moon.zzz.fill", .gray, String(localized: "\(mac.name) is asleep"),
+                    String(localized: "It answers again once it wakes."))
+        }
         if !reachable {
             return ("antenna.radiowaves.left.and.right.slash", .orange,
                     String(localized: "Can’t reach \(mac.name)"),

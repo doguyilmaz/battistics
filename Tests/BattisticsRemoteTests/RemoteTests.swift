@@ -282,6 +282,22 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.chargeAlertRearms(at: status(percent: 80, adapter: false), target: 80))
     }
 
+    @Test func aMacThatSaysItSleepsIsAsleepNotSilent() {
+        var asleep = status()
+        asleep.lidClosed = true
+        asleep.network = .wifi
+        asleep.sleptAt = now
+        #expect(!asleep.isFresh(at: now.addingTimeInterval(1)))
+        #expect(asleep.unheardDate == now)
+        #expect(RemoteAlert.alerts(from: status(), to: asleep, now: now) == [.sleptDuringSession])
+        #expect(RemoteAlert.pushed(from: status(), to: asleep) == [.sleptDuringSession])
+        #expect(RemoteAlert.alerts(from: asleep, to: asleep, now: now).isEmpty)
+        #expect(RemoteAlert.alerts(from: status(), to: asleep, now: now.addingTimeInterval(3600)).isEmpty)
+        var idle = status(session: false)
+        idle.sleptAt = now
+        #expect(RemoteAlert.alerts(from: status(session: false), to: idle, now: now).isEmpty)
+    }
+
     @Test func anEndReportedLongAfterItHappenedStaysSilent() {
         var late = status(session: false, ended: .timer)
         late.readAt = now.addingTimeInterval(3 * 3600)

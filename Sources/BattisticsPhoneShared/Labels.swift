@@ -89,8 +89,12 @@ extension RemoteStatus {
     /// The Mac's symbol, flagged while it is not answering.
     func macSymbol(reachable: Bool) -> String {
         if reachable { return macSymbol }
+        if sleptAt != nil { return "moon.zzz.fill" }
         return battery == nil ? "desktopcomputer.trianglebadge.exclamationmark" : "laptopcomputer.slash"
     }
+
+    /// A Mac not answering is asleep when it said so before sleeping.
+    var silentLabel: String { sleptAt != nil ? String(localized: "Asleep") : String(localized: "Offline") }
 }
 
 extension RemoteStatus.Thermal {

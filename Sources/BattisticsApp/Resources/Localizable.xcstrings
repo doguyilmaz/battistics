@@ -7880,6 +7880,28 @@
           }
         }
       }
+    },
+    "Mac went to sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uykuya geçti"
+          }
+        }
+      }
+    },
+    "Keep Awake was on. To keep a closed Mac awake, use Lid Closed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut açıktı. Kapağı kapalı bir Mac’i uyanık tutmak için Kapak Kapalı modunu kullan."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

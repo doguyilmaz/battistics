@@ -117,9 +117,7 @@ enum Notifications {
     static func syncWatchdog(for mac: MacStore.Mac, reading: MacStore.Reading?) {
         // Shares the `.unreachable` alert identifier, so a foreground refresh
         // and the background timer replace each other instead of stacking.
-        let id = "\(mac.id).silent"
-        let quietID = "\(mac.id).quiet"
-        let endingID = "\(mac.id).ending"
+        let (id, quietID, endingID) = AlertActions.reminderIDs(macID: mac.id)
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id, quietID, endingID])
         // A fetch settled whether the Mac answers, which the quiet note left open.
@@ -238,6 +236,8 @@ private extension RemoteAlert {
             String(localized: "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.")
         case .bagReady:
             String(localized: "On Personal Hotspot. You can close the lid and the Mac stays online.")
+        case .sleptDuringSession:
+            String(localized: "Went to sleep while Keep Awake was on. To keep a closed Mac awake, use Lid Closed.")
         case .chargeReached(let percent):
             String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:
