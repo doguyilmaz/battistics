@@ -158,8 +158,10 @@ final class LocalPhoneMonitor {
         if unpluggedAt != before { UserDefaults.standard.set(unpluggedAt, forKey: Self.unpluggedKey) }
     }
 
-    /// A Mac joined to a hotspot reports its network name, which is this iPhone's name.
+    /// A Mac joined to a hotspot reports its network name, which is this
+    /// iPhone's name while this iPhone is the one sharing.
     func learnHotspotName(from readings: [String: MacStore.Reading]) {
+        guard Self.isSharingHotspot() else { return }
         let names = readings.values.compactMap { reading -> String? in
             guard reading.reachable, let status = reading.status, status.network == .hotspot else { return nil }
             return status.networkName?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -167,6 +169,21 @@ final class LocalPhoneMonitor {
         guard let name = names.first, !name.isEmpty, name != hotspotName else { return }
         hotspotName = name
         UserDefaults.standard.set(name, forKey: Self.hotspotKey)
+    }
+
+    /// Personal Hotspot gives this iPhone 172.20.10.1 on a bridge interface.
+    private static func isSharingHotspot() -> Bool {
+        var list: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&list) == 0, let first = list else { return false }
+        defer { freeifaddrs(list) }
+        for pointer in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            let entry = pointer.pointee
+            guard String(cString: entry.ifa_name).hasPrefix("bridge"),
+                  let address = entry.ifa_addr, address.pointee.sa_family == UInt8(AF_INET) else { continue }
+            let ip = address.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr }
+            if ip.s_addr == inet_addr("172.20.10.1") { return true }
+        }
+        return false
     }
 
     private func record(_ percent: Double) {
