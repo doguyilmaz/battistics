@@ -87,18 +87,10 @@ struct RemoteTests {
         let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: readAt, deadline: nil)
         let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session,
                                   heartbeatSeconds: RemoteStatus.heartbeat(duringSession: true))
-        #expect(status.expectedHeartbeat == RemoteStatus.sessionHeartbeat)
+        #expect(status.heartbeatSeconds == RemoteStatus.sessionHeartbeat)
         #expect(status.staleDate == readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 4))
         #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 3)))
         #expect(!status.isFresh(at: status.staleDate))
-    }
-
-    @Test func olderMacWithoutHeartbeatFieldGetsTheSlowWindow() {
-        let readAt = Date(timeIntervalSince1970: 1_000_000)
-        let session = RemoteStatus.Session(mode: .displayOn, origin: .phone, startedAt: readAt, deadline: nil)
-        let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session)
-        #expect(status.expectedHeartbeat == RemoteStatus.heartbeat)
-        #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 5)))
     }
 
     @Test func watchdogFollowsHowReliablyPushesArrive() {

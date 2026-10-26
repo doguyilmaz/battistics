@@ -151,7 +151,7 @@ final class MacStore {
             let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
-            let pushed = status.pushesAlerts == true && UserDefaults.standard.bool(forKey: Notifications.pushedKey)
+            let pushed = UserDefaults.standard.bool(forKey: Notifications.pushedKey)
             let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil,
                                                chargeTarget: Notifications.chargeTarget)
                 .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }

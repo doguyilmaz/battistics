@@ -198,8 +198,7 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        status.pushesAlerts = true
-        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds {
             var compared = status
             compared.readAt = lastCheap.readAt
             compared.battery?.watts = lastCheap.battery?.watts

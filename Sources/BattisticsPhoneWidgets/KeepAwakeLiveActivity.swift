@@ -57,7 +57,7 @@ struct KeepAwakeActivityWidget: Widget {
                                 .tint(context.state.powerColor)
                         }
                         HStack(spacing: 6) {
-                            Text(context.state.offline == true ? String(localized: "Mac not answering") : context.state.headline)
+                            Text(context.state.offline ? String(localized: "Mac not answering") : context.state.headline)
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
@@ -144,7 +144,7 @@ private struct LockScreenLiveActivityView: View {
     var body: some View {
         let state = context.state
         // `offline` comes from a real fetch; stale only means the phone heard nothing new.
-        let offline = state.offline == true
+        let offline = state.offline
         let isHotspot = state.network == .hotspot
 
         VStack(alignment: .leading, spacing: 10) {
@@ -248,7 +248,7 @@ private struct LiveActions: View {
         }
         .controlSize(size)
         .fixedSize()
-        .disabled(context.state.offline == true)
+        .disabled(context.state.offline)
     }
 }
 
@@ -259,14 +259,13 @@ private struct LiveFreshness: View {
 
     var body: some View {
         Group {
-            if let last = state.lastUpdate {
-                if quiet {
-                    Label("No update since \(last.formatted(date: .omitted, time: .shortened))", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                } else {
-                    Label { Text("Updated \(Ago.text(last))") } icon: { Image(systemName: "checkmark.icloud") }
-                        .foregroundStyle(.white.opacity(0.72))
-                }
+            if quiet {
+                Label("No update since \(state.lastUpdate.formatted(date: .omitted, time: .shortened))",
+                      systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+            } else {
+                Label { Text("Updated \(Ago.text(state.lastUpdate))") } icon: { Image(systemName: "checkmark.icloud") }
+                    .foregroundStyle(.white.opacity(0.72))
             }
         }
         .font(.caption)

@@ -224,9 +224,6 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// The outcome of the newest phone command the Mac handled.
     public var lastCommand: CommandResult?
     public var extras: Extras?
-    /// Set by a Mac that posts its own alerts through iCloud, so a phone does
-    /// not repeat the ones it pushes.
-    public var pushesAlerts: Bool?
 
     public struct CommandResult: Codable, Sendable, Equatable {
         public var id: String
@@ -247,21 +244,18 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// shorter wait reports a healthy Mac as silent.
     public static let unheardDelay: TimeInterval = 30 * 60
 
-    /// The write interval the Mac promised in this reading. Missing means a Mac
-    /// build from before the field existed, which wrote every `heartbeat`.
-    public var heartbeatSeconds: TimeInterval?
+    /// The write interval the Mac promised in this reading.
+    public var heartbeatSeconds: TimeInterval
 
     public static func heartbeat(duringSession: Bool) -> TimeInterval {
         duringSession ? sessionHeartbeat : heartbeat
     }
 
-    public var expectedHeartbeat: TimeInterval { heartbeatSeconds ?? Self.heartbeat }
-
     /// After this moment, a fetch that returns no newer reading means the Mac
     /// is unreachable. Only a real fetch may conclude that; see `unheardDate`.
     public var staleDate: Date {
         let missed: Double = session == nil ? 2 : 4
-        return readAt.addingTimeInterval(expectedHeartbeat * missed)
+        return readAt.addingTimeInterval(heartbeatSeconds * missed)
     }
 
     /// When surfaces that cannot fetch stop presenting this reading as live.
@@ -308,7 +302,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         macModel: String? = nil,
         osVersion: String? = nil,
         pairedPhoneName: String? = nil,
-        heartbeatSeconds: TimeInterval? = nil
+        heartbeatSeconds: TimeInterval = RemoteStatus.heartbeat
     ) {
         self.machineName = machineName
         self.macModel = macModel

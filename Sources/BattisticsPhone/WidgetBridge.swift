@@ -75,7 +75,7 @@ enum WidgetBridge {
             network: status.network,
             networkName: status.resolvedNetworkName(),
             lastUpdate: status.readAt,
-            offline: reachable ? nil : true
+            offline: !reachable
         )
         // Marks the activity stale even if the app never runs again, late
         // enough that throttled pushes alone do not trigger it.
