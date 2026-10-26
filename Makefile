@@ -6,8 +6,12 @@ VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' 
 
 .PHONY: gen build test app run run-icloud install dmg appcast release tap metrics clean
 
+# The app resolves the same package versions as `swift test`; only Sparkle,
+# pinned exactly in project.yml, is added on top.
 gen:
 	xcodegen generate
+	mkdir -p Battistics.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+	cp Package.resolved Battistics.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 # SIGN_IDENTITY defaults to ad-hoc, which is fine until you need the
 # privileged helper: SMAppService will not register a daemon without a real
