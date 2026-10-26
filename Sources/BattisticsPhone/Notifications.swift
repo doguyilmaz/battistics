@@ -63,6 +63,7 @@ enum Notifications {
                 content.title = mac.name
                 content.body = alert.message
                 content.sound = .default
+                content.threadIdentifier = mac.id
                 try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             }
         }
@@ -76,6 +77,7 @@ enum Notifications {
         let content = UNMutableNotificationContent()
         content.title = mac.name
         content.body = failure
+        content.threadIdentifier = mac.id
         try? await UNUserNotificationCenter.current()
             .add(UNNotificationRequest(identifier: "\(mac.id).command", content: content, trigger: nil))
     }
