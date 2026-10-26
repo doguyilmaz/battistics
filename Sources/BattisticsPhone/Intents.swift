@@ -14,6 +14,7 @@ struct MacEntity: AppEntity {
     @Property(title: "Charging") var isCharging: Bool
     @Property(title: "Keep Awake On") var keepAwakeOn: Bool
     @Property(title: "Answering") var isAnswering: Bool
+    @Property(title: "Asleep") var isAsleep: Bool
 
     var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(name)") }
 
@@ -24,6 +25,7 @@ struct MacEntity: AppEntity {
         let reading = MacStore.shared.reading(for: mac)
         let answering = reading?.reachable == true && reading?.status?.isFresh() == true
         isAnswering = answering
+        isAsleep = !answering && reading?.status?.sleptAt != nil
         batteryLevel = reading?.status?.battery?.percent
         isCharging = reading?.status?.battery?.isCharging ?? false
         keepAwakeOn = answering && reading?.status?.session != nil
@@ -190,6 +192,7 @@ struct MacStatusIntent: AppIntent {
         try await MacStore.shared.refreshForIntent()
         let entity = MacEntity(mac)
         guard entity.isAnswering, let status = MacStore.shared.reading(for: mac)?.status else {
+            if entity.isAsleep { return .result(value: entity, dialog: "\(mac.name) is asleep.") }
             return .result(value: entity, dialog: "\(mac.name) is not answering.")
         }
         var sentences: [String] = []

@@ -6498,6 +6498,23 @@
           }
         }
       }
+    },
+    "%@ is asleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is asleep."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uykuda."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
