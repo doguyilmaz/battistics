@@ -51,11 +51,11 @@ struct SetupGuide: View {
                 if let problem = store.problem {
                     Label(problem, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
-                } else if store.macs.isEmpty {
+                } else if store.remoteMacs.isEmpty {
                     Label("No Mac is sharing with this Apple Account yet.", systemImage: "magnifyingglass")
                         .foregroundStyle(.secondary)
                 } else {
-                    Label("^[\(store.macs.count) Mac](inflect: true) found", systemImage: "checkmark.circle.fill")
+                    Label("^[\(store.remoteMacs.count) Mac](inflect: true) found", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                 }
                 Button {
