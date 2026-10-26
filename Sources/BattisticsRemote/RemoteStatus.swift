@@ -155,6 +155,16 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public static let fallback = Self.nominal
 
         public var isHot: Bool { self == .serious || self == .critical }
+
+        public init(_ state: ProcessInfo.ThermalState) {
+            self = switch state {
+            case .nominal: .nominal
+            case .fair: .fair
+            case .serious: .serious
+            case .critical: .critical
+            @unknown default: .serious
+            }
+        }
     }
 
     public struct Protection: Codable, Sendable, Equatable {
@@ -167,6 +177,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.warnAtPercent = warnAtPercent
             self.closedLidAllowed = closedLidAllowed
         }
+
+        /// The level the phone treats as low, also when the Mac's own warning is off.
+        public var lowBatteryPercent: Int { warnAtPercent ?? 20 }
     }
 
     /// Sampled on the Mac only when a phone asks, since measuring costs a few seconds of work.

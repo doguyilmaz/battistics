@@ -177,6 +177,15 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(minutes: 90), to: status(minutes: 80)).isEmpty)
     }
 
+    @Test func lowBatteryFollowsTheMacsWarningOrTwentyWhenItIsOff() {
+        #expect(RemoteStatus.Protection(warnAtPercent: 30).lowBatteryPercent == 30)
+        #expect(RemoteStatus.Protection().lowBatteryPercent == 20)
+    }
+
+    @Test func aCommandLivesLongerThanThePhoneWaitsForIt() {
+        #expect(RemoteRequest.lifetime > RemoteRequest.answerWait)
+    }
+
     @Test func chargeTargetAlertsOnceWhileCharging() {
         let below = status(percent: 79, adapter: true, session: false)
         let reached = status(percent: 80, adapter: true, session: false)

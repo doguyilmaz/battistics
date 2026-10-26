@@ -64,7 +64,7 @@ public enum RemoteAlert: Equatable, Sendable {
             alerts.append(.runningHot)
         }
         if let battery = current.battery, !battery.onAdapter {
-            let threshold = current.protection.warnAtPercent ?? 20
+            let threshold = current.protection.lowBatteryPercent
             let wasAbove = previous.battery.map { $0.onAdapter || $0.percent > threshold } ?? true
             if battery.percent <= threshold, wasAbove { alerts.append(.batteryLow(percent: battery.percent)) }
             if current.batteryRunsOutFirst, !previous.batteryRunsOutFirst, let minutes = battery.minutesRemaining {
