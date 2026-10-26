@@ -298,12 +298,14 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(session: false), to: idle, now: now).isEmpty)
     }
 
-    @Test func anEndReportedLongAfterItHappenedStaysSilent() {
+    @Test func theMacDropsAnEndItReportsLongAfterItHappened() {
         var late = status(session: false, ended: .timer)
         late.readAt = now.addingTimeInterval(3 * 3600)
-        #expect(RemoteAlert.alerts(from: status(), to: late).isEmpty)
-        late.readAt = now.addingTimeInterval(60)
+        #expect(RemoteAlert.pushed(from: status(), to: late).isEmpty)
+        // A phone that hears of the end late still says so.
         #expect(RemoteAlert.alerts(from: status(), to: late) == [.sessionEnded(.timer)])
+        late.readAt = now.addingTimeInterval(60)
+        #expect(RemoteAlert.pushed(from: status(), to: late) == [.sessionEnded(.timer)])
     }
 
     @Test func unplugOrClosingLidOnWiFiDuringSessionAlertsForHotspot() {

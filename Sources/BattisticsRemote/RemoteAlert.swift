@@ -58,8 +58,13 @@ public enum RemoteAlert: Equatable, Sendable {
     }
 
     /// What the Mac posts after publishing `current` over `previous`.
+    /// An end the Mac first reports long after it happened, having slept
+    /// through it, is old news; a phone may only hear of one late.
     public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
-        changes(from: previous, to: current, chargeTarget: nil)
+        changes(from: previous, to: current, chargeTarget: nil).filter { alert in
+            guard case .sessionEnded = alert, let end = current.lastEnd else { return true }
+            return current.readAt.timeIntervalSince(end.at) < 10 * 60
+        }
     }
 
     /// `current` is nil when the Mac did not answer; `previous` is nil before
@@ -71,7 +76,7 @@ public enum RemoteAlert: Equatable, Sendable {
         switch (previous, current) {
         case (.some(.some(let previous)), .some(let current)):
             // Nobody needs to hear that the Mac went to sleep hours ago.
-            if current.sleptAt != nil, now.timeIntervalSince(current.readAt) > 10 * 60 { return [] }
+            if let sleptAt = current.sleptAt, now.timeIntervalSince(sleptAt) > 10 * 60 { return [] }
             return changes(from: previous, to: current, chargeTarget: chargeTarget)
         case (.some(.some(let previous)), .none): return previous.session?.isActive(at: now) == true ? [.unreachable] : []
         default: return []
@@ -88,9 +93,7 @@ public enum RemoteAlert: Equatable, Sendable {
            battery.percent >= chargeTarget, let before = previous.battery, before.percent < chargeTarget {
             alerts.append(.chargeReached(percent: battery.percent))
         }
-        // An end first reported long after it happened, by a Mac that slept through it, is old news.
-        if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone,
-           current.lastEnd.map({ current.readAt.timeIntervalSince($0.at) < 10 * 60 }) ?? true {
+        if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
             alerts.append(.sessionEnded(current.lastEnd?.reason))
         }
         if current.session != nil, current.thermal.isHot, !previous.thermal.isHot {
