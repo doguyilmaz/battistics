@@ -204,6 +204,24 @@ struct RemoteAlertTests {
         #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
     }
 
+    @Test func bagReadyFiresOnceWhenAClosedLidSessionReachesHotspotWithTheLidOpen() {
+        var wifi = status()
+        wifi.network = .wifi
+        wifi.lidClosed = false
+        wifi.protection.closedLidAllowed = true
+        var hotspot = wifi
+        hotspot.network = .hotspot
+        #expect(RemoteAlert.alerts(from: wifi, to: hotspot) == [.bagReady])
+        #expect(RemoteAlert.pushed(from: wifi, to: hotspot) == [.bagReady])
+        #expect(RemoteAlert.alerts(from: hotspot, to: hotspot).isEmpty)
+        var shut = hotspot
+        shut.lidClosed = true
+        #expect(RemoteAlert.alerts(from: wifi, to: shut).isEmpty)
+        var displayOn = hotspot
+        displayOn.session?.mode = .displayOn
+        #expect(RemoteAlert.alerts(from: wifi, to: displayOn).isEmpty)
+    }
+
     @Test func heatAlertsOnceWhenASessionRunsHot() {
         var hot = status()
         hot.thermal = .serious

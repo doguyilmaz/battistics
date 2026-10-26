@@ -7858,6 +7858,28 @@
           }
         }
       }
+    },
+    "Bag Ready": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çantaya Hazır"
+          }
+        }
+      }
+    },
+    "On Personal Hotspot. You can close the lid and the Mac stays online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kişisel Erişim Noktası’nda. Kapağı kapatabilirsin, Mac çevrimiçi kalır."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
