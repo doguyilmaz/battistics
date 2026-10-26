@@ -30,6 +30,8 @@ final class MacStore {
     private(set) var pending: [String: RemoteRequest.Operation] = [:]
     /// Why iCloud could not be read, in the user's language.
     private(set) var problem: String?
+    /// Macs whose status is too new for this app to read.
+    private(set) var outdated: Set<String> = []
     var selectedID: String? {
         didSet {
             if selectedID != Self.localPhoneID { macID = selectedID }
@@ -94,8 +96,12 @@ final class MacStore {
     /// Widgets and the Live Activity move to a Mac a Shortcut starts or extends.
     func follow(_ mac: Mac) {
         guard mac.id != macID else { return }
-        macID = mac.id
-        publishSelected()
+        if isLocalPhoneSelected {
+            macID = mac.id
+            publishSelected()
+        } else {
+            selectedID = mac.id
+        }
     }
 
     /// A Mac picked in Shortcuts, else `remoteMac`.
@@ -107,7 +113,8 @@ final class MacStore {
     /// The Mac a widget or Live Activity names, else the selected one.
     private func mac(_ id: String?) -> Mac? {
         guard !triesSample else { return nil }
-        return id.flatMap { id in macs.first { $0.id == id } } ?? selected
+        guard let id else { return selected }
+        return macs.first { $0.id == id }
     }
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
@@ -191,6 +198,7 @@ final class MacStore {
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
         var alerts: [(Mac, [RemoteAlert])] = []
         for (id, status) in snapshot.statuses {
+            outdated.remove(id)
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
@@ -202,6 +210,11 @@ final class MacStore {
                 .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
             alerts.append((mac, macAlerts))
             Notifications.syncWatchdog(for: mac, reading: reading)
+        }
+        // Its last readable status stays, but no longer as live.
+        for id in snapshot.unreadable where readings[id] != nil {
+            outdated.insert(id)
+            readings[id]?.reachable = false
         }
         // A Mac that stopped sharing is gone, not silent.
         for id in readings.keys where snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {

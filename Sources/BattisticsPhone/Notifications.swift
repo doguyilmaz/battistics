@@ -98,7 +98,11 @@ enum Notifications {
         // A fetch settled whether the Mac answers, which the quiet note left open.
         center.removeDeliveredNotifications(withIdentifiers: [quietID])
 
-        guard let reading, reading.reachable else { return }
+        guard let reading, reading.reachable else {
+            // A removed Mac takes its reminder with it.
+            if reading == nil { center.removeDeliveredNotifications(withIdentifiers: [endingID]) }
+            return
+        }
         // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
         center.removeDeliveredNotifications(withIdentifiers: [id])
         // On Hotspot the lid and unplug warnings no longer apply.

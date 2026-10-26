@@ -317,7 +317,7 @@ struct AllMacsEntry: TimelineEntry {
     let snapshots: [SharedSnapshot]
 
     var relevance: TimelineEntryRelevance? {
-        TimelineEntryRelevance(score: snapshots.map { $0.relevance(at: date) }.max() ?? 0)
+        TimelineEntryRelevance(score: snapshots.map { $0.asOf(date).relevance(at: date) }.max() ?? 0)
     }
 }
 

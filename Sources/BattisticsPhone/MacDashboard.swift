@@ -11,7 +11,8 @@ struct MacDashboard: View {
 
         DashboardPage(glow: reading?.status.map { Glow($0, reachable: reachable) } ?? .offline,
                       refresh: { await store.refreshAll() }) {
-            StatusLine(reading: reading, problem: store.problem)
+            StatusLine(reading: reading, problem: store.problem
+                       ?? (store.outdated.contains(mac.id) ? String(localized: "Update Battistics Remote to read this Mac") : nil))
             if let status = reading?.status {
                 Group {
                     BatteryCard(mac: mac, status: status, reachable: reachable)

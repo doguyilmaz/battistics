@@ -6001,6 +6001,23 @@
           }
         }
       }
+    },
+    "Update Battistics Remote to read this Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Battistics Remote to read this Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’i okumak için Battistics Remote’u güncelle"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
