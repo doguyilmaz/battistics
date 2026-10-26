@@ -6,9 +6,10 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 - Everything goes through the user's private CloudKit database, container `iCloud.com.doguyilmaz.Battistics`, zone `Remote`. No server, no open port, no pairing code: a Mac and an iPhone on the same Apple Account see each other.
 - One `MacStatus` record per Mac and short-lived `Command` records from phones. Payloads are JSON (`RemoteWire`) in `encryptedValues["payload"]`.
+- A Mac's record is named by a sharing ID kept with its hardware UUID, so a Mac set up from another Mac's backup gets its own record instead of answering for that Mac.
 - Sharing is off by default (`Battistics › iPhone › Show this Mac in Battistics Remote`). Turning it off deletes the Mac's record; a publish already in flight deletes it again when it lands.
 - Each queued command gets its own answer published before the next one runs.
-- A phone that stops waiting (no answer, a fetch error or a cancelled intent) deletes its command first, so a late Mac does not run it. A Mac also deletes expired commands addressed to Macs that no longer exist.
+- A phone that stops waiting (no answer within `RemoteRequest.answerWait`, a fetch error or a cancelled intent) deletes its command first, so a late Mac does not run it. If that delete fails, the Mac still drops any command older than `RemoteRequest.lifetime`, a minute. A Mac also deletes expired commands addressed to Macs that no longer exist.
 - Turning sharing off while offline keeps retrying the delete until it lands, so phones never keep a ghost of the Mac.
 - Details › Remove Mac, offered while a Mac is not answering, deletes its record for an erased or sold Mac. A Mac that still shares sees the deletion in its next change read and publishes again at once.
 - A status or command written by a newer build stays readable: an unknown operation is answered as an invalid request ("Update Battistics"), and a status the phone cannot decode keeps that Mac's last reading instead of removing it.
