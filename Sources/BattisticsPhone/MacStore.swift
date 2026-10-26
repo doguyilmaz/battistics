@@ -320,17 +320,18 @@ final class MacStore {
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
         var request = request
         request.deviceName = LocalPhoneMonitor.shared.commandName
+        // Shown at once, also while an earlier command to this Mac is out.
+        let locks = request.operation != .inspect
+        if locks { pending[mac.id] = request.operation }
+        defer { if locks, pending[mac.id] == request.operation { pending[mac.id] = nil } }
         // The Mac reports one answer at a time, so a second command waits
         // instead of hiding the first one's answer.
         while sending.contains(mac.id) {
-            do { try await Task.sleep(for: .milliseconds(200)) } catch { return nil }
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return String(localized: "Cancelled.") }
         }
         sending.insert(mac.id)
         defer { sending.remove(mac.id) }
         request.sentAt = .now
-        let locks = request.operation != .inspect
-        if locks { pending[mac.id] = request.operation }
-        defer { if locks { pending[mac.id] = nil } }
         if isSample, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
             guard isSample else { return nil }
@@ -340,12 +341,14 @@ final class MacStore {
             return nil
         }
         do {
-            _ = try await cloud.send(request, to: mac.id)
+            try await cloud.send(request, to: mac.id)
         } catch {
             return Self.describe(error)
         }
-        // Long enough for an idle Mac's poll, its fetch and its write.
-        for _ in 0..<Int(RemoteRequest.answerWait / 1.5) {
+        // Long enough for an idle Mac's poll, its fetch and its write, counted
+        // in time since each refresh takes longer on a slow connection.
+        let giveUp = request.sentAt.addingTimeInterval(RemoteRequest.answerWait)
+        while Date.now < giveUp {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
             // Through refreshAll, so this read and a push's never apply out of order.
             await refreshAll()

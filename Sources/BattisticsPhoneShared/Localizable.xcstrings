@@ -6362,6 +6362,23 @@
           }
         }
       }
+    },
+    "Cancelled.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelled."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İptal edildi."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
