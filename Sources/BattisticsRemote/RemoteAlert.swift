@@ -9,11 +9,13 @@ public enum RemoteAlert: Equatable, Sendable {
     case unpluggedWithoutHotspot
     case closedLidWithoutHotspot
     case runningHot
+    /// A closed-lid session reached Personal Hotspot while the lid is still open.
+    case bagReady
     case chargeReached(percent: Int)
     case unreachable
 
     public enum Kind: String, Sendable {
-        case ended, battery, runtime, unplugged, closedlid, hot, charged, silent
+        case ended, battery, runtime, unplugged, closedlid, hot, bagready, charged, silent
     }
 
     /// One notification per kind and Mac: a newer one replaces the older.
@@ -25,6 +27,7 @@ public enum RemoteAlert: Equatable, Sendable {
         case .unpluggedWithoutHotspot: .unplugged
         case .closedLidWithoutHotspot: .closedlid
         case .runningHot: .hot
+        case .bagReady: .bagready
         case .chargeReached: .charged
         case .unreachable: .silent
         }
@@ -32,7 +35,7 @@ public enum RemoteAlert: Equatable, Sendable {
 
     /// Kinds the Mac notices itself. The charge target is the phone's own
     /// setting, and only a phone can tell that the Mac stopped answering.
-    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot]
+    public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot, .bagready]
 
     /// What the Mac posts after publishing `current` over `previous`.
     public static func pushed(from previous: RemoteStatus, to current: RemoteStatus) -> [RemoteAlert] {
@@ -62,6 +65,9 @@ public enum RemoteAlert: Equatable, Sendable {
         }
         if current.session != nil, current.thermal.isHot, !previous.thermal.isHot {
             alerts.append(.runningHot)
+        }
+        if current.session?.mode == .lidClosed, current.isBagReady, !previous.isBagReady, current.lidClosed != true {
+            alerts.append(.bagReady)
         }
         if let battery = current.battery, !battery.onAdapter {
             let threshold = current.protection.lowBatteryPercent

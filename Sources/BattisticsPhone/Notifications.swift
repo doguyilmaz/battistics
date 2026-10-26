@@ -109,6 +109,10 @@ enum Notifications {
         if reading.status?.network == .hotspot {
             center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).closedlid", "\(mac.id).unplugged"])
         }
+        // Once the lid is shut or the session is over, "you can close the lid" is old news.
+        if reading.status?.lidClosed == true || reading.status?.session == nil {
+            center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).bagready"])
+        }
 
         // Added time or a stop makes "ends in 5 minutes" wrong.
         if reading.status?.session?.deadline.map({ $0.timeIntervalSinceNow > endingLead + 30 }) ?? true {
@@ -205,6 +209,8 @@ private extension RemoteAlert {
             String(localized: "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you.")
         case .runningHot:
             String(localized: "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.")
+        case .bagReady:
+            String(localized: "On Personal Hotspot. You can close the lid and the Mac stays online.")
         case .chargeReached(let percent):
             String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:
