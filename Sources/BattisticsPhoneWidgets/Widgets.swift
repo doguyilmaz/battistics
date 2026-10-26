@@ -151,6 +151,6 @@ struct AllMacsWidget: Widget {
         }
         .configurationDisplayName("All Macs")
         .description("Battery and Keep Awake for every Mac on your Apple Account.")
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .supportedFamilies([.systemMedium, .systemLarge, .accessoryRectangular])
     }
 }

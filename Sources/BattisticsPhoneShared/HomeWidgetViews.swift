@@ -304,14 +304,46 @@ struct AllMacsWidgetView: View {
     var body: some View {
         if entry.snapshots.isEmpty {
             Text("Open Battistics Remote").font(.caption)
+        } else if family == .accessoryRectangular {
+            VStack(alignment: .leading, spacing: 1) {
+                ForEach(Array(entry.snapshots.prefix(3).enumerated()), id: \.offset) { _, snapshot in
+                    AllMacsLine(snapshot: snapshot.asOf(entry.date), date: entry.date)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         } else {
             VStack(alignment: .leading, spacing: family == .systemLarge ? 12 : 7) {
                 ForEach(Array(entry.snapshots.prefix(family == .systemLarge ? 7 : 3).enumerated()), id: \.offset) { _, snapshot in
-                    AllMacsRow(snapshot: snapshot.asOf(entry.date), date: entry.date)
+                    if let url = snapshot.url {
+                        Link(destination: url) { AllMacsRow(snapshot: snapshot.asOf(entry.date), date: entry.date) }
+                    } else {
+                        AllMacsRow(snapshot: snapshot.asOf(entry.date), date: entry.date)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: family == .systemLarge ? .topLeading : .leading)
         }
+    }
+}
+
+/// One Lock Screen line: symbol, name and charge.
+private struct AllMacsLine: View {
+    let snapshot: SharedSnapshot
+    let date: Date
+
+    var body: some View {
+        let running = snapshot.reachable && snapshot.status?.session?.isActive(at: date) == true
+        HStack(spacing: 4) {
+            Image(systemName: !snapshot.reachable ? "laptopcomputer.slash"
+                  : running ? "cup.and.saucer.fill" : (snapshot.status?.macSymbol ?? "laptopcomputer"))
+                .frame(width: 16)
+            Text(snapshot.macName).lineLimit(1)
+            Spacer(minLength: 2)
+            Text(snapshot.status?.battery.map { "\($0.percent)%" } ?? "–")
+                .fontWeight(.bold)
+                .monospacedDigit()
+        }
+        .font(.caption2.weight(.semibold))
     }
 }
 

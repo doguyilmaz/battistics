@@ -166,6 +166,21 @@ struct MacStatusIntent: AppIntent {
     }
 }
 
+/// Opens the app on a Mac, from Shortcuts, Siri or Spotlight.
+struct OpenMacIntent: OpenIntent {
+    static let title: LocalizedStringResource = "Open Mac"
+    static let description = IntentDescription("Opens a Mac in Battistics Remote.")
+
+    @Parameter(title: "Mac") var target: MacEntity
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard let mac = MacStore.shared.remoteMac(id: target.id) else { throw IntentFailure.notPaired }
+        MacStore.shared.selectedID = mac.id
+        return .result()
+    }
+}
+
 /// A number for Shortcuts automations, such as a reminder when the Mac runs low.
 struct MacBatteryLevelIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed

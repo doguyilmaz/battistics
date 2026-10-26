@@ -110,6 +110,13 @@ final class MacStore {
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
 
+    /// `battistics-remote://mac/<ID>`, from a widget.
+    func open(_ url: URL) {
+        guard url.scheme == "battistics-remote", url.host() == "mac" else { return }
+        let id = url.lastPathComponent
+        if macs.contains(where: { $0.id == id }) { selectedID = id }
+    }
+
     /// Alerts are named "<Mac ID>.<kind>", here and in the Mac's pushes.
     func show(notification identifier: String) {
         if let mac = macs.first(where: { identifier.hasPrefix($0.id + ".") }) { selectedID = mac.id }
@@ -326,7 +333,8 @@ final class MacStore {
         if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         WidgetBridge.publishAll(macs.map {
-            SharedSnapshot(macName: $0.name, status: readings[$0.id]?.status, reachable: readings[$0.id]?.reachable ?? false)
+            SharedSnapshot(macName: $0.name, status: readings[$0.id]?.status, reachable: readings[$0.id]?.reachable ?? false,
+                           macID: $0.id)
         })
         QuickActions.update(selected.flatMap { readings[$0.id] })
     }

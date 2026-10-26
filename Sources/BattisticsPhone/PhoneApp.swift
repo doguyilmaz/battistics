@@ -17,6 +17,7 @@ struct PhoneApp: App {
                 .environment(store)
                 .environment(phone)
                 .onAppear { theme.apply() }
+                .onOpenURL { store.open($0) }
                 .onChange(of: theme) { theme.apply() }
         }
         .onChange(of: scenePhase) {

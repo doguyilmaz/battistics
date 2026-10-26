@@ -34,6 +34,10 @@ struct WidgetSettingsView: View {
                         preview(width: 230, height: 32, shape: .capsule, dark: true) {
                             MacLockScreenDetailView(entry: entry, familyOverride: .accessoryInline)
                         }
+                        preview(width: 170, height: 76, shape: .rect(cornerRadius: 16), dark: true) {
+                            AllMacsWidgetView(entry: AllMacsEntry(date: .now, snapshots: allSnapshots),
+                                              familyOverride: .accessoryRectangular)
+                        }
                     }
                     .padding(.vertical, 8)
                 }

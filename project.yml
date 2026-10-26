@@ -193,6 +193,9 @@ targets:
       path: Sources/BattisticsPhone/Info.plist
       properties:
         CFBundleDisplayName: Battistics Remote
+        CFBundleURLTypes:
+          - CFBundleURLName: com.doguyilmaz.Battistics.Remote
+            CFBundleURLSchemes: [battistics-remote]
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, tr]
         CFBundleShortVersionString: "1.0.0"

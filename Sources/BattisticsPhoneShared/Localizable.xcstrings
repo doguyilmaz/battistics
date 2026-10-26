@@ -5967,6 +5967,40 @@
           }
         }
       }
+    },
+    "Open Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i Aç"
+          }
+        }
+      }
+    },
+    "Opens a Mac in Battistics Remote.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens a Mac in Battistics Remote."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir Mac’i Battistics Remote’ta açar."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

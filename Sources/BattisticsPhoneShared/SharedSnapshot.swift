@@ -6,6 +6,10 @@ struct SharedSnapshot: Codable, Equatable {
     var macName: String
     var status: RemoteStatus?
     var reachable: Bool
+    /// Lets a widget open this Mac in the app.
+    var macID: String?
+
+    var url: URL? { macID.flatMap { URL(string: "battistics-remote://mac/\($0)") } }
 
     var bagReady: Bool { reachable && status?.isBagReady == true }
 
