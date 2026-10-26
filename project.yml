@@ -182,7 +182,6 @@ targets:
       - path: Sources/BattisticsPhone
       - path: Sources/BattisticsPhoneShared
       - path: Sources/BattisticsApp/Resources/AppIcon.icon
-      - path: Sources/BattisticsApp/Resources/AppIcons
     dependencies:
       - package: BattisticsCore
         product: BattisticsRemote
