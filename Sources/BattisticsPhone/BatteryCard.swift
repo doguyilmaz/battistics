@@ -92,17 +92,20 @@ struct BatteryCard: View {
     private func powerMenu(_ battery: RemoteStatus.Battery?) -> some View {
         let lowPower = battery?.lowPowerMode == true
         return Menu {
-            Picker(selection: Binding(
-                get: { battery?.lowPowerPolicy },
-                set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
-            )) {
-                ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
-                    Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
+            // macOS offers the four-way choice only on a Mac with a battery.
+            if let battery {
+                Picker(selection: Binding(
+                    get: { battery.lowPowerPolicy },
+                    set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
+                )) {
+                    ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
+                        Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
+                    }
+                } label: {
+                    Label("Low Power Mode on the Mac", systemImage: "leaf")
                 }
-            } label: {
-                Label("Low Power Mode on the Mac", systemImage: "leaf")
+                .pickerStyle(.menu)
             }
-            .pickerStyle(.menu)
             Button {
                 run { await store.sleepDisplay(mac) }
             } label: {
