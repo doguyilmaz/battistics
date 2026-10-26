@@ -82,6 +82,15 @@ enum Notifications {
             .add(UNNotificationRequest(identifier: "\(mac.id).command", content: content, trigger: nil))
     }
 
+    /// A control or widget used before any Mac shares with this account.
+    @MainActor
+    static func reportNoMac() async {
+        let content = UNMutableNotificationContent()
+        content.body = String(localized: "Open Battistics Remote to connect to your Mac first.")
+        try? await UNUserNotificationCenter.current()
+            .add(UNNotificationRequest(identifier: "nomac.command", content: content, trigger: nil))
+    }
+
     /// Maintains a rolling local notification while a Keep Awake session is
     /// active, for a Mac that goes quiet while the app is suspended. Each
     /// fresh reading pushes it forward and clears one already delivered; how
