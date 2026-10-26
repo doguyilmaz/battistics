@@ -93,6 +93,10 @@ extension RemoteStatus {
     }
 }
 
+extension RemoteStatus {
+    var macSymbol: String { battery == nil ? "desktopcomputer" : "laptopcomputer" }
+}
+
 extension RemoteStatus.Thermal {
     var label: String {
         switch self {

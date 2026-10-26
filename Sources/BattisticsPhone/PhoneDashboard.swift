@@ -183,7 +183,7 @@ struct PhoneDashboard: View {
                     store.selectedID = mac.id
                 } label: {
                     HStack {
-                        Label(mac.name, systemImage: "laptopcomputer")
+                        Label(mac.name, systemImage: reading?.status?.macSymbol ?? "laptopcomputer")
                             .lineLimit(1)
                         Spacer()
                         if reading?.reachable != true {

@@ -36,8 +36,8 @@ struct KeepAwakeControl: ControlWidget {
 
     struct Value {
         var isOn: Bool
-        var mode: ControlMode
-        var duration: ControlDuration
+        var mode: KeepAwakeMode
+        var duration: KeepAwakeDuration
 
         /// "Lid Closed · 1 hour", what turning the control on will do.
         var summary: String {

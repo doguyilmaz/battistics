@@ -21,10 +21,14 @@ struct MacLockScreenDetailView: View {
         }
     }
 
+    private var reachable: Bool { entry.snapshot?.reachable == true }
+
     @ViewBuilder
     private func inline(_ status: RemoteStatus) -> some View {
         let percent = status.battery.map { $0.percent.percentText } ?? "–"
-        if let session = status.session, session.isActive(at: entry.date) {
+        if !reachable {
+            Label("Offline", systemImage: "laptopcomputer.slash")
+        } else if let session = status.session, session.isActive(at: entry.date) {
             Label {
                 Text("\(percent) · \(SessionTimerText.text(session))")
             } icon: {
@@ -38,8 +42,8 @@ struct MacLockScreenDetailView: View {
     }
 
     private func circular(_ status: RemoteStatus) -> some View {
-        let symbol = status.session?.isActive(at: entry.date) == true
-            ? "cup.and.saucer.fill"
+        let symbol = !reachable ? "laptopcomputer.slash"
+            : status.session?.isActive(at: entry.date) == true ? "cup.and.saucer.fill"
             : (status.battery?.symbol ?? "laptopcomputer")
         return Gauge(value: Double(status.battery?.percent ?? 0), in: 0...100) {
             Image(systemName: symbol)
@@ -53,10 +57,10 @@ struct MacLockScreenDetailView: View {
     /// Name and charge, a full-width bar, then the session timer or the chosen details.
     private func rectangular(_ snapshot: SharedSnapshot, _ status: RemoteStatus) -> some View {
         let battery = status.battery
-        let session = status.session.flatMap { $0.isActive(at: entry.date) ? $0 : nil }
+        let session = reachable ? status.session.flatMap { $0.isActive(at: entry.date) ? $0 : nil } : nil
         return VStack(alignment: .leading, spacing: 3) {
             HStack(spacing: 4) {
-                Image(systemName: session != nil ? "cup.and.saucer.fill" : status.network.symbol)
+                Image(systemName: !reachable ? "laptopcomputer.slash" : session != nil ? "cup.and.saucer.fill" : status.network.symbol)
                     .font(.caption2.weight(.bold))
                 Text(snapshot.macName)
                     .font(.footnote.weight(.bold))
@@ -75,7 +79,15 @@ struct MacLockScreenDetailView: View {
                 Gauge(value: Double(battery?.percent ?? 0), in: 0...100) { EmptyView() }
                     .gaugeStyle(.accessoryLinearCapacity)
             }
-            if let session {
+            if !reachable {
+                HStack(spacing: 4) {
+                    Text("Offline")
+                    Spacer(minLength: 2)
+                    Text(status.readAt, style: .time)
+                }
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            } else if let session {
                 HStack(spacing: 4) {
                     Text(session.mode.label).lineLimit(1).minimumScaleFactor(0.75)
                     Spacer(minLength: 2)

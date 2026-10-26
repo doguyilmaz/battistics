@@ -1361,23 +1361,6 @@
         }
       }
     },
-    "Starts Keep Awake on your Mac with the display allowed to sleep.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Starts Keep Awake on your Mac with the display allowed to sleep."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’inizde ekranın uyumasına izin vererek Uyanık Tut’u başlatır."
-          }
-        }
-      }
-    },
     "Stop": {
       "extractionState": "manual",
       "localizations": {
@@ -5781,19 +5764,104 @@
         }
       }
     },
-    "Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
+    "Allow Notifications": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
+            "value": "Allow Notifications"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut bitmeden beş dakika önce, süre eklemek için bir düğmeyle. Ayrıca bittiğinde, Mac ısındığında, pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
+            "value": "Bildirimlere İzin Ver"
+          }
+        }
+      }
+    },
+    "How to turn on Personal Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How to turn on Personal Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kişisel Erişim Noktası nasıl açılır"
+          }
+        }
+      }
+    },
+    "%@ stays awake until you turn it off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ stays awake until you turn it off."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sen kapatana kadar uyanık kalır."
+          }
+        }
+      }
+    },
+    "Starts Keep Awake on your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts Keep Awake on your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inde Uyanık Tut’u başlatır."
+          }
+        }
+      }
+    },
+    "Keep Awake for 1 hour": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake for 1 hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 saat Uyanık Tut"
+          }
+        }
+      }
+    },
+    "Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bitmeden önce ve bittiğinde, Mac ısındığında, pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
           }
         }
       }

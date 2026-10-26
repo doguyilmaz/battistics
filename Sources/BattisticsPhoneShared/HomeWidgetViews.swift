@@ -232,9 +232,12 @@ struct MacTelemetryWidgetView: View {
 
     var body: some View {
         if let snapshot = entry.snapshot, let status = snapshot.status, let battery = status.battery {
-            let tint = PowerPalette.batteryTint(battery)
+            let tint = snapshot.reachable ? PowerPalette.batteryTint(battery) : .secondary
             VStack(alignment: .leading, spacing: 6) {
-                HStack {
+                HStack(spacing: 4) {
+                    if !snapshot.reachable {
+                        Image(systemName: "laptopcomputer.slash").font(.caption2.weight(.bold))
+                    }
                     Text(snapshot.macName)
                         .font(.caption.weight(.bold))
                         .lineLimit(1)
@@ -251,7 +254,7 @@ struct MacTelemetryWidgetView: View {
                         Text("\(battery.percent)%")
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(tint)
-                        Text(WidgetHelpers.subtitle(battery))
+                        Text(snapshot.reachable ? WidgetHelpers.subtitle(battery) : String(localized: "Offline"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -272,6 +275,12 @@ struct MacTelemetryWidgetView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        } else if let snapshot = entry.snapshot {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(snapshot.macName).font(.caption.weight(.bold)).lineLimit(1)
+                Label("This Mac has no battery", systemImage: "powerplug").font(.caption)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         } else {
             Text("Open Battistics Remote").font(.caption)
         }

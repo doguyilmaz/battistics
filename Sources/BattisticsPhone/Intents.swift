@@ -1,34 +1,28 @@
 import AppIntents
 import BattisticsRemote
 
-enum IntentDuration: Int, AppEnum {
-    case fifteen = 15, thirty = 30, hour = 60, twoHours = 120, fourHours = 240, sixHours = 360, twelveHours = 720
-
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Duration"
-    static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-        .fifteen: "15 minutes", .thirty: "30 minutes", .hour: "1 hour", .twoHours: "2 hours",
-        .fourHours: "4 hours", .sixHours: "6 hours", .twelveHours: "12 hours",
-    ]
-}
-
-struct StartKeepAwakeIntent: AppIntent {
+/// A Live Activity intent, so a session started from Siri or Shortcuts in
+/// the background still gets its Lock Screen countdown.
+struct StartKeepAwakeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake"
-    static let description = IntentDescription("Starts Keep Awake on your Mac with the display allowed to sleep.")
+    static let description = IntentDescription("Starts Keep Awake on your Mac.")
 
-    @Parameter(title: "Duration", default: .hour) var duration: IntentDuration
+    @Parameter(title: "Mode", default: .displayMaySleep) var mode: KeepAwakeMode
+    @Parameter(title: "Duration", default: .hour) var duration: KeepAwakeDuration
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
-        if let failure = await MacStore.shared.start(mac, mode: .displayMaySleep, minutes: duration.rawValue) {
+        if let failure = await MacStore.shared.start(mac, mode: mode.mode, minutes: duration.rawValue) {
             return .result(dialog: "\(failure)")
         }
+        if duration == .untilOff { return .result(dialog: "\(mac.name) stays awake until you turn it off.") }
         return .result(dialog: "\(mac.name) stays awake for \(DurationLabel.long(minutes: duration.rawValue)).")
     }
 }
 
-struct StopKeepAwakeIntent: AppIntent {
+struct StopKeepAwakeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Let Mac Sleep"
     static let description = IntentDescription("Stops Keep Awake on your Mac.")
@@ -50,7 +44,7 @@ enum IntentExtension: Int, AppEnum {
     ]
 }
 
-struct AddKeepAwakeTimeIntent: AppIntent {
+struct AddKeepAwakeTimeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Add Time to Keep Awake"
     static let description = IntentDescription("Adds time to the Keep Awake session running on your Mac.")

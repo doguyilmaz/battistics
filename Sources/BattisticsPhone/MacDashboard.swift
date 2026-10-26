@@ -18,7 +18,7 @@ struct MacDashboard: View {
                     KeepAwakeCard(mac: mac, status: status, reachable: reachable)
                     ConditionsGrid(status: status)
                         .opacity(reachable ? 1 : 0.6)
-                    HotspotCard(mac: mac, status: status, reachable: reachable)
+                    if status.battery != nil { HotspotCard(mac: mac, status: status, reachable: reachable) }
                     MacExtrasCard(mac: mac, status: status, reachable: reachable)
                 }
                 .animation(.snappy, value: reachable)
@@ -28,7 +28,11 @@ struct MacDashboard: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            if store.isSample { SampleBar() }
+            if store.isSample && !DemoData.isEnabled { SampleBar() }
+        }
+        .task {
+            guard !store.isSample, UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true else { return }
+            await Notifications.requestPermission()
         }
     }
 }

@@ -31,9 +31,15 @@ final class MacStore {
     private(set) var problem: String?
     var selectedID: String? {
         didSet {
+            if selectedID != Self.localPhoneID { macID = selectedID }
             if !isSample { UserDefaults.standard.set(selectedID, forKey: "selectedMac") }
             publishSelected()
         }
+    }
+    /// The Mac that widgets, Siri and the Live Activity act on. Looking at
+    /// This iPhone keeps it, so they never switch to another Mac.
+    private var macID: String? {
+        didSet { if !isSample { UserDefaults.standard.set(macID, forKey: "remoteMac") } }
     }
     /// Trying the app with made-up Macs, held in memory only.
     private(set) var isSample = DemoData.isEnabled
@@ -44,10 +50,12 @@ final class MacStore {
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
     @ObservationIgnored private var alertSubscriptionChecked: Date?
+    @ObservationIgnored private var sending: Set<String> = []
 
     private init() {
         readings = DemoData.isEnabled ? DemoData.readings : Self.savedReadings()
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
+        macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (selectedID == Self.localPhoneID ? nil : selectedID)
         RemoteIntentBridge.start = { [weak self] mode, minutes in
             guard let self, let mac = self.selected else { return }
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
@@ -68,7 +76,7 @@ final class MacStore {
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
-    var selected: Mac? { macs.first { $0.id == selectedID } ?? macs.first }
+    var selected: Mac? { macs.first { $0.id == macID } ?? macs.first }
 
     /// The Mac a widget or Live Activity names, else the selected one.
     private func mac(_ id: String?) -> Mac? {
@@ -76,6 +84,11 @@ final class MacStore {
     }
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
+
+    /// Alerts are named "<Mac ID>.<kind>", here and in the Mac's pushes.
+    func show(notification identifier: String) {
+        if let mac = macs.first(where: { identifier.hasPrefix($0.id + ".") }) { selectedID = mac.id }
+    }
 
     // MARK: Sample
 
@@ -89,6 +102,7 @@ final class MacStore {
     func endSample() {
         isSample = false
         readings = Self.savedReadings()
+        macID = UserDefaults.standard.string(forKey: "remoteMac")
         selectedID = UserDefaults.standard.string(forKey: "selectedMac")
         Task { await refreshAll() }
     }
@@ -199,31 +213,41 @@ final class MacStore {
 
     /// Returns a message to show when the Mac refused or did not answer.
     func start(_ mac: Mac, mode: RemoteStatus.Mode, minutes: Int) async -> String? {
-        await send(.init(operation: .start, mode: mode, durationMinutes: minutes, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .start, mode: mode, durationMinutes: minutes), to: mac)
     }
 
     func stop(_ mac: Mac) async -> String? {
-        await send(.init(operation: .stop, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .stop), to: mac)
     }
 
     func extend(_ mac: Mac, minutes: Int) async -> String? {
-        await send(.init(operation: .extend, durationMinutes: minutes, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .extend, durationMinutes: minutes), to: mac)
     }
 
     func setLowPower(_ mac: Mac, policy: RemoteStatus.LowPowerPolicy) async -> String? {
-        await send(.init(operation: .setLowPower, lowPowerPolicy: policy, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .setLowPower, lowPowerPolicy: policy), to: mac)
     }
 
     func sleepDisplay(_ mac: Mac) async -> String? {
-        await send(.init(operation: .sleepDisplay, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .sleepDisplay), to: mac)
     }
 
     func inspect(_ mac: Mac) async -> String? {
-        await send(.init(operation: .inspect, deviceName: LocalPhoneMonitor.shared.commandName), to: mac)
+        await send(.init(operation: .inspect), to: mac)
     }
 
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
+        var request = request
+        request.deviceName = LocalPhoneMonitor.shared.commandName
+        // The Mac reports one answer at a time, so a second command waits
+        // instead of hiding the first one's answer.
+        while sending.contains(mac.id) {
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return nil }
+        }
+        sending.insert(mac.id)
+        defer { sending.remove(mac.id) }
+        request.sentAt = .now
         let locks = request.operation != .inspect
         if locks { pending[mac.id] = request.operation }
         defer { if locks { pending[mac.id] = nil } }
@@ -261,7 +285,11 @@ final class MacStore {
         publishSelected()
     }
 
-    private func publishSelected() {
+    /// Hands the selected Mac to widgets, the Live Activity and quick actions.
+    func publishSelected() {
+        // A sample tried in the app stays out of widgets and the Lock Screen;
+        // `-demo` screenshots need them.
+        if isSample && !DemoData.isEnabled { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         QuickActions.update(selected.flatMap { readings[$0.id] })
     }

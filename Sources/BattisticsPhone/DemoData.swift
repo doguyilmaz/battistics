@@ -36,7 +36,11 @@ enum DemoData {
             network: .hotspot, networkName: "Ada’s iPhone", lidClosed: true,
             protection: .init(warnAtPercent: 20, closedLidAllowed: true),
             heartbeatSeconds: RemoteStatus.sessionHeartbeat)
-        return ["demo-desk": .init(status: desk, reachable: true), "demo-bag": .init(status: bag, reachable: true)]
+        let mini = RemoteStatus(machineName: "Mac mini", readAt: now.addingTimeInterval(-25), network: .wired,
+                                macModel: "Mac mini (Mac16,10)", osVersion: "macOS 26.1",
+                                heartbeatSeconds: RemoteStatus.heartbeat)
+        return ["demo-desk": .init(status: desk, reachable: true), "demo-bag": .init(status: bag, reachable: true),
+                "demo-mini": .init(status: mini, reachable: true)]
     }
 
     /// Plays a command against the sample Mac, as the real one would answer it.

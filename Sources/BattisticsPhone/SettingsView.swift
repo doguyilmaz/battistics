@@ -24,13 +24,18 @@ struct SettingsView: View {
                             ForEach([80, 90, 100], id: \.self) { Text($0.percentText).tag($0) }
                         }
                     }
+                    if notify, permission == .notDetermined {
+                        Button("Allow Notifications") {
+                            Task { await Notifications.requestPermission(); await readPermission() }
+                        }
+                    }
                     if notify, permission == .denied {
                         Button("Open Notification Settings") {
                             openURL(URL(string: UIApplication.openNotificationSettingsURLString)!)
                         }
                     }
                 } footer: {
-                    Text("Five minutes before Keep Awake ends, with a button to add time. Also when it ends, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
+                    Text("Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
                 }
 
                 Section {

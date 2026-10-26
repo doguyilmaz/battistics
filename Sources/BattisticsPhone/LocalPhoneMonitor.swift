@@ -95,7 +95,7 @@ final class LocalPhoneMonitor {
 
     /// "Dogu’s iPhone (16e)", without repeating a model the name already ends with.
     var pickerName: String {
-        displayName.hasSuffix(shortModelName) ? displayName : "\(displayName) (\(shortModelName))"
+        shortModelName.isEmpty || displayName.hasSuffix(shortModelName) ? displayName : "\(displayName) (\(shortModelName))"
     }
 
     /// How the Mac labels sessions started here; not localized, since the Mac shows it as a name.
@@ -201,6 +201,21 @@ final class LocalPhoneMonitor {
 
     private static func marketingName(for identifier: String) -> (String, String) {
         let short: String? = switch identifier {
+        case "iPhone11,2": "XS"
+        case "iPhone11,4", "iPhone11,6": "XS Max"
+        case "iPhone11,8": "XR"
+        case "iPhone12,1": "11"
+        case "iPhone12,3": "11 Pro"
+        case "iPhone12,5": "11 Pro Max"
+        case "iPhone12,8", "iPhone14,6": "SE"
+        case "iPhone13,1": "12 mini"
+        case "iPhone13,2": "12"
+        case "iPhone13,3": "12 Pro"
+        case "iPhone13,4": "12 Pro Max"
+        case "iPhone14,4": "13 mini"
+        case "iPhone14,5": "13"
+        case "iPhone14,2": "13 Pro"
+        case "iPhone14,3": "13 Pro Max"
         case "iPhone14,7": "14"
         case "iPhone14,8": "14 Plus"
         case "iPhone15,2": "14 Pro"
@@ -221,7 +236,7 @@ final class LocalPhoneMonitor {
         case "iPhone18,5": "17e"
         default: nil
         }
-        guard let short else { return ("iPhone", identifier) }
+        guard let short else { return (identifier.hasPrefix("iPad") ? "iPad" : "iPhone", "") }
         return ("iPhone \(short)", short)
     }
 }
