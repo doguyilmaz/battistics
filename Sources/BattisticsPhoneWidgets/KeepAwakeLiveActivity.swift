@@ -10,6 +10,7 @@ struct KeepAwakeActivityWidget: Widget {
             LockScreenLiveActivityView(context: context)
                 .activityBackgroundTint(Color.black.opacity(0.84))
                 .activitySystemActionForegroundColor(.white)
+                .widgetURL(SharedSnapshot.url(macID: context.attributes.macID))
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -94,6 +95,7 @@ struct KeepAwakeActivityWidget: Widget {
                 Image(systemName: context.state.isCharging ? "bolt.fill" : "cup.and.saucer.fill")
                     .foregroundStyle(context.state.isCharging ? PowerPalette.charging : .orange)
             }
+            .widgetURL(SharedSnapshot.url(macID: context.attributes.macID))
         }
     }
 }

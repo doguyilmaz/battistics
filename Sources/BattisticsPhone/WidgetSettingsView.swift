@@ -82,17 +82,14 @@ struct WidgetSettingsView: View {
     }
 
     private var snapshot: SharedSnapshot {
-        guard let mac = store.selected, let reading = store.reading(for: mac), let status = reading.status else {
+        guard let mac = store.selected, let reading = store.reading(for: mac), reading.status != nil else {
             return .sample()
         }
-        return SharedSnapshot(macName: mac.name, status: status, reachable: reading.reachable)
+        return SharedSnapshot(mac, reading: reading)
     }
 
     private var allSnapshots: [SharedSnapshot] {
-        let snapshots = store.macs.map {
-            SharedSnapshot(macName: $0.name, status: store.reading(for: $0)?.status,
-                           reachable: store.reading(for: $0)?.reachable ?? false)
-        }
+        let snapshots = store.macs.map { SharedSnapshot($0, reading: store.reading(for: $0)) }
         return snapshots.isEmpty ? [.sample()] : snapshots
     }
 
@@ -104,5 +101,6 @@ struct WidgetSettingsView: View {
             .background(dark ? AnyShapeStyle(.black.opacity(0.85)) : AnyShapeStyle(Color(.secondarySystemGroupedBackground)), in: shape)
             .environment(\.colorScheme, dark ? .dark : colorScheme)
             .clipShape(shape)
+            .allowsHitTesting(false)
     }
 }

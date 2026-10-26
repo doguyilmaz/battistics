@@ -52,6 +52,8 @@ final class MacStore {
     @ObservationIgnored private lazy var cloud = RemoteCloud()
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
+    /// The Macs Siri and Spotlight last offered by name.
+    @ObservationIgnored private var shortcutMacs: [Mac] = []
 
     private init() {
         readings = DemoData.isEnabled ? DemoData.readings : Self.savedReadings()
@@ -110,16 +112,24 @@ final class MacStore {
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
 
-    /// `battistics-remote://mac/<ID>`, from a widget.
+    /// Shows a Mac from a widget, an alert or Shortcuts, leaving a sample tried in the app.
+    @discardableResult
+    func select(_ id: String) -> Bool {
+        if triesSample, Self.savedReadings()[id] != nil { endSample() }
+        guard macs.contains(where: { $0.id == id }) else { return false }
+        selectedID = id
+        return true
+    }
+
+    /// `battistics-remote://mac/<ID>`, from a widget or the Live Activity.
     func open(_ url: URL) {
         guard url.scheme == "battistics-remote", url.host() == "mac" else { return }
-        let id = url.lastPathComponent
-        if macs.contains(where: { $0.id == id }) { selectedID = id }
+        select(url.lastPathComponent)
     }
 
     /// Alerts are named "<Mac ID>.<kind>", here and in the Mac's pushes.
     func show(notification identifier: String) {
-        if let mac = macs.first(where: { identifier.hasPrefix($0.id + ".") }) { selectedID = mac.id }
+        if let dot = identifier.lastIndex(of: ".") { select(String(identifier[..<dot])) }
     }
 
     // MARK: Sample
@@ -332,11 +342,12 @@ final class MacStore {
         // `-demo` screenshots need them.
         if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
-        WidgetBridge.publishAll(macs.map {
-            SharedSnapshot(macName: $0.name, status: readings[$0.id]?.status, reachable: readings[$0.id]?.reachable ?? false,
-                           macID: $0.id)
-        })
+        WidgetBridge.publishAll(macs.map { SharedSnapshot($0, reading: readings[$0.id]) })
         QuickActions.update(selected.flatMap { readings[$0.id] })
+        if macs != shortcutMacs {
+            shortcutMacs = macs
+            Shortcuts.updateAppShortcutParameters()
+        }
     }
 
     /// In this iPhone's language; the Mac's own text may be in another.

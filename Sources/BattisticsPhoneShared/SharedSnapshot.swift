@@ -9,7 +9,9 @@ struct SharedSnapshot: Codable, Equatable {
     /// Lets a widget open this Mac in the app.
     var macID: String?
 
-    var url: URL? { macID.flatMap { URL(string: "battistics-remote://mac/\($0)") } }
+    var url: URL? { macID.flatMap(Self.url(macID:)) }
+
+    static func url(macID: String) -> URL? { URL(string: "battistics-remote://mac/\(macID)") }
 
     var bagReady: Bool { reachable && status?.isBagReady == true }
 

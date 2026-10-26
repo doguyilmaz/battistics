@@ -39,8 +39,10 @@
   button to add 30 minutes, and warns when a session runs hot.
 - An All Macs widget, Get Mac Battery Level for Shortcuts, and Siri starts
   Keep Awake in any mode, also until turned off. Each Shortcuts action can
-  name the Mac it acts on, and Open Mac opens one in the app. The All Macs
-  widget also fits the Lock Screen, and tapping a Mac opens it.
+  name the Mac it acts on, and Open Mac opens one in the app, also by name
+  from Siri. The All Macs widget also fits the Lock Screen. On the Home
+  Screen tapping a Mac in it opens that Mac, and every other widget and the
+  Live Activity open the Mac they show.
 - Try a Sample Mac shows the iPhone app before a Mac is set up.
 - Switching a running session to closed-lid keeps the Mac awake while the
   power helper is set up.

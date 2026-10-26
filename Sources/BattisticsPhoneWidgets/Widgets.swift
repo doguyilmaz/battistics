@@ -91,6 +91,7 @@ struct MacWidget: Widget {
         StaticConfiguration(kind: "mac", provider: MacProvider()) { entry in
             MacWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Dashboard")
         .description("Battery, power, network and Keep Awake controls for your Mac.")
@@ -103,6 +104,7 @@ struct MacBatteryWidget: Widget {
         StaticConfiguration(kind: "mac.telemetry", provider: MacProvider()) { entry in
             MacTelemetryWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Battery Telemetry")
         .description("Capacity in mAh, power, health, cycles, temperature and the last 24 hours.")
@@ -115,6 +117,7 @@ struct MacLockScreenDetailWidget: Widget {
         StaticConfiguration(kind: "mac.lockscreen.detail", provider: MacProvider()) { entry in
             MacLockScreenDetailView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Lock Screen")
         .description("A full-width Lock Screen widget with charge bar, power, health, cycles and the Keep Awake timer.")

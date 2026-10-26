@@ -27,7 +27,7 @@ enum WidgetBridge {
             endActivities()
             return
         }
-        let snapshot = SharedSnapshot(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false)
+        let snapshot = SharedSnapshot(mac, reading: reading)
         if snapshot != SharedSnapshot.load() {
             snapshot.save()
             reloadWidgets()
@@ -109,5 +109,11 @@ enum WidgetBridge {
 
     private nonisolated static func end(_ id: String) async {
         await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?.end(nil, dismissalPolicy: .immediate)
+    }
+}
+
+extension SharedSnapshot {
+    init(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
+        self.init(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false, macID: mac.id)
     }
 }

@@ -175,8 +175,7 @@ struct OpenMacIntent: OpenIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let mac = MacStore.shared.remoteMac(id: target.id) else { throw IntentFailure.notPaired }
-        MacStore.shared.selectedID = mac.id
+        guard MacStore.shared.select(target.id) else { throw IntentFailure.notPaired }
         return .result()
     }
 }
@@ -227,5 +226,8 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Mac Low Power", systemImageName: "leaf")
         AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my Mac’s display with \(.applicationName)"],
                     shortTitle: "Display Off", systemImageName: "display")
+        AppShortcut(intent: OpenMacIntent(), phrases: ["Open \(\.$target) in \(.applicationName)",
+                                                       "Open my Mac in \(.applicationName)"],
+                    shortTitle: "Open Mac", systemImageName: "arrow.up.forward.app")
     }
 }
