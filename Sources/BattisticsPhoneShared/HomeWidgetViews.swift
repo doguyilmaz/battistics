@@ -34,7 +34,7 @@ struct MacWidgetView: View {
 
     private func header(_ snapshot: SharedSnapshot, font: Font) -> some View {
         HStack(spacing: 5) {
-            Image(systemName: snapshot.reachable ? "laptopcomputer" : "laptopcomputer.slash")
+            Image(systemName: snapshot.status?.macSymbol(reachable: snapshot.reachable) ?? "laptopcomputer")
                 .foregroundStyle(.secondary)
             Text(snapshot.macName)
                 .lineLimit(1)
@@ -55,6 +55,23 @@ struct MacWidgetView: View {
         }
     }
 
+    /// What a desktop Mac shows where a laptop shows its charge.
+    private func desktop(_ status: RemoteStatus, size: CGFloat, network: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Image(systemName: "desktopcomputer")
+                .font(.system(size: size, weight: .medium))
+                .foregroundStyle(.tint)
+            if network {
+                Label(status.network.label, systemImage: status.network.symbol)
+                    .foregroundStyle(.secondary)
+            }
+            Label(status.thermal.label, systemImage: "thermometer.medium")
+                .foregroundStyle(status.thermal.isHot ? status.thermal.tint : .secondary)
+        }
+        .font(.caption2.weight(.semibold))
+        .lineLimit(1)
+    }
+
     private func small(_ snapshot: SharedSnapshot, _ status: RemoteStatus) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             header(snapshot, font: .caption.weight(.bold))
@@ -65,6 +82,8 @@ struct MacWidgetView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+            } else {
+                desktop(status, size: 24, network: true)
             }
             Spacer(minLength: 0)
             if let session = activeSession(status), snapshot.reachable {
@@ -108,6 +127,8 @@ struct MacWidgetView: View {
                             .minimumScaleFactor(0.8)
                         Spacer(minLength: 0)
                         WidgetHelpers.tokenRow(WidgetHelpers.tokens(battery, status, prefs: entry.prefs))
+                    } else {
+                        desktop(status, size: 30, network: false)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -183,6 +204,8 @@ struct MacWidgetView: View {
                     Spacer(minLength: 0)
                 }
                 WidgetHelpers.metricBoxes(battery, status)
+            } else {
+                desktop(status, size: 40, network: false)
             }
             if let points = status.chargeHistory, points.count > 1 {
                 ChargeSparkline(points: points, tint: status.battery.map(PowerPalette.batteryTint) ?? .accentColor,
@@ -338,8 +361,8 @@ private struct AllMacsLine: View {
     var body: some View {
         let running = snapshot.reachable && snapshot.status?.session?.isActive(at: date) == true
         HStack(spacing: 4) {
-            Image(systemName: !snapshot.reachable ? "laptopcomputer.slash"
-                  : running ? "cup.and.saucer.fill" : (snapshot.status?.macSymbol ?? "laptopcomputer"))
+            Image(systemName: running ? "cup.and.saucer.fill"
+                  : snapshot.status?.macSymbol(reachable: snapshot.reachable) ?? "laptopcomputer")
                 .frame(width: 16)
             Text(snapshot.macName).lineLimit(1)
             Spacer(minLength: 2)
@@ -360,7 +383,7 @@ private struct AllMacsRow: View {
         let session = snapshot.reachable ? snapshot.status?.session.flatMap { $0.isActive(at: date) ? $0 : nil } : nil
         let tint = snapshot.reachable ? battery.map(PowerPalette.batteryTint) ?? .accentColor : .secondary
         HStack(spacing: 10) {
-            Image(systemName: snapshot.reachable ? (snapshot.status?.macSymbol ?? "laptopcomputer") : "laptopcomputer.slash")
+            Image(systemName: snapshot.status?.macSymbol(reachable: snapshot.reachable) ?? "laptopcomputer")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(tint)
                 .frame(width: 24)

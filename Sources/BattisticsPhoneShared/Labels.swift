@@ -85,6 +85,12 @@ extension RemoteStatus {
 
 extension RemoteStatus {
     var macSymbol: String { battery == nil ? "desktopcomputer" : "laptopcomputer" }
+
+    /// The Mac's symbol, flagged while it is not answering.
+    func macSymbol(reachable: Bool) -> String {
+        if reachable { return macSymbol }
+        return battery == nil ? "desktopcomputer.trianglebadge.exclamationmark" : "laptopcomputer.slash"
+    }
 }
 
 extension RemoteStatus.Thermal {

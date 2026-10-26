@@ -16,7 +16,8 @@ struct KeepAwakeActivityWidget: Widget {
                 DynamicIslandExpandedRegion(.leading) {
                     VStack(alignment: .leading, spacing: 3) {
                         HStack(spacing: 5) {
-                            Image(systemName: context.state.network == .hotspot ? "personalhotspot" : "laptopcomputer")
+                            Image(systemName: context.state.network == .hotspot ? "personalhotspot"
+                                  : context.state.batteryPercent == nil ? "desktopcomputer" : "laptopcomputer")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(context.state.network == .hotspot ? PowerPalette.hotspot : .orange)
                             Text(context.attributes.macName)
