@@ -38,7 +38,8 @@
 - Battistics Remote reminds you five minutes before Keep Awake ends, with a
   button to add 30 minutes, and warns when a session runs hot.
 - An All Macs widget, Get Mac Battery Level for Shortcuts, and Siri starts
-  Keep Awake in any mode, also until turned off.
+  Keep Awake in any mode, also until turned off. Each Shortcuts action can
+  name the Mac it acts on.
 - Try a Sample Mac shows the iPhone app before a Mac is set up.
 - Switching a running session to closed-lid keeps the Mac awake while the
   power helper is set up.
