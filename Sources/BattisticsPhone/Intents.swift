@@ -9,11 +9,24 @@ struct MacEntity: AppEntity {
     let id: String
     let name: String
 
+    /// As last read; Check Mac returns them fresh, for automations.
+    @Property(title: "Battery Level") var batteryLevel: Int?
+    @Property(title: "Charging") var isCharging: Bool
+    @Property(title: "Keep Awake On") var keepAwakeOn: Bool
+    @Property(title: "Answering") var isAnswering: Bool
+
     var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(name)") }
 
+    @MainActor
     init(_ mac: MacStore.Mac) {
         id = mac.id
         name = mac.name
+        let reading = MacStore.shared.reading(for: mac)
+        let answering = reading?.reachable == true && reading?.status?.isFresh() == true
+        isAnswering = answering
+        batteryLevel = reading?.status?.battery?.percent
+        isCharging = reading?.status?.battery?.isCharging ?? false
+        keepAwakeOn = answering && reading?.status?.session != nil
     }
 }
 
@@ -153,16 +166,16 @@ struct MacStatusIntent: AppIntent {
     @Parameter(title: "Mac") var target: MacEntity?
 
     @MainActor
-    func perform() async throws -> some IntentResult & ProvidesDialog {
+    func perform() async throws -> some IntentResult & ReturnsValue<MacEntity> & ProvidesDialog {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
         await MacStore.shared.refreshAll()
-        guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status,
-              status.isFresh() else {
-            return .result(dialog: "\(mac.name) is not answering.")
+        let entity = MacEntity(mac)
+        guard entity.isAnswering, let status = MacStore.shared.reading(for: mac)?.status else {
+            return .result(value: entity, dialog: "\(mac.name) is not answering.")
         }
         let battery = status.battery.map { String(localized: "Battery \($0.percent)%.") } ?? ""
         let awake = status.session == nil ? String(localized: "Keep Awake is off.") : String(localized: "Keep Awake is on.")
-        return .result(dialog: "\(battery) \(awake)")
+        return .result(value: entity, dialog: "\(battery) \(awake)")
     }
 }
 
