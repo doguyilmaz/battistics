@@ -10,6 +10,7 @@ struct RemoteWidgets: WidgetBundle {
         MacWidget()
         MacBatteryWidget()
         MacLockScreenDetailWidget()
+        AllMacsWidget()
         KeepAwakeActivityWidget()
         if #available(iOS 18.0, *) {
             KeepAwakeControl()
@@ -118,5 +119,38 @@ struct MacLockScreenDetailWidget: Widget {
         .configurationDisplayName("Mac Lock Screen")
         .description("A full-width Lock Screen widget with charge bar, power, health, cycles and the Keep Awake timer.")
         .supportedFamilies([.accessoryRectangular, .accessoryCircular, .accessoryInline])
+    }
+}
+
+struct AllMacsProvider: TimelineProvider {
+    func placeholder(in context: Context) -> AllMacsEntry {
+        AllMacsEntry(date: .now, snapshots: [.sample()])
+    }
+
+    func getSnapshot(in context: Context, completion: @escaping (AllMacsEntry) -> Void) {
+        let snapshots = SharedSnapshot.loadAll()
+        completion(AllMacsEntry(date: .now, snapshots: snapshots.isEmpty ? [.sample()] : snapshots))
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<AllMacsEntry>) -> Void) {
+        let now = Date.now
+        let snapshots = SharedSnapshot.loadAll()
+        // Each Mac that stops writing turns offline at its own moment.
+        let offline = snapshots.compactMap { $0.reachable ? $0.status?.unheardDate : nil }.filter { $0 > now }
+        let entries = ([now] + offline.sorted()).map { AllMacsEntry(date: $0, snapshots: snapshots) }
+        let deadline = snapshots.compactMap { $0.status?.session?.deadline }.filter { $0 > now }.min()
+        completion(Timeline(entries: entries, policy: .after(deadline ?? now.addingTimeInterval(15 * 60))))
+    }
+}
+
+struct AllMacsWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: AllMacsEntry.kind, provider: AllMacsProvider()) { entry in
+            AllMacsWidgetView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+        .configurationDisplayName("All Macs")
+        .description("Battery and Keep Awake for every Mac on your Apple Account.")
+        .supportedFamilies([.systemMedium, .systemLarge])
     }
 }

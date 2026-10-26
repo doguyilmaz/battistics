@@ -35,6 +35,12 @@ enum WidgetBridge {
         syncActivity(mac, reading: reading)
     }
 
+    static func publishAll(_ snapshots: [SharedSnapshot]) {
+        guard snapshots != SharedSnapshot.loadAll() else { return }
+        SharedSnapshot.saveAll(snapshots)
+        WidgetCenter.shared.reloadTimelines(ofKind: AllMacsEntry.kind)
+    }
+
     private static func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
         if #available(iOS 18.0, *) { ControlCenter.shared.reloadAllControls() }

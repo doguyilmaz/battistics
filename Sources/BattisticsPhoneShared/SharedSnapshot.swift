@@ -19,6 +19,7 @@ struct SharedSnapshot: Codable, Equatable {
 
     static let group = "group.com.doguyilmaz.Battistics.Remote"
     private static let key = "snapshot"
+    private static let allKey = "allSnapshots"
 
     static func load() -> SharedSnapshot? {
         UserDefaults(suiteName: group)?.data(forKey: key).flatMap { try? RemoteWire.decode(Self.self, from: $0) }
@@ -30,6 +31,15 @@ struct SharedSnapshot: Codable, Equatable {
 
     static func clear() {
         UserDefaults(suiteName: group)?.removeObject(forKey: key)
+    }
+
+    /// Every Mac, for the All Macs widget.
+    static func loadAll() -> [SharedSnapshot] {
+        UserDefaults(suiteName: group)?.data(forKey: allKey).flatMap { try? RemoteWire.decode([Self].self, from: $0) } ?? []
+    }
+
+    static func saveAll(_ snapshots: [SharedSnapshot]) {
+        UserDefaults(suiteName: group)?.set(try? RemoteWire.encode(snapshots), forKey: allKey)
     }
 }
 

@@ -5916,6 +5916,40 @@
           }
         }
       }
+    },
+    "All Macs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Macs"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm Mac’ler"
+          }
+        }
+      }
+    },
+    "Battery and Keep Awake for every Mac on your Apple Account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery and Keep Awake for every Mac on your Apple Account."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabındaki her Mac’in pili ve Uyanık Tut durumu."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

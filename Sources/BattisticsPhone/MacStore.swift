@@ -292,6 +292,9 @@ final class MacStore {
         // `-demo` screenshots need them.
         if isSample && !DemoData.isEnabled { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+        WidgetBridge.publishAll(macs.map {
+            SharedSnapshot(macName: $0.name, status: readings[$0.id]?.status, reachable: readings[$0.id]?.reachable ?? false)
+        })
         QuickActions.update(selected.flatMap { readings[$0.id] })
     }
 

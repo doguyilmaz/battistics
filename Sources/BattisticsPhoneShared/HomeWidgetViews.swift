@@ -286,3 +286,77 @@ struct MacTelemetryWidgetView: View {
         }
     }
 }
+
+struct AllMacsEntry: TimelineEntry {
+    static let kind = "mac.all"
+    let date: Date
+    let snapshots: [SharedSnapshot]
+}
+
+/// One row per Mac: charge, or the Keep Awake countdown while one runs.
+struct AllMacsWidgetView: View {
+    @Environment(\.widgetFamily) private var environmentFamily
+    let entry: AllMacsEntry
+    var familyOverride: WidgetFamily?
+
+    private var family: WidgetFamily { familyOverride ?? environmentFamily }
+
+    var body: some View {
+        if entry.snapshots.isEmpty {
+            Text("Open Battistics Remote").font(.caption)
+        } else {
+            VStack(alignment: .leading, spacing: family == .systemLarge ? 12 : 7) {
+                ForEach(Array(entry.snapshots.prefix(family == .systemLarge ? 7 : 3).enumerated()), id: \.offset) { _, snapshot in
+                    AllMacsRow(snapshot: snapshot.asOf(entry.date), date: entry.date)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: family == .systemLarge ? .topLeading : .leading)
+        }
+    }
+}
+
+private struct AllMacsRow: View {
+    let snapshot: SharedSnapshot
+    let date: Date
+
+    var body: some View {
+        let battery = snapshot.status?.battery
+        let session = snapshot.reachable ? snapshot.status?.session.flatMap { $0.isActive(at: date) ? $0 : nil } : nil
+        let tint = snapshot.reachable ? battery.map(PowerPalette.batteryTint) ?? .accentColor : .secondary
+        HStack(spacing: 10) {
+            Image(systemName: snapshot.reachable ? (snapshot.status?.macSymbol ?? "laptopcomputer") : "laptopcomputer.slash")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(tint)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(snapshot.macName)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                Group {
+                    if !snapshot.reachable {
+                        Text("Offline")
+                    } else if let session {
+                        HStack(spacing: 3) {
+                            Image(systemName: "cup.and.saucer.fill")
+                            SessionTimerText(session: session)
+                        }
+                        .foregroundStyle(.orange)
+                    } else if let battery {
+                        Text(WidgetHelpers.subtitle(battery))
+                    } else {
+                        Text("This Mac has no battery")
+                    }
+                }
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
+            Spacer(minLength: 4)
+            if let battery {
+                Text("\(battery.percent)%")
+                    .font(.system(.title3, design: .rounded, weight: .bold).monospacedDigit())
+                    .foregroundStyle(tint)
+            }
+        }
+    }
+}

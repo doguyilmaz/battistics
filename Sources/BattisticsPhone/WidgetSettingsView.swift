@@ -57,6 +57,9 @@ struct WidgetSettingsView: View {
                         preview(width: 338, height: 158, shape: .rect(cornerRadius: 22)) {
                             MacTelemetryWidgetView(entry: entry, familyOverride: .systemMedium)
                         }
+                        preview(width: 338, height: 158, shape: .rect(cornerRadius: 22)) {
+                            AllMacsWidgetView(entry: AllMacsEntry(date: .now, snapshots: allSnapshots), familyOverride: .systemMedium)
+                        }
                     }
                     .padding(.vertical, 8)
                 }
@@ -79,6 +82,14 @@ struct WidgetSettingsView: View {
             return .sample()
         }
         return SharedSnapshot(macName: mac.name, status: status, reachable: reading.reachable)
+    }
+
+    private var allSnapshots: [SharedSnapshot] {
+        let snapshots = store.macs.map {
+            SharedSnapshot(macName: $0.name, status: store.reading(for: $0)?.status,
+                           reachable: store.reading(for: $0)?.reachable ?? false)
+        }
+        return snapshots.isEmpty ? [.sample()] : snapshots
     }
 
     private func preview<S: Shape, Content: View>(width: CGFloat, height: CGFloat, shape: S, dark: Bool = false,
