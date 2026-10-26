@@ -175,14 +175,15 @@ final class MacStore {
     /// switch. The subscription belongs to the account, so it is checked on
     /// the server rather than remembered: another phone, or iCloud recreating
     /// the zone, can remove it. Until it is confirmed, this phone raises every
-    /// alert itself.
-    func syncAlertSubscription() async {
+    /// alert itself. Only turning the switch off removes it; a routine check
+    /// never does, since another iPhone on the account may still want it.
+    func syncAlertSubscription(removing: Bool = false) async {
         alertSubscriptionChecked = .now
         let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
         do {
             if wanted {
                 if try await !cloud.hasAlertSubscription() { try await cloud.subscribeToAlerts() }
-            } else {
+            } else if removing {
                 try await cloud.unsubscribeFromAlerts()
             }
             UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)

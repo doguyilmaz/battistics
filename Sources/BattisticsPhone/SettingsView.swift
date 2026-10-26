@@ -16,7 +16,7 @@ struct SettingsView: View {
                     Toggle("Notifications", isOn: $notify)
                         .onChange(of: notify) {
                             if notify { Task { await Notifications.requestPermission(); await readPermission() } }
-                            Task { await MacStore.shared.syncAlertSubscription() }
+                            Task { await MacStore.shared.syncAlertSubscription(removing: !notify) }
                         }
                     if notify {
                         Picker("When Charged To", selection: $chargeTarget) {
