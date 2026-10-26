@@ -298,6 +298,27 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         return min(maximum, max(minimum, longestGap * 1.5))
     }
 
+    /// Whether this reading tells a phone something `old` did not. The time
+    /// it was read, values that drift every few seconds and small moves of
+    /// the time-left estimate, which macOS revises every minute, do not count.
+    public func differsNoticeably(from old: RemoteStatus) -> Bool {
+        var compared = self
+        compared.readAt = old.readAt
+        if var battery = compared.battery, let before = old.battery {
+            battery.watts = before.watts
+            battery.temperatureC = before.temperatureC
+            battery.voltageMV = before.voltageMV
+            battery.amperageMA = before.amperageMA
+            battery.currentCapacityMah = before.currentCapacityMah
+            if let minutes = battery.minutesRemaining, let was = before.minutesRemaining,
+               abs(minutes - was) < max(5, was / 10) {
+                battery.minutesRemaining = was
+            }
+            compared.battery = battery
+        }
+        return compared != old
+    }
+
     /// Whether this reading is recent enough to call the Mac reachable.
     public func isFresh(at now: Date = Date()) -> Bool {
         now < staleDate

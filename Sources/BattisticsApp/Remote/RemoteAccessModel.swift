@@ -212,15 +212,9 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds {
-            var compared = status
-            compared.readAt = lastCheap.readAt
-            compared.battery?.watts = lastCheap.battery?.watts
-            compared.battery?.temperatureC = lastCheap.battery?.temperatureC
-            compared.battery?.voltageMV = lastCheap.battery?.voltageMV
-            compared.battery?.amperageMA = lastCheap.battery?.amperageMA
-            compared.battery?.currentCapacityMah = lastCheap.battery?.currentCapacityMah
-            if compared == lastCheap { return }
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds,
+           !status.differsNoticeably(from: lastCheap) {
+            return
         }
         let cheap = status
         status = await enriched(status)

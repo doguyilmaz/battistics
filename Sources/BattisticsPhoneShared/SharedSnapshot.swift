@@ -23,6 +23,20 @@ struct SharedSnapshot: Codable, Equatable {
         return copy
     }
 
+    /// Whether widgets showing `old` should reload for this snapshot:
+    /// something they show changed, or `old` is read long enough ago that
+    /// they would soon call the Mac unheard. Each reload in the background
+    /// spends WidgetKit's daily budget.
+    func differsNoticeably(from old: SharedSnapshot) -> Bool {
+        guard macName == old.macName, macID == old.macID, reachable == old.reachable,
+              var status, let before = old.status else { return self != old }
+        if status.readAt.timeIntervalSince(before.readAt) > RemoteStatus.unheardDelay / 2 { return true }
+        status.chargeHistory = before.chargeHistory
+        status.lastCommand = before.lastCommand
+        status.extras = before.extras
+        return status.differsNoticeably(from: before)
+    }
+
     static let group = "group.com.doguyilmaz.Battistics.Remote"
     private static let key = "snapshot"
     private static let allKey = "allSnapshots"

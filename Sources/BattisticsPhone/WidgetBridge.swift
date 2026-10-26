@@ -28,7 +28,7 @@ enum WidgetBridge {
             return
         }
         let snapshot = SharedSnapshot(mac, reading: reading)
-        if snapshot != SharedSnapshot.load() {
+        if SharedSnapshot.load().map(snapshot.differsNoticeably) ?? true {
             snapshot.save()
             reloadWidgets()
         }
@@ -36,7 +36,9 @@ enum WidgetBridge {
     }
 
     static func publishAll(_ snapshots: [SharedSnapshot]) {
-        guard snapshots != SharedSnapshot.loadAll() else { return }
+        let saved = SharedSnapshot.loadAll()
+        guard snapshots.count != saved.count || zip(snapshots, saved).contains(where: { $0.differsNoticeably(from: $1) })
+        else { return }
         SharedSnapshot.saveAll(snapshots)
         // A widget set to one Mac reads it from here too.
         WidgetCenter.shared.reloadAllTimelines()

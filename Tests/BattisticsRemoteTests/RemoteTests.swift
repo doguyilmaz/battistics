@@ -35,6 +35,27 @@ struct RemoteTests {
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
     }
 
+    @Test func onlyNoticeableChangesCount() {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        let old = RemoteStatus(machineName: "Mac", readAt: now,
+                               battery: .init(percent: 60, isCharging: false, onAdapter: false, minutesRemaining: 300, watts: -8))
+        var next = old
+        next.readAt = now.addingTimeInterval(60)
+        next.battery?.watts = -9.5
+        next.battery?.minutesRemaining = 290
+        #expect(!next.differsNoticeably(from: old))
+        next.battery?.minutesRemaining = 260
+        #expect(next.differsNoticeably(from: old))
+        next.battery?.minutesRemaining = 300
+        next.battery?.percent = 59
+        #expect(next.differsNoticeably(from: old))
+        var short = old
+        short.battery?.minutesRemaining = 20
+        var shorter = short
+        shorter.battery?.minutesRemaining = 14
+        #expect(shorter.differsNoticeably(from: short))
+    }
+
     @Test func chargeRateNeedsAQuarterHourOfRecentReadings() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         let point = { (minutesAgo: Double, percent: Double) in RemoteStatus.ChargePoint(at: now.addingTimeInterval(-minutesAgo * 60), percent: percent) }
