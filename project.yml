@@ -33,6 +33,12 @@ settings:
     ENABLE_HARDENED_RUNTIME: YES
     DEAD_CODE_STRIPPING: YES
 
+settingGroups:
+  # The iPhone app and its extensions must carry the same version.
+  Phone:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+
 targets:
   BattisticsCLI:
     type: tool
@@ -181,6 +187,7 @@ targets:
       - package: BattisticsCore
         product: BattisticsRemote
       - target: BattisticsPhoneWidgets
+      - target: BattisticsPhoneAlerts
     entitlements:
       path: Sources/BattisticsPhone/BattisticsPhone.entitlements
       properties:
@@ -198,8 +205,8 @@ targets:
             CFBundleURLSchemes: [battistics-remote]
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, tr]
-        CFBundleShortVersionString: "1.0.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.utilities
         UILaunchScreen: {}
@@ -222,6 +229,7 @@ targets:
               CFBundleIconFiles: [stats]
               UIPrerenderedIcon: true
     settings:
+      groups: [Phone]
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote
         DEVELOPMENT_TEAM: 5MYT4VYJFC
@@ -255,11 +263,12 @@ targets:
       path: Sources/BattisticsPhoneWidgets/Info.plist
       properties:
         CFBundleDisplayName: Battistics Remote
-        CFBundleShortVersionString: "1.0.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
+      groups: [Phone]
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote.Widgets
         DEVELOPMENT_TEAM: 5MYT4VYJFC
@@ -267,6 +276,38 @@ targets:
         PRODUCT_NAME: BattisticsRemoteWidgets
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_EMIT_LOC_STRINGS: YES
+
+  BattisticsPhoneAlerts:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources/BattisticsPhoneAlerts
+      - path: Sources/BattisticsPhoneShared/SharedSnapshot.swift
+    dependencies:
+      - package: BattisticsCore
+        product: BattisticsRemote
+    entitlements:
+      path: Sources/BattisticsPhoneAlerts/BattisticsPhoneAlerts.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.doguyilmaz.Battistics.Remote]
+    info:
+      path: Sources/BattisticsPhoneAlerts/Info.plist
+      properties:
+        CFBundleDisplayName: Battistics Remote
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
+    settings:
+      groups: [Phone]
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote.Alerts
+        DEVELOPMENT_TEAM: 5MYT4VYJFC
+        "CODE_SIGN_IDENTITY[sdk=iphoneos*]": Apple Development
+        PRODUCT_NAME: BattisticsRemoteAlerts
+        TARGETED_DEVICE_FAMILY: "1"
 
 schemes:
   BattisticsPhone:
