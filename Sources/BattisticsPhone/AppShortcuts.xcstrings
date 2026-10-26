@@ -1,66 +1,66 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Check my Mac with ${applicationName}": {
+    "Check my computer with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Check my Mac with ${applicationName}"
+            "value": "Check my computer with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imi kontrol et"
+            "value": "${applicationName} ile bilgisayarımı kontrol et"
           }
         }
       }
     },
-    "Keep my Mac awake longer with ${applicationName}": {
+    "Keep my computer awake longer with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep my Mac awake longer with ${applicationName}"
+            "value": "Keep my computer awake longer with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imi daha uzun uyanık tut"
+            "value": "${applicationName} ile bilgisayarımı daha uzun uyanık tut"
           }
         }
       }
     },
-    "Keep my Mac awake with ${applicationName}": {
+    "Keep my computer awake with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep my Mac awake with ${applicationName}"
+            "value": "Keep my computer awake with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imi uyanık tut"
+            "value": "${applicationName} ile bilgisayarımı uyanık tut"
           }
         }
       }
     },
-    "Let my Mac sleep with ${applicationName}": {
+    "Let my computer sleep with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Let my Mac sleep with ${applicationName}"
+            "value": "Let my computer sleep with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imi uyut"
+            "value": "${applicationName} ile bilgisayarımı uyut"
           }
         }
       }
@@ -81,50 +81,50 @@
         }
       }
     },
-    "Open my Mac in ${applicationName}": {
+    "Open my computer in ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open my Mac in ${applicationName}"
+            "value": "Open my computer in ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imi aç"
+            "value": "${applicationName} ile bilgisayarımı aç"
           }
         }
       }
     },
-    "Set my Mac’s Low Power Mode with ${applicationName}": {
+    "Set my computer’s Low Power Mode with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Set my Mac’s Low Power Mode with ${applicationName}"
+            "value": "Set my computer’s Low Power Mode with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imin Düşük Güç Modunu ayarla"
+            "value": "${applicationName} ile bilgisayarımın Düşük Güç Modunu ayarla"
           }
         }
       }
     },
-    "Turn off my Mac’s display with ${applicationName}": {
+    "Turn off my computer’s display with ${applicationName}": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Turn off my Mac’s display with ${applicationName}"
+            "value": "Turn off my computer’s display with ${applicationName}"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile Mac’imin ekranını kapat"
+            "value": "${applicationName} ile bilgisayarımın ekranını kapat"
           }
         }
       }

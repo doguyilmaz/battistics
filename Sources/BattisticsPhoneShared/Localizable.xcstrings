@@ -1429,19 +1429,19 @@
         }
       }
     },
-    "Stops Keep Awake on your Mac.": {
+    "Stops Keep Awake on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stops Keep Awake on your Mac."
+            "value": "Stops Keep Awake on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inde Uyanık Tut’u durdurur."
+            "value": "Bilgisayarında Uyanık Tut’u durdurur."
           }
         }
       }
@@ -1463,19 +1463,19 @@
         }
       }
     },
-    "Tells you your Mac’s battery and whether it is kept awake.": {
+    "Tells you your computer’s battery and whether it is kept awake.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tells you your Mac’s battery and whether it is kept awake."
+            "value": "Tells you your computer’s battery and whether it is kept awake."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inin pilini ve uyanık tutulup tutulmadığını söyler."
+            "value": "Bilgisayarının pilini ve uyanık tutulup tutulmadığını söyler."
           }
         }
       }
@@ -2772,19 +2772,19 @@
         }
       }
     },
-    "Starts a 1-hour Keep Awake session on your Mac.": {
+    "Starts a 1-hour Keep Awake session on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starts a 1-hour Keep Awake session on your Mac."
+            "value": "Starts a 1-hour Keep Awake session on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’te 1 saatlik Uyanık Tut oturumu başlatır."
+            "value": "Bilgisayarında 1 saatlik Uyanık Tut oturumu başlatır."
           }
         }
       }
@@ -2840,19 +2840,19 @@
         }
       }
     },
-    "Stops the active Keep Awake session on your Mac.": {
+    "Stops the active Keep Awake session on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stops the active Keep Awake session on your Mac."
+            "value": "Stops the active Keep Awake session on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’teki Uyanık Tut oturumunu durdurur."
+            "value": "Bilgisayarındaki Uyanık Tut oturumunu durdurur."
           }
         }
       }
@@ -4829,19 +4829,19 @@
         }
       }
     },
-    "Puts your Mac’s display to sleep. The Mac keeps running.": {
+    "Puts your computer’s display to sleep. The computer keeps running.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Puts your Mac’s display to sleep. The Mac keeps running."
+            "value": "Puts your computer’s display to sleep. The computer keeps running."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’in ekranını uyutur. Mac çalışmaya devam eder."
+            "value": "Bilgisayarının ekranını uyutur. Bilgisayar çalışmaya devam eder."
           }
         }
       }
@@ -4897,19 +4897,19 @@
         }
       }
     },
-    "Chooses when your Mac uses Low Power Mode.": {
+    "Chooses when your computer uses Low Power Mode.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chooses when your Mac uses Low Power Mode."
+            "value": "Chooses when your computer uses Low Power Mode."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’in Düşük Güç Modunu ne zaman kullanacağını seçer."
+            "value": "Bilgisayarının Düşük Güç Modunu ne zaman kullanacağını seçer."
           }
         }
       }
@@ -5186,19 +5186,19 @@
         }
       }
     },
-    "Adds time to the Keep Awake session on your Mac.": {
+    "Adds time to the Keep Awake session on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adds time to the Keep Awake session on your Mac."
+            "value": "Adds time to the Keep Awake session on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’indeki Uyanık Tut oturumuna süre ekler."
+            "value": "Bilgisayarındaki Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5254,19 +5254,19 @@
         }
       }
     },
-    "Adds time to the Keep Awake session running on your Mac.": {
+    "Adds time to the Keep Awake session running on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adds time to the Keep Awake session running on your Mac."
+            "value": "Adds time to the Keep Awake session running on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inde çalışan Uyanık Tut oturumuna süre ekler."
+            "value": "Bilgisayarında çalışan Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5543,19 +5543,19 @@
         }
       }
     },
-    "Choose the mode and how long this control keeps your Mac awake.": {
+    "Choose the mode and how long this control keeps your computer awake.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose the mode and how long this control keeps your Mac awake."
+            "value": "Choose the mode and how long this control keeps your computer awake."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu kontrolün Mac’ini hangi modda ve ne kadar uyanık tutacağını seç."
+            "value": "Bu kontrolün bilgisayarını hangi modda ve ne kadar uyanık tutacağını seç."
           }
         }
       }
@@ -5577,19 +5577,19 @@
         }
       }
     },
-    "Keeps your Mac awake, or lets it sleep again.": {
+    "Keeps your computer awake, or lets it sleep again.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keeps your Mac awake, or lets it sleep again."
+            "value": "Keeps your computer awake, or lets it sleep again."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’ini uyanık tutar ya da yeniden uyumasına izin verir."
+            "value": "Bilgisayarını uyanık tutar ya da yeniden uyumasına izin verir."
           }
         }
       }
@@ -5815,19 +5815,19 @@
         }
       }
     },
-    "Starts Keep Awake on your Mac.": {
+    "Starts Keep Awake on your computer.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starts Keep Awake on your Mac."
+            "value": "Starts Keep Awake on your computer."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inde Uyanık Tut’u başlatır."
+            "value": "Bilgisayarında Uyanık Tut’u başlatır."
           }
         }
       }
@@ -5900,19 +5900,19 @@
         }
       }
     },
-    "Returns your Mac’s battery level, from 0 to 100.": {
+    "Returns your computer’s battery level, from 0 to 100.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Returns your Mac’s battery level, from 0 to 100."
+            "value": "Returns your computer’s battery level, from 0 to 100."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inin pil seviyesini 0 ile 100 arasında verir."
+            "value": "Bilgisayarının pil seviyesini 0 ile 100 arasında verir."
           }
         }
       }
@@ -5985,19 +5985,19 @@
         }
       }
     },
-    "Opens a Mac in Battistics Remote.": {
+    "Opens a computer in Battistics Remote.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Opens a Mac in Battistics Remote."
+            "value": "Opens a computer in Battistics Remote."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bir Mac’i Battistics Remote’ta açar."
+            "value": "Bir bilgisayarı Battistics Remote’ta açar."
           }
         }
       }
