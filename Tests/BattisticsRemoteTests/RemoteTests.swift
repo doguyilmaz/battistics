@@ -54,6 +54,28 @@ struct RemoteTests {
         #expect(request.operation == .unknown)
     }
 
+    @Test func valuesFromANewerMacKeepItsStatusReadable() throws {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        var status = RemoteStatus(machineName: "Mac", readAt: now,
+                                  session: .init(mode: .displayOn, origin: .manual, startedAt: now, deadline: nil),
+                                  lastEnd: .init(reason: .timer, at: now), network: .wifi, thermal: .fair)
+        status.lastCommand = .init(id: "c", failure: RemoteFailure(.busy))
+        var json = try JSONSerialization.jsonObject(with: RemoteWire.encode(status)) as! [String: Any]
+        var session = json["session"] as! [String: Any]
+        session["origin"] = "watch"
+        json["session"] = session
+        json["lastEnd"] = ["reason": "eclipse", "at": 1_000_000]
+        json["network"] = "satellite"
+        json["thermal"] = "molten"
+        json["lastCommand"] = ["id": "c", "failure": ["code": "quota", "message": "Später"]]
+        let decoded = try RemoteWire.decode(RemoteStatus.self, from: JSONSerialization.data(withJSONObject: json))
+        #expect(decoded.session?.origin == .manual)
+        #expect(decoded.lastEnd?.reason == .user)
+        #expect(decoded.network == .other)
+        #expect(decoded.thermal == .nominal)
+        #expect(decoded.lastCommand?.failure == RemoteFailure(.startFailed, "Später"))
+    }
+
     @Test func allowedDurationsIncludeUntilTurnedOffAndTelemetryRoundTrips() throws {
         #expect(RemoteRequest.allowedDurations.contains(0))
         #expect(RemoteRequest.allowedDurations == [0, 15, 30, 60, 120, 240, 360, 720])

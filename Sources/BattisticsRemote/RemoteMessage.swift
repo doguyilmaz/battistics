@@ -2,7 +2,7 @@ import Foundation
 
 /// A command sent from a phone through iCloud.
 public struct RemoteRequest: Codable, Sendable, Equatable {
-    public enum Operation: String, Codable, Sendable {
+    public enum Operation: String, Codable, Sendable, TolerantWireValue {
         case start
         case stop
         case setLowPower
@@ -14,9 +14,7 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         /// Sent by a newer phone; answered as an invalid request instead of left unread.
         case unknown
 
-        public init(from decoder: Decoder) throws {
-            self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .unknown
-        }
+        public static let fallback = Self.unknown
     }
 
     public var id: String
@@ -61,8 +59,11 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
 }
 
 public struct RemoteFailure: Codable, Sendable, Equatable {
-    public enum Code: String, Codable, Sendable {
+    public enum Code: String, Codable, Sendable, TolerantWireValue {
         case invalidRequest, busy, closedLidNotAllowed, helperUnavailable, protection, startFailed, unavailable
+
+        /// The phone shows the Mac's own words for a code it does not know.
+        public static let fallback = Self.startFailed
     }
 
     public var code: Code
@@ -70,6 +71,18 @@ public struct RemoteFailure: Codable, Sendable, Equatable {
     /// phone words every other code itself, in its own language.
     public var message: String
     public init(_ code: Code, _ message: String = "") { self.code = code; self.message = message }
+}
+
+/// A value a newer Mac or phone adds decodes as `fallback` on an older one,
+/// so one new case never makes a whole message unreadable.
+public protocol TolerantWireValue: RawRepresentable<String>, Decodable {
+    static var fallback: Self { get }
+}
+
+extension TolerantWireValue {
+    public init(from decoder: Decoder) throws {
+        self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .fallback
+    }
 }
 
 public enum RemoteWire {

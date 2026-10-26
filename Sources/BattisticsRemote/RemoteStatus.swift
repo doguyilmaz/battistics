@@ -93,8 +93,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         case displayOn, displayMaySleep, lidClosed
     }
 
-    public enum Origin: String, Codable, Sendable {
+    public enum Origin: String, Codable, Sendable, TolerantWireValue {
         case manual, profile, terminal, ai, phone
+        public static let fallback = Self.manual
     }
 
     public struct Session: Codable, Sendable, Equatable {
@@ -133,8 +134,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public init(at: Date, percent: Double) { self.at = at; self.percent = percent }
     }
 
-    public enum EndReason: String, Codable, Sendable {
+    public enum EndReason: String, Codable, Sendable, TolerantWireValue {
         case timer, user, phone, battery, thermal, client, failure
+        public static let fallback = Self.user
     }
 
     public struct LastEnd: Codable, Sendable, Equatable {
@@ -143,12 +145,14 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public init(reason: EndReason, at: Date) { self.reason = reason; self.at = at }
     }
 
-    public enum Network: String, Codable, Sendable {
+    public enum Network: String, Codable, Sendable, TolerantWireValue {
         case wifi, hotspot, wired, other, offline
+        public static let fallback = Self.other
     }
 
-    public enum Thermal: String, Codable, Sendable {
+    public enum Thermal: String, Codable, Sendable, TolerantWireValue {
         case nominal, fair, serious, critical
+        public static let fallback = Self.nominal
 
         public var isHot: Bool { self == .serious || self == .critical }
     }
