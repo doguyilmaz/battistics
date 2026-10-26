@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The popover shows Keep Awake as a chip in its header again, with a stop
+  button, so starting a session no longer pushes the readings down.
 - Battistics Remote can put the Mac to sleep. Keep Awake ends first, so a
   closed-lid session no longer holds the Mac awake.
 - The Mac tells the iPhone just before it sleeps, so Battistics Remote shows

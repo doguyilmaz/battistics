@@ -8,8 +8,6 @@ struct KeepAwakeSessionCard: View {
     @Environment(NetworkMonitor.self) private var network
     @Environment(AppModel.self) private var model
     @State private var windowVisible = false
-    /// The popover keeps to what, how long and the warning; Power shows the rest.
-    var compact = false
 
     var body: some View {
         if let session = awake.session {
@@ -47,18 +45,16 @@ struct KeepAwakeSessionCard: View {
                     .monospacedDigit()
                 }
                 .font(.caption).foregroundStyle(.secondary)
-                if !compact {
-                    Text(conditions(session)).font(.caption).foregroundStyle(.secondary)
-                }
+                Text(conditions(session)).font(.caption).foregroundStyle(.secondary)
                 if let warning = runtimeWarning(session) {
                     Label(warning, systemImage: "battery.25percent")
                         .font(.caption).foregroundStyle(.orange)
                 }
-                if !compact, awake.safety.configuration.stopOnLowBattery {
+                if awake.safety.configuration.stopOnLowBattery {
                     Text("Stops at \(awake.safety.configuration.effectiveStopPercent)% battery")
                         .font(.caption).foregroundStyle(.secondary)
                 }
-                if !compact, awake.safety.configuration.stopOnThermalPressure {
+                if awake.safety.configuration.stopOnThermalPressure {
                     Text("Stops under high thermal pressure")
                         .font(.caption).foregroundStyle(.secondary)
                 }
