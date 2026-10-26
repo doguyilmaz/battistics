@@ -4,8 +4,8 @@ import Foundation
 import UIKit
 import WidgetKit
 
-/// Hands the selected Mac's reading to the widgets and keeps the lock-screen
-/// countdown in step with it. Without push, both update when the app or its
+/// Hands the Macs' readings to the widgets and keeps a lock-screen countdown
+/// for each Mac kept awake. Without push, both update when the app or its
 /// background refresh runs; the countdown itself runs on the system clock.
 @MainActor
 enum WidgetBridge {
@@ -24,7 +24,6 @@ enum WidgetBridge {
         guard let mac else {
             SharedSnapshot.clear()
             reloadWidgets()
-            endActivities()
             return
         }
         let snapshot = SharedSnapshot(mac, reading: reading)
@@ -32,7 +31,19 @@ enum WidgetBridge {
             snapshot.save()
             reloadWidgets()
         }
-        syncActivity(mac, reading: reading)
+    }
+
+    /// One countdown per Mac, so picking another Mac in the app leaves a
+    /// running one on the Lock Screen.
+    static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)]) {
+        let ids = Set(macs.map(\.mac.id))
+        // A Mac that stopped sharing takes its countdown with it.
+        for activity in Activity<KeepAwakeActivityAttributes>.activities where !ids.contains(activity.attributes.macID) {
+            let id = activity.id
+            changes.append(Task { await end(id) })
+        }
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        for (mac, reading) in macs { syncActivity(mac, reading: reading) }
     }
 
     static func publishAll(_ snapshots: [SharedSnapshot]) {
@@ -50,24 +61,17 @@ enum WidgetBridge {
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // One activity, for the selected Mac.
-        for activity in Activity<KeepAwakeActivityAttributes>.activities where activity.attributes.macID != mac.id {
-            let id = activity.id
-            changes.append(Task { await end(id) })
-        }
         guard let status = reading?.status, let session = status.session else {
             // Only a Mac that is answering can tell us its session ended.
-            if reading?.reachable == true { endActivities() }
+            if reading?.reachable == true { endActivities(of: mac.id) }
             return
         }
         if let deadline = session.deadline, deadline <= .now {
-            endActivities()
+            endActivities(of: mac.id)
             return
         }
         let reachable = reading?.reachable == true
-        let current = Activity<KeepAwakeActivityAttributes>.activities
-        let existing = current.first(where: { $0.attributes.macID == mac.id })
+        let existing = Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id }
         // Never start a new activity for a Mac that has gone silent.
         if !reachable && existing == nil { return }
 
@@ -92,15 +96,16 @@ enum WidgetBridge {
         if let activity = existing {
             let id = activity.id
             if activity.content.state != state { changes.append(Task { await update(id, content) }) }
-            endActivities(except: id)
+            endActivities(of: mac.id, except: id)
         } else {
-            endActivities()
             _ = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
         }
     }
 
-    private static func endActivities(except kept: String? = nil) {
-        for id in Activity<KeepAwakeActivityAttributes>.activities.map(\.id) where id != kept {
+    private static func endActivities(of macID: String, except kept: String? = nil) {
+        for activity in Activity<KeepAwakeActivityAttributes>.activities
+        where activity.attributes.macID == macID && activity.id != kept {
+            let id = activity.id
             changes.append(Task { await end(id) })
         }
     }

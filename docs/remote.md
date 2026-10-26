@@ -54,7 +54,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - The app icon's menu offers Keep Awake for 1 hour, or Add 30 Minutes and Stop while a session runs (`QuickActions`).
 - Shortcuts and Siri: Keep Awake, Add Time, Let Sleep, Check Mac, Mac Low Power, Display Off and Open Mac, plus Get Mac Battery Level for automations (`Intents.swift`). Each can name the Mac it acts on (`MacEntity`). Check Mac also returns that Mac with its battery level, charging, Keep Awake and whether it answers, read fresh, for automations.
 - Add Time (`RemoteRequest.Operation.extend`, 15 minutes to 2 hours) is on the Mac dashboard, the Live Activity (30 minutes), the large widget and Shortcuts. It adds to what is left, up to 12 hours from now, and takes a session over from a terminal or AI task.
-- Live Activities are matched to a Mac by its id, so two Macs with the same name never share one.
+- Each Mac kept awake has its own Live Activity, matched by its id, so picking another Mac in the app leaves a running countdown in place and two Macs with the same name never share one.
 - A refused or unanswered command from a widget, the Live Activity or the control arrives as a notification, since those surfaces cannot show a reply.
 - Starting Keep Awake from a widget, Shortcut or control requires an unlocked iPhone. Stopping from the Live Activity or a Shortcut does not; the Control Center toggle asks in both directions, since a control has one policy.
 

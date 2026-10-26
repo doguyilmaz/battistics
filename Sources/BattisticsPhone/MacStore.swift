@@ -100,7 +100,7 @@ final class MacStore {
 
     var remoteMacs: [Mac] { triesSample ? [] : macs }
 
-    /// Widgets and the Live Activity move to a Mac a Shortcut starts or extends.
+    /// Widgets move to a Mac a Shortcut, widget or control starts or extends.
     func follow(_ mac: Mac) {
         guard mac.id != macID else { return }
         if isLocalPhoneSelected {
@@ -382,6 +382,7 @@ final class MacStore {
         if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         WidgetBridge.publishAll(macs.map { SharedSnapshot($0, reading: readings[$0.id]) })
+        WidgetBridge.syncActivities(macs.map { ($0, readings[$0.id]) })
         QuickActions.update(selected.flatMap { readings[$0.id] })
         if macs != shortcutMacs {
             shortcutMacs = macs
