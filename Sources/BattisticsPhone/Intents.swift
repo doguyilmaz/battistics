@@ -14,6 +14,7 @@ struct MacEntity: AppEntity {
     @Property(title: "Charging") var isCharging: Bool
     @Property(title: "Keep Awake On") var keepAwakeOn: Bool
     @Property(title: "Answering") var isAnswering: Bool
+    @Property(title: "Asleep") var isAsleep: Bool
 
     var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(name)") }
 
@@ -24,6 +25,7 @@ struct MacEntity: AppEntity {
         let reading = MacStore.shared.reading(for: mac)
         let answering = reading?.reachable == true && reading?.status?.isFresh() == true
         isAnswering = answering
+        isAsleep = !answering && reading?.status?.sleptAt != nil
         batteryLevel = reading?.status?.battery?.percent
         isCharging = reading?.status?.battery?.isCharging ?? false
         keepAwakeOn = answering && reading?.status?.session != nil
@@ -104,6 +106,10 @@ struct AddKeepAwakeTimeIntent: LiveActivityIntent {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
         MacStore.shared.follow(mac)
         if let failure = await MacStore.shared.extend(mac, minutes: time.rawValue) { return .result(dialog: "\(failure)") }
+        // The Mac caps a session at 12 hours from now, so the new end says what was added.
+        if let deadline = MacStore.shared.reading(for: mac)?.status?.session?.deadline {
+            return .result(dialog: "\(mac.name) now stays awake until \(deadline.formatted(date: .omitted, time: .shortened)).")
+        }
         return .result(dialog: "\(mac.name) stays awake \(DurationLabel.long(minutes: time.rawValue)) longer.")
     }
 }
@@ -158,6 +164,21 @@ struct TurnOffMacDisplayIntent: AppIntent {
     }
 }
 
+struct SleepMacIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let title: LocalizedStringResource = "Put Mac to Sleep"
+    static let description = IntentDescription("Ends Keep Awake and puts your computer to sleep. It answers again once woken.")
+
+    @Parameter(title: "Mac") var target: MacEntity?
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
+        if let failure = await MacStore.shared.sleep(mac) { return .result(dialog: "\(failure)") }
+        return .result(dialog: "\(mac.name) is going to sleep.")
+    }
+}
+
 struct MacStatusIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Check Mac"
@@ -168,9 +189,10 @@ struct MacStatusIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<MacEntity> & ProvidesDialog {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
-        await MacStore.shared.refreshAll()
+        try await MacStore.shared.refreshForIntent()
         let entity = MacEntity(mac)
         guard entity.isAnswering, let status = MacStore.shared.reading(for: mac)?.status else {
+            if entity.isAsleep { return .result(value: entity, dialog: "\(mac.name) is asleep.") }
             return .result(value: entity, dialog: "\(mac.name) is not answering.")
         }
         var sentences: [String] = []
@@ -213,7 +235,7 @@ struct MacBatteryLevelIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
-        await MacStore.shared.refreshAll()
+        try await MacStore.shared.refreshForIntent()
         guard let reading = MacStore.shared.reading(for: mac), reading.reachable,
               reading.status?.isFresh() == true, let percent = reading.status?.battery?.percent else {
             throw IntentFailure.noReading(mac.name)
@@ -225,12 +247,23 @@ struct MacBatteryLevelIntent: AppIntent {
 enum IntentFailure: Error, CustomLocalizedStringResourceConvertible {
     case notPaired
     case noReading(String)
+    case cloud(String)
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
         case .notPaired: "Open Battistics Remote to connect to your Mac first."
         case .noReading(let name): "\(name) is not answering or has no battery."
+        case .cloud(let problem): "\(problem)"
         }
+    }
+}
+
+extension MacStore {
+    /// A reading kept from before a failed fetch can look current for minutes,
+    /// so Siri reports the failure instead.
+    func refreshForIntent() async throws {
+        await refreshAll()
+        if let problem { throw IntentFailure.cloud(problem) }
     }
 }
 
@@ -248,6 +281,8 @@ struct Shortcuts: AppShortcutsProvider {
                     shortTitle: "Mac Low Power", systemImageName: "leaf")
         AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my computer’s display with \(.applicationName)"],
                     shortTitle: "Display Off", systemImageName: "display")
+        AppShortcut(intent: SleepMacIntent(), phrases: ["Put my computer to sleep with \(.applicationName)"],
+                    shortTitle: "Sleep Mac", systemImageName: "powersleep")
         AppShortcut(intent: OpenMacIntent(), phrases: ["Open \(\.$target) in \(.applicationName)",
                                                        "Open my computer in \(.applicationName)"],
                     shortTitle: "Open Mac", systemImageName: "arrow.up.forward.app")

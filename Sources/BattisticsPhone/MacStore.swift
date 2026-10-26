@@ -63,9 +63,10 @@ final class MacStore {
         let saved = UserDefaults.standard.string(forKey: "selectedMac")
         macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (saved == Self.localPhoneID ? nil : saved)
         selectedID = saved
-        RemoteIntentBridge.start = { [weak self] mode, minutes in
+        RemoteIntentBridge.start = { [weak self] id, mode, minutes in
             guard let self else { return }
-            guard let mac = self.remoteMac else { return await Notifications.reportNoMac() }
+            guard let mac = self.mac(id) else { return await Notifications.reportNoMac() }
+            self.follow(mac)
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] id in
@@ -99,7 +100,7 @@ final class MacStore {
 
     var remoteMacs: [Mac] { triesSample ? [] : macs }
 
-    /// Widgets and the Live Activity move to a Mac a Shortcut starts or extends.
+    /// Widgets move to a Mac a Shortcut, widget or control starts or extends.
     func follow(_ mac: Mac) {
         guard mac.id != macID else { return }
         if isLocalPhoneSelected {
@@ -143,6 +144,11 @@ final class MacStore {
     /// Alerts are named "<Mac ID>.<kind>", here and in the Mac's pushes.
     func show(notification identifier: String) {
         if let dot = identifier.lastIndex(of: ".") { select(String(identifier[..<dot])) }
+    }
+
+    func isShowing(alert identifier: String) -> Bool {
+        guard !isLocalPhoneSelected, let dot = identifier.lastIndex(of: ".") else { return false }
+        return selected?.id == String(identifier[..<dot])
     }
 
     // MARK: Sample
@@ -194,32 +200,36 @@ final class MacStore {
         // A cancelled refresh says nothing about the Macs, nor one that ended
         // after the sample replaced them.
         guard !Task.isCancelled, !isSample else { return [] }
+        // Settled before alerts are filtered, so one posted while another
+        // iPhone had removed the subscription is raised here instead.
         if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 120 }) ?? true {
-            alertSubscriptionChecked = .now
-            Task { await syncAlertSubscription() }
+            await syncAlertSubscription()
         }
         return await apply(snapshot)
     }
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
         var alerts: [(Mac, [RemoteAlert])] = []
+        // Also a Mac never read before, so setup can say why it does not appear.
+        outdated = snapshot.unreadable
         for (id, status) in snapshot.statuses {
-            outdated.remove(id)
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
             let pushed = UserDefaults.standard.bool(forKey: Notifications.pushedKey)
-            let macAlerts = RemoteAlert.alerts(from: previous, to: fresh ? status : nil,
-                                               chargeTarget: Notifications.chargeTarget)
+            let macAlerts = Notifications.latchCharge(
+                // A Mac that said it is going to sleep is not silent.
+                RemoteAlert.alerts(from: previous, to: fresh || status.sleptAt != nil ? status : nil,
+                                   chargeTarget: Notifications.chargeTarget),
+                macID: id, status: fresh ? status : nil)
                 .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
             alerts.append((mac, macAlerts))
             Notifications.syncWatchdog(for: mac, reading: reading)
         }
         // Its last readable status stays, but no longer as live.
         for id in snapshot.unreadable where readings[id] != nil {
-            outdated.insert(id)
             readings[id]?.reachable = false
         }
         // A Mac that stopped sharing is gone, not silent.
@@ -250,12 +260,21 @@ final class MacStore {
         do {
             if wanted {
                 defaults.set(false, forKey: Self.removalPendingKey)
-                if try await !cloud.hasAlertSubscription() { try await cloud.subscribeToAlerts() }
-            } else if defaults.bool(forKey: Self.removalPendingKey) {
-                try await cloud.unsubscribeFromAlerts()
-                defaults.set(false, forKey: Self.removalPendingKey)
+                let subscribed = try await cloud.hasAlertSubscription()
+                if !subscribed {
+                    try await cloud.subscribeToAlerts()
+                    // Confirmed by the next refresh, which then leaves the Mac's alerts to iCloud.
+                    alertSubscriptionChecked = nil
+                }
+                // What the Mac posted while it was missing never reached this iPhone.
+                UserDefaults.standard.set(subscribed, forKey: Notifications.pushedKey)
+            } else {
+                if defaults.bool(forKey: Self.removalPendingKey) {
+                    try await cloud.unsubscribeFromAlerts()
+                    defaults.set(false, forKey: Self.removalPendingKey)
+                }
+                UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
             }
-            UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)
         } catch {
             UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
         }
@@ -302,6 +321,10 @@ final class MacStore {
         await send(.init(operation: .sleepDisplay), to: mac)
     }
 
+    func sleep(_ mac: Mac) async -> String? {
+        await send(.init(operation: .sleep), to: mac)
+    }
+
     func inspect(_ mac: Mac) async -> String? {
         await send(.init(operation: .inspect), to: mac)
     }
@@ -310,17 +333,18 @@ final class MacStore {
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
         var request = request
         request.deviceName = LocalPhoneMonitor.shared.commandName
+        // Shown at once, also while an earlier command to this Mac is out.
+        let locks = request.operation != .inspect
+        if locks { pending[mac.id] = request.operation }
+        defer { if locks, pending[mac.id] == request.operation { pending[mac.id] = nil } }
         // The Mac reports one answer at a time, so a second command waits
         // instead of hiding the first one's answer.
         while sending.contains(mac.id) {
-            do { try await Task.sleep(for: .milliseconds(200)) } catch { return nil }
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return String(localized: "Cancelled.") }
         }
         sending.insert(mac.id)
         defer { sending.remove(mac.id) }
         request.sentAt = .now
-        let locks = request.operation != .inspect
-        if locks { pending[mac.id] = request.operation }
-        defer { if locks { pending[mac.id] = nil } }
         if isSample, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
             guard isSample else { return nil }
@@ -330,12 +354,14 @@ final class MacStore {
             return nil
         }
         do {
-            _ = try await cloud.send(request, to: mac.id)
+            try await cloud.send(request, to: mac.id)
         } catch {
             return Self.describe(error)
         }
-        // Long enough for an idle Mac's poll, its fetch and its write.
-        for _ in 0..<Int(RemoteRequest.answerWait / 1.5) {
+        // Long enough for an idle Mac's poll, its fetch and its write, counted
+        // in time since each refresh takes longer on a slow connection.
+        let giveUp = request.sentAt.addingTimeInterval(RemoteRequest.answerWait)
+        while Date.now < giveUp {
             do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
             // Through refreshAll, so this read and a push's never apply out of order.
             await refreshAll()
@@ -362,6 +388,7 @@ final class MacStore {
         if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         WidgetBridge.publishAll(macs.map { SharedSnapshot($0, reading: readings[$0.id]) })
+        WidgetBridge.syncActivities(macs.map { ($0, readings[$0.id]) })
         QuickActions.update(selected.flatMap { readings[$0.id] })
         if macs != shortcutMacs {
             shortcutMacs = macs

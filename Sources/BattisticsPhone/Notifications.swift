@@ -17,6 +17,23 @@ enum Notifications {
         let value = UserDefaults.standard.integer(forKey: chargeTargetKey)
         return value > 0 ? value : nil
     }
+    /// Macs already reported at the charge target during this charge.
+    private static let chargedKey = "chargeAlerted"
+
+    static func latchCharge(_ alerts: [RemoteAlert], macID: String, status: RemoteStatus?) -> [RemoteAlert] {
+        var latched = Set(UserDefaults.standard.stringArray(forKey: chargedKey) ?? [])
+        if let status, status.battery?.onAdapter == false
+            || chargeTarget.map({ RemoteAlert.chargeAlertRearms(at: status, target: $0) }) == true {
+            latched.remove(macID)
+        }
+        var alerts = alerts
+        if alerts.contains(where: { $0.kind == .charged }) {
+            if latched.contains(macID) { alerts.removeAll { $0.kind == .charged } } else { latched.insert(macID) }
+        }
+        UserDefaults.standard.set(Array(latched), forKey: chargedKey)
+        return alerts
+    }
+
     static let refreshTask = "com.doguyilmaz.Battistics.Remote.refresh"
     static let extendAction = "extend30"
     private static let endingCategory = "keepawake.ending"
@@ -28,9 +45,9 @@ enum Notifications {
 
     static func register() {
         let extend = UNNotificationAction(identifier: extendAction, title: String(localized: "Add 30 Minutes"))
-        UNUserNotificationCenter.current().setNotificationCategories([
+        UNUserNotificationCenter.current().setNotificationCategories(AlertActions.categories.union([
             UNNotificationCategory(identifier: endingCategory, actions: [extend], intentIdentifiers: []),
-        ])
+        ]))
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTask, using: nil) { task in
             // BGTask is thread-safe but not marked Sendable.
             nonisolated(unsafe) let refresh = task
@@ -65,6 +82,7 @@ enum Notifications {
                 content.body = alert.message
                 content.sound = .default
                 content.threadIdentifier = mac.id
+                AlertActions.tag(content, macID: mac.id, kind: alert.kind, status: MacStore.shared.reading(for: mac)?.status)
                 try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             }
         }
@@ -100,9 +118,7 @@ enum Notifications {
     static func syncWatchdog(for mac: MacStore.Mac, reading: MacStore.Reading?) {
         // Shares the `.unreachable` alert identifier, so a foreground refresh
         // and the background timer replace each other instead of stacking.
-        let id = "\(mac.id).silent"
-        let quietID = "\(mac.id).quiet"
-        let endingID = "\(mac.id).ending"
+        let (id, quietID, endingID) = AlertActions.reminderIDs(macID: mac.id)
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id, quietID, endingID])
         // A fetch settled whether the Mac answers, which the quiet note left open.
@@ -221,6 +237,8 @@ private extension RemoteAlert {
             String(localized: "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.")
         case .bagReady:
             String(localized: "On Personal Hotspot. You can close the lid and the Mac stays online.")
+        case .sleptDuringSession:
+            String(localized: "Went to sleep while Keep Awake was on. To keep a closed Mac awake, use Lid Closed.")
         case .chargeReached(let percent):
             String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:

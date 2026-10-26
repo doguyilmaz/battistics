@@ -5,6 +5,7 @@ struct PhoneDashboard: View {
     @Environment(MacStore.self) private var store
     @Environment(LocalPhoneMonitor.self) private var phone
     @State private var editingHealth = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         DashboardPage(glow: Glow(battery: phone.batteryStatus.map(PowerPalette.batteryTint) ?? .accentColor), fills: true, refresh: {
@@ -12,7 +13,8 @@ struct PhoneDashboard: View {
             await store.refreshAll()
         }) {
             batteryCard
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: typeSize.isAccessibilitySize ? 1 : 2),
+                      spacing: 10) {
                 StatTile(title: String(localized: "Power"), value: powerText,
                          symbol: phone.isCharging ? "bolt.fill" : phone.onAdapter ? "powerplug.fill" : "battery.75percent",
                          tint: phone.isCharging ? PowerPalette.charging : .accentColor)

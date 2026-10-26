@@ -27,7 +27,7 @@ struct MacLockScreenDetailView: View {
     private func inline(_ status: RemoteStatus) -> some View {
         let percent = status.battery.map { $0.percent.percentText } ?? "–"
         if !reachable {
-            Label("Offline", systemImage: status.macSymbol(reachable: false))
+            Label(status.silentLabel, systemImage: status.macSymbol(reachable: false))
         } else if let session = status.session, session.isActive(at: entry.date) {
             Label {
                 Text("\(percent) · \(SessionTimerText.text(session))")
@@ -89,9 +89,9 @@ struct MacLockScreenDetailView: View {
             }
             if !reachable {
                 HStack(spacing: 4) {
-                    Text("Offline")
+                    Text(status.silentLabel)
                     Spacer(minLength: 2)
-                    Text(status.readAt, style: .time)
+                    Text(status.sleptAt ?? status.readAt, style: .time)
                 }
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)

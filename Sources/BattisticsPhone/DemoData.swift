@@ -52,7 +52,7 @@ enum DemoData {
             let minutes = request.durationMinutes ?? 0
             status.session = .init(mode: request.mode ?? .displayMaySleep, origin: .phone, name: request.deviceName,
                                    startedAt: now, deadline: minutes > 0 ? now.addingTimeInterval(Double(minutes) * 60) : nil)
-        case .stop:
+        case .stop, .sleep:
             status.session = nil
             status.lastEnd = .init(reason: .phone, at: now)
         case .setLowPower:

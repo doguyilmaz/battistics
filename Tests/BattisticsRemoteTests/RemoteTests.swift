@@ -30,7 +30,30 @@ struct RemoteTests {
         let sleepRequest = RemoteRequest(operation: .sleepDisplay, deviceName: "iPhone",
                                          sentAt: Date(timeIntervalSince1970: 1_000_000))
         #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(sleepRequest)) == sleepRequest)
+        let macSleep = RemoteRequest(operation: .sleep, sentAt: Date(timeIntervalSince1970: 1_000_000))
+        #expect(try RemoteWire.decode(RemoteRequest.self, from: RemoteWire.encode(macSleep)).operation == .sleep)
         #expect(throws: (any Error).self) { try RemoteWire.decode(RemoteRequest.self, from: Data("{}".utf8)) }
+    }
+
+    @Test func onlyNoticeableChangesCount() {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        let old = RemoteStatus(machineName: "Mac", readAt: now,
+                               battery: .init(percent: 60, isCharging: false, onAdapter: false, minutesRemaining: 300, watts: -8))
+        var next = old
+        next.readAt = now.addingTimeInterval(60)
+        next.battery?.watts = -9.5
+        next.battery?.minutesRemaining = 290
+        #expect(!next.differsNoticeably(from: old))
+        next.battery?.minutesRemaining = 260
+        #expect(next.differsNoticeably(from: old))
+        next.battery?.minutesRemaining = 300
+        next.battery?.percent = 59
+        #expect(next.differsNoticeably(from: old))
+        var short = old
+        short.battery?.minutesRemaining = 20
+        var shorter = short
+        shorter.battery?.minutesRemaining = 14
+        #expect(shorter.differsNoticeably(from: short))
     }
 
     @Test func chargeRateNeedsAQuarterHourOfRecentReadings() {
@@ -222,6 +245,16 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: wifi, to: displayOn).isEmpty)
     }
 
+    @Test func onlyAlertsAboutARunningSessionOfferStop() {
+        #expect(RemoteAlert.batteryRunsOut(minutesLeft: 30).kind.offersStop(sessionRunning: false))
+        #expect(RemoteAlert.runningHot.kind.offersStop(sessionRunning: false))
+        #expect(RemoteAlert.batteryLow(percent: 10).kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.batteryLow(percent: 10).kind.offersStop(sessionRunning: false))
+        #expect(!RemoteAlert.sessionEnded(.timer).kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.bagReady.kind.offersStop(sessionRunning: true))
+        #expect(!RemoteAlert.unreachable.kind.offersStop(sessionRunning: true))
+    }
+
     @Test func heatAlertsOnceWhenASessionRunsHot() {
         var hot = status()
         hot.thermal = .serious
@@ -236,9 +269,43 @@ struct RemoteAlertTests {
     }
 
     @Test func silenceAlertsOnlyWhileASessionRan() {
-        #expect(RemoteAlert.alerts(from: status(), to: nil) == [.unreachable])
-        #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)
-        #expect(RemoteAlert.alerts(from: .some(nil), to: nil).isEmpty)
+        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now) == [.unreachable])
+        #expect(RemoteAlert.alerts(from: status(session: false), to: nil, now: now).isEmpty)
+        #expect(RemoteAlert.alerts(from: .some(nil), to: nil, now: now).isEmpty)
+        // Its timer ran out, so the Mac most likely slept before reporting the end.
+        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now.addingTimeInterval(7300)).isEmpty)
+    }
+
+    @Test func chargeAlertRearmsOnlyWellBelowTheTargetOrUnplugged() {
+        #expect(!RemoteAlert.chargeAlertRearms(at: status(percent: 79, adapter: true), target: 80))
+        #expect(RemoteAlert.chargeAlertRearms(at: status(percent: 75, adapter: true), target: 80))
+        #expect(RemoteAlert.chargeAlertRearms(at: status(percent: 80, adapter: false), target: 80))
+    }
+
+    @Test func aMacThatSaysItSleepsIsAsleepNotSilent() {
+        var asleep = status()
+        asleep.lidClosed = true
+        asleep.network = .wifi
+        asleep.sleptAt = now
+        #expect(!asleep.isFresh(at: now.addingTimeInterval(1)))
+        #expect(asleep.unheardDate == now)
+        #expect(RemoteAlert.alerts(from: status(), to: asleep, now: now) == [.sleptDuringSession])
+        #expect(RemoteAlert.pushed(from: status(), to: asleep) == [.sleptDuringSession])
+        #expect(RemoteAlert.alerts(from: asleep, to: asleep, now: now).isEmpty)
+        #expect(RemoteAlert.alerts(from: status(), to: asleep, now: now.addingTimeInterval(3600)).isEmpty)
+        var idle = status(session: false)
+        idle.sleptAt = now
+        #expect(RemoteAlert.alerts(from: status(session: false), to: idle, now: now).isEmpty)
+    }
+
+    @Test func theMacDropsAnEndItReportsLongAfterItHappened() {
+        var late = status(session: false, ended: .timer)
+        late.readAt = now.addingTimeInterval(3 * 3600)
+        #expect(RemoteAlert.pushed(from: status(), to: late).isEmpty)
+        // A phone that hears of the end late still says so.
+        #expect(RemoteAlert.alerts(from: status(), to: late) == [.sessionEnded(.timer)])
+        late.readAt = now.addingTimeInterval(60)
+        #expect(RemoteAlert.pushed(from: status(), to: late) == [.sessionEnded(.timer)])
     }
 
     @Test func unplugOrClosingLidOnWiFiDuringSessionAlertsForHotspot() {

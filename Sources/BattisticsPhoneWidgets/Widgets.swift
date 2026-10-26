@@ -74,18 +74,18 @@ struct MacDisplayControl: ControlWidget {
     }
 }
 
-struct MacProvider: TimelineProvider {
+struct MacProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> MacEntry {
         MacEntry(date: .now, snapshot: .sample(), prefs: .load())
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (MacEntry) -> Void) {
-        completion(MacEntry(date: .now, snapshot: SharedSnapshot.load() ?? .sample(), prefs: .load()))
+    func snapshot(for configuration: MacWidgetIntent, in context: Context) async -> MacEntry {
+        MacEntry(date: .now, snapshot: configuration.snapshot ?? .sample(), prefs: .load())
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<MacEntry>) -> Void) {
+    func timeline(for configuration: MacWidgetIntent, in context: Context) async -> Timeline<MacEntry> {
         let now = Date.now
-        let snapshot = SharedSnapshot.load()
+        let snapshot = configuration.snapshot
         let prefs = WidgetPreferences.load()
         var entries = [MacEntry(date: now, snapshot: snapshot?.asOf(now), prefs: prefs)]
         // A Mac that stops writing never triggers a reload, so the offline
@@ -96,13 +96,13 @@ struct MacProvider: TimelineProvider {
         // Ending sessions change the view without new data; refresh at the deadline.
         let deadline = snapshot?.status?.session?.deadline
         let next = deadline.flatMap { $0 > now ? $0 : nil } ?? now.addingTimeInterval(15 * 60)
-        completion(Timeline(entries: entries, policy: .after(next)))
+        return Timeline(entries: entries, policy: .after(next))
     }
 }
 
 struct MacWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "mac", provider: MacProvider()) { entry in
+        AppIntentConfiguration(kind: "mac", intent: MacWidgetIntent.self, provider: MacProvider()) { entry in
             MacWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
                 .widgetURL(entry.snapshot?.url)
@@ -115,7 +115,7 @@ struct MacWidget: Widget {
 
 struct MacBatteryWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "mac.telemetry", provider: MacProvider()) { entry in
+        AppIntentConfiguration(kind: "mac.telemetry", intent: MacWidgetIntent.self, provider: MacProvider()) { entry in
             MacTelemetryWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
                 .widgetURL(entry.snapshot?.url)
@@ -128,7 +128,7 @@ struct MacBatteryWidget: Widget {
 
 struct MacLockScreenDetailWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "mac.lockscreen.detail", provider: MacProvider()) { entry in
+        AppIntentConfiguration(kind: "mac.lockscreen.detail", intent: MacWidgetIntent.self, provider: MacProvider()) { entry in
             MacLockScreenDetailView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
                 .widgetURL(entry.snapshot?.url)

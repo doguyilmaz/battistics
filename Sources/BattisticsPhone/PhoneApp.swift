@@ -40,15 +40,18 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         return true
     }
 
-    /// A refused quick action or intent is the one alert worth showing over the
-    /// app; everything else is already on screen.
+    /// Over the app, an alert shows as a banner unless its Mac is on screen,
+    /// and stays in Notification Center either way. A refused quick action or
+    /// intent always shows.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        notification.request.identifier.hasSuffix(".command") ? [.banner, .sound] : []
+        let identifier = notification.request.identifier
+        if identifier.hasSuffix(".command") { return [.banner, .sound] }
+        return await MacStore.shared.isShowing(alert: identifier) ? [.list] : [.banner, .sound, .list]
     }
 
-    /// Opens the Mac an alert was about, or runs Add 30 Minutes from the
-    /// "ends in 5 minutes" reminder, also on the Lock Screen.
+    /// Opens the Mac an alert was about, or runs an alert's button: Add 30
+    /// Minutes, or Stop Keep Awake, also on the Lock Screen.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             didReceive response: UNNotificationResponse) async {
         let request = response.notification.request
@@ -62,6 +65,8 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         let store = MacStore.shared
         if action == Notifications.extendAction, let macID {
             await RemoteIntentBridge.extend?(macID, 30)
+        } else if action == AlertActions.stopAction, let macID {
+            await RemoteIntentBridge.stop?(macID)
         } else if action == UNNotificationDefaultActionIdentifier {
             store.show(notification: identifier)
         }

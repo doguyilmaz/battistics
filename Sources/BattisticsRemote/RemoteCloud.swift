@@ -174,14 +174,13 @@ public actor RemoteCloud {
         }
     }
 
-    public func send(_ request: RemoteRequest, to macID: String) async throws -> String {
+    public func send(_ request: RemoteRequest, to macID: String) async throws {
         try await prepare()
         let record = CKRecord(recordType: Self.commandType, recordID: .init(recordName: request.id, zoneID: Self.zoneID))
         record["mac"] = macID
         record.encryptedValues["payload"] = try RemoteWire.encode(request)
         let saved = try await database.modifyRecords(saving: [record], deleting: [])
         for result in saved.saveResults.values { _ = try result.get() }
-        return record.recordID.recordName
     }
 
     /// An alert iOS shows on the account's phones straight from the push,

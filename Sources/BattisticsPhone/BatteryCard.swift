@@ -6,8 +6,9 @@ struct BatteryCard: View {
     let mac: MacStore.Mac
     let status: RemoteStatus
     let reachable: Bool
-    /// Why a Low Power or display command failed, shown here rather than in Keep Awake.
+    /// Why a Low Power, display or sleep command failed, shown here rather than in Keep Awake.
     @State private var message: String?
+    @State private var confirmingSleep = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
@@ -114,6 +115,11 @@ struct BatteryCard: View {
             } label: {
                 Label("Turn Off Mac Display", systemImage: "moon.zzz.fill")
             }
+            Button {
+                confirmingSleep = true
+            } label: {
+                Label("Put Mac to Sleep", systemImage: "powersleep")
+            }
         } label: {
             Label {
                 Text(lowPower ? String(localized: "Low Power") : (battery?.lowPowerPolicy?.compactBadge ?? String(localized: "Power")))
@@ -132,6 +138,11 @@ struct BatteryCard: View {
         }
         .disabled(!reachable || store.pending[mac.id] != nil)
         .accessibilityLabel(Text("Mac power settings"))
+        .confirmationDialog("Put \(mac.name) to sleep?", isPresented: $confirmingSleep, titleVisibility: .visible) {
+            Button("Sleep") { run { await store.sleep(mac) } }
+        } message: {
+            Text("Keep Awake stops, and the Mac stops answering until it is woken on the Mac itself.")
+        }
     }
 
     private func run(_ action: @escaping () async -> String?) {

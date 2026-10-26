@@ -26,6 +26,9 @@ extension RemoteAlert {
         case .bagReady:
             (String(localized: "Bag Ready"),
              String(localized: "On Personal Hotspot. You can close the lid and the Mac stays online."))
+        case .sleptDuringSession:
+            (String(localized: "Mac went to sleep"),
+             String(localized: "Keep Awake was on. To keep a closed Mac awake, use Lid Closed."))
         case .chargeReached, .unreachable:
             nil
         }

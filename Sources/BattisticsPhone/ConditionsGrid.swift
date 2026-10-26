@@ -3,11 +3,13 @@ import SwiftUI
 
 struct ConditionsGrid: View {
     let status: RemoteStatus
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         let isHotspot = status.network == .hotspot
         let name = status.resolvedNetworkName()
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+        let columns = typeSize.isAccessibilitySize ? 1 : 2
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: columns), spacing: 10) {
             StatTile(title: name == nil ? String(localized: "Network") : status.network.label,
                      value: name ?? status.network.label,
                      symbol: status.network.symbol,
@@ -78,10 +80,14 @@ struct HotspotCard: View {
     }
 
     private func content(ready: Bool) -> (String, Color, String, String) {
+        if !reachable, status.sleptAt != nil {
+            return ("moon.zzz.fill", .gray, String(localized: "\(mac.name) is asleep"),
+                    String(localized: "It answers again once it wakes."))
+        }
         if !reachable {
             return ("antenna.radiowaves.left.and.right.slash", .orange,
                     String(localized: "Can’t reach \(mac.name)"),
-                    status.session == nil
+                    status.session?.isActive(at: .now) != true
                         ? String(localized: "Asleep, or away from Wi‑Fi without Hotspot.")
                         : String(localized: "It was keeping awake. If it left Wi‑Fi, turn on Hotspot."))
         }

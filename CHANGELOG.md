@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Battistics Remote can put the Mac to sleep. Keep Awake ends first, so a
+  closed-lid session no longer holds the Mac awake.
+- The Mac tells the iPhone just before it sleeps, so Battistics Remote shows
+  it asleep instead of unreachable, and alerts you if it slept during Keep
+  Awake.
+- Sharing with the iPhone uses less energy: the Mac writes to iCloud only
+  for changes the iPhone would show, and polls every 15 seconds during long
+  sessions instead of every 4.
+
 ## 1.5.1
 
 - Battistics Remote says Bag Ready when a closed-lid session reaches

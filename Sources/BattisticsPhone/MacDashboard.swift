@@ -23,9 +23,6 @@ struct MacDashboard: View {
                     MacExtrasCard(mac: mac, status: status, reachable: reachable)
                 }
                 .animation(.snappy, value: reachable)
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, minHeight: 240)
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -77,13 +74,16 @@ private struct StatusLine: View {
     var body: some View {
         HStack(spacing: 6) {
             Circle()
-                .fill(problem != nil || reading?.reachable != true ? Color.orange : .green)
+                .fill(problem != nil ? .orange : reading?.reachable == true ? .green
+                      : reading?.status?.sleptAt != nil ? .gray : .orange)
                 .frame(width: 8, height: 8)
             if let problem {
                 Text(problem)
             } else if let readAt = reading?.status?.readAt {
                 if reading?.reachable == true {
                     Text("Updated \(Ago.text(readAt))")
+                } else if let sleptAt = reading?.status?.sleptAt {
+                    Text("Went to sleep \(Ago.text(sleptAt))")
                 } else {
                     Text("Last seen \(Ago.text(readAt))")
                 }

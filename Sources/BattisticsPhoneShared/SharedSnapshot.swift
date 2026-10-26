@@ -23,6 +23,16 @@ struct SharedSnapshot: Codable, Equatable {
         return copy
     }
 
+    /// Whether widgets showing `old` would show something else for this snapshot.
+    func differsNoticeably(from old: SharedSnapshot) -> Bool {
+        guard macName == old.macName, macID == old.macID, reachable == old.reachable,
+              var status, let before = old.status else { return self != old }
+        status.chargeHistory = before.chargeHistory
+        status.lastCommand = before.lastCommand
+        status.extras = before.extras
+        return status.differsNoticeably(from: before)
+    }
+
     static let group = "group.com.doguyilmaz.Battistics.Remote"
     private static let key = "snapshot"
     private static let allKey = "allSnapshots"

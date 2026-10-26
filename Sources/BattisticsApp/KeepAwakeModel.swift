@@ -312,7 +312,11 @@ final class KeepAwakeModel {
     }
 
     func stop(reason: RemoteStatus.EndReason = .user) {
-        if session != nil { lastEnd = .init(reason: reason, at: Date()) }
+        if let session {
+            // A timer that ran out while the Mac slept ended at its deadline, not at the wake.
+            let now = Date()
+            lastEnd = .init(reason: reason, at: reason == .timer ? min(session.deadline ?? now, now) : now)
+        }
         let leaseID = session?.mode == .lidClosed ? sessionID : nil
         if approvalTask != nil {
             cancelApprovalWait()

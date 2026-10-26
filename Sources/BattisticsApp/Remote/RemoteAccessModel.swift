@@ -57,6 +57,11 @@ final class RemoteAccessModel {
     @ObservationIgnored private var lastStatus: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
+    /// A phone asked the Mac to sleep; it does once the answer is out.
+    @ObservationIgnored private var sleepRequested = false
+    /// Published as the Mac's last word before sleeping.
+    @ObservationIgnored private var sleptAt: Date?
+    @ObservationIgnored private var sleepWatcher: SleepWatcher?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
@@ -109,6 +114,10 @@ final class RemoteAccessModel {
         }
         observeSession()
         observePowerSettings()
+        if cloud != nil {
+            sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
+                                        didWake: { [weak self] in self?.woke() })
+        }
         startTicker()
         updateNapActivity()
         if enabled, cloud != nil {
@@ -152,8 +161,9 @@ final class RemoteAccessModel {
                 guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
                 lastCommand = .init(id: command.request.id, failure: await handle(command.request))
                 lastCommandAt = .now
-                // Each answer goes out before the next command replaces it, or that phone waits in vain.
-                if mine.count > 1 { try? await publish(force: true) }
+                // Each answer goes out before the next command replaces it, or that phone
+                // waits in vain; the last goes out with the publish below.
+                if command.recordName != mine.last?.recordName { try? await publish(force: true) }
                 handled = true
             }
             // Alerts only need to live long enough to be pushed. A delta fetch
@@ -179,6 +189,38 @@ final class RemoteAccessModel {
             retryAt = .now.addingTimeInterval(seconds)
         }
         problem = failure.map(Self.describe)
+        if sleepRequested {
+            sleepRequested = false
+            try? await SystemSleep.now()
+        }
+    }
+
+    /// Phones then show the Mac asleep instead of silent, and are told if it
+    /// slept during Keep Awake.
+    private func goingToSleep() async {
+        guard enabled, cloud != nil else { return }
+        sleptAt = .now
+        try? await publish(force: true)
+    }
+
+    private func woke() {
+        guard sleptAt != nil else { return }
+        sleptAt = nil
+        publishSoon(force: true)
+    }
+
+    /// Ends Keep Awake and waits for a closed-lid session to give back
+    /// macOS's sleep setting, so the answer says whether the Mac can sleep.
+    private func prepareToSleep() async -> RemoteFailure? {
+        if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
+        let deadline = Date.now.addingTimeInterval(10)
+        while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(250)) }
+        let sleepDisabled = (try? await SystemSleep.isDisabled()) == true
+        if awake.isChanging || sleepDisabled {
+            return .init(.startFailed, String(localized: "Sleep is turned off on this Mac. Choose Allow Sleep in Battistics › Power."))
+        }
+        sleepRequested = true
+        return nil
     }
 
     /// One at a time, so an older reading never lands after a newer one.
@@ -198,15 +240,9 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds {
-            var compared = status
-            compared.readAt = lastCheap.readAt
-            compared.battery?.watts = lastCheap.battery?.watts
-            compared.battery?.temperatureC = lastCheap.battery?.temperatureC
-            compared.battery?.voltageMV = lastCheap.battery?.voltageMV
-            compared.battery?.amperageMA = lastCheap.battery?.amperageMA
-            compared.battery?.currentCapacityMah = lastCheap.battery?.currentCapacityMah
-            if compared == lastCheap { return }
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds,
+           !status.differsNoticeably(from: lastCheap) {
+            return
         }
         let cheap = status
         status = await enriched(status)
@@ -308,8 +344,7 @@ final class RemoteAccessModel {
     }
 
     /// Polls for phone commands because macOS throttles silent pushes: every
-    /// few seconds while a session runs or right after a command, otherwise
-    /// slower. Each poll is a delta fetch, so an idle zone costs one small
+    /// few seconds right after a command, otherwise slower. Each poll is a delta fetch, so an idle zone costs one small
     /// request. Stops while sharing is off and nothing is left to withdraw.
     private func startTicker() {
         guard ticker == nil, cloud != nil else { return }
@@ -343,9 +378,11 @@ final class RemoteAccessModel {
         }
     }
 
+    /// Not faster during a session: one polled every few seconds for hours
+    /// keeps the radios busy, over cellular on Hotspot.
     private var pollInterval: TimeInterval {
         let recentCommand = lastCommandAt.map { -$0.timeIntervalSinceNow < 120 } ?? false
-        return awake.isActive || recentCommand ? 4 : 15
+        return recentCommand ? 4 : 15
     }
 
     private static func describe(_ error: Error) -> String {
@@ -381,6 +418,8 @@ final class RemoteAccessModel {
             return nil
         case .extend:
             return extend(request)
+        case .sleep:
+            return await prepareToSleep()
         case .unknown:
             return .init(.invalidRequest)
         }
@@ -567,6 +606,7 @@ final class RemoteAccessModel {
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras
+        status.sleptAt = sleptAt
         return status
     }
 

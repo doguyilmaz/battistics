@@ -239,6 +239,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// The outcome of the newest phone command the Mac handled.
     public var lastCommand: CommandResult?
     public var extras: Extras?
+    /// Set on the Mac's last reading before it sleeps: until a newer one, the
+    /// Mac is asleep, not lost.
+    public var sleptAt: Date?
 
     public struct CommandResult: Codable, Sendable, Equatable {
         public var id: String
@@ -269,13 +272,14 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// After this moment, a fetch that returns no newer reading means the Mac
     /// is unreachable. Only a real fetch may conclude that; see `unheardDate`.
     public var staleDate: Date {
+        if sleptAt != nil { return readAt }
         let missed: Double = session == nil ? 2 : 4
         return readAt.addingTimeInterval(heartbeatSeconds * missed)
     }
 
     /// When surfaces that cannot fetch stop presenting this reading as live.
     public var unheardDate: Date {
-        max(staleDate, readAt.addingTimeInterval(Self.unheardDelay))
+        sleptAt != nil ? readAt : max(staleDate, readAt.addingTimeInterval(Self.unheardDelay))
     }
 
     /// The earliest a phone that has heard nothing may mention it: just past
@@ -296,6 +300,27 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
               now.timeIntervalSince(oldest) >= Self.unheardDelay / 2 else { return maximum }
         let longestGap = zip(times, times.dropFirst()).map { $1.timeIntervalSince($0) }.max() ?? maximum
         return min(maximum, max(minimum, longestGap * 1.5))
+    }
+
+    /// Whether this reading tells a phone something `old` did not. The time
+    /// it was read, values that drift every few seconds and small moves of
+    /// the time-left estimate, which macOS revises every minute, do not count.
+    public func differsNoticeably(from old: RemoteStatus) -> Bool {
+        var compared = self
+        compared.readAt = old.readAt
+        if var battery = compared.battery, let before = old.battery {
+            battery.watts = before.watts
+            battery.temperatureC = before.temperatureC
+            battery.voltageMV = before.voltageMV
+            battery.amperageMA = before.amperageMA
+            battery.currentCapacityMah = before.currentCapacityMah
+            if let minutes = battery.minutesRemaining, let was = before.minutesRemaining,
+               abs(minutes - was) < max(5, was / 10) {
+                battery.minutesRemaining = was
+            }
+            compared.battery = battery
+        }
+        return compared != old
     }
 
     /// Whether this reading is recent enough to call the Mac reachable.
