@@ -7902,6 +7902,17 @@
           }
         }
       }
+    },
+    "Sleep is turned off on this Mac. Choose Allow Sleep in Battistics › Power.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te uyku kapalı. Battistics › Güç’te Uykuya İzin Ver’i seç."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

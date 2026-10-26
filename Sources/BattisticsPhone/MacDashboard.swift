@@ -82,8 +82,8 @@ private struct StatusLine: View {
             } else if let readAt = reading?.status?.readAt {
                 if reading?.reachable == true {
                     Text("Updated \(Ago.text(readAt))")
-                } else if reading?.status?.sleptAt != nil {
-                    Text("Went to sleep \(Ago.text(readAt))")
+                } else if let sleptAt = reading?.status?.sleptAt {
+                    Text("Went to sleep \(Ago.text(sleptAt))")
                 } else {
                     Text("Last seen \(Ago.text(readAt))")
                 }

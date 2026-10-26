@@ -18,7 +18,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Handled command ids are remembered until their records are deleted, so a failed delete never runs a command twice.
 - A full read without this Mac's record (a lost zone, or one another device recreated) makes the Mac publish at once instead of waiting for the heartbeat.
 - Before the Mac sleeps, `SleepWatcher` (IOKit `IORegisterForSystemPower`) holds sleep for up to 8 seconds while the Mac publishes a status with `sleptAt`. Phones then show it asleep at once, and `.sleptDuringSession` is pushed when a session was still running. After the wake the next status clears it.
-- `RemoteRequest.Operation.sleep` ends any session, answers, waits for a closed-lid session to give back the sleep setting, then runs `pmset sleepnow`.
+- `RemoteRequest.Operation.sleep` ends any session and waits for a closed-lid session to give back the sleep setting. It answers with a failure while macOS sleep is turned off, otherwise answers and then runs `pmset sleepnow`.
 
 ## Freshness
 
@@ -29,7 +29,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
   - Neither is scheduled when the session ends before the watchdog would fire.
   - Widgets add a timeline entry at `unheardDate` (at least 30 minutes after the reading) that shows the Mac offline.
   - A reading with `sleptAt` is stale at once and shows "Asleep" everywhere a silent Mac shows "Offline"; its Live Activity ends. A timed session that ran out raises no "stopped answering" alert, since the Mac most likely slept before saying so.
-  - Widgets reload only for a change they show or when the saved reading is more than 15 minutes old (`SharedSnapshot.differsNoticeably`), so background writes do not spend WidgetKit's daily budget.
+  - The newest reading is always saved for widgets, but they reload only for a change they show (`SharedSnapshot.differsNoticeably`) or 15 minutes after the last reload, so background writes do not spend WidgetKit's daily budget.
   - The Live Activity uses `unheardDate` as its stale date, also for timed sessions, and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Settings › Notifications › When Charged To reports once when a charging Mac reaches 80, 90 or 100%. It is evaluated on the phone, so it arrives with the next update the phone receives, and re-arms only after the charge falls 5 points below the target or the adapter is unplugged, so a Mac held at a charge limit does not ring on every top-up.
 - Alerts about a running session (battery low or running out, unplugged or lid closed away from Hotspot, running hot) carry a Stop Keep Awake button (`AlertActions`). The extension adds it to the Mac's pushes from the collapse id.

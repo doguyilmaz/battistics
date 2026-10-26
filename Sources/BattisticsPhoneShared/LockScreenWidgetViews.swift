@@ -91,7 +91,7 @@ struct MacLockScreenDetailView: View {
                 HStack(spacing: 4) {
                     Text(status.silentLabel)
                     Spacer(minLength: 2)
-                    Text(status.readAt, style: .time)
+                    Text(status.sleptAt ?? status.readAt, style: .time)
                 }
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)

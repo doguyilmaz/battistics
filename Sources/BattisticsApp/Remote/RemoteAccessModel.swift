@@ -191,7 +191,7 @@ final class RemoteAccessModel {
         problem = failure.map(Self.describe)
         if sleepRequested {
             sleepRequested = false
-            await sleepNow()
+            try? await SystemSleep.now()
         }
     }
 
@@ -209,12 +209,18 @@ final class RemoteAccessModel {
         publishSoon(force: true)
     }
 
-    /// Waits for a stopping session to give back macOS's sleep setting,
-    /// which a closed-lid session overrides.
-    private func sleepNow() async {
+    /// Ends Keep Awake and waits for a closed-lid session to give back
+    /// macOS's sleep setting, so the answer says whether the Mac can sleep.
+    private func prepareToSleep() async -> RemoteFailure? {
+        if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
         let deadline = Date.now.addingTimeInterval(10)
         while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(250)) }
-        try? await SystemSleep.now()
+        let sleepDisabled = (try? await SystemSleep.isDisabled()) == true
+        if awake.isChanging || sleepDisabled {
+            return .init(.startFailed, String(localized: "Sleep is turned off on this Mac. Choose Allow Sleep in Battistics › Power."))
+        }
+        sleepRequested = true
+        return nil
     }
 
     /// One at a time, so an older reading never lands after a newer one.
@@ -413,9 +419,7 @@ final class RemoteAccessModel {
         case .extend:
             return extend(request)
         case .sleep:
-            if awake.isActive || awake.isChanging { awake.stop(reason: .phone) }
-            sleepRequested = true
-            return nil
+            return await prepareToSleep()
         case .unknown:
             return .init(.invalidRequest)
         }
