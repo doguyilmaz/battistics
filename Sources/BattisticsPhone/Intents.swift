@@ -13,7 +13,7 @@ struct StartKeepAwakeIntent: LiveActivityIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         if let failure = await MacStore.shared.start(mac, mode: mode.mode, minutes: duration.rawValue) {
             return .result(dialog: "\(failure)")
         }
@@ -29,7 +29,7 @@ struct StopKeepAwakeIntent: LiveActivityIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         if let failure = await MacStore.shared.stop(mac) { return .result(dialog: "\(failure)") }
         return .result(dialog: "Keep Awake is off on \(mac.name).")
     }
@@ -53,7 +53,7 @@ struct AddKeepAwakeTimeIntent: LiveActivityIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         if let failure = await MacStore.shared.extend(mac, minutes: time.rawValue) { return .result(dialog: "\(failure)") }
         return .result(dialog: "\(mac.name) stays awake \(DurationLabel.long(minutes: time.rawValue)) longer.")
     }
@@ -84,7 +84,7 @@ struct SetMacLowPowerIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         if let failure = await MacStore.shared.setLowPower(mac, policy: setting.policy) { return .result(dialog: "\(failure)") }
         return .result(dialog: "Low Power Mode on \(mac.name): \(setting.policy.label).")
     }
@@ -97,7 +97,7 @@ struct TurnOffMacDisplayIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         if let failure = await MacStore.shared.sleepDisplay(mac) { return .result(dialog: "\(failure)") }
         return .result(dialog: "The display of \(mac.name) is off.")
     }
@@ -110,7 +110,7 @@ struct MacStatusIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         await MacStore.shared.refreshAll()
         guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status else {
             return .result(dialog: "\(mac.name) is not answering.")
@@ -129,7 +129,7 @@ struct MacBatteryLevelIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<Int> {
-        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        guard let mac = MacStore.shared.remoteMac else { throw IntentFailure.notPaired }
         await MacStore.shared.refreshAll()
         guard let reading = MacStore.shared.reading(for: mac), reading.reachable,
               let percent = reading.status?.battery?.percent else {

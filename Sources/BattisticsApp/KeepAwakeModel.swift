@@ -225,7 +225,7 @@ final class KeepAwakeModel {
     /// Mac awake. Switching first would drop the session if macOS has yet to
     /// approve the helper.
     private func switchToLidClosed(_ running: KeepAwakeSession) {
-        let id = sessionID
+        guard let id = sessionID else { return }
         cancelApprovalWait()
         Task {
             do {
@@ -235,7 +235,7 @@ final class KeepAwakeModel {
                 isStoppedReasonInformational = true
                 errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
                 helper.openLoginItemsSettings()
-                waitForHelperApproval(duration: running.duration, switching: running)
+                waitForHelperApproval(duration: running.duration, switching: id)
                 return
             } catch {
                 guard sessionID == id, mode == .lidClosed else { return }
@@ -277,15 +277,19 @@ final class KeepAwakeModel {
     /// Polls a cheap registration read for a few minutes at most: no
     /// notification reports the approval, and returning to Battistics is not
     /// guaranteed to activate a menu bar app.
-    /// With `running`, the approval switches that session instead of starting one.
-    private func waitForHelperApproval(duration: KeepAwakeDuration, switching running: KeepAwakeSession? = nil) {
+    /// With `runningID`, the approval switches that session instead of starting one.
+    private func waitForHelperApproval(duration: KeepAwakeDuration, switching runningID: String? = nil) {
         approvalTask?.cancel()
+        let unchanged: (KeepAwakeModel) -> Bool = { model in
+            guard let runningID else { return model.session == nil }
+            return model.sessionID == runningID && model.session != nil
+        }
         approvalTask = Task { [weak self] in
             for _ in 0..<180 {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled, let self else { return }
                 // A different choice since then wins over the old request.
-                guard self.session?.startedAt == running?.startedAt, self.mode == .lidClosed else { break }
+                guard unchanged(self), self.mode == .lidClosed else { break }
                 self.helper.refreshStatusIfChanged()
                 if self.helper.isInstalled {
                     self.approvalTask = nil
@@ -299,7 +303,7 @@ final class KeepAwakeModel {
             }
             guard let self, !Task.isCancelled else { return }
             self.approvalTask = nil
-            if self.session?.startedAt == running?.startedAt, self.mode == .lidClosed {
+            if unchanged(self), self.mode == .lidClosed {
                 self.isStoppedReasonInformational = false
                 self.errorMessage = String(localized: "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.")
             }

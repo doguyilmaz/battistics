@@ -11,6 +11,7 @@ import UIKit
 final class MacStore {
     static let shared = MacStore()
     static let localPhoneID = "__this_iphone__"
+    private static let removalPendingKey = "alertSubscriptionRemovalPending"
 
     struct Mac: Identifiable, Equatable {
         let id: String
@@ -54,10 +55,12 @@ final class MacStore {
 
     private init() {
         readings = DemoData.isEnabled ? DemoData.readings : Self.savedReadings()
-        selectedID = UserDefaults.standard.string(forKey: "selectedMac")
-        macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (selectedID == Self.localPhoneID ? nil : selectedID)
+        // Before selectedID, whose didSet already publishes the Mac to widgets.
+        let saved = UserDefaults.standard.string(forKey: "selectedMac")
+        macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (saved == Self.localPhoneID ? nil : saved)
+        selectedID = saved
         RemoteIntentBridge.start = { [weak self] mode, minutes in
-            guard let self, let mac = self.selected else { return }
+            guard let self, let mac = self.remoteMac else { return }
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] id in
@@ -78,9 +81,16 @@ final class MacStore {
 
     var selected: Mac? { macs.first { $0.id == macID } ?? macs.first }
 
+    /// The Mac Siri, Shortcuts, widgets and the Live Activity act on; never a
+    /// sample tried in the app.
+    var remoteMac: Mac? { triesSample ? nil : selected }
+
+    private var triesSample: Bool { isSample && !DemoData.isEnabled }
+
     /// The Mac a widget or Live Activity names, else the selected one.
     private func mac(_ id: String?) -> Mac? {
-        id.flatMap { id in macs.first { $0.id == id } } ?? selected
+        guard !triesSample else { return nil }
+        return id.flatMap { id in macs.first { $0.id == id } } ?? selected
     }
 
     func reading(for mac: Mac) -> Reading? { readings[mac.id] }
@@ -180,11 +190,16 @@ final class MacStore {
     func syncAlertSubscription(removing: Bool = false) async {
         alertSubscriptionChecked = .now
         let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
+        let defaults = UserDefaults.standard
+        // Kept until iCloud confirms, so an offline switch-off is retried.
+        if removing { defaults.set(true, forKey: Self.removalPendingKey) }
         do {
             if wanted {
+                defaults.set(false, forKey: Self.removalPendingKey)
                 if try await !cloud.hasAlertSubscription() { try await cloud.subscribeToAlerts() }
-            } else if removing {
+            } else if defaults.bool(forKey: Self.removalPendingKey) {
                 try await cloud.unsubscribeFromAlerts()
+                defaults.set(false, forKey: Self.removalPendingKey)
             }
             UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)
         } catch {
@@ -290,7 +305,7 @@ final class MacStore {
     func publishSelected() {
         // A sample tried in the app stays out of widgets and the Lock Screen;
         // `-demo` screenshots need them.
-        if isSample && !DemoData.isEnabled { return }
+        if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         WidgetBridge.publishAll(macs.map {
             SharedSnapshot(macName: $0.name, status: readings[$0.id]?.status, reachable: readings[$0.id]?.reachable ?? false)

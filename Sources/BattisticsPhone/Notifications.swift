@@ -115,7 +115,7 @@ enum Notifications {
             return
         }
 
-        if let deadline = session.deadline, deadline.timeIntervalSinceNow - endingLead > 30 {
+        if let deadline = session.deadline, deadline.timeIntervalSinceNow - endingLead > 1 {
             let content = UNMutableNotificationContent()
             content.title = mac.name
             content.body = String(localized: "Keep Awake ends in 5 minutes.")
