@@ -7,6 +7,7 @@ import UserNotifications
 /// timer when Keep Awake is active: no third-party server, no cost.
 enum Notifications {
     static let enabledKey = "notificationsEnabled"
+    static var isEnabled: Bool { UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true }
     /// Whether iCloud shows the Mac's own alerts on this phone, so the app does not repeat them.
     static let pushedKey = "alertPushesSubscribed"
     /// Charge level to report while a Mac charges; 0 is off.
@@ -51,7 +52,7 @@ enum Notifications {
 
     @MainActor
     static func deliver(_ results: [(MacStore.Mac, [RemoteAlert])]) async {
-        guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true else { return }
+        guard isEnabled else { return }
         let center = UNUserNotificationCenter.current()
         let delivered = Set(await center.deliveredNotifications().map(\.request.identifier))
         for (mac, alerts) in results {
@@ -124,7 +125,7 @@ enum Notifications {
             center.removeDeliveredNotifications(withIdentifiers: [endingID])
         }
 
-        guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true,
+        guard isEnabled,
               let status = reading.status,
               let session = status.session else {
             return

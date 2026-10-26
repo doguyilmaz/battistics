@@ -238,7 +238,7 @@ final class MacStore {
     /// never does, since another iPhone on the account may still want it.
     func syncAlertSubscription(removing: Bool = false) async {
         alertSubscriptionChecked = .now
-        let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
+        let wanted = Notifications.isEnabled
         let defaults = UserDefaults.standard
         // Kept until iCloud confirms, so an offline switch-off is retried.
         if removing { defaults.set(true, forKey: Self.removalPendingKey) }
