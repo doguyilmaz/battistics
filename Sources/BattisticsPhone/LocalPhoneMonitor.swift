@@ -129,13 +129,7 @@ final class LocalPhoneMonitor {
         onAdapter = state == .charging || state == .full
         if state != .unknown { trackUnplug(wasOnAdapter: wasOnAdapter) }
         lowPowerMode = ProcessInfo.processInfo.isLowPowerModeEnabled
-        thermal = switch ProcessInfo.processInfo.thermalState {
-        case .nominal: .nominal
-        case .fair: .fair
-        case .serious: .serious
-        case .critical: .critical
-        @unknown default: .serious
-        }
+        thermal = .init(ProcessInfo.processInfo.thermalState)
         if let values = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(
             forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityForImportantUsageKey]) {
             totalStorage = Int64(values.volumeTotalCapacity ?? 0)

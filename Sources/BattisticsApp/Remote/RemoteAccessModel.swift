@@ -560,7 +560,7 @@ final class RemoteAccessModel {
             network: network.state,
             networkName: network.ssid ?? (network.state == .hotspot ? network.preferredHotspotPhoneName : nil),
             lidClosed: Clamshell.read()?.isClosed,
-            thermal: Self.thermal(ProcessInfo.processInfo.thermalState),
+            thermal: .init(ProcessInfo.processInfo.thermalState),
             protection: .init(
                 stopAtPercent: protection.stopOnLowBattery ? protection.effectiveStopPercent : nil,
                 warnAtPercent: protection.warnOnLowBattery ? protection.effectiveWarningPercent : nil,
@@ -602,16 +602,6 @@ final class RemoteAccessModel {
             return "\(friendly) (\(raw))"
         }
         return raw
-    }
-
-    private static func thermal(_ state: ProcessInfo.ThermalState) -> RemoteStatus.Thermal {
-        switch state {
-        case .nominal: .nominal
-        case .fair: .fair
-        case .serious: .serious
-        case .critical: .critical
-        @unknown default: .serious
-        }
     }
 }
 

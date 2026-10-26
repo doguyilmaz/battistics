@@ -155,7 +155,15 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public static let fallback = Self.nominal
 
         public var isHot: Bool { self == .serious || self == .critical }
-    }
+
+        public init(_ state: ProcessInfo.ThermalState) {
+            self = switch state {
+            case .nominal: .nominal
+            case .fair: .fair
+            case .serious: .serious
+            case .critical: .critical
+            @unknown default: .serious
+            }
 
     public struct Protection: Codable, Sendable, Equatable {
         public var stopAtPercent: Int?
