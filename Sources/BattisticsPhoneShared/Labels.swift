@@ -76,20 +76,20 @@ extension RemoteStatus.Network {
 }
 
 extension RemoteStatus {
-    /// The Wi‑Fi or Hotspot name; on a Hotspot without one, the paired iPhone's name.
-    func resolvedNetworkName(fallbackHotspot: String? = nil) -> String? {
-        if let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
-            return name
-        }
-        if network == .hotspot {
-            if let paired = pairedPhoneName?.trimmingCharacters(in: .whitespacesAndNewlines), !paired.isEmpty {
-                return paired
-            }
-            if let fallback = fallbackHotspot?.trimmingCharacters(in: .whitespacesAndNewlines), !fallback.isEmpty {
-                return fallback
-            }
-        }
-        return nil
+    /// The Wi‑Fi or Hotspot name, if the Mac could read it.
+    func resolvedNetworkName() -> String? {
+        guard let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else { return nil }
+        return name
+    }
+}
+
+extension RemoteStatus {
+    var macSymbol: String { battery == nil ? "desktopcomputer" : "laptopcomputer" }
+
+    /// The Mac's symbol, flagged while it is not answering.
+    func macSymbol(reachable: Bool) -> String {
+        if reachable { return macSymbol }
+        return battery == nil ? "desktopcomputer.trianglebadge.exclamationmark" : "laptopcomputer.slash"
     }
 }
 
@@ -214,9 +214,13 @@ enum DurationLabel {
         return minutes < 60 ? String(localized: "\(minutes)m") : String(localized: "\(minutes / 60)h")
     }
 
+    /// "1 hr, 20 min"; spelled out here because iOS abbreviates Turkish as "1sa. 20dk.".
     static func long(minutes: Int) -> String {
         if minutes <= 0 { return String(localized: "Until turned off") }
-        return Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        let hours = minutes / 60, rest = minutes % 60
+        if hours == 0 { return String(localized: "\(rest) min") }
+        if rest == 0 { return String(localized: "\(hours) hr") }
+        return String(localized: "\(hours) hr, \(rest) min")
     }
 
     static func spoken(minutes: Int) -> String {

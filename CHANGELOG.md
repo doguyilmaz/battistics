@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Battistics Remote for iPhone: battery and its last day, time left,
-  connection, lid, heat and Keep Awake for the Macs on your Apple ID, with
+  connection, lid, heat and Keep Awake for the Macs on your Apple Account, with
   start and stop, push alerts, Siri shortcuts, widgets and a Lock Screen
   countdown. Off by default on the Mac; everything goes through your private
   iCloud, with nothing to pair.
@@ -27,6 +27,30 @@
 - "Still on Battery" is sent once per unplug, also across a relaunch.
 - Battistics Remote can remove a Mac that no longer answers, and tells you
   when a command from a widget, the Lock Screen or Control Center was refused.
+- Power is now three panes: Keep Awake, Power and, under Developer,
+  Automation. Explanations moved behind info buttons, thresholds sit next to
+  their switch, and every pane fits the window without scrolling.
+- Add Time extends a running Keep Awake from the Mac, the iPhone, the Lock
+  Screen, the large widget or Shortcuts.
+- The Mac sends its alerts to the iPhone through iCloud, so they arrive at
+  once, also while Battistics Remote is closed.
+- The Mac answers the iPhone promptly while its window is closed.
+- Battistics Remote reminds you five minutes before Keep Awake ends, with a
+  button to add 30 minutes, and warns when a session runs hot.
+- An All Macs widget, Get Mac Battery Level for Shortcuts, and Siri starts
+  Keep Awake in any mode, also until turned off. Each Shortcuts action can
+  name the Mac it acts on, and Open Mac opens one in the app, also by name
+  from Siri. The All Macs widget also fits the Lock Screen. On the Home
+  Screen tapping a Mac in it opens that Mac, and every other widget and the
+  Live Activity open the Mac they show.
+- Try a Sample Mac shows the iPhone app before a Mac is set up.
+- Battistics Remote widgets move up a Smart Stack while Keep Awake runs or
+  the battery runs low, and show a desktop Mac's network and heat.
+- Alerts the Mac pushes name that Mac on the iPhone and group by Mac. The
+  Keep Awake card names a profile or task, and a Mac running a newer
+  Battistics asks you to update Battistics Remote instead of looking live.
+- Switching a running session to closed-lid keeps the Mac awake while the
+  power helper is set up.
 
 ## 1.4.1
 

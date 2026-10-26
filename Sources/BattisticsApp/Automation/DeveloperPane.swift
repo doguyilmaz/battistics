@@ -1,0 +1,93 @@
+import AppKit
+import SwiftUI
+
+/// Terminal and MCP clients, kept apart from the panes everyone uses.
+struct DeveloperPane: View {
+    @Environment(AutomationModel.self) private var automation
+    @State private var codexConfiguration = false
+    @State private var copied = false
+    @State private var copiedSetup = false
+
+    var body: some View {
+        @Bindable var automation = automation
+        Form {
+            Section {
+                Toggle("Allow terminal and AI tasks", isOn: $automation.enabled)
+                    .tourTarget(.automation)
+                if automation.enabled {
+                    if automation.errorMessage == nil {
+                        Label(automation.isListening ? String(localized: "Ready for local clients") : String(localized: "Starting…"),
+                              systemImage: automation.isListening ? "checkmark.circle" : "clock")
+                            .foregroundStyle(.secondary)
+                    }
+                    Toggle("Allow closed-lid tasks", isOn: $automation.closedLidAllowed)
+                }
+                if let error = automation.errorMessage { Text(error).foregroundStyle(.red) }
+            } header: {
+                InfoHeader("Local automation",
+                           info: "Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply.",
+                           "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.")
+            }
+
+            Section {
+                Text("battistics run --name Build -- swift build")
+                    .font(.system(.callout, design: .monospaced))
+                    .textSelection(.enabled)
+                Button(copiedSetup ? String(localized: "Copied") : String(localized: "Copy Terminal setup")) {
+                    let path = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/battistics").path
+                    let quote: (String) -> String = { "'" + $0.replacingOccurrences(of: "'", with: "'\\''") + "'" }
+                    NSPasteboard.general.clearContents()
+                    copiedSetup = NSPasteboard.general.setString("alias battistics=\(quote(quote(path)))\n", forType: .string)
+                }
+                guideLink("Terminal guide", path: "automation/terminal/")
+            } header: {
+                InfoHeader("Keep awake until a command finishes",
+                           info: "Run a build, test suite or script from Terminal. Keep Awake ends when the command exits, or earlier if its time limit or your protection settings apply.",
+                           "Paste once in your shell, then run the example. Enable local automation above and keep Battistics open. The default limit is 12 hours; use --minutes to choose a shorter limit.")
+            }
+            .disabled(!automation.enabled)
+
+            Section {
+                Picker("Client configuration", selection: $codexConfiguration) {
+                    Text("JSON (Claude / Cursor)").tag(false)
+                    Text("TOML (Codex)").tag(true)
+                }
+                Button(copied ? String(localized: "Copied") : String(localized: "Copy MCP configuration")) {
+                    NSPasteboard.general.clearContents()
+                    copied = NSPasteboard.general.setString(configuration, forType: .string)
+                }
+                .onChange(of: codexConfiguration) { _, _ in copied = false }
+                guideLink("MCP guide", path: "automation/mcp/")
+            } header: {
+                InfoHeader("AI clients",
+                           info: "An interactive AI terminal can stay open after work finishes. Use MCP to start a task before work and stop it afterward; process lifetime alone cannot detect AI task completion.",
+                           "Keep Battistics open. If the client disconnects or stops responding, its task ends and normal sleep is allowed again.")
+            }
+            .disabled(!automation.enabled)
+        }
+        .formStyle(.grouped)
+        .modifier(TourScrollModifier())
+    }
+
+    private func guideLink(_ title: LocalizedStringKey, path: String) -> some View {
+        Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com/docs/\(path)")!) {
+            Label(title, systemImage: "arrow.up.right.square")
+        }
+    }
+
+    private var configuration: String {
+        let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/battistics-mcp").path
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        if codexConfiguration {
+            // JSON string escaping is compatible with TOML basic strings for
+            // filesystem paths, including backslashes and quotation marks.
+            let quoted = (try? encoder.encode(path)).map { String(decoding: $0, as: UTF8.self) } ?? "\"\""
+            return "[mcp_servers.battistics]\ncommand = \(quoted)\n"
+        }
+        struct Server: Encodable { let command: String; let args: [String] }
+        struct Config: Encodable { let mcpServers: [String: Server] }
+        let data = try? encoder.encode(Config(mcpServers: ["battistics": .init(command: path, args: [])]))
+        return data.map { String(decoding: $0, as: UTF8.self) } ?? ""
+    }
+}

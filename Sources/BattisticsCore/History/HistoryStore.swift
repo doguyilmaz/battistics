@@ -189,17 +189,10 @@ public actor HistoryStore {
         return points
     }
 
-    /// Every snapshot by default; pass `from` to bound it (the Overview
-    /// sparkline only wants the last year).
-    public func healthSeries(from: Date? = nil) -> [HealthPoint] {
+    public func healthSeries() -> [HealthPoint] {
         guard ensureOpen() else { return [] }
         var points: [HealthPoint] = []
-        let sql =
-            from == nil
-            ? "SELECT ts, health_pct, raw_max, cycles FROM health_snapshots ORDER BY ts"
-            : "SELECT ts, health_pct, raw_max, cycles FROM health_snapshots WHERE ts >= ? ORDER BY ts"
-        let bindings: [SQLiteValue] = from.map { [.int(Int64($0.timeIntervalSince1970))] } ?? []
-        query(sql, bind: bindings) { statement in
+        query("SELECT ts, health_pct, raw_max, cycles FROM health_snapshots ORDER BY ts") { statement in
             points.append(
                 HealthPoint(
                     date: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 0))),

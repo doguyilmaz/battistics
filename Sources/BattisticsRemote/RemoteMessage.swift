@@ -2,19 +2,19 @@ import Foundation
 
 /// A command sent from a phone through iCloud.
 public struct RemoteRequest: Codable, Sendable, Equatable {
-    public enum Operation: String, Codable, Sendable {
+    public enum Operation: String, Codable, Sendable, TolerantWireValue {
         case start
         case stop
         case setLowPower
         case sleepDisplay
         /// Samples accessory batteries and the apps using the most energy, on request only.
         case inspect
+        /// Adds `durationMinutes` to the running timed session.
+        case extend
         /// Sent by a newer phone; answered as an invalid request instead of left unread.
         case unknown
 
-        public init(from decoder: Decoder) throws {
-            self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .unknown
-        }
+        public static let fallback = Self.unknown
     }
 
     public var id: String
@@ -40,8 +40,16 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         self.sentAt = sentAt
     }
 
+    /// The phone's name as the Mac shows it next to a session.
+    public var senderName: String? {
+        deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+    }
+
     /// Finite durations a phone may request; the app and Shortcuts each offer a subset.
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
+
+    /// What a phone may add to a running session at once.
+    public static let extensions = [15, 30, 60, 120]
 
     /// All valid duration values including 0 (indefinite / until turned off).
     public static let allowedDurations: Set<Int> = Set(durations + [0])
@@ -51,8 +59,11 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
 }
 
 public struct RemoteFailure: Codable, Sendable, Equatable {
-    public enum Code: String, Codable, Sendable {
+    public enum Code: String, Codable, Sendable, TolerantWireValue {
         case invalidRequest, busy, closedLidNotAllowed, helperUnavailable, protection, startFailed, unavailable
+
+        /// The phone shows the Mac's own words for a code it does not know.
+        public static let fallback = Self.startFailed
     }
 
     public var code: Code
@@ -60,6 +71,18 @@ public struct RemoteFailure: Codable, Sendable, Equatable {
     /// phone words every other code itself, in its own language.
     public var message: String
     public init(_ code: Code, _ message: String = "") { self.code = code; self.message = message }
+}
+
+/// A value a newer Mac or phone adds decodes as `fallback` on an older one,
+/// so one new case never makes a whole message unreadable.
+public protocol TolerantWireValue: RawRepresentable<String>, Decodable {
+    static var fallback: Self { get }
+}
+
+extension TolerantWireValue {
+    public init(from decoder: Decoder) throws {
+        self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .fallback
+    }
 }
 
 public enum RemoteWire {

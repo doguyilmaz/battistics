@@ -33,6 +33,22 @@ struct KeepAwakeTests {
         #expect(session.hasExpired(at: start.addingTimeInterval(900)))
     }
 
+    @Test func extendingAddsToTheDeadlineUpToTwelveHoursFromNow() {
+        let session = KeepAwakeSession(mode: .displayOn, duration: .oneHour, startedAt: start)
+        let later = start.addingTimeInterval(1800)
+        #expect(session.extended(byMinutes: 30, now: later)?.deadline == start.addingTimeInterval(5400))
+        #expect(session.extended(byMinutes: 30, now: later)?.startedAt == start)
+        // Past its deadline but not yet stopped, the time counts from now.
+        let overdue = start.addingTimeInterval(4000)
+        #expect(session.extended(byMinutes: 15, now: overdue)?.deadline == overdue.addingTimeInterval(900))
+        let long = KeepAwakeSession(mode: .displayOn, duration: .twelveHours, startedAt: start)
+        #expect(long.extended(byMinutes: 60, now: start) == nil)
+        #expect(long.extended(byMinutes: 60, now: start.addingTimeInterval(1800))?.deadline
+                == start.addingTimeInterval(1800 + 12 * 3600))
+        #expect(KeepAwakeSession(mode: .displayOn, duration: .indefinite, startedAt: start)
+            .extended(byMinutes: 30, now: start) == nil)
+    }
+
     @Test func durationRawValueIsItsMinutesSoItPersistsAsOneInteger() {
         #expect(KeepAwakeDuration.fifteenMinutes.minutes == 15)
         #expect(KeepAwakeDuration.twelveHours.minutes == 720)

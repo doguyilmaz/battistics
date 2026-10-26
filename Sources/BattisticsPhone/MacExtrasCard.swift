@@ -58,7 +58,7 @@ struct MacExtrasCard: View {
                             Text(app.name).lineLimit(1)
                             Spacer()
                             Text(app.energyShare.map { Int(($0 * 100).rounded()).percentText }
-                                 ?? app.cpuPercent.formatted(.number.precision(.fractionLength(0))) + "% CPU")
+                                 ?? Int(app.cpuPercent.rounded()).percentText + " CPU")
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)
                         }

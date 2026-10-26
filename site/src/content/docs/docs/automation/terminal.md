@@ -3,7 +3,7 @@ title: Terminal
 description: Keep the Mac awake for exactly as long as a command runs.
 ---
 
-Turn on **Power › Local automation** in Battistics, then:
+Turn on **Automation › Local automation** in Battistics. **Copy Terminal setup** copies a line that adds the `battistics` command; paste it into your shell profile (`~/.zshrc`) and open a new Terminal window. Then:
 
 ```sh
 battistics run --name Build -- swift build

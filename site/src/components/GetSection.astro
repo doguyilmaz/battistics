@@ -47,12 +47,16 @@ const icons = [
     color: #e8efe9;
     background:
       radial-gradient(70% 60% at 50% 0%, color-mix(in oklab, var(--accent-b) 30%, transparent), transparent 70%),
-      #0f1513;
+      rgb(15 21 19 / var(--get-alpha, 0.66));
     --ink: #e8efe9;
     --ink-2: #b2c0b8;
     --ink-3: #8a988f;
     --paper: #0f1513;
     --line: #2c3833;
+  }
+:global(:root[data-theme="light"]) .get { --get-alpha: 0.86; }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .get { --get-alpha: 0.86; }
   }
   .icon-stage { position: relative; width: 160px; height: 160px; margin: 0 auto; }
   .big {

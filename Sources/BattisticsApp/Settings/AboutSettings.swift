@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AboutSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(UpdaterModel.self) private var updater
     @State private var showingReport = false
 
     static var versionString: String { IssueReporter.appVersion }
@@ -12,7 +13,8 @@ struct AboutSettings: View {
     @State private var crashReport: URL?
 
     var body: some View {
-        Form {
+        @Bindable var updater = updater
+        return Form {
             Section {
                 VStack(spacing: 10) {
                     Image(nsImage: NSApp.applicationIconImage)
@@ -71,9 +73,20 @@ struct AboutSettings: View {
                 }
             }
             Section {
-                Text("Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
+                Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
+                LabeledContent {
+                    Button("Check Now") {
+                        updater.checkForUpdates()
+                    }
+                    .disabled(!updater.canCheckForUpdates)
+                } label: {
+                    Text(lastCheckedText)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                InfoHeader("Updates", info: "Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.")
             }
         }
         .formStyle(.grouped)
@@ -86,6 +99,16 @@ struct AboutSettings: View {
         }
         // The popover and the Help menu ask for the sheet by setting this.
         .onChange(of: model.reportRequested) { presentRequestedReport() }
+    }
+
+    /// Sparkle checks daily, counted from the last check rather than from
+    /// launch, so "never" here means it has not run yet, not that it is off.
+    private var lastCheckedText: String {
+        guard let date = updater.lastCheckDate else {
+            return String(localized: "Checked automatically every 24 hours")
+        }
+        return String(
+            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
     }
 
     private func presentRequestedReport() {

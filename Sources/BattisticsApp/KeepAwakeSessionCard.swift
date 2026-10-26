@@ -19,6 +19,16 @@ struct KeepAwakeSessionCard: View {
                           systemImage: "cup.and.saucer.fill")
                         .font(.callout.weight(.semibold)).lineLimit(2)
                     Spacer(minLength: 8)
+                    if session.deadline != nil {
+                        Menu("Add Time") {
+                            ForEach(RemoteRequest.extensions, id: \.self) { minutes in
+                                Button(KeepAwakeDuration(rawValue: minutes)?.label ?? "") { awake.extend(byMinutes: minutes) }
+                            }
+                        }
+                        .menuStyle(.button)
+                        .fixedSize()
+                        .controlSize(.small)
+                    }
                     Button("Stop") { awake.stop() }.controlSize(.small)
                         .accessibilityLabel(String(localized: "Stop Keep Awake"))
                 }

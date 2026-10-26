@@ -87,13 +87,42 @@ final class PowerAuthorizationSession: @unchecked Sendable {
         argv.append(nil)
 
         var communications: UnsafeMutablePointer<FILE>?
+        let before = Self.childProcesses()
         let status = argv.withUnsafeMutableBufferPointer { buffer in
             execute(reference, PowerSettingsWriter.executable, [], buffer.baseAddress!, &communications)
         }
+        let privileged = Self.childProcesses().subtracting(before).filter(Self.runsAsRoot)
+        // Runs after the pipe closes, so the child has exited or is about to.
+        defer { Self.reap(privileged) }
         defer { if let communications { fclose(communications) } }
         guard status == errAuthorizationSuccess else { throw Failure.failed(status) }
         guard let communications else { throw Failure.communicationFailed(EBADF) }
         try drain(communications)
+    }
+
+    /// The API gives no child PID, so the child is found as the new root
+    /// process among this app's children; other children run as the user.
+    private static func childProcesses() -> Set<pid_t> {
+        var pids = [pid_t](repeating: 0, count: 256)
+        _ = proc_listchildpids(getpid(), &pids, Int32(pids.count * MemoryLayout<pid_t>.size))
+        return Set(pids.filter { $0 > 0 })
+    }
+
+    private static func runsAsRoot(_ pid: pid_t) -> Bool {
+        var info = proc_bsdshortinfo()
+        let size = Int32(MemoryLayout<proc_bsdshortinfo>.size)
+        return proc_pidinfo(pid, PROC_PIDT_SHORTBSDINFO, 0, &info, size) == size && info.pbsi_uid == 0
+    }
+
+    /// Collects the finished child so it does not stay a zombie until quit.
+    private static func reap(_ pids: Set<pid_t>) {
+        for pid in pids {
+            var status: Int32 = 0
+            for _ in 0..<100 {
+                if waitpid(pid, &status, WNOHANG) != 0 { break }
+                usleep(20_000)
+            }
+        }
     }
 
     private func drain(_ communications: UnsafeMutablePointer<FILE>) throws {

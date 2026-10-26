@@ -3,9 +3,9 @@ name: CI
 on:
   push:
     branches: [main]
-    paths-ignore: ["site/**"]
+    paths-ignore: ["site/**", "marketing/**"]
   pull_request:
-    paths-ignore: ["site/**"]
+    paths-ignore: ["site/**", "marketing/**"]
 
 jobs:
   test:
@@ -20,7 +20,7 @@ jobs:
         run: swift test
       - name: Build app
         run: |
-          xcodegen generate
+          make gen
           xcodebuild -project Battistics.xcodeproj -scheme Battistics \
             -configuration Debug -derivedDataPath .build/xcode build \
             CODE_SIGN_IDENTITY="-"

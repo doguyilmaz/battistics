@@ -34,15 +34,13 @@ struct AppearanceSettings: View {
     var body: some View {
         Form {
             Section("Icon Style") {
-                HStack(spacing: 14) {
+                HStack(spacing: 12) {
                     ForEach(MenuBarIconStyle.allCases) { style in
                         stylePicker(style)
                     }
                 }
                 .frame(maxWidth: .infinity)
-            }
-            Section("Preview") {
-                HStack(spacing: 18) {
+                HStack(spacing: 22) {
                     statusPreview(percent: 100, charging: false, label: String(localized: "Full"))
                     statusPreview(percent: 57, charging: false, label: String(localized: "Normal"))
                     statusPreview(percent: 20, charging: false, label: String(localized: "Low"))
@@ -51,44 +49,38 @@ struct AppearanceSettings: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            Section("Content") {
+            Section {
                 Toggle("Show battery glyph", isOn: $showGlyph)
                 Toggle("Show percentage inside battery", isOn: $percentInside)
                     .disabled(!showGlyph)
-                Picker("Primary text", selection: $primaryRaw) {
-                    ForEach(MenuBarText.allCases) { kind in
-                        Text(kind.label).tag(kind.rawValue)
+                LabeledContent("Text") {
+                    HStack(spacing: 6) {
+                        Picker("Primary text", selection: $primaryRaw) {
+                            ForEach(MenuBarText.allCases) { kind in
+                                Text(kind.label).tag(kind.rawValue)
+                            }
+                        }
+                        Picker("Secondary text", selection: $secondaryRaw) {
+                            ForEach(MenuBarText.allCases) { kind in
+                                Text(kind.label).tag(kind.rawValue)
+                            }
+                        }
                     }
+                    .labelsHidden()
+                    .fixedSize()
                 }
-                Picker("Secondary text", selection: $secondaryRaw) {
-                    ForEach(MenuBarText.allCases) { kind in
-                        Text(kind.label).tag(kind.rawValue)
-                    }
-                }
-                Text("The glyph reappears automatically when both texts are set to Nothing.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 Toggle("Show an icon while Keep Awake is on", isOn: $keepAwakeMenuBarIcon)
+            } header: {
+                InfoHeader("Content", info: "The glyph reappears automatically when both texts are set to Nothing.")
             }
-            Section("Color") {
-                Toggle("Orange when low, red when critical", isOn: $colorLow)
-                if colorLow {
-                    LabeledContent("Low threshold: \(lowThreshold)%") {
-                        Slider(
-                            value: Binding(
-                                get: { Double(lowThreshold) },
-                                set: { lowThreshold = Int($0) }
-                            ), in: 5...50, step: 5)
-                    }
-                    Text("Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+            Section {
+                ThresholdToggle("Orange when low, red when critical", isOn: $colorLow, percent: $lowThreshold, range: 5...50)
                 Toggle("Green when full", isOn: $colorHigh)
                 Toggle("Blue while charging", isOn: $colorCharging)
-                Text("With every color rule off, the icon stays monochrome and matches the menu bar.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            } header: {
+                InfoHeader("Color",
+                           info: "Critical red kicks in at 10%. Low battery notifications have their own threshold in Notifications.",
+                           "With every color rule off, the icon stays monochrome and matches the menu bar.")
             }
         }
         .formStyle(.grouped)
@@ -96,7 +88,7 @@ struct AppearanceSettings: View {
 
     private func stylePicker(_ style: MenuBarIconStyle) -> some View {
         let selected = style == iconStyle
-        return VStack(spacing: 8) {
+        return VStack(spacing: 4) {
             Image(
                 nsImage: BatGlyph.image(
                     size: NSSize(width: 58, height: 36),
@@ -108,7 +100,7 @@ struct AppearanceSettings: View {
                 .font(.caption)
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 7)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(selected ? Color.accentColor.opacity(0.14) : Color.clear)
@@ -132,10 +124,7 @@ struct AppearanceSettings: View {
                 nsImage: MenuBarIconRenderer.previewImage(
                     percent: percent, charging: charging, config: config)
             )
-            .frame(height: 27)
-            Text(Formatting.percent(Double(percent)))
-                .font(.caption2)
-                .monospacedDigit()
+            .frame(height: 22)
             Text(label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -143,36 +132,35 @@ struct AppearanceSettings: View {
     }
 }
 
-/// Theme and app icon, shown in General.
-struct ThemeAndIconSections: View {
+struct ThemeAndIconRows: View {
     @Environment(AppModel.self) private var model
     @AppStorage(Prefs.theme) private var themeRaw = ThemePreference.automatic.rawValue
     @AppStorage(Prefs.appIconStyle) private var appIconRaw = AppIconStyle.original.rawValue
 
     var body: some View {
-        Section("Theme") {
-            Picker("Theme", selection: $themeRaw) {
-                ForEach(ThemePreference.allCases) { theme in
-                    Text(theme.label).tag(theme.rawValue)
-                }
+        Picker("Theme", selection: $themeRaw) {
+            ForEach(ThemePreference.allCases) { theme in
+                Text(theme.label).tag(theme.rawValue)
             }
         }
-        Section("App Icon") {
-            HStack(spacing: 14) {
+        LabeledContent {
+            HStack(spacing: 10) {
                 ForEach(AppIconStyle.allCases) { style in
                     appIconPicker(style)
                 }
             }
-            .frame(maxWidth: .infinity)
+        } label: {
+            Text("App Icon")
             Text("Applies to the Dock and the app switcher while Battistics runs.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 
     private func appIconPicker(_ style: AppIconStyle) -> some View {
         let selected = style.rawValue == appIconRaw
-        return VStack(spacing: 8) {
+        return Button {
+            appIconRaw = style.rawValue
+            model.applyAppIcon()
+        } label: {
             Group {
                 if let image = style.image {
                     Image(nsImage: image)
@@ -180,31 +168,19 @@ struct ThemeAndIconSections: View {
                         .scaledToFit()
                 } else {
                     Image(systemName: "questionmark.square.dashed")
-                        .font(.largeTitle)
+                        .font(.title)
                 }
             }
-            .frame(width: 56, height: 56)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            Text(style.label)
-                .font(.caption)
+            .frame(width: 34, height: 34)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .padding(3)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2))
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(selected ? Color.accentColor.opacity(0.14) : Color.clear)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(
-                    selected ? Color.accentColor : Color.secondary.opacity(0.25),
-                    lineWidth: selected ? 2 : 1)
-        )
-        .contentShape(RoundedRectangle(cornerRadius: 10))
-        .onTapGesture {
-            appIconRaw = style.rawValue
-            model.applyAppIcon()
-        }
+        .buttonStyle(.plain)
+        .help(style.label)
+        .accessibilityLabel(style.label)
         .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 }

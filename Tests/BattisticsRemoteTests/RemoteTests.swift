@@ -42,6 +42,9 @@ struct RemoteTests {
         #expect(ChargeRate.perHour([point(60, 50), point(0, 50.5)], now: now) == nil)
         #expect(ChargeRate.minutesLeft(percent: 50, rate: -10) == 300)
         #expect(ChargeRate.minutesLeft(percent: 76, rate: 24) == 60)
+        let day = [point(600, 80), point(400, 40), point(300, 90), point(0, 70)]
+        #expect(ChargeRate.totals(day) == (gained: 50, used: 60))
+        #expect(ChargeRate.totals([point(0, 50)]) == (gained: 0, used: 0))
     }
 
     @Test func anOperationFromANewerPhoneDecodesAsUnknown() throws {
@@ -49,6 +52,28 @@ struct RemoteTests {
         json["operation"] = "hibernate"
         let request = try RemoteWire.decode(RemoteRequest.self, from: JSONSerialization.data(withJSONObject: json))
         #expect(request.operation == .unknown)
+    }
+
+    @Test func valuesFromANewerMacKeepItsStatusReadable() throws {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        var status = RemoteStatus(machineName: "Mac", readAt: now,
+                                  session: .init(mode: .displayOn, origin: .manual, startedAt: now, deadline: nil),
+                                  lastEnd: .init(reason: .timer, at: now), network: .wifi, thermal: .fair)
+        status.lastCommand = .init(id: "c", failure: RemoteFailure(.busy))
+        var json = try JSONSerialization.jsonObject(with: RemoteWire.encode(status)) as! [String: Any]
+        var session = json["session"] as! [String: Any]
+        session["origin"] = "watch"
+        json["session"] = session
+        json["lastEnd"] = ["reason": "eclipse", "at": 1_000_000]
+        json["network"] = "satellite"
+        json["thermal"] = "molten"
+        json["lastCommand"] = ["id": "c", "failure": ["code": "quota", "message": "Später"]]
+        let decoded = try RemoteWire.decode(RemoteStatus.self, from: JSONSerialization.data(withJSONObject: json))
+        #expect(decoded.session?.origin == .manual)
+        #expect(decoded.lastEnd?.reason == .user)
+        #expect(decoded.network == .other)
+        #expect(decoded.thermal == .nominal)
+        #expect(decoded.lastCommand?.failure == RemoteFailure(.startFailed, "Später"))
     }
 
     @Test func allowedDurationsIncludeUntilTurnedOffAndTelemetryRoundTrips() throws {
@@ -84,18 +109,10 @@ struct RemoteTests {
         let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: readAt, deadline: nil)
         let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session,
                                   heartbeatSeconds: RemoteStatus.heartbeat(duringSession: true))
-        #expect(status.expectedHeartbeat == RemoteStatus.sessionHeartbeat)
+        #expect(status.heartbeatSeconds == RemoteStatus.sessionHeartbeat)
         #expect(status.staleDate == readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 4))
         #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 3)))
         #expect(!status.isFresh(at: status.staleDate))
-    }
-
-    @Test func olderMacWithoutHeartbeatFieldGetsTheSlowWindow() {
-        let readAt = Date(timeIntervalSince1970: 1_000_000)
-        let session = RemoteStatus.Session(mode: .displayOn, origin: .phone, startedAt: readAt, deadline: nil)
-        let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session)
-        #expect(status.expectedHeartbeat == RemoteStatus.heartbeat)
-        #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 5)))
     }
 
     @Test func watchdogFollowsHowReliablyPushesArrive() {
@@ -167,6 +184,28 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: reached, to: status(percent: 81, adapter: true, session: false), chargeTarget: 80).isEmpty)
         #expect(RemoteAlert.alerts(from: below, to: reached).isEmpty)
         #expect(RemoteAlert.alerts(from: below, to: status(percent: 80, adapter: false, session: false), chargeTarget: 80).isEmpty)
+    }
+
+    @Test func theMacPushesWhatItCanSeeAndLeavesThePhoneItsOwn() {
+        #expect(RemoteAlert.pushed(from: status(), to: status(session: false, ended: .timer)) == [.sessionEnded(.timer)])
+        #expect(RemoteAlert.pushed(from: status(percent: 21), to: status(percent: 20)) == [.batteryLow(percent: 20)])
+        let below = status(percent: 79, adapter: true, session: false)
+        #expect(RemoteAlert.pushed(from: below, to: status(percent: 80, adapter: true, session: false)).isEmpty)
+        #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.unreachable.kind))
+        #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
+    }
+
+    @Test func heatAlertsOnceWhenASessionRunsHot() {
+        var hot = status()
+        hot.thermal = .serious
+        #expect(RemoteAlert.alerts(from: status(), to: hot) == [.runningHot])
+        var hotter = hot
+        hotter.thermal = .critical
+        #expect(RemoteAlert.alerts(from: hot, to: hotter).isEmpty)
+        var idleHot = status(session: false)
+        idleHot.thermal = .critical
+        #expect(RemoteAlert.alerts(from: status(session: false), to: idleHot).isEmpty)
+        #expect(RemoteAlert.pushed(from: status(), to: hot) == [.runningHot])
     }
 
     @Test func silenceAlertsOnlyWhileASessionRan() {

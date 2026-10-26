@@ -57,12 +57,12 @@ struct PowerSettingsTests {
         #expect(battery.systemSleepMinutes == 1)
     }
 
-    /// Keys are multi-word; only the last token is the value.
+    /// Keys are multi-word; only the last token is the value, so "Sleep On
+    /// Power Button 1" is not read as the sleep timer.
     @Test func multiWordKeysParse() {
         let settings = PowerSettingsReader.parse(laptop)
-        #expect(settings.battery?.sleepOnPowerButton == true)
-        #expect(settings.ac?.wakeOnNetwork == true)
-        #expect(settings.battery?.wakeOnNetwork == false)
+        #expect(settings.battery?.systemSleepMinutes == 1)
+        #expect(settings.ac?.systemSleepMinutes == 1)
     }
 
     /// macOS presents the two lowpowermode flags as one four-way choice, and

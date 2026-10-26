@@ -145,12 +145,12 @@ const previews = [
     cursor: pointer;
   }
   .styles button :global(svg) { width: 46px; height: 28px; color: var(--ink); overflow: visible; }
-  .styles button[aria-checked="true"] { border-color: var(--sys-blue); box-shadow: 0 0 0 1px var(--sys-blue); color: var(--ink); }
-  .styles button:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 2px; }
+  .styles button[aria-checked="true"] { border-color: var(--accent-b); box-shadow: 0 0 0 1px var(--accent-b); color: var(--ink); }
+  .styles button:focus-visible { outline: 2px solid var(--accent-b); outline-offset: 2px; }
   .rows { border-radius: 14px; background: var(--form-bg); border: 1px solid var(--line); }
   .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
   .row + .row { border-top: 1px solid var(--row-line); }
-  .slider-row input { width: 46%; accent-color: var(--sys-blue); }
+  .slider-row input { width: 46%; accent-color: var(--accent-b); }
   .field input { flex: 1; min-width: 0; accent-color: var(--accent-b); }
   .field output { min-width: 4ch; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
   select {
@@ -190,9 +190,9 @@ const previews = [
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
     transition: translate 0.18s cubic-bezier(0.3, 0.7, 0.3, 1);
   }
-  input[role="switch"]:checked { background: var(--sys-blue); }
+  input[role="switch"]:checked { background: var(--accent-strong); }
   input[role="switch"]:checked::after { translate: 14px 0; }
-  input:focus-visible, select:focus-visible { outline: 2px solid var(--sys-blue); outline-offset: 2px; }
+  input:focus-visible, select:focus-visible { outline: 2px solid var(--accent-b); outline-offset: 2px; }
 
   @media (max-width: 920px) {
     .stage, .settings { grid-template-columns: minmax(0, 1fr); }

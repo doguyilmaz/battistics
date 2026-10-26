@@ -37,9 +37,7 @@ final class PowerAuthorization {
     @ObservationIgnored private var isUnlocking = false
     @ObservationIgnored private var idleTask: Task<Void, Never>?
 
-    /// Whether privileged changes are possible at all on this system. False
-    /// means the UI should stay read-only rather than offer a lock that
-    /// cannot open.
+    /// Whether privileged changes are possible at all on this system.
     var isSupported: Bool { PowerAuthorizationSession.isSupported }
 
     // MARK: - Lock state

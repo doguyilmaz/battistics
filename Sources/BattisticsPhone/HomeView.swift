@@ -77,7 +77,7 @@ struct HomeView: View {
                 deviceRow(mac.name, detail: reading?.reachable == true
                           ? reading?.status?.battery.map { $0.percent.percentText }
                           : String(localized: "Offline"),
-                          symbol: "laptopcomputer")
+                          symbol: reading?.status?.macSymbol ?? "laptopcomputer")
                     .tag(Optional(mac.id))
             }
             deviceRow(phone.pickerName, detail: phone.percent.map { $0.percentText }, symbol: "iphone")

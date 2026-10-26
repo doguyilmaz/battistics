@@ -8,7 +8,7 @@ on:
     branches: [main]
     tags: ['v*']
     # Ignored for tag pushes; keeps website-only commits from starting a release run.
-    paths-ignore: ["site/**"]
+    paths-ignore: ["site/**", "marketing/**"]
 
 permissions:
   contents: write
@@ -40,9 +40,6 @@ jobs:
             echo "v$VERSION is already tagged: nothing to release."
             exit 0
           fi
-          # Pushed with GITHUB_TOKEN, which does not start another run.
-          git tag "v$VERSION" "$GITHUB_SHA"
-          git push origin "v$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   release:
@@ -85,7 +82,13 @@ jobs:
       - name: Build signed DMG
         env:
           SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        run: make dmg
+          PROFILE_BASE64: ${{ secrets.MACOS_PROVISIONING_PROFILE }}
+        run: |
+          if [ -n "$PROFILE_BASE64" ]; then
+            export PROFILE="$RUNNER_TEMP/battistics.provisionprofile"
+            echo "$PROFILE_BASE64" | base64 --decode > "$PROFILE"
+          fi
+          make dmg
 
       - name: Notarize and staple
         env:
@@ -134,7 +137,9 @@ jobs:
           else
             NOTES=(--generate-notes)
           fi
-          gh release create "v$VERSION" \
+          # Creates the tag only now, after the build, so a failed run leaves
+          # none. Made with GITHUB_TOKEN, it starts no other run.
+          gh release create "v$VERSION" --target "$GITHUB_SHA" \
             dist/release/Battistics-*.dmg \
             dist/release/appcast-2.xml dist/release/appcast.xml \
             --title "Battistics-$VERSION" "${NOTES[@]}"

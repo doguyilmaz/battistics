@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>aps-environment</key>
-	<string>development</string>
+	<string>$(APS_ENVIRONMENT)</string>
 	<key>com.apple.developer.icloud-container-environment</key>
-	<string>Development</string>
+	<string>$(CLOUDKIT_ENVIRONMENT)</string>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.com.doguyilmaz.Battistics</string>

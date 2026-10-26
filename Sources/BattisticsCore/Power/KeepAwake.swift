@@ -47,22 +47,45 @@ public enum KeepAwakeDuration: Int, Sendable, CaseIterable, Identifiable {
     public static let finite = allCases.filter { $0 != .indefinite }
 }
 
-/// An active keep-awake session. Pure: the deadline is derived, never
-/// tracked by a ticking timer, so a throttled or suspended app can always
-/// recompute the truth from `startedAt`.
+/// An active keep-awake session. Pure: the deadline is fixed when the
+/// session starts or is extended, never tracked by a ticking timer, so a
+/// throttled or suspended app can always recompute the truth.
 public struct KeepAwakeSession: Sendable, Equatable {
     public let mode: KeepAwakeMode
     public let duration: KeepAwakeDuration
     public let startedAt: Date
+    public let deadline: Date?
+
+    /// The longest a session may still have left after an extension.
+    public static let maximumRemaining: TimeInterval = 12 * 3600
 
     public init(mode: KeepAwakeMode, duration: KeepAwakeDuration, startedAt: Date) {
         self.mode = mode
         self.duration = duration
         self.startedAt = startedAt
+        deadline = duration.minutes.map { startedAt.addingTimeInterval(TimeInterval($0) * 60) }
     }
 
-    public var deadline: Date? {
-        duration.minutes.map { startedAt.addingTimeInterval(TimeInterval($0) * 60) }
+    private init(_ session: KeepAwakeSession, mode: KeepAwakeMode? = nil, deadline: Date?) {
+        self.mode = mode ?? session.mode
+        duration = session.duration
+        startedAt = session.startedAt
+        self.deadline = deadline
+    }
+
+    /// The same session, same deadline, in another mode.
+    public func switching(to mode: KeepAwakeMode) -> KeepAwakeSession {
+        KeepAwakeSession(self, mode: mode, deadline: deadline)
+    }
+
+    /// The same session ending later, capped at twelve hours from now. Nil
+    /// for a session without a deadline or one already at the cap.
+    public func extended(byMinutes minutes: Int, now: Date) -> KeepAwakeSession? {
+        guard minutes > 0, let deadline else { return nil }
+        let capped = min(max(deadline, now).addingTimeInterval(TimeInterval(minutes) * 60),
+                         now.addingTimeInterval(Self.maximumRemaining))
+        guard capped > deadline else { return nil }
+        return KeepAwakeSession(self, deadline: capped)
     }
 
     /// Seconds left, floored at zero; nil when the session has no deadline.

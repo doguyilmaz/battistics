@@ -105,9 +105,7 @@ final class PowerHelperClient {
     /// leaves a service that exists and never answers.
     private(set) var isReachable = false
     /// Until a probe has actually finished, "not reachable" only means "not
-    /// asked yet". Without this the pane briefly accuses a healthy helper of
-    /// being broken every time it appears, because the probe is async and
-    /// the first render beats it.
+    /// asked yet".
     private(set) var hasProbed = false
     /// Answering, but with an older build than this app ships: launchd kept
     /// the previous process alive through an update or rebuild. Power
@@ -123,11 +121,7 @@ final class PowerHelperClient {
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
 
     init() {
-        // refreshStatus rather than reading status directly: it also starts
-        // the reachability probe. Setting the field alone left isReachable
-        // false until something else happened to refresh, so the first change
-        // of a session fell back to asking for a password even though the
-        // helper was running.
+        // Also starts the reachability probe, which reading status alone would not.
         refreshStatus()
         // The user approves or revokes this in System Settings, which no
         // notification reports back. Re-reading when the app is activated

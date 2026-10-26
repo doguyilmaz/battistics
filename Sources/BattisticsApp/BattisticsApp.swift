@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// A menu bar app must survive its last window closing; SwiftUI's default
 /// is to terminate once no regular windows remain, which kills the app the
@@ -8,9 +9,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
-    /// iCloud's silent push for the iPhone companion's zone.
+    /// iCloud's silent push for the iPhone companion's zone. Alerts another
+    /// Mac on the account posts for the phones arrive here too and are
+    /// taken down, since they are not about this Mac.
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
         NotificationCenter.default.post(name: .battisticsRemotePush, object: nil)
+        Task {
+            let center = UNUserNotificationCenter.current()
+            let pushed = await center.deliveredNotifications().filter { $0.request.content.userInfo["ck"] != nil }
+            center.removeDeliveredNotifications(withIdentifiers: pushed.map(\.request.identifier))
+        }
     }
 
     /// Opens the dashboard at launch through the app's own URL scheme.
@@ -53,10 +61,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 name: .battisticsSelectPane, object: nil, userInfo: ["pane": pane])
         }
     }
-}
-
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
 }
 
 @main

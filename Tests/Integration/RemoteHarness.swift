@@ -3,10 +3,6 @@ import BattisticsCore
 import BattisticsRemote
 import SwiftUI
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 /// Runs the Mac side of the iPhone companion without iCloud: the same command
 /// handling and status the CloudKit records carry. Takes only short-lived
 /// idle/display assertions; never installs the helper.
@@ -52,13 +48,23 @@ struct RemoteHarness {
         precondition(startedIndefinite == nil)
         let indefiniteSession = try require(await remote.fullStatus().session)
         precondition(indefiniteSession.origin == .phone && indefiniteSession.deadline == nil)
+        let extendedIndefinite = await command(.extend, minutes: 30)
+        precondition(extendedIndefinite?.code == .startFailed)
         _ = await command(.stop)
+        let extendedIdle = await command(.extend, minutes: 30)
+        precondition(extendedIdle?.code == .startFailed)
 
         let started = await command(.start, mode: .displayMaySleep, minutes: 15)
         precondition(started == nil)
         let session = try require(await remote.fullStatus().session)
         precondition(session.origin == .phone && session.name == "Test iPhone" && awake.sessionOrigin == .phone)
         precondition(session.deadline.map { abs($0.timeIntervalSinceNow - 900) < 5 } == true)
+        let oddExtension = await command(.extend, minutes: 7)
+        precondition(oddExtension?.code == .invalidRequest)
+        let extended = await command(.extend, minutes: 30)
+        let longer = try require(await remote.fullStatus().session)
+        precondition(extended == nil && longer.startedAt == session.startedAt)
+        precondition(longer.deadline.map { abs($0.timeIntervalSinceNow - 2700) < 5 } == true)
         let busy = await command(.start, mode: .displayOn, minutes: 30)
         precondition(busy?.code == .busy)
         precondition(awake.session?.mode == .displayMaySleep)
@@ -76,7 +82,7 @@ struct RemoteHarness {
         remote.enabled = false
         let off = await command(.stop)
         precondition(off?.code == .unavailable)
-        print("PASS: start limits, busy, closed-lid gate, phone stop reason, history, inspect, disabled")
+        print("PASS: start limits, extend, busy, closed-lid gate, phone stop reason, history, inspect, disabled")
     }
 
     private static func require<T>(_ value: T?) throws -> T {

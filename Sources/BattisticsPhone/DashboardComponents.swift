@@ -62,15 +62,20 @@ extension View {
 /// The scrolling page every dashboard sits on.
 struct DashboardPage<Content: View>: View {
     var glow: Glow?
+    /// Stretches the content to the screen's height, for pages short enough to fit.
+    var fills = false
     var refresh: (() async -> Void)?
     @ViewBuilder var content: Content
+    @State private var visibleHeight: CGFloat = 0
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) { content }
+                .frame(minHeight: fills ? max(visibleHeight - 16, 0) : nil, alignment: .top)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { visibleHeight = $0 }
         .scrollIndicators(.hidden)
         .topBlur()
         .background {

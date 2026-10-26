@@ -9,8 +9,8 @@ const features = [
   { icon: "laptopcomputer", title: "The whole battery, anywhere", text: "Charge and its last day, time left, power, health and heat, plus the network the Mac is on and whether its lid is shut." },
   { icon: "cup.and.saucer.fill", title: "Keep Awake from your pocket", text: "Start any mode for any duration, lid closed included, and stop it again. Switch Low Power Mode or turn the display off." },
   { icon: "personalhotspot", title: "Ready for the bag", text: "Set the Mac to join your Hotspot and it stays online with the lid shut. Bag Ready tells you when it is safe to close it." },
-  { icon: "lock.fill", title: "Lock Screen and Control Center", text: "A Live Activity counts down with a Stop button, next to widgets and a Control Center and Action Button control." },
-  { icon: "bell.badge", title: "Alerts that matter", text: "Hear about it when a session ends, the battery runs low, the Mac stops answering or it reaches the charge you picked." },
+  { icon: "lock.fill", title: "Lock Screen and Control Center", text: "A Live Activity counts down with buttons for 30 more minutes and Stop, next to widgets and a Control Center and Action Button control." },
+  { icon: "bell.badge", title: "Alerts that matter", text: "Hear about it when a session ends, the battery runs low, the Mac stops answering or it reaches the charge you picked. They arrive at once, even with the app closed." },
   { icon: "icloud", title: "Through your own iCloud", text: "Every Mac on your Apple Account shows up by itself. Nothing to pair, no server, no account, and Siri knows the Mac too." },
 ];
 
@@ -56,8 +56,8 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
           <Image src={bagReady} alt="Battistics Remote showing a MacBook Air kept awake with the lid closed and Bag Ready" widths={[300, 600]} sizes="280px" />
         </div>
       </div>
-      <div class="activity" role="button" tabindex="0" data-zoom={liveActivity.src} data-caption="The Live Activity on the Lock Screen: time left, the connection and a Stop button." aria-label="Enlarge: the Live Activity">
-        <Image src={liveActivity} alt="The Lock Screen Live Activity: MacBook Air, lid closed, 1:00:16 remaining, with a Stop button" widths={[340, 680]} sizes="340px" />
+      <div class="activity" role="button" tabindex="0" data-zoom={liveActivity.src} data-caption="The Live Activity on the Lock Screen: time left, the connection, 30 more minutes and Stop." aria-label="Enlarge: the Live Activity">
+        <Image src={liveActivity} alt="The Lock Screen Live Activity: MacBook Air, lid closed, 1:04:43 remaining, with 30 min and Stop buttons" widths={[340, 680]} sizes="340px" />
       </div>
     </div>
   </div>

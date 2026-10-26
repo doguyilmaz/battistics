@@ -446,6 +446,17 @@
         }
       }
     },
+    "AI clients": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yapay zekâ istemcileri"
+          }
+        }
+      }
+    },
     "AI selected this answer from the built-in guide on this Mac. Check the source if it does not answer your question.": {
       "extractionState": "manual",
       "localizations": {
@@ -479,6 +490,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hakkında"
+          }
+        }
+      }
+    },
+    "About %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hakkında"
           }
         }
       }
@@ -530,23 +552,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enerji örneklemesi hakkında"
-          }
-        }
-      }
-    },
-    "Above %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Above %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ üzerinde"
           }
         }
       }
@@ -608,19 +613,13 @@
         }
       }
     },
-    "After %@ hours": {
+    "Add Time": {
       "extractionState": "manual",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "After %@ hours"
-          }
-        },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saat sonra"
+            "value": "Süre Ekle"
           }
         }
       }
@@ -715,6 +714,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Terminal ve yapay zekâ görevlerine izin ver"
+          }
+        }
+      }
+    },
+    "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı oturumlara izin vermek, gereken güç yardımcısını kurar. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
           }
         }
       }
@@ -823,6 +839,17 @@
         }
       }
     },
+    "Appearance": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görünüm"
+          }
+        }
+      }
+    },
     "Apple Rated Health": {
       "extractionState": "manual",
       "localizations": {
@@ -923,6 +950,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Otomatik"
+          }
+        }
+      }
+    },
+    "Automation": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomasyon"
           }
         }
       }
@@ -1097,6 +1135,17 @@
         }
       }
     },
+    "Battery is at %@. Connect power if the Mac must keep running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağla."
+          }
+        }
+      }
+    },
     "Battery is at %lld%%. Keep Awake cannot prevent an empty battery from interrupting your work. Connect power soon.": {
       "extractionState": "manual",
       "localizations": {
@@ -1186,6 +1235,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pil gücü. Negatif değer boşalmayı, pozitif değer şarjı gösterir."
+          }
+        }
+      }
+    },
+    "Battery protection stopped it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil koruması durdurdu."
+          }
+        }
+      }
+    },
+    "Battery runs out first": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil önce bitecek"
           }
         }
       }
@@ -1297,13 +1368,24 @@
         }
       }
     },
-    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Power → Thermal Care you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. Thermal Care is not a hardware diagnosis or a guarantee against overheating.": {
+    "Battistics Remote": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Güç → Isıl Koruma bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl Koruma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
+            "value": "Battistics Remote"
+          }
+        }
+      }
+    },
+    "Battistics does not change fan speeds. Battistics warns during a Keep Awake session when macOS reports serious or critical thermal pressure. In Keep Awake → Session Protection you can optionally end Keep Awake at that point, on battery or adapter. This uses system thermal pressure, not the battery temperature reading. Keep vents clear, use a hard surface, open the lid, and reduce heavy work. Never keep a running closed Mac inside a bag. The thermal stop is not a hardware diagnosis or a guarantee against overheating.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics fan hızlarını değiştirmez. macOS ciddi veya kritik ısıl baskı bildirdiğinde, Uyanık Tut oturumu sırasında uyarı verir. Uyanık Tut → Oturum Koruması bölümünden bu durumda Uyanık Tut’u pilde veya adaptörde otomatik sonlandırmayı seçebilirsiniz. Bu özellik pil sıcaklığını değil sistemin ısıl baskısını kullanır. Havalandırma deliklerini açık tutun, sert bir yüzey kullanın, kapağı açın ve ağır işleri azaltın. Çalışan bir Mac’i kapağı kapalı olarak çantaya koymayın. Isıl durdurma bir donanım teşhisi veya aşırı ısınmaya karşı garanti değildir."
           }
         }
       }
@@ -1824,6 +1906,23 @@
         }
       }
     },
+    "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı görevler için güç yardımcısı gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
+          }
+        }
+      }
+    },
     "Color": {
       "localizations": {
         "tr": {
@@ -1840,6 +1939,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Durum"
+          }
+        }
+      }
+    },
+    "Connect the Mac to Personal Hotspot if you are taking it with you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i yanına alıyorsan Kişisel Erişim Noktası’na bağla."
           }
         }
       }
@@ -2365,6 +2475,17 @@
         }
       }
     },
+    "Developer": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geliştirici"
+          }
+        }
+      }
+    },
     "Direction unknown": {
       "extractionState": "manual",
       "localizations": {
@@ -2554,18 +2675,18 @@
         }
       }
     },
-    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on.": {
+    "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. The Terminal and MCP setup below work once this is on.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. Terminal setup and MCP configuration appear below once this is on."
+            "value": "Enable local automation to use battistics run for builds and scripts. For interactive AI work, use MCP to start and stop each task. The Terminal and MCP setup below work once this is on."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Bunu açınca terminal kurulumu ve MCP yapılandırması aşağıda görünür."
+            "value": "Derleme ve betikleri battistics run ile çalıştırmak için yerel otomasyonu açın. Etkileşimli yapay zekâ işlerinde her görevi MCP ile başlatıp durdurun. Aşağıdaki terminal ve MCP kurulumu bu açıkken çalışır."
           }
         }
       }
@@ -2755,19 +2876,13 @@
         }
       }
     },
-    "Experiments": {
+    "Experimental. Support varies by Mac and macOS.": {
       "extractionState": "manual",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Experiments"
-          }
-        },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deneyler"
+            "value": "Deneysel. Desteği Mac’e ve macOS sürümüne göre değişir."
           }
         }
       }
@@ -2932,6 +3047,17 @@
     "GitHub": {
       "shouldTranslate": false
     },
+    "Go to Power": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç’e Git"
+          }
+        }
+      }
+    },
     "Good": {
       "localizations": {
         "tr": {
@@ -2992,6 +3118,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sağlık anlık görüntüleri günde bir kez kaydedilir. Yarın tekrar bakın."
+          }
+        }
+      }
+    },
+    "Heat protection stopped it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isı koruması durdurdu."
           }
         }
       }
@@ -3193,13 +3330,13 @@
         }
       }
     },
-    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
+    "In Keep Awake, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
+            "value": "Uyanık Tut bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
           }
         }
       }
@@ -3265,6 +3402,28 @@
         }
       }
     },
+    "Keep Awake already lasts the longest it can, 12 hours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut zaten en uzun süreye, 12 saate ulaştı."
+          }
+        }
+      }
+    },
+    "Keep Awake already runs until it is turned off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut zaten kapatılana kadar çalışıyor."
+          }
+        }
+      }
+    },
     "Keep Awake cannot start at %lld%% with battery protection enabled. Connect power before starting a session.": {
       "extractionState": "manual",
       "localizations": {
@@ -3304,6 +3463,17 @@
         }
       }
     },
+    "Keep Awake ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bitti"
+          }
+        }
+      }
+    },
     "Keep Awake ended because battery charge reached %lld%%. Normal sleep is allowed again. Connect power before starting another session.": {
       "extractionState": "manual",
       "localizations": {
@@ -3338,6 +3508,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geliştirme görevleri boyunca uyanık tutun"
+          }
+        }
+      }
+    },
+    "Keep Awake is not running on this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te Uyanık Tut çalışmıyor."
           }
         }
       }
@@ -3531,17 +3712,6 @@
         }
       }
     },
-    "Learn the controls in a short guided tour, or find an answer below.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kısa tanıtımla kontrolleri öğrenin veya aşağıda yanıt arayın."
-          }
-        }
-      }
-    },
     "Left": {
       "extractionState": "manual",
       "localizations": {
@@ -3605,6 +3775,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapak kapalı"
+          }
+        }
+      }
+    },
+    "Lid closed without Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak Erişim Noktası olmadan kapandı"
           }
         }
       }
@@ -3742,19 +3923,13 @@
         }
       }
     },
-    "Low threshold: %lld%%": {
+    "MCP guide": {
       "extractionState": "manual",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low threshold: %lld%%"
-          }
-        },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Düşük eşiği: %%%lld"
+            "value": "MCP kılavuzu"
           }
         }
       }
@@ -3786,13 +3961,35 @@
         }
       }
     },
-    "Make yourself at home": {
+    "Mac battery low": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics’i keşfedin"
+            "value": "Mac’in pili azaldı"
+          }
+        }
+      }
+    },
+    "Mac is running hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ısınıyor"
+          }
+        }
+      }
+    },
+    "Mac unplugged on Wi‑Fi": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Wi‑Fi’dayken güçten çıkarıldı"
           }
         }
       }
@@ -3900,23 +4097,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ay"
-          }
-        }
-      }
-    },
-    "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerekir; bu Mac’te kapak kapalı Uyanık Tut’u bir kez başlatarak kurulur. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
           }
         }
       }
@@ -4151,23 +4331,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bildirimler"
-          }
-        }
-      }
-    },
-    "Notify at %lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notify at %lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%lld olunca bildir"
           }
         }
       }
@@ -4453,6 +4616,17 @@
         }
       }
     },
+    "Open the lid and keep the vents clear, or stop Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapağı aç ve hava deliklerini açık bırak ya da Uyanık Tut’u durdur."
+          }
+        }
+      }
+    },
     "Open the main window at launch": {
       "extractionState": "manual",
       "localizations": {
@@ -4572,19 +4746,19 @@
         }
       }
     },
-    "Permission granted until Battistics quits.": {
+    "Permission granted. It locks again after 10 minutes without a change.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Permission granted until Battistics quits."
+            "value": "Permission granted. It locks again after 10 minutes without a change."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics kapanana kadar izin verildi."
+            "value": "İzin verildi. 10 dakika değişiklik yapılmazsa yeniden kilitlenir."
           }
         }
       }
@@ -4766,16 +4940,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu Mac'in uykuya geçmesini engelle"
-          }
-        }
-      }
-    },
-    "Preview": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Önizleme"
           }
         }
       }
@@ -5176,23 +5340,6 @@
         }
       }
     },
-    "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısının önceden kurulmuş olması gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
-          }
-        }
-      }
-    },
     "Right": {
       "extractionState": "manual",
       "localizations": {
@@ -5527,23 +5674,6 @@
         }
       }
     },
-    "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show power readings in Energy and the popover. On by default; support varies by Mac and macOS."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç okumalarını Enerji bölümünde ve açılır panelde gösterir. Varsayılan olarak açıktır; destek Mac'e ve macOS sürümüne göre değişir."
-          }
-        }
-      }
-    },
     "Show the update": {
       "extractionState": "manual",
       "localizations": {
@@ -5698,22 +5828,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kaynak Yazılar"
-          }
-        }
-      }
-    },
-    "Start": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başlat"
           }
         }
       }
@@ -5941,17 +6055,6 @@
         }
       }
     },
-    "Stop at": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durdurma seviyesi"
-          }
-        }
-      }
-    },
     "Stop on Low Battery": {
       "extractionState": "manual",
       "localizations": {
@@ -5965,6 +6068,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Düşük pilde durdur"
+          }
+        }
+      }
+    },
+    "Stopped from iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’dan durduruldu."
+          }
+        }
+      }
+    },
+    "Stopped on the Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te durduruldu."
           }
         }
       }
@@ -6085,13 +6210,13 @@
         }
       }
     },
-    "System thermal pressure": {
+    "System thermal pressure: %@": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sistemin ısıl durumu"
+            "value": "Sistem ısıl baskısı: %@"
           }
         }
       }
@@ -6193,6 +6318,39 @@
         }
       }
     },
+    "Terminal guide": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal kılavuzu"
+          }
+        }
+      }
+    },
+    "Text": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metin"
+          }
+        }
+      }
+    },
+    "The Mac can sleep again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac yeniden uyuyabilir."
+          }
+        }
+      }
+    },
     "The Mac has been on battery power for %@.": {
       "localizations": {
         "tr": {
@@ -6221,6 +6379,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Asistan, macOS 26 veya üzerini ve Apple Intelligence’ı gerektirir. Hazır yardım içerikleri bu Mac’te çalışır."
+          }
+        }
+      }
+    },
+    "The battery lasts about %@, less than the Keep Awake session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil yaklaşık %@ dayanır; bu, Uyanık Tut oturumundan kısa."
           }
         }
       }
@@ -6376,6 +6545,17 @@
         }
       }
     },
+    "The power helper changes sleep settings without a password and keeps the Mac running with its lid closed. It restores the previous setting when a closed-lid session ends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı uyku ayarlarını parola sormadan değiştirir ve Mac’in kapağı kapalıyken çalışmasını sağlar. Kapak kapalı oturum bitince önceki ayarı geri yükler."
+          }
+        }
+      }
+    },
     "The power helper could not confirm the closed-lid session. Keep Awake has stopped.": {
       "extractionState": "manual",
       "localizations": {
@@ -6406,6 +6586,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güç yardımcısı yeniden kaydedildikten sonra bile yanıt vermedi. Güç bölümündeki Onar düğmesini kullanın veya Mac'i yeniden başlatın."
+          }
+        }
+      }
+    },
+    "The power helper needs attention.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güç yardımcısı ilgi bekliyor."
           }
         }
       }
@@ -6461,6 +6652,28 @@
         }
       }
     },
+    "The task finished.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görev bitti."
+          }
+        }
+      }
+    },
+    "The time you set is up.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belirlediğin süre doldu."
+          }
+        }
+      }
+    },
     "The update time does not confirm when each reading was measured.": {
       "extractionState": "manual",
       "localizations": {
@@ -6484,17 +6697,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tema"
-          }
-        }
-      }
-    },
-    "Thermal Care": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isıl Koruma"
           }
         }
       }
@@ -6753,6 +6955,17 @@
         }
       }
     },
+    "Turn on Personal Hotspot before the Mac goes in a bag, so its tasks stay online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı aç ki görevleri çevrimiçi kalsın."
+          }
+        }
+      }
+    },
     "Turn this on to end Keep Awake at a battery level you choose. It allows normal sleep; it does not shut down the Mac. Low-battery warnings below are on by default.": {
       "localizations": {
         "en": {
@@ -6776,16 +6989,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zaman içindeki değişimi anlayın"
-          }
-        }
-      }
-    },
-    "Units": {
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birimler"
           }
         }
       }
@@ -7017,17 +7220,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bluetooth bekleniyor…"
-          }
-        }
-      }
-    },
-    "Warn at": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyarı seviyesi"
           }
         }
       }
@@ -7275,46 +7467,46 @@
         }
       }
     },
-    "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+    "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet, aynı Apple ID’yi kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
+            "value": "Evet, aynı Apple Hesabı’nı kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
           }
         }
       }
     },
-    "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.": {
+    "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yes. Enable Local automation in Power. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open."
+            "value": "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet. Güç bölümünden Yerel otomasyonu açın. Derleme veya betikler için Terminal kurulumunu kopyalayıp battistics run kullanın; komut bitince Uyanık Tut sona erer, üst sınır 12 saattir. Etkileşimli bir yapay zekâ terminali için MCP yapılandırmasını güvendiğiniz istemciye ekleyin ve işe başlamadan görev başlatıp bitince durdurmasını isteyin. Açık kalan bir süreç tek başına işin bittiğini göstermez. Elle durdurma, süre sınırı, bağlantı kesilmesi veya pil ve ısı koruması, komutunuzu sonlandırmadan Uyanık Tut’u daha erken bitirebilir. Kapak kapalı görevler ayrı izin ve kurulu yardımcı gerektirir. Battistics’i açık tutun."
+            "value": "Evet. Otomasyon bölümünden Yerel otomasyonu açın. Derleme veya betikler için Terminal kurulumunu kopyalayıp battistics run kullanın; komut bitince Uyanık Tut sona erer, üst sınır 12 saattir. Etkileşimli bir yapay zekâ terminali için MCP yapılandırmasını güvendiğiniz istemciye ekleyin ve işe başlamadan görev başlatıp bitince durdurmasını isteyin. Açık kalan bir süreç tek başına işin bittiğini göstermez. Elle durdurma, süre sınırı, bağlantı kesilmesi veya pil ve ısı koruması, komutunuzu sonlandırmadan Uyanık Tut’u daha erken bitirebilir. Kapak kapalı görevler ayrı izin ve kurulu yardımcı gerektirir. Battistics’i açık tutun."
           }
         }
       }
     },
-    "Yes. In Power → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.": {
+    "Yes. In Keep Awake → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet. Güç → Oturum Koruması bölümünden Pil azaldığında Uyanık Tut’u durdur seçeneğini açın ve %5–50 arasında bir seviye seçin. Varsayılan olarak kapalıdır; önceden seçilen seviye %10’dur. Pil gücündeyken bu seviyede veya altında Battistics oturumu bitirir ve normal uykuya izin verir. Mac’i kapatmaz veya uygulamaları sonlandırmaz. Kural için Battistics’in çalışması ve geçerli bir pil ölçümü gerekir; ani güç kaybına karşı garanti vermez."
+            "value": "Evet. Uyanık Tut → Oturum Koruması bölümünden Pil azaldığında Uyanık Tut’u durdur seçeneğini açın ve %5–50 arasında bir seviye seçin. Varsayılan olarak kapalıdır; önceden seçilen seviye %10’dur. Pil gücündeyken bu seviyede veya altında Battistics oturumu bitirir ve normal uykuya izin verir. Mac’i kapatmaz veya uygulamaları sonlandırmaz. Kural için Battistics’in çalışması ve geçerli bir pil ölçümü gerekir; ani güç kaybına karşı garanti vermez."
           }
         }
       }
@@ -7347,19 +7539,19 @@
         }
       }
     },
-    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
+    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
+            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple ID’yi kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
+            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple Hesabı’nı kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
           }
         }
       }
@@ -7505,6 +7697,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS, kapak kapalı modun ihtiyaç duyduğu güç yardımcısını kurmadı."
+          }
+        }
+      }
+    },
+    "macOS ended it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS sonlandırdı."
           }
         }
       }

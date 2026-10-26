@@ -16,6 +16,7 @@ struct SettingsView: View {
                     Toggle("Notifications", isOn: $notify)
                         .onChange(of: notify) {
                             if notify { Task { await Notifications.requestPermission(); await readPermission() } }
+                            Task { await MacStore.shared.syncAlertSubscription(removing: !notify) }
                         }
                     if notify {
                         Picker("When Charged To", selection: $chargeTarget) {
@@ -23,13 +24,23 @@ struct SettingsView: View {
                             ForEach([80, 90, 100], id: \.self) { Text($0.percentText).tag($0) }
                         }
                     }
+                    if notify, permission == .notDetermined {
+                        Button("Allow Notifications") {
+                            Task { await Notifications.requestPermission(); await readPermission() }
+                        }
+                    }
                     if notify, permission == .denied {
-                        Button("Allow Notifications in Settings") {
+                        Button("Open Notification Settings") {
                             openURL(URL(string: UIApplication.openNotificationSettingsURLString)!)
                         }
                     }
                 } footer: {
-                    Text("When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
+                    if notify {
+                        Text("Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
+                    } else {
+                        // iCloud alert subscriptions belong to the account, not to one iPhone.
+                        Text("The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications.")
+                    }
                 }
 
                 Section {
@@ -55,6 +66,9 @@ struct SettingsView: View {
                     LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")
                     Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com")!) {
                         Label("Website and Help", systemImage: "safari")
+                    }
+                    Link(destination: URL(string: "https://www.doguyilmaz.com/legal/privacy/battistics")!) {
+                        Label("Privacy Policy", systemImage: "hand.raised")
                     }
                 }
             }

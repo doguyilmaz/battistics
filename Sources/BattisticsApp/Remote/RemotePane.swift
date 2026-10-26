@@ -12,8 +12,6 @@ struct RemotePane: View {
             Section {
                 Toggle("Show this Mac in Battistics Remote", isOn: $remote.enabled)
                     .disabled(!remote.isAvailable)
-                Text("Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.")
-                    .font(.caption).foregroundStyle(.secondary)
                 if !remote.isAvailable {
                     Label("This copy of Battistics is not signed for iCloud.", systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
@@ -28,12 +26,14 @@ struct RemotePane: View {
                             .foregroundStyle(.secondary)
                     }
                     Toggle("Allow closed-lid sessions from iPhone", isOn: $remote.closedLidAllowed)
-                    Text("Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.")
-                        .font(.caption).foregroundStyle(.secondary)
                 }
+            } header: {
+                InfoHeader("Battistics Remote",
+                           info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.",
+                           "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.")
             }
 
-            Section("Stay online with the lid closed") {
+            Section {
                 LabeledContent("Connection") {
                     if let ssid = network.ssid {
                         Text("\(network.state.label) · \(ssid)")
@@ -52,11 +52,11 @@ struct RemotePane: View {
                         .controlSize(.small)
                     }
                 }
-                Text("With no known Wi‑Fi nearby, this Mac can join your iPhone’s hotspot by itself. In Wi‑Fi settings, set Ask to join hotspots to Automatic. Keep Awake keeps the Mac, and so the connection, awake.")
-                    .font(.caption).foregroundStyle(.secondary)
                 Button("Open Wi‑Fi Settings") {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.wifi-settings-extension")!)
                 }
+            } header: {
+                InfoHeader("Stay online with the lid closed", info: "With no known Wi‑Fi nearby, this Mac can join your iPhone’s hotspot by itself. In Wi‑Fi settings, set Ask to join hotspots to Automatic. Keep Awake keeps the Mac, and so the connection, awake.")
             }
         }
         .formStyle(.grouped)

@@ -4,24 +4,27 @@ import SwiftUI
 enum DashboardPane: String, CaseIterable, Identifiable {
     case overview
     case history
+    /// Not in the sidebar; kept for battistics://dashboard/details.
     case details
     case peripherals
     case energy
     case system
+    case power
     case phone
     case general
     case appearance
     case notifications
     case data
+    case developer
     case about
     case help
 
     var id: String { rawValue }
 
-    // Not in the sidebar; kept for battistics://dashboard/details.
     static let batteryPanes: [DashboardPane] = [.overview, .history, .energy, .peripherals]
-    static let controlPanes: [DashboardPane] = [.system, .phone]
+    static let controlPanes: [DashboardPane] = [.system, .power, .phone]
     static let settingsPanes: [DashboardPane] = [.general, .appearance, .notifications, .data]
+    static let developerPanes: [DashboardPane] = [.developer]
     static let helpPanes: [DashboardPane] = [.help, .about]
 
     var title: String {
@@ -32,12 +35,14 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .peripherals: String(localized: "Peripherals")
         case .energy: String(localized: "Energy")
         // Raw values are persisted and used in links: never rename them.
-        case .system: String(localized: "Power")
+        case .system: String(localized: "Keep Awake")
+        case .power: String(localized: "Power")
         case .phone: String(localized: "iPhone")
         case .general: String(localized: "General")
         case .appearance: String(localized: "Menu Bar")
         case .notifications: String(localized: "Notifications")
         case .data: String(localized: "Data")
+        case .developer: String(localized: "Automation")
         case .about: String(localized: "About")
         case .help: String(localized: "Help & Assistant")
         }
@@ -50,12 +55,14 @@ enum DashboardPane: String, CaseIterable, Identifiable {
         case .details: "list.bullet.rectangle"
         case .peripherals: "keyboard"
         case .energy: "bolt.circle"
-        case .system: "switch.2"
+        case .system: "cup.and.saucer"
+        case .power: "bolt.batteryblock"
         case .phone: "iphone"
         case .general: "gearshape"
         case .appearance: "menubar.rectangle"
         case .notifications: "bell.badge"
         case .data: "internaldrive"
+        case .developer: "terminal"
         case .about: "info.circle"
         case .help: "questionmark.circle"
         }
@@ -99,7 +106,7 @@ struct DashboardView: View {
                 .disabled(model.tourRequested)
                 .accessibilityHidden(model.tourRequested)
         }
-        .frame(width: 860, height: 545)
+        .frame(width: 860, height: 620)
         .environment(\.tourStep, model.tourRequested ? tourStep : nil)
         .overlayPreferenceValue(TourTargetPreference.self) { anchors in
             if model.tourRequested {
@@ -218,6 +225,7 @@ struct DashboardView: View {
             Section("Battery") { rows(DashboardPane.batteryPanes) }
             Section("Controls") { rows(DashboardPane.controlPanes) }
             Section("Settings") { rows(DashboardPane.settingsPanes) }
+            Section("Developer") { rows(DashboardPane.developerPanes) }
             Section("Help") { rows(DashboardPane.helpPanes) }
         }
         .listStyle(.sidebar)
@@ -242,12 +250,14 @@ struct DashboardView: View {
         case .history: HistoryPane()
         case .peripherals: PeripheralsPane()
         case .energy: EnergyPane(isVisible: windowVisible)
-        case .system: SystemPane()
+        case .system: KeepAwakePane()
+        case .power: PowerPane()
         case .phone: RemotePane()
         case .general: GeneralSettings()
         case .appearance: AppearanceSettings()
         case .notifications: NotificationSettings()
         case .data: HistorySettings()
+        case .developer: DeveloperPane()
         case .about: AboutSettings()
         case .help: HelpPane()
         }

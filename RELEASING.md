@@ -32,6 +32,7 @@ Set these once with `gh secret set <NAME>`:
 | `APPLE_TEAM_ID` | 10 character team identifier |
 | `NOTARY_PASSWORD` | App-specific password for notarytool |
 | `SPARKLE_PRIVATE_KEY` | Sparkle EdDSA private key (see below) |
+| `MACOS_PROVISIONING_PROFILE` | Developer ID profile with iCloud and Push for `com.doguyilmaz.Battistics`, base64: `base64 -i Battistics_Developer_ID.provisionprofile \| pbcopy`. It must list the certificate in `MACOS_CERT_P12`. Without it a release has no iCloud and cannot reach the iPhone app. |
 
 ## The Sparkle key
 
@@ -53,18 +54,12 @@ WARNING: losing this key strands existing users on their current version.
 Updates signed with a different key are rejected by installed apps. Keep the
 Keychain item backed up.
 
-## Manual fallback
+## When a release run fails
 
-If CI is unavailable, a full release can run locally:
-
-```sh
-make test
-SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" make dmg
-xcrun notarytool submit dist/Battistics-*.dmg --keychain-profile battistics --wait
-xcrun stapler staple dist/Battistics-*.dmg
-make appcast   # requires the Sparkle key in the login Keychain
-make release   # needs gh auth
-```
+The tag is created with the GitHub release, after the build, so a run that
+fails in the build, signing or notarization leaves no tag: fix the cause and
+re-run the workflow or push again. If only the Homebrew step fails, the
+release exists; run `make tap V=X.Y.Z` instead.
 
 The `battistics` notary profile is stored in the login Keychain
 (`notarytool store-credentials`). Signing note: `make app` re-signs

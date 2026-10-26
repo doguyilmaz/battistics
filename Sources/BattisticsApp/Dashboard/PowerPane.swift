@@ -1,12 +1,9 @@
 import BattisticsCore
 import SwiftUI
 
-/// Live controls over how this Mac behaves, as opposed to the panes that
-/// only report on the battery.
-struct SystemPane: View {
+/// Low Power Mode, sleep timers and the helper that changes them.
+struct PowerPane: View {
     @Environment(KeepAwakeModel.self) private var keepAwake
-    /// Ticks with the dashboard's existing refresh loop so the countdown
-    /// moves without a timer of its own.
     @Environment(AppModel.self) private var model
     @Environment(PowerSettingsModel.self) private var powerModel
     @State private var failure: PaneFailure?
@@ -24,60 +21,7 @@ struct SystemPane: View {
     @Environment(PowerHelperClient.self) private var helper
 
     var body: some View {
-        @Bindable var keepAwake = keepAwake
-        return Form {
-            if keepAwake.isActive {
-                Section("Current session") { KeepAwakeSessionCard() }
-            }
-            Section("Keep Awake") {
-                VStack(alignment: .leading, spacing: 12) {
-                    Toggle(
-                        "Prevent this Mac from sleeping",
-                        isOn: Binding(
-                            get: { keepAwake.isActive },
-                            set: { _ in keepAwake.toggle() }))
-
-                    Picker("Mode", selection: $keepAwake.displayedMode) {
-                        ForEach(KeepAwakeMode.allCases) { mode in
-                            Text(mode.label).tag(mode)
-                        }
-                    }
-                    if let caption = keepAwake.displayedMode.caption {
-                        Text(caption)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Picker("Duration", selection: $keepAwake.displayedDuration) {
-                        ForEach(KeepAwakeDuration.allCases) { duration in
-                            Text(duration.label).tag(duration)
-                        }
-                    }
-
-                    if let error = keepAwake.errorMessage {
-                        Text(error)
-                            .foregroundStyle(keepAwake.isStoppedReasonInformational ? Color.secondary : Color.red)
-                    }
-                    if keepAwake.isActive && keepAwake.displayedMode != .displayOn {
-                        Button("Sleep Display Now") { keepAwake.sleepDisplayNow() }
-                    }
-                }
-                .disabled(keepAwake.isChanging)
-                .tourTarget(.power)
-            }
-
-            KeepAwakeProfiles()
-            KeepAwakeSafetySettings()
-            AutomationSettings()
-
-            Section {
-                Text(
-                    "Display modes use a power assertion. Closed-lid mode also uses the power helper to temporarily disable system sleep and restore the previous setting when the session ends. If the lid is still closed then, the Mac goes to sleep as it normally would."
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-
+        Form {
             Section {
                 if let power = powerModel.settings {
                     if power.sleepDisabled == true, !holdsLidSleep {
@@ -121,13 +65,13 @@ struct SystemPane: View {
                 Text("Sleep and Energy")
             }
 
-            Section("Power Helper") {
+            Section {
                 permissionRow
+            } header: {
+                InfoHeader("Power Helper", info: "The power helper changes sleep settings without a password and keeps the Mac running with its lid closed. It restores the previous setting when a closed-lid session ends.")
             }
         }
         .formStyle(.grouped)
-        .modifier(TourScrollModifier())
-        .navigationTitle("Power")
         .alert(
             failure?.title ?? "", isPresented: failureBinding, presenting: failure
         ) { _ in
@@ -216,7 +160,7 @@ struct SystemPane: View {
                 localized: "No password needed. Sleep timers apply to \(sourceName).")
         }
         if auth.isUnlocked {
-            return String(localized: "Permission granted until Battistics quits.")
+            return String(localized: "Permission granted. It locks again after 10 minutes without a change.")
         }
         return String(
             localized: "You will be asked for your administrator password on the first change.")

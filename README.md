@@ -51,15 +51,16 @@ All three work on battery or adapter and end on their timer even if Battistics i
 
 ### Protection
 
-In **Power › Session Protection**, or **Stop on Low Battery** in the menu bar's
+In **Keep Awake › Session Protection**, or **Stop on Low Battery** in the menu bar's
 Keep Awake menu, Keep Awake can end at 5–50% charge on battery. It is off by
 default and only ends the session; it never shuts the Mac down. Warnings start
-at 20%. **Thermal Care** warns under heavy thermal pressure and can stop the
+at 20%. **Session Protection** also warns under heavy thermal pressure and can stop the
 session. Fan speeds are not changed. Details: [session protection](docs/session-protection.md).
 
 ### Terminal and AI tasks
 
-Turn on **Power › Local automation**, then:
+Turn on **Automation › Local automation** and paste the line from **Copy
+Terminal setup** into your shell profile (`~/.zshrc`), then:
 
 ```sh
 battistics run --name Build -- swift build
@@ -75,7 +76,7 @@ Battistics Remote shows the Mac's battery and its last day, how long it lasts,
 its connection, lid and heat, its accessory batteries and busiest apps, and
 starts or stops Keep Awake, even with the lid closed in a bag. Widgets, a Lock
 Screen countdown and a Control Center control come with it. Turn on
-**iPhone** in Battistics; any iPhone on the same Apple ID finds the Mac through
+**iPhone** in Battistics; any iPhone on the same Apple Account finds the Mac through
 your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
 to join hotspots automatically uses the iPhone's hotspot. See
 [remote companion](docs/remote.md) and the [iPhone guide](https://battistics.apps.doguyilmaz.com/docs/iphone/).

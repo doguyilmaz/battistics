@@ -13,13 +13,10 @@ struct HistorySettings: View {
 
     var body: some View {
         Form {
-            Section("Recording") {
-                Text("Charge history records battery changes. Power and temperature history add periodic background readings; a longer interval reduces sampling work.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            Section {
                 Toggle("Record power and temperature", isOn: $samplingEnabled)
                     .onChange(of: samplingEnabled) {
-                        model.restartPowerSampling()
+                        model.samplePowerOnNextRead()
                     }
                 if samplingEnabled {
                     Picker("Sampling interval", selection: $samplingInterval) {
@@ -29,11 +26,13 @@ struct HistorySettings: View {
                         Text("5 minutes").tag(300.0)
                     }
                     .onChange(of: samplingInterval) {
-                        model.restartPowerSampling()
+                        model.samplePowerOnNextRead()
                     }
                 }
+            } header: {
+                InfoHeader("Recording", info: "Charge history records battery changes. Power and temperature history add periodic background readings; a longer interval reduces sampling work.")
             }
-            Section("Data") {
+            Section {
                 LabeledContent(
                     "On disk",
                     value: ByteCountFormatter.string(fromByteCount: databaseSize, countStyle: .file))
@@ -47,9 +46,8 @@ struct HistorySettings: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Text("Old samples are compacted automatically: raw power readings become hourly averages after 30 days. Daily health snapshots are kept forever.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            } header: {
+                InfoHeader("Data", info: "Old samples are compacted automatically: raw power readings become hourly averages after 30 days. Daily health snapshots are kept forever.")
             }
         }
         .formStyle(.grouped)

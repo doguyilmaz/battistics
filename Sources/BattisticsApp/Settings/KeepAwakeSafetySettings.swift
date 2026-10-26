@@ -6,37 +6,29 @@ struct KeepAwakeSafetySettings: View {
 
     var body: some View {
         @Bindable var safety = keepAwake.safety
-        Section("Session Protection") {
+        Section {
             Toggle("Warn when the power adapter disconnects", isOn: $safety.configuration.warnOnAdapterDisconnect)
-            Text("Only during Keep Awake. The session continues on battery with your existing protection settings.")
-                .font(.caption).foregroundStyle(.secondary)
-            Toggle("Stop Keep Awake on low battery", isOn: $safety.configuration.stopOnLowBattery)
+            ThresholdToggle("Stop Keep Awake on low battery", isOn: $safety.configuration.stopOnLowBattery,
+                            percent: stopPercent, range: 5...50)
                 .tourTarget(.protection)
-            if safety.configuration.stopOnLowBattery {
-                Stepper(value: stopPercent, in: 5...50, step: 5) {
-                    LabeledContent("Stop at", value: Formatting.percent(Double(safety.configuration.effectiveStopPercent)))
-                }
-                Text("Ends Keep Awake and allows normal sleep. It does not shut down the Mac or close your apps. Disabled by default.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            Toggle("Warn me before the battery runs low", isOn: $safety.configuration.warnOnLowBattery)
-            if safety.configuration.warnOnLowBattery {
-                Stepper(value: warningPercent, in: safety.configuration.minimumWarningPercent...80, step: 5) {
-                    LabeledContent("Warn at", value: Formatting.percent(Double(safety.configuration.effectiveWarningPercent)))
-                }
+            ThresholdToggle("Warn me before the battery runs low", isOn: $safety.configuration.warnOnLowBattery,
+                            percent: warningPercent, range: safety.configuration.minimumWarningPercent...80)
+            LabeledContent {
+                Toggle("", isOn: $safety.configuration.stopOnThermalPressure).labelsHidden().toggleStyle(.switch)
+            } label: {
+                Text("Stop Keep Awake under high thermal pressure")
+                Text("System thermal pressure: \(thermalLabel)")
             }
             if let warning = safety.warningMessage {
                 Label(warning, systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
             }
-            Text("Protection works while Battistics is running. A sudden charge drop may skip the warning level. Keep power connected for work that cannot be interrupted.")
-                .font(.caption).foregroundStyle(.secondary)
-        }
-        Section("Thermal Care") {
-            LabeledContent("System thermal pressure", value: thermalLabel)
-            Toggle("Stop Keep Awake under high thermal pressure", isOn: $safety.configuration.stopOnThermalPressure)
-            Text("Warns when macOS reports serious or critical thermal pressure. The optional stop applies on battery and power adapter. Battistics does not change fan speeds; keep vents clear and never run a closed Mac in a bag.")
-                .font(.caption).foregroundStyle(.secondary)
+        } header: {
+            InfoHeader("Session Protection",
+                       info: "Only during Keep Awake. The session continues on battery with your existing protection settings.",
+                       "Ends Keep Awake and allows normal sleep. It does not shut down the Mac or close your apps. Disabled by default.",
+                       "Protection works while Battistics is running. A sudden charge drop may skip the warning level. Keep power connected for work that cannot be interrupted.",
+                       "Warns when macOS reports serious or critical thermal pressure. The optional stop applies on battery and power adapter. Battistics does not change fan speeds; keep vents clear and never run a closed Mac in a bag.")
         }
     }
 

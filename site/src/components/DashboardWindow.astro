@@ -4,7 +4,9 @@ import overview from "../assets/panes/overview.png";
 import history from "../assets/panes/history.png";
 import energy from "../assets/panes/energy.png";
 import peripherals from "../assets/panes/peripherals.png";
-import power from "../assets/panes/system.png";
+import keepAwake from "../assets/panes/keep-awake.png";
+import power from "../assets/panes/power.png";
+import automation from "../assets/panes/automation.png";
 import phone from "../assets/panes/phone.png";
 import general from "../assets/panes/general.png";
 import menubar from "../assets/panes/appearance.png";
@@ -26,7 +28,8 @@ const groups = [
   {
     title: "Controls",
     panes: [
-      { id: "power", label: "Power", icon: "switch.2", image: power, about: "Keep Awake with its modes and profiles, session protection, Low Power Mode and the sleep timers." },
+      { id: "awake", label: "Keep Awake", icon: "cup.and.saucer", image: keepAwake, about: "Keep Awake with its modes, ready-made profiles and the protection that stops it on low battery or heat." },
+      { id: "power", label: "Power", icon: "bolt.batteryblock", image: power, about: "Low Power Mode, the sleep timers, and the helper that changes them without a password." },
       { id: "iphone", label: "iPhone", icon: "iphone", image: phone, about: "Show this Mac in Battistics Remote and let the iPhone start closed-lid sessions." },
     ],
   },
@@ -38,6 +41,10 @@ const groups = [
       { id: "notifications", label: "Notifications", icon: "bell.badge", image: notifications, about: "Low battery, full charge, charge limit, heat and health alerts, each with its own threshold." },
       { id: "data", label: "Data", icon: "internaldrive", image: data, about: "Power and temperature recording, CSV export and import, and how much history is on disk." },
     ],
+  },
+  {
+    title: "Developer",
+    panes: [{ id: "automation", label: "Automation", icon: "terminal", image: automation, about: "Keep the Mac awake for exactly as long as a terminal command or an AI task runs." }],
   },
   {
     title: "Help",
@@ -123,12 +130,12 @@ const first = groups[0].panes[0];
   .icon { display: flex; justify-content: center; width: 18px; opacity: 0.9; }
   .sidebar button[aria-pressed="true"] .icon { opacity: 1; }
   .sidebar button:hover { background: rgb(255 255 255 / 0.06); }
-  .sidebar button[aria-pressed="true"] { background: #0a63d8; }
-  .sidebar button:focus-visible { outline: 2px solid #4b9bff; outline-offset: -2px; }
+  .sidebar button[aria-pressed="true"] { background: var(--accent-strong); }
+  .sidebar button:focus-visible { outline: 2px solid var(--accent-a); outline-offset: -2px; }
   .content { display: grid; min-width: 0; }
   figure { grid-area: 1 / 1; margin: 0; visibility: hidden; opacity: 0; transition: opacity 0.15s ease, visibility 0s linear 0.15s; }
   figure[data-active="true"] { visibility: visible; opacity: 1; transition: opacity 0.15s ease; }
-  .shot { display: block; aspect-ratio: 668 / 530; max-width: 668px; background: var(--win-bg); }
+  .shot { display: block; aspect-ratio: 668 / 608; max-width: 668px; background: var(--win-bg); }
   .shot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
   figcaption { padding: 14px 20px 18px; border-top: 1px solid rgb(255 255 255 / 0.06); color: var(--win-ink-2); font-size: 14px; line-height: 1.5; }
 

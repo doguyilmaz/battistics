@@ -34,6 +34,10 @@ struct WidgetSettingsView: View {
                         preview(width: 230, height: 32, shape: .capsule, dark: true) {
                             MacLockScreenDetailView(entry: entry, familyOverride: .accessoryInline)
                         }
+                        preview(width: 170, height: 76, shape: .rect(cornerRadius: 16), dark: true) {
+                            AllMacsWidgetView(entry: AllMacsEntry(date: .now, snapshots: allSnapshots),
+                                              familyOverride: .accessoryRectangular)
+                        }
                     }
                     .padding(.vertical, 8)
                 }
@@ -57,6 +61,9 @@ struct WidgetSettingsView: View {
                         preview(width: 338, height: 158, shape: .rect(cornerRadius: 22)) {
                             MacTelemetryWidgetView(entry: entry, familyOverride: .systemMedium)
                         }
+                        preview(width: 338, height: 158, shape: .rect(cornerRadius: 22)) {
+                            AllMacsWidgetView(entry: AllMacsEntry(date: .now, snapshots: allSnapshots), familyOverride: .systemMedium)
+                        }
                     }
                     .padding(.vertical, 8)
                 }
@@ -75,10 +82,15 @@ struct WidgetSettingsView: View {
     }
 
     private var snapshot: SharedSnapshot {
-        guard let mac = store.selected, let reading = store.reading(for: mac), let status = reading.status else {
+        guard let mac = store.selected, let reading = store.reading(for: mac), reading.status != nil else {
             return .sample()
         }
-        return SharedSnapshot(macName: mac.name, status: status, reachable: reading.reachable)
+        return SharedSnapshot(mac, reading: reading)
+    }
+
+    private var allSnapshots: [SharedSnapshot] {
+        let snapshots = store.macs.map { SharedSnapshot($0, reading: store.reading(for: $0)) }
+        return snapshots.isEmpty ? [.sample()] : snapshots
     }
 
     private func preview<S: Shape, Content: View>(width: CGFloat, height: CGFloat, shape: S, dark: Bool = false,
@@ -89,5 +101,6 @@ struct WidgetSettingsView: View {
             .background(dark ? AnyShapeStyle(.black.opacity(0.85)) : AnyShapeStyle(Color(.secondarySystemGroupedBackground)), in: shape)
             .environment(\.colorScheme, dark ? .dark : colorScheme)
             .clipShape(shape)
+            .allowsHitTesting(false)
     }
 }

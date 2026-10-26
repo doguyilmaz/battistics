@@ -19,11 +19,10 @@ public final class WakeAssertion {
     /// Takes an assertion for `mode`, replacing any current one. When
     /// `deadline` is set the kernel is given the timeout too, so the
     /// assertion cannot outlive it even if this process is suspended and
-    /// never gets to release it itself.
+    /// never gets to release it itself. The new one is taken before the old
+    /// is released, so the Mac is never left without one in between.
     @discardableResult
     public func take(mode: KeepAwakeMode, until deadline: Date?, now: Date = Date()) -> Bool {
-        release()
-
         var properties: [String: Any] = [
             kIOPMAssertionTypeKey as String: mode.assertionType,
             kIOPMAssertionNameKey as String: "Battistics Keep Awake",
@@ -39,6 +38,7 @@ public final class WakeAssertion {
         var newIdentifier = IOPMAssertionID(0)
         let result = IOPMAssertionCreateWithProperties(
             properties as CFDictionary, &newIdentifier)
+        release()
         guard result == kIOReturnSuccess else { return false }
         identifier = newIdentifier
         isHeld = true

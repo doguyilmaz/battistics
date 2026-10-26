@@ -2,7 +2,7 @@
 
 Battistics exposes a local stdio MCP server through the bundled
 `Battistics.app/Contents/MacOS/battistics-mcp` executable. Open Battistics,
-enable **Local automation** in Power, and copy the client configuration
+enable **Local automation** in Automation, and copy the client configuration
 from that section. Automation is off by default. No cloud service, TCP port,
 API key, or history access is involved.
 
@@ -36,8 +36,8 @@ absolute and cannot be extended by heartbeats.
 
 The stdio process holds a private Unix socket connection to the app. EOF or
 process exit releases its session. A 15-second heartbeat and 45-second lease
-also release it if the client stalls (checked every five seconds while the app
-can run). User stops, expiry, battery protection,
+also release it if the client stalls (checked when the lease runs out, while
+the app can run). User stops, expiry, battery protection,
 thermal protection, and disabling automation are final: a heartbeat never
 restarts a session. Closed-lid automation needs a separate opt-in and an
 already installed power helper; MCP does not install or repair the helper.

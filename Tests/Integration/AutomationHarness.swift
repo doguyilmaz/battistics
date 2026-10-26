@@ -2,10 +2,6 @@ import AppKit
 import BattisticsCore
 import SwiftUI
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 /// Runs with a separate bundle identifier and temporary socket. It acquires
 /// short-lived idle/display assertions only; it never installs a helper or
 /// enables closed-lid mode on the development Mac.
@@ -145,7 +141,7 @@ struct AutomationHarness {
     }
 
     private static func capture(_ automation: AutomationModel, awake: KeepAwakeModel) async throws {
-        try await render(Form { AutomationSettings() }.formStyle(.grouped).environment(automation),
+        try await render(DeveloperPane().environment(automation),
                          name: "automation", width: 680, height: 760)
         let directory = URL(fileURLWithPath: "/private/tmp/battistics-automation-\(UUID())")
         defer { try? FileManager.default.removeItem(at: directory) }

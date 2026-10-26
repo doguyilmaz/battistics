@@ -4,7 +4,6 @@ import SwiftUI
 
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
-    @Environment(UpdaterModel.self) private var updater
     @AppStorage(Prefs.showMenuBarIcon) private var showMenuBarIcon = true
     @AppStorage(Prefs.showDockIcon) private var showDockIcon = false
     @AppStorage(Prefs.openDashboardAtLaunch) private var openDashboardAtLaunch = false
@@ -17,8 +16,7 @@ struct GeneralSettings: View {
     @State private var loginItemError: String?
 
     var body: some View {
-        @Bindable var updater = updater
-        return Form {
+        Form {
             Section {
                 Toggle("Start at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in
@@ -38,8 +36,9 @@ struct GeneralSettings: View {
                         .foregroundStyle(.red)
                 }
                 Toggle("Open the main window at launch", isOn: $openDashboardAtLaunch)
+                Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
             }
-            Section("Visibility") {
+            Section {
                 Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
                     .disabled(showMenuBarIcon && !showDockIcon)
                 Toggle("Show Dock icon", isOn: $showDockIcon)
@@ -47,55 +46,31 @@ struct GeneralSettings: View {
                     .onChange(of: showDockIcon) {
                         model.applyActivationPolicy()
                     }
-                Text("At least one of the two stays on so Battistics remains reachable.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Toggle("Keep the main window on top", isOn: $keepDashboardOnTop)
+            } header: {
+                InfoHeader("Visibility", info: "At least one of the two stays on so Battistics remains reachable.")
             }
-            ThemeAndIconSections()
-            Section("Updates") {
-                Toggle("Check for updates automatically", isOn: $updater.automaticallyChecksForUpdates)
-                Toggle("Download updates automatically", isOn: $updater.automaticallyDownloadsUpdates)
-                LabeledContent {
-                    Button("Check Now") {
-                        updater.checkForUpdates()
-                    }
-                    .disabled(!updater.canCheckForUpdates)
-                } label: {
-                    Text(lastCheckedText)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Section("Experiments") {
-                HStack {
-                    Toggle("Show Power Flow", isOn: $showPowerFlow)
-                        .onChange(of: showPowerFlow) { model.refreshSensors() }
-                    PowerFlowInfoButton()
-                }
-                Text("Show power readings in Energy and the popover. On by default; support varies by Mac and macOS.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Section("Units") {
+            Section("Appearance") {
+                ThemeAndIconRows()
                 Picker("Temperature unit", selection: $temperatureUnitRaw) {
                     Text("Celsius and Fahrenheit").tag(TemperatureUnit.both.rawValue)
                     Text("Celsius").tag(TemperatureUnit.celsius.rawValue)
                     Text("Fahrenheit").tag(TemperatureUnit.fahrenheit.rawValue)
                 }
+                LabeledContent {
+                    HStack(spacing: 8) {
+                        PowerFlowInfoButton()
+                        Toggle("", isOn: $showPowerFlow)
+                            .labelsHidden()
+                            .toggleStyle(.switch)
+                            .onChange(of: showPowerFlow) { model.refreshSensors() }
+                    }
+                } label: {
+                    Text("Show Power Flow")
+                    Text("Experimental. Support varies by Mac and macOS.")
+                }
             }
         }
         .formStyle(.grouped)
-    }
-
-    /// Sparkle checks daily, counted from the last check rather than from
-    /// launch, so "never" here means it has not run yet, not that it is off.
-    private var lastCheckedText: String {
-        guard let date = updater.lastCheckDate else {
-            return String(localized: "Checked automatically every 24 hours")
-        }
-        return String(
-            localized: "Last checked \(date.formatted(.relative(presentation: .named)))")
     }
 
     private func updateLoginItem(_ enabled: Bool) {

@@ -7,19 +7,24 @@ import Observation
 import SystemConfiguration
 
 /// Shares this Mac with the user's iPhones through their private iCloud
-/// database: a status record out, Start and Stop commands in. Off by default.
+/// database: a status record and alerts out, commands in. Off by default.
 @MainActor
 @Observable
 final class RemoteAccessModel {
     var enabled: Bool {
         didSet {
             UserDefaults.standard.set(enabled, forKey: Prefs.remoteEnabled)
+            updateNapActivity()
             if enabled {
                 NSApplication.shared.registerForRemoteNotifications()
                 Task { await sync() }
             } else {
-                Task { await withdraw() }
+                Task {
+                    await withdraw()
+                    startTicker()
+                }
             }
+            if enabled { startTicker() }
         }
     }
     var closedLidAllowed: Bool {
@@ -47,17 +52,26 @@ final class RemoteAccessModel {
     @ObservationIgnored private let battery: @MainActor () -> BatterySnapshot?
     /// The last published status before history and power settings were added, for cheap comparisons.
     @ObservationIgnored private var lastCheap: RemoteStatus?
+    /// The last full status published, which alerts compare against.
+    @ObservationIgnored private var lastStatus: RemoteStatus?
     @ObservationIgnored private var lastCommand: RemoteStatus.CommandResult?
     @ObservationIgnored private var lastCommandAt: Date?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
     /// Ran but not yet deleted, so a failed delete neither runs a command
     /// twice nor leaves its record behind: the delete is retried next sync.
     @ObservationIgnored private var handledCommands: Set<String> = []
+    /// Alert records seen in the zone, by when they were posted.
+    @ObservationIgnored private var events: [String: Date] = [:]
+    /// Retried with the next publish until they land or go stale.
+    @ObservationIgnored private var unsentAlerts: [(alert: RemoteAlert, at: Date)] = []
+    @ObservationIgnored private var runtimeAlertSession: Date?
+    @ObservationIgnored private var publishing: Task<Void, Error>?
     @ObservationIgnored private var retryAt: Date?
     @ObservationIgnored private var cachedPower: (settings: PowerSettings?, at: Date)?
     @ObservationIgnored private var syncing = false
     @ObservationIgnored private var pendingPublish: Task<Void, Never>?
     @ObservationIgnored private var ticker: Task<Void, Never>?
+    @ObservationIgnored private var napActivity: NSObjectProtocol?
     @ObservationIgnored private var pushObserver: NSObjectProtocol?
     @ObservationIgnored private var powerStateObserver: NSObjectProtocol?
     @ObservationIgnored let macID: String
@@ -100,6 +114,7 @@ final class RemoteAccessModel {
         observeSession()
         observePowerSettings()
         startTicker()
+        updateNapActivity()
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
             Task { await sync() }
@@ -124,6 +139,8 @@ final class RemoteAccessModel {
         var recordMissing = false
         do {
             let snapshot = try await cloud.fetchChanges()
+            // After a relaunch, alerts compare against what the phones last saw.
+            if lastStatus == nil { lastStatus = snapshot.statuses[macID] }
             recordMissing = (snapshot.isFull && snapshot.statuses[macID] == nil)
                 || snapshot.removedStatuses.contains(macID)
             // Left behind by a phone whose delete failed for a Mac that is gone; seen at launch.
@@ -143,8 +160,13 @@ final class RemoteAccessModel {
                 if mine.count > 1 { try? await publish(force: true) }
                 handled = true
             }
-            try await cloud.delete(Array(handledCommands))
+            // Alerts only need to live long enough to be pushed. A delta fetch
+            // shows each one once, so they are remembered until they expire.
+            events.merge(snapshot.events) { $1 }
+            let expired = events.filter { -$0.value.timeIntervalSinceNow > 10 * 60 }.keys
+            try await cloud.delete(Array(handledCommands) + expired)
             handledCommands.removeAll()
+            for name in expired { events[name] = nil }
         } catch {
             failure = error
         }
@@ -163,13 +185,24 @@ final class RemoteAccessModel {
         problem = failure.map(Self.describe)
     }
 
+    /// One at a time, so an older reading never lands after a newer one.
+    private func publish(force: Bool) async throws {
+        let previous = publishing
+        let next = Task { [weak self] in
+            _ = await previous?.result
+            try await self?.publishNow(force: force)
+        }
+        publishing = next
+        try await next.value
+    }
+
     /// Compares the cheap part of the status first, so a poll that changes
     /// nothing costs no history query and no `pmset` spawn.
-    private func publish(force: Bool) async throws {
+    private func publishNow(force: Bool) async throws {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds {
             var compared = status
             compared.readAt = lastCheap.readAt
             compared.battery?.watts = lastCheap.battery?.watts
@@ -190,6 +223,28 @@ final class RemoteAccessModel {
         }
         lastCheap = cheap
         lastPublished = Date()
+        if let previous = lastStatus {
+            for alert in RemoteAlert.pushed(from: previous, to: status) {
+                // An estimate hovering around the session's end would otherwise ring each time it crosses.
+                if case .batteryRunsOut = alert {
+                    guard runtimeAlertSession != status.session?.startedAt else { continue }
+                    runtimeAlertSession = status.session?.startedAt
+                }
+                unsentAlerts.append((alert, .now))
+            }
+        }
+        lastStatus = status
+        unsentAlerts.removeAll { -$0.at.timeIntervalSinceNow > 10 * 60 }
+        var failed: [(alert: RemoteAlert, at: Date)] = []
+        for item in unsentAlerts {
+            guard let text = item.alert.pushText else { continue }
+            do {
+                try await cloud.post(title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
+            } catch {
+                failed.append(item)
+            }
+        }
+        unsentAlerts = failed
     }
 
     /// Coalesces bursts of changes into one write.
@@ -212,13 +267,15 @@ final class RemoteAccessModel {
     private func withdraw() async {
         pendingPublish?.cancel()
         lastCheap = nil
+        lastStatus = nil
         lastPublished = nil
         problem = nil
         // Retried by the ticker until it lands, or phones keep a ghost of this Mac.
         guard let cloud else { return }
         let removed: Bool
         do {
-            try await cloud.delete([macID])
+            try await cloud.delete([macID] + events.keys)
+            events.removeAll()
             removed = true
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             removed = true
@@ -256,18 +313,37 @@ final class RemoteAccessModel {
 
     /// Polls for phone commands because macOS throttles silent pushes: every
     /// few seconds while a session runs or right after a command, otherwise
-    /// slower. Each poll is a delta fetch, so an idle zone costs one small request.
+    /// slower. Each poll is a delta fetch, so an idle zone costs one small
+    /// request. Stops while sharing is off and nothing is left to withdraw.
     private func startTicker() {
+        guard ticker == nil, cloud != nil else { return }
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 let interval = self?.pollInterval ?? 15
                 try? await Task.sleep(for: .seconds(interval))
                 guard let self, !Task.isCancelled else { return }
-                if !self.enabled, UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) {
+                if !self.enabled {
+                    guard UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) else {
+                        self.ticker = nil
+                        return
+                    }
                     await self.withdraw()
                 }
                 await self.sync()
             }
+        }
+    }
+
+    /// App Nap stretches a windowless app's timers far past the phone's
+    /// wait, so the Mac sits out commands while sharing is on. Idle sleep is
+    /// still allowed.
+    private func updateNapActivity() {
+        if enabled, cloud != nil, napActivity == nil {
+            napActivity = ProcessInfo.processInfo.beginActivity(
+                options: .userInitiatedAllowingIdleSystemSleep, reason: "Answering Battistics Remote")
+        } else if !enabled, let activity = napActivity {
+            ProcessInfo.processInfo.endActivity(activity)
+            napActivity = nil
         }
     }
 
@@ -307,6 +383,8 @@ final class RemoteAccessModel {
         case .inspect:
             extras = await Self.inspect()
             return nil
+        case .extend:
+            return extend(request)
         case .unknown:
             return .init(.invalidRequest)
         }
@@ -357,6 +435,23 @@ final class RemoteAccessModel {
         }
     }
 
+    private func extend(_ request: RemoteRequest) -> RemoteFailure? {
+        guard let minutes = request.durationMinutes, RemoteRequest.extensions.contains(minutes) else {
+            return .init(.invalidRequest)
+        }
+        guard let session = awake.session, !awake.isChanging else {
+            return .init(.startFailed, String(localized: "Keep Awake is not running on this Mac."))
+        }
+        guard session.deadline != nil else {
+            return .init(.startFailed, String(localized: "Keep Awake already runs until it is turned off."))
+        }
+        let name = request.senderName
+        guard awake.extend(byMinutes: minutes, origin: .phone, name: name ?? String(localized: "iPhone")) else {
+            return .init(.startFailed, String(localized: "Keep Awake already lasts the longest it can, 12 hours."))
+        }
+        return nil
+    }
+
     private func start(_ request: RemoteRequest) async -> RemoteFailure? {
         let minutes = request.durationMinutes ?? 0
         guard RemoteRequest.allowedDurations.contains(minutes),
@@ -378,7 +473,7 @@ final class RemoteAccessModel {
             }
         }
         let id = UUID().uuidString
-        let name = request.deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
+        let name = request.senderName
         let task = awake.start(mode: mode, duration: duration, id: id, allowHelperSetup: false,
                                name: name ?? String(localized: "iPhone"), origin: .phone)
         await task?.value
@@ -473,7 +568,6 @@ final class RemoteAccessModel {
             ),
             macModel: Self.hardwareModel,
             osVersion: Self.osVersion,
-            pairedPhoneName: network.preferredHotspotPhoneName,
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras
