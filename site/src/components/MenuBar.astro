@@ -245,6 +245,10 @@ const menus = [
   const popover = document.getElementById("popover");
   item.addEventListener("click", (event) => {
     event.stopPropagation();
+    if (popover && getComputedStyle(popover).position !== "absolute") {
+      popover.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     const opening = item.getAttribute("aria-expanded") !== "true";
     item.setAttribute("aria-expanded", String(opening));
     if (popover) popover.dataset.open = String(opening);

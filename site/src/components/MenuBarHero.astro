@@ -125,6 +125,9 @@ import Contours from "./Contours.astro";
     .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
     .desk :global(.pop) { position: relative; top: auto; right: auto; margin: 48px auto 0; width: min(340px, calc(100% - 2 * var(--gutter))); }
     .desk :global(.pop .arrow) { display: none; }
+    /* On a phone the popover is part of the page: it stays open and cannot be quit. */
+    .desk :global(.pop[data-open="false"]) { opacity: 1; transform: none; visibility: visible; }
+    .desk :global(.pop [data-quit]), .desk :global(.pop hr:has(+ [data-quit])) { display: none; }
   }
 </style>
 
