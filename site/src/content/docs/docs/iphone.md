@@ -17,7 +17,7 @@ Battistics Remote is on its way. Set up your Mac today and it will be ready the 
 2. In Battistics, open **iPhone** and turn on **Show this Mac in Battistics Remote**.
 3. Sign in to iCloud on the iPhone and the Mac with the same Apple Account.
 
-There is nothing to pair. The Mac and the iPhone talk through your private iCloud database, encrypted, with no server and no open port. Closed-lid sessions from the iPhone are allowed only if you turn that on in the same pane.
+There is nothing to pair. The Mac and the iPhone talk through your private iCloud database, with readings and commands encrypted, no server and no open port. Closed-lid sessions from the iPhone are allowed only if you turn that on in the same pane.
 
 ## On the iPhone
 

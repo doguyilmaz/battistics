@@ -28,8 +28,9 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
   - The Live Activity uses `unheardDate` as its stale date, also for timed sessions, and then shows "No update since 10:42". It shows the Mac as offline only after a fetch confirmed it.
 - Settings › Notifications › When Charged To reports once when a charging Mac reaches 80, 90 or 100%. It is evaluated on the phone, so it arrives with the next update the phone receives.
 - Alerts are delivered once per change and awaited before a background task completes. Lid and unplug warnings are cleared when the Mac moves to Hotspot.
-- The Mac posts the alerts it can see itself (session ended, battery low or running out, unplugged or lid closed away from Hotspot) as short-lived `Event` records after each publish (`RemoteAlert.pushed`). Phones hold one CloudKit query subscription on `Event` (`remote-alerts`), so iOS shows them straight from the push, without the silent-push throttling and while the app is not running. No server, no cost.
+- The Mac posts the alerts it can see itself (session ended, battery low or running out, unplugged or lid closed away from Hotspot, running hot) as short-lived `Event` records after each publish (`RemoteAlert.pushed`). Phones hold one CloudKit query subscription on `Event` (`remote-alerts`), so iOS shows them straight from the push, without the silent-push throttling and while the app is not running. No server, no cost.
 - Push payloads cannot carry encrypted fields, so an `Event` holds only a title and a sentence in the Mac's language and a collapse id; no Mac name, network or reading beyond the percentage or time the alert is about. The Mac deletes them after 10 minutes.
+- The phone's notification service extension (`BattisticsPhoneAlerts`) reads the Mac id from the collapse id and adds the Mac's name and its thread from the phone's own copy (`SharedSnapshot.loadAll`), so the name never leaves the device.
 - Every Mac pushes its own alerts; a phone whose subscription is saved skips those kinds locally, leaving it the charge target and "stopped answering". The collapse id equals the local notification id, so the two replace each other instead of stacking.
 - CloudKit does not push a change to the device that made it, so a Mac never shows its own alerts; one that receives another Mac's alert removes it.
 
@@ -40,17 +41,17 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Accessories & Apps is sampled on the Mac only when asked (`RemoteRequest.Operation.inspect`): accessory batteries (IORegistry and `system_profiler`) and the five apps using the most CPU over 3 seconds.
 - This iPhone shows only what iOS reports (charge, state, Low Power Mode, heat, storage, time since restart) and the health and cycle count the user copied from Settings, labelled as entered. iOS gives apps neither those values nor the device name.
 - From its own readings it adds the last day's charge, how long since it saw the iPhone unplugged and the rate over the last hour (`ChargeRate`), with a time estimate worded as "at this rate". An unplug from before the app ran stays unknown.
-- Notification permission is asked on the first Keep Awake start, not at launch.
+- Notification permission is asked when a Mac dashboard first opens, not at launch, and from Settings while it is undecided.
 - Theme is applied with `window.overrideUserInterfaceStyle`, which also reaches open sheets.
-- `-demo` (Debug builds only) fills the app with sample Macs and plays commands locally, for Simulator checks without iCloud.
+- `-demo` fills the app with sample Macs and plays commands locally, for Simulator checks without iCloud.
 
 ## Widgets, Live Activity, Control
 
-- Home Screen: Mac (small, medium, large) and Mac Battery (small, medium). Lock Screen: rectangular, circular, inline. One preference set in Settings › Widgets applies to all of them.
+- Home Screen: Mac (small, medium, large), Mac Battery (small, medium) and All Macs (medium, large). Lock Screen: Mac (rectangular, circular, inline) and All Macs (rectangular). Each opens the Mac it shows (`battistics-remote://mac/<id>`). One preference set in Settings › Widgets applies to all of them.
 - The Live Activity merges mode and lid into one line ("Lid closed", "Ready to close lid") and ends with a freshness line, 30 more minutes and Stop. Its buttons carry the Mac id, so they act on that Mac whichever one the app has selected.
 - Keep Mac Awake is a Control Center and Action Button control on iOS 18 (`KeepAwakeControl`). Each placed control has its own mode and duration, set by tapping it while Control Center is in edit mode; iOS gives third-party controls no long-press menu.
 - The app icon's menu offers Keep Awake for 1 hour, or Add 30 Minutes and Stop while a session runs (`QuickActions`).
-- Shortcuts and Siri: Keep Awake, Add Time, Let Sleep, Check Mac, Mac Low Power and Display Off (`Intents.swift`).
+- Shortcuts and Siri: Keep Awake, Add Time, Let Sleep, Check Mac, Mac Low Power, Display Off and Open Mac, plus Get Mac Battery Level for automations (`Intents.swift`). Each can name the Mac it acts on (`MacEntity`).
 - Add Time (`RemoteRequest.Operation.extend`, 15 minutes to 2 hours) is on the Mac dashboard, the Live Activity (30 minutes), the large widget and Shortcuts. It adds to what is left, up to 12 hours from now, and takes a session over from a terminal or AI task.
 - Live Activities are matched to a Mac by its id, so two Macs with the same name never share one.
 - A refused or unanswered command from a widget, the Live Activity or the control arrives as a notification, since those surfaces cannot show a reply.
