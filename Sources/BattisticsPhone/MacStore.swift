@@ -89,6 +89,13 @@ final class MacStore {
 
     var remoteMacs: [Mac] { triesSample ? [] : macs }
 
+    /// Widgets and the Live Activity move to a Mac a Shortcut starts or extends.
+    func follow(_ mac: Mac) {
+        guard mac.id != macID else { return }
+        macID = mac.id
+        publishSelected()
+    }
+
     /// A Mac picked in Shortcuts, else `remoteMac`.
     func remoteMac(id: String?) -> Mac? {
         guard let id else { return remoteMac }
@@ -125,9 +132,12 @@ final class MacStore {
         Task { await refreshAll() }
     }
 
+    /// A reading saved as live counts only while it is still fresh, so an
+    /// offline launch does not show an old one as current.
     private static func savedReadings() -> [String: Reading] {
-        UserDefaults.standard.data(forKey: "readings")
+        let saved = UserDefaults.standard.data(forKey: "readings")
             .flatMap { try? RemoteWire.decode([String: Reading].self, from: $0) } ?? [:]
+        return saved.mapValues { .init(status: $0.status, reachable: $0.reachable && $0.status?.isFresh() == true) }
     }
 
     // MARK: Reading
@@ -154,7 +164,7 @@ final class MacStore {
         // A cancelled refresh says nothing about the Macs, nor one that ended
         // after the sample replaced them.
         guard !Task.isCancelled, !isSample else { return [] }
-        if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 600 }) ?? true {
+        if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 120 }) ?? true {
             alertSubscriptionChecked = .now
             Task { await syncAlertSubscription() }
         }

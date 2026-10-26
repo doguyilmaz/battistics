@@ -44,6 +44,7 @@ struct StartKeepAwakeIntent: LiveActivityIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
+        MacStore.shared.follow(mac)
         if let failure = await MacStore.shared.start(mac, mode: mode.mode, minutes: duration.rawValue) {
             return .result(dialog: "\(failure)")
         }
@@ -88,6 +89,7 @@ struct AddKeepAwakeTimeIntent: LiveActivityIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
+        MacStore.shared.follow(mac)
         if let failure = await MacStore.shared.extend(mac, minutes: time.rawValue) { return .result(dialog: "\(failure)") }
         return .result(dialog: "\(mac.name) stays awake \(DurationLabel.long(minutes: time.rawValue)) longer.")
     }
@@ -113,7 +115,9 @@ struct SetMacLowPowerIntent: AppIntent {
     @Parameter(title: "Low Power Mode") var setting: IntentLowPower
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Set Mac Low Power Mode to \(\.$setting)")
+        Summary("Set Mac Low Power Mode to \(\.$setting)") {
+            \.$target
+        }
     }
 
     @Parameter(title: "Mac") var target: MacEntity?
@@ -152,7 +156,8 @@ struct MacStatusIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
         await MacStore.shared.refreshAll()
-        guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status else {
+        guard let reading = MacStore.shared.reading(for: mac), reading.reachable, let status = reading.status,
+              status.isFresh() else {
             return .result(dialog: "\(mac.name) is not answering.")
         }
         let battery = status.battery.map { String(localized: "Battery \($0.percent)%.") } ?? ""
@@ -174,7 +179,7 @@ struct MacBatteryLevelIntent: AppIntent {
         guard let mac = MacStore.shared.remoteMac(id: target?.id) else { throw IntentFailure.notPaired }
         await MacStore.shared.refreshAll()
         guard let reading = MacStore.shared.reading(for: mac), reading.reachable,
-              let percent = reading.status?.battery?.percent else {
+              reading.status?.isFresh() == true, let percent = reading.status?.battery?.percent else {
             throw IntentFailure.noReading(mac.name)
         }
         return .result(value: percent)

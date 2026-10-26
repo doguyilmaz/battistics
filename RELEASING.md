@@ -56,8 +56,9 @@ Keychain item backed up.
 ## When a release run fails
 
 The tag is created with the GitHub release, after the build, so a run that
-fails in signing or notarization leaves no tag. Fix the cause and re-run the
-workflow or push again.
+fails in the build, signing or notarization leaves no tag: fix the cause and
+re-run the workflow or push again. If only the Homebrew step fails, the
+release exists; run `make tap V=X.Y.Z` instead.
 
 The `battistics` notary profile is stored in the login Keychain
 (`notarytool store-credentials`). Signing note: `make app` re-signs
