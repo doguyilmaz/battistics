@@ -14,6 +14,7 @@ struct RemoteWidgets: WidgetBundle {
         KeepAwakeActivityWidget()
         if #available(iOS 18.0, *) {
             KeepAwakeControl()
+            MacDisplayControl()
         }
     }
 }
@@ -57,6 +58,19 @@ struct KeepAwakeControl: ControlWidget {
             let on = snapshot?.reachable == true && snapshot?.status?.session?.isActive(at: .now) == true
             return Value(isOn: on, mode: configuration.mode, duration: configuration.duration)
         }
+    }
+}
+
+@available(iOS 18.0, *)
+struct MacDisplayControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "mac.display.control") {
+            ControlWidgetButton(action: SleepMacDisplayLiveIntent()) {
+                Label("Display Off", systemImage: "moon.zzz.fill")
+            }
+        }
+        .displayName("Turn Off Mac Display")
+        .description("Turns off the display of the Mac you picked in Battistics Remote. The Mac keeps running.")
     }
 }
 

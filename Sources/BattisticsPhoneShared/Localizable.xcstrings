@@ -6187,6 +6187,17 @@
           }
         }
       }
+    },
+    "Turns off the display of the Mac you picked in Battistics Remote. The Mac keeps running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battistics Remote’ta seçtiğin Mac’in ekranını kapatır. Mac çalışmaya devam eder."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

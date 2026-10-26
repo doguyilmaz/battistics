@@ -38,6 +38,7 @@ enum RemoteIntentBridge {
     /// Given the Live Activity's own Mac; nil means the selected one.
     static var stop: ((String?) async -> Void)?
     static var extend: ((String?, Int) async -> Void)?
+    static var sleepDisplay: (() async -> Void)?
 }
 
 struct StartKeepAwakeLiveIntent: LiveActivityIntent {
@@ -95,6 +96,20 @@ struct ExtendKeepAwakeLiveIntent: LiveActivityIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         await RemoteIntentBridge.extend?(macID, minutes)
+        return .result()
+    }
+}
+
+/// Backs the Control Center and Action Button display control; runs in the app.
+struct SleepMacDisplayLiveIntent: LiveActivityIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
+    static let title: LocalizedStringResource = "Turn Off Mac Display"
+    static let description = IntentDescription("Puts your computer’s display to sleep. The computer keeps running.")
+    static let isDiscoverable = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        await RemoteIntentBridge.sleepDisplay?()
         return .result()
     }
 }
