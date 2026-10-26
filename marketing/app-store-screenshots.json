@@ -22,8 +22,8 @@
           "tr": "Battistics Remote"
         },
         "headline": {
-          "en": "Your Mac,\n*from your pocket.*",
-          "tr": "Mac'in,\n*cebinde.*"
+          "en": "Your Mac\n*in your pocket*",
+          "tr": "Mac’in\n*cebinde*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/01.png"
       },
@@ -35,8 +35,8 @@
           "tr": "Canlı Etkinlik"
         },
         "headline": {
-          "en": "Lid closed.\n*Still running.*",
-          "tr": "Kapak kapalı.\n*Mac çalışıyor.*"
+          "en": "Keeps running\n*with the lid closed*",
+          "tr": "Kapak kapalıyken de\n*çalışmaya devam*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/02.png"
       },
@@ -48,8 +48,8 @@
           "tr": "Uyanık Tut"
         },
         "headline": {
-          "en": "Keep Awake,\n*one tap away.*",
-          "tr": "Uyanık Tut,\n*tek dokunuşla.*"
+          "en": "Keep Awake\n*with one tap*",
+          "tr": "Tek dokunuşla\n*Uyanık Tut*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/03.png"
       },
@@ -61,8 +61,8 @@
           "tr": "Aksesuarlar ve Uygulamalar"
         },
         "headline": {
-          "en": "Every battery,\n*one glance.*",
-          "tr": "Her pil,\n*tek bakışta.*"
+          "en": "Every battery\n*at a glance*",
+          "tr": "Tüm piller\n*tek bakışta*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/04.png"
       },
@@ -74,8 +74,8 @@
           "tr": "Pil Ayrıntıları"
         },
         "headline": {
-          "en": "Every detail,\n*down to the mAh.*",
-          "tr": "Her ayrıntı,\n*mAh'ine kadar.*"
+          "en": "Every detail\n*down to the mAh*",
+          "tr": "Her ayrıntı\n*mAh düzeyinde*"
         },
         "screenshot": "/screenshots/apple/iphone/{locale}/05.png",
         "screenshotSecondary": "/screenshots/apple/iphone/{locale}/03.png"
@@ -84,12 +84,12 @@
         "id": "br_closer",
         "layout": "no-device",
         "label": {
-          "en": "Private by design",
-          "tr": "Gizlilik önce gelir"
+          "en": "Privacy",
+          "tr": "Gizlilik"
         },
         "headline": {
-          "en": "No account.\nNo server.\n*Just your iCloud.*",
-          "tr": "Hesap yok.\nSunucu yok.\n*Yalnızca iCloud'un.*"
+          "en": "Nothing in between\n*but your iCloud*",
+          "tr": "Arada sadece\n*senin iCloud’un var*"
         },
         "screenshot": "",
         "transforms": {
@@ -122,7 +122,7 @@
             "id": "features",
             "text": {
               "en": "Home Screen widgets\nLive Activity\nControl Center\nShortcuts\nQuick Actions",
-              "tr": "Ana Ekran widget'ları\nCanlı Etkinlik\nDenetim Merkezi\nKestirmeler\nHızlı Eylemler"
+              "tr": "Ana Ekran widget’ları\nCanlı Etkinlik\nDenetim Merkezi\nKestirmeler\nHızlı Eylemler"
             },
             "transform": {
               "x": 106,
