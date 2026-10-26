@@ -51,6 +51,9 @@ struct SetupGuide: View {
                 if let problem = store.problem {
                     Label(problem, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
+                } else if store.remoteMacs.isEmpty, !store.outdated.isEmpty {
+                    Label("Update Battistics Remote to read this Mac", systemImage: "arrow.down.app")
+                        .foregroundStyle(.orange)
                 } else if store.remoteMacs.isEmpty {
                     Label("No Mac is sharing with this Apple Account yet.", systemImage: "magnifyingglass")
                         .foregroundStyle(.secondary)
@@ -59,7 +62,8 @@ struct SetupGuide: View {
                         .foregroundStyle(.green)
                 }
                 Button {
-                    Task { await store.refreshAll() }
+                    // Looks for a real Mac, which the sample stands in for.
+                    if store.isSample { store.endSample() } else { Task { await store.refreshAll() } }
                 } label: {
                     HStack {
                         if store.refreshing { ProgressView() }

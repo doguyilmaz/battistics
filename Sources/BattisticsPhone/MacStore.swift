@@ -209,8 +209,9 @@ final class MacStore {
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
         var alerts: [(Mac, [RemoteAlert])] = []
+        // Also a Mac never read before, so setup can say why it does not appear.
+        outdated = snapshot.unreadable
         for (id, status) in snapshot.statuses {
-            outdated.remove(id)
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
@@ -226,7 +227,6 @@ final class MacStore {
         }
         // Its last readable status stays, but no longer as live.
         for id in snapshot.unreadable where readings[id] != nil {
-            outdated.insert(id)
             readings[id]?.reachable = false
         }
         // A Mac that stopped sharing is gone, not silent.
