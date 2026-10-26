@@ -19,8 +19,12 @@ final class RemoteAccessModel {
                 NSApplication.shared.registerForRemoteNotifications()
                 Task { await sync() }
             } else {
-                Task { await withdraw() }
+                Task {
+                    await withdraw()
+                    startTicker()
+                }
             }
+            if enabled { startTicker() }
         }
     }
     var closedLidAllowed: Bool {
@@ -198,8 +202,7 @@ final class RemoteAccessModel {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
-        status.pushesAlerts = true
-        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.expectedHeartbeat {
+        if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds {
             var compared = status
             compared.readAt = lastCheap.readAt
             compared.battery?.watts = lastCheap.battery?.watts
@@ -310,14 +313,20 @@ final class RemoteAccessModel {
 
     /// Polls for phone commands because macOS throttles silent pushes: every
     /// few seconds while a session runs or right after a command, otherwise
-    /// slower. Each poll is a delta fetch, so an idle zone costs one small request.
+    /// slower. Each poll is a delta fetch, so an idle zone costs one small
+    /// request. Stops while sharing is off and nothing is left to withdraw.
     private func startTicker() {
+        guard ticker == nil, cloud != nil else { return }
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 let interval = self?.pollInterval ?? 15
                 try? await Task.sleep(for: .seconds(interval))
                 guard let self, !Task.isCancelled else { return }
-                if !self.enabled, UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) {
+                if !self.enabled {
+                    guard UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) else {
+                        self.ticker = nil
+                        return
+                    }
                     await self.withdraw()
                 }
                 await self.sync()
@@ -559,7 +568,6 @@ final class RemoteAccessModel {
             ),
             macModel: Self.hardwareModel,
             osVersion: Self.osVersion,
-            pairedPhoneName: network.preferredHotspotPhoneName,
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras

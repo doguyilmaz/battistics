@@ -13,18 +13,23 @@ struct ConditionsGrid: View {
                      symbol: status.network.symbol,
                      tint: status.network == .offline ? .orange : (isHotspot ? PowerPalette.hotspot : .accentColor),
                      highlighted: isHotspot)
-            StatTile(title: String(localized: "Lid"),
-                     value: status.lidClosed == true ? String(localized: "Closed") : String(localized: "Open"),
-                     symbol: status.lidClosed == true ? "laptopcomputer.slash" : "laptopcomputer")
-            StatTile(title: String(localized: "Power Adapter"),
-                     value: status.battery?.onAdapter == true
-                        ? status.battery?.adapterWatts.map { "\($0) W" } ?? String(localized: "Connected")
-                        : String(localized: "Not connected"),
-                     symbol: status.battery?.onAdapter == true ? "powerplug.fill" : "powerplug",
-                     tint: status.battery?.onAdapter == true ? PowerPalette.charging : .accentColor)
-            StatTile(title: String(localized: "Battery stop"),
-                     value: status.protection.stopAtPercent?.percentText ?? String(localized: "Off"),
-                     symbol: "shield.lefthalf.filled")
+            if let battery = status.battery {
+                StatTile(title: String(localized: "Lid"),
+                         value: status.lidClosed == true ? String(localized: "Closed") : String(localized: "Open"),
+                         symbol: status.lidClosed == true ? "laptopcomputer.slash" : "laptopcomputer")
+                StatTile(title: String(localized: "Power Adapter"),
+                         value: battery.onAdapter
+                            ? battery.adapterWatts.map { "\($0) W" } ?? String(localized: "Connected")
+                            : String(localized: "Not connected"),
+                         symbol: battery.onAdapter ? "powerplug.fill" : "powerplug",
+                         tint: battery.onAdapter ? PowerPalette.charging : .accentColor)
+                StatTile(title: String(localized: "Battery stop"),
+                         value: status.protection.stopAtPercent?.percentText ?? String(localized: "Off"),
+                         symbol: "shield.lefthalf.filled")
+            } else {
+                StatTile(title: String(localized: "Heat"), value: status.thermal.label, symbol: "thermometer.medium",
+                         tint: status.thermal.isHot ? status.thermal.tint : .accentColor)
+            }
         }
     }
 }
@@ -60,6 +65,7 @@ struct HotspotCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             if !ready {
                 Button("How") { showingHelp = true }
+                    .accessibilityLabel(Text("How to turn on Personal Hotspot"))
                     .buttonStyle(.bordered)
                     .controlSize(.small)
             }

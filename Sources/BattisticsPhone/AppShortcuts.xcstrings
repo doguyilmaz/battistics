@@ -65,6 +65,38 @@
         }
       }
     },
+    "Open ${target} in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open ${target} in ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile ${target} aç"
+          }
+        }
+      }
+    },
+    "Open my Mac in ${applicationName}": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open my Mac in ${applicationName}"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} ile Mac’imi aç"
+          }
+        }
+      }
+    },
     "Set my Mac’s Low Power Mode with ${applicationName}": {
       "localizations": {
         "en": {

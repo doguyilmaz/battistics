@@ -2,8 +2,8 @@ import Foundation
 import IOKit.ps
 
 /// Event-driven power source observation. macOS invokes the run loop source
-/// on every power state change (each percent step, plug or unplug), so no
-/// a low-frequency fallback catches delayed controller updates.
+/// on every power state change (each percent step, plug or unplug); a
+/// low-frequency fallback catches delayed controller updates.
 @MainActor
 public final class PowerSourceMonitor {
     private var powerSourceNotification: CFRunLoopSource?

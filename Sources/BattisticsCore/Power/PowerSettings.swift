@@ -58,9 +58,6 @@ public struct PowerSettings: Sendable, Equatable {
         public var systemSleepMinutes: Int?
         public var displaySleepMinutes: Int?
         public var diskSleepMinutes: Int?
-        public var powerNap: Bool?
-        public var wakeOnNetwork: Bool?
-        public var sleepOnPowerButton: Bool?
         public var energyMode: EnergyMode?
 
         public init() {}
@@ -173,9 +170,6 @@ public enum PowerSettingsReader {
         case "sleep": source.systemSleepMinutes = number
         case "displaysleep": source.displaySleepMinutes = number
         case "disksleep": source.diskSleepMinutes = number
-        case "powernap": source.powerNap = flag
-        case "womp": source.wakeOnNetwork = flag
-        case "sleep on power button": source.sleepOnPowerButton = flag
         case "powermode": source.energyMode = number.flatMap(EnergyMode.init(rawValue:))
         default: break
         }

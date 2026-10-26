@@ -286,7 +286,10 @@ struct PopoverView: View {
             get: { current },
             set: { option in
                 Task { @MainActor in
-                    await powerModel.apply(.lowPowerMode(option), using: auth, helper: helper)
+                    // The menu re-reads the real value; the beep says the change did not land.
+                    if await powerModel.apply(.lowPowerMode(option), using: auth, helper: helper) == .failed {
+                        NSSound.beep()
+                    }
                 }
             })
     }

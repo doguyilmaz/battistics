@@ -26,7 +26,7 @@ struct DeveloperPane: View {
             } header: {
                 InfoHeader("Local automation",
                            info: "Terminal commands and AI clients can start a named task for up to 12 hours. Your battery and thermal protections still apply.",
-                           "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.")
+                           "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.")
             }
 
             Section {

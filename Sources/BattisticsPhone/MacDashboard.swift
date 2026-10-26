@@ -11,14 +11,15 @@ struct MacDashboard: View {
 
         DashboardPage(glow: reading?.status.map { Glow($0, reachable: reachable) } ?? .offline,
                       refresh: { await store.refreshAll() }) {
-            StatusLine(reading: reading, problem: store.problem)
+            StatusLine(reading: reading, problem: store.problem
+                       ?? (store.outdated.contains(mac.id) ? String(localized: "Update Battistics Remote to read this Mac") : nil))
             if let status = reading?.status {
                 Group {
                     BatteryCard(mac: mac, status: status, reachable: reachable)
                     KeepAwakeCard(mac: mac, status: status, reachable: reachable)
                     ConditionsGrid(status: status)
                         .opacity(reachable ? 1 : 0.6)
-                    HotspotCard(mac: mac, status: status, reachable: reachable)
+                    if status.battery != nil { HotspotCard(mac: mac, status: status, reachable: reachable) }
                     MacExtrasCard(mac: mac, status: status, reachable: reachable)
                 }
                 .animation(.snappy, value: reachable)
@@ -27,6 +28,45 @@ struct MacDashboard: View {
                     .frame(maxWidth: .infinity, minHeight: 240)
             }
         }
+        .safeAreaInset(edge: .bottom) {
+            if store.isSample && !DemoData.isEnabled { SampleBar() }
+        }
+        .task {
+            guard !store.isSample, UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true else { return }
+            await Notifications.requestPermission()
+        }
+    }
+}
+
+/// Stays in view while the Macs on screen are made up.
+private struct SampleBar: View {
+    @Environment(MacStore.self) private var store
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Sample Mac")
+                    .font(.subheadline.weight(.semibold))
+                Text("Made-up readings. Every control works.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Button("Exit") {
+                withAnimation(.snappy) { store.endSample() }
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .fontWeight(.semibold)
+        }
+        .padding(.leading, 18)
+        .padding(.trailing, 10)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: .capsule)
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .accessibilityElement(children: .contain)
     }
 }
 

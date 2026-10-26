@@ -10,6 +10,7 @@ struct RemoteWidgets: WidgetBundle {
         MacWidget()
         MacBatteryWidget()
         MacLockScreenDetailWidget()
+        AllMacsWidget()
         KeepAwakeActivityWidget()
         if #available(iOS 18.0, *) {
             KeepAwakeControl()
@@ -36,8 +37,8 @@ struct KeepAwakeControl: ControlWidget {
 
     struct Value {
         var isOn: Bool
-        var mode: ControlMode
-        var duration: ControlDuration
+        var mode: KeepAwakeMode
+        var duration: KeepAwakeDuration
 
         /// "Lid Closed · 1 hour", what turning the control on will do.
         var summary: String {
@@ -90,6 +91,7 @@ struct MacWidget: Widget {
         StaticConfiguration(kind: "mac", provider: MacProvider()) { entry in
             MacWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Dashboard")
         .description("Battery, power, network and Keep Awake controls for your Mac.")
@@ -102,6 +104,7 @@ struct MacBatteryWidget: Widget {
         StaticConfiguration(kind: "mac.telemetry", provider: MacProvider()) { entry in
             MacTelemetryWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Battery Telemetry")
         .description("Capacity in mAh, power, health, cycles, temperature and the last 24 hours.")
@@ -114,9 +117,43 @@ struct MacLockScreenDetailWidget: Widget {
         StaticConfiguration(kind: "mac.lockscreen.detail", provider: MacProvider()) { entry in
             MacLockScreenDetailView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.snapshot?.url)
         }
         .configurationDisplayName("Mac Lock Screen")
         .description("A full-width Lock Screen widget with charge bar, power, health, cycles and the Keep Awake timer.")
         .supportedFamilies([.accessoryRectangular, .accessoryCircular, .accessoryInline])
+    }
+}
+
+struct AllMacsProvider: TimelineProvider {
+    func placeholder(in context: Context) -> AllMacsEntry {
+        AllMacsEntry(date: .now, snapshots: [.sample()])
+    }
+
+    func getSnapshot(in context: Context, completion: @escaping (AllMacsEntry) -> Void) {
+        let snapshots = SharedSnapshot.loadAll()
+        completion(AllMacsEntry(date: .now, snapshots: snapshots.isEmpty ? [.sample()] : snapshots))
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<AllMacsEntry>) -> Void) {
+        let now = Date.now
+        let snapshots = SharedSnapshot.loadAll()
+        // Each Mac that stops writing turns offline at its own moment.
+        let offline = snapshots.compactMap { $0.reachable ? $0.status?.unheardDate : nil }.filter { $0 > now }
+        let entries = ([now] + offline.sorted()).map { AllMacsEntry(date: $0, snapshots: snapshots) }
+        let deadline = snapshots.compactMap { $0.status?.session?.deadline }.filter { $0 > now }.min()
+        completion(Timeline(entries: entries, policy: .after(deadline ?? now.addingTimeInterval(15 * 60))))
+    }
+}
+
+struct AllMacsWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: AllMacsEntry.kind, provider: AllMacsProvider()) { entry in
+            AllMacsWidgetView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+        .configurationDisplayName("All Macs")
+        .description("Battery and Keep Awake for every Mac on your Apple Account.")
+        .supportedFamilies([.systemMedium, .systemLarge, .accessoryRectangular])
     }
 }

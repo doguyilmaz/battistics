@@ -256,23 +256,6 @@
         }
       }
     },
-    "Allow Notifications in Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow Notifications in Settings"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar’dan Bildirimlere İzin Ver"
-          }
-        }
-      }
-    },
     "Allow closed-lid sessions from iPhone in Battistics on the Mac.": {
       "extractionState": "manual",
       "localizations": {
@@ -285,7 +268,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin verin."
+            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin ver."
           }
         }
       }
@@ -353,7 +336,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %%%lld. Mac çalışmaya devam etmeliyse güce bağlayın."
+            "value": "Pil %%%lld. Mac çalışmaya devam etmeliyse güce bağla."
           }
         }
       }
@@ -1033,7 +1016,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hotspot olmadan pilde kapak kapatıldı. Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
+            "value": "Hotspot olmadan pilde kapak kapatıldı. Mac’i yanına alıyorsan Kişisel Erişim Noktası’na bağla."
           }
         }
       }
@@ -1361,23 +1344,6 @@
         }
       }
     },
-    "Sign in to iCloud on this iPhone with the same Apple ID as your Mac.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign in to iCloud on this iPhone with the same Apple ID as your Mac."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu iPhone’da Mac’inizle aynı Apple ID ile iCloud’a giriş yapın."
-          }
-        }
-      }
-    },
     "Started from iPhone": {
       "extractionState": "manual",
       "localizations": {
@@ -1391,23 +1357,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone’dan başlatıldı"
-          }
-        }
-      }
-    },
-    "Starts Keep Awake on your Mac with the display allowed to sleep.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Starts Keep Awake on your Mac with the display allowed to sleep."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’inizde ekranın uyumasına izin vererek Uyanık Tut’u başlatır."
           }
         }
       }
@@ -1458,7 +1407,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut açıkken yanıt vermeyi bıraktı. Devam eden bir iş varsa Kişisel Erişim Noktası’na bağlayın veya Wi‑Fi’yi kontrol edin."
+            "value": "Uyanık Tut açıkken yanıt vermeyi bıraktı. Devam eden bir iş varsa Kişisel Erişim Noktası’na bağla veya Wi‑Fi’yi kontrol et."
           }
         }
       }
@@ -1492,7 +1441,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizde Uyanık Tut’u durdurur."
+            "value": "Mac’inde Uyanık Tut’u durdurur."
           }
         }
       }
@@ -1526,7 +1475,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizin pilini ve uyanık tutulup tutulmadığını söyler."
+            "value": "Mac’inin pilini ve uyanık tutulup tutulmadığını söyler."
           }
         }
       }
@@ -1628,7 +1577,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinizin çevrimiçi kalması için Kişisel Erişim Noktası’nı açın."
+            "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinin çevrimiçi kalması için Kişisel Erişim Noktası’nı aç."
           }
         }
       }
@@ -1662,7 +1611,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’teki Battistics’i veya bu uygulamayı güncelleyin."
+            "value": "Mac’teki Battistics’i veya bu uygulamayı güncelle."
           }
         }
       }
@@ -1730,7 +1679,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’leriniz"
+            "value": "Mac’lerin"
           }
         }
       }
@@ -1747,7 +1696,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud’a ulaşılamadı. Birazdan tekrar deneyin."
+            "value": "iCloud’a ulaşılamadı. Birazdan tekrar dene."
           }
         }
       }
@@ -4625,23 +4574,6 @@
         }
       }
     },
-    "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "When Keep Awake ends, the Mac’s battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyanık Tut bittiğinde, Mac’in pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
-          }
-        }
-      }
-    },
     "Fully charged": {
       "extractionState": "manual",
       "localizations": {
@@ -5266,7 +5198,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizdeki Uyanık Tut oturumuna süre ekler."
+            "value": "Mac’indeki Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5334,7 +5266,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizde çalışan Uyanık Tut oturumuna süre ekler."
+            "value": "Mac’inde çalışan Uyanık Tut oturumuna süre ekler."
           }
         }
       }
@@ -5623,7 +5555,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu kontrolün Mac’inizi hangi modda ve ne kadar uyanık tutacağını seçin."
+            "value": "Bu kontrolün Mac’ini hangi modda ve ne kadar uyanık tutacağını seç."
           }
         }
       }
@@ -5640,7 +5572,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics Remote’ta seçtiğiniz Mac’i, seçtiğiniz modda ve sürede uyanık tutar."
+            "value": "Battistics Remote’ta seçtiğin Mac’i, seçtiğin modda ve sürede uyanık tutar."
           }
         }
       }
@@ -5657,7 +5589,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’inizi uyanık tutar ya da yeniden uyumasına izin verir."
+            "value": "Mac’ini uyanık tutar ya da yeniden uyumasına izin verir."
           }
         }
       }
@@ -5675,6 +5607,465 @@
           "stringUnit": {
             "state": "translated",
             "value": "Henüz görülmedi"
+          }
+        }
+      }
+    },
+    "Privacy Policy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gizlilik Politikası"
+          }
+        }
+      }
+    },
+    "Open Notification Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Notification Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirim Ayarlarını Aç"
+          }
+        }
+      }
+    },
+    "Try a Sample Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try a Sample Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek Bir Mac ile Dene"
+          }
+        }
+      }
+    },
+    "Sample Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek Mac"
+          }
+        }
+      }
+    },
+    "Made-up readings. Every control works.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made-up readings. Every control works."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Örnek değerler. Tüm denetimler çalışır."
+          }
+        }
+      }
+    },
+    "Exit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çık"
+          }
+        }
+      }
+    },
+    "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to iCloud on this iPhone with the same Apple Account as your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu iPhone’da Mac’inle aynı Apple Hesabı ile iCloud’a giriş yap."
+          }
+        }
+      }
+    },
+    "Keep Awake ends in 5 minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake ends in 5 minutes."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut 5 dakika içinde bitiyor."
+          }
+        }
+      }
+    },
+    "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut sırasında ısınıyor. Kapağı aç ve hava deliklerini açık bırak ya da Uyanık Tut’u durdur."
+          }
+        }
+      }
+    },
+    "Allow Notifications": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Notifications"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirimlere İzin Ver"
+          }
+        }
+      }
+    },
+    "How to turn on Personal Hotspot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How to turn on Personal Hotspot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kişisel Erişim Noktası nasıl açılır"
+          }
+        }
+      }
+    },
+    "%@ stays awake until you turn it off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ stays awake until you turn it off."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sen kapatana kadar uyanık kalır."
+          }
+        }
+      }
+    },
+    "Starts Keep Awake on your Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts Keep Awake on your Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inde Uyanık Tut’u başlatır."
+          }
+        }
+      }
+    },
+    "Keep Awake for 1 hour": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake for 1 hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 saat Uyanık Tut"
+          }
+        }
+      }
+    },
+    "Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut bitmeden önce ve bittiğinde, Mac ısındığında, pili azaldığında ya da oturuma yetmeyecekse, Hotspot dışında kapak kapandığında, Mac yanıt vermeyi bıraktığında veya seçtiğin seviyeye şarj olduğunda."
+          }
+        }
+      }
+    },
+    "%@ is not answering or has no battery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is not answering or has no battery."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yanıt vermiyor ya da pili yok."
+          }
+        }
+      }
+    },
+    "Get Mac Battery Level": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Mac Battery Level"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Pil Seviyesini Al"
+          }
+        }
+      }
+    },
+    "Returns your Mac’s battery level, from 0 to 100.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Returns your Mac’s battery level, from 0 to 100."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inin pil seviyesini 0 ile 100 arasında verir."
+          }
+        }
+      }
+    },
+    "All Macs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Macs"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm Mac’ler"
+          }
+        }
+      }
+    },
+    "Battery and Keep Awake for every Mac on your Apple Account.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery and Keep Awake for every Mac on your Apple Account."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabındaki her Mac’in pili ve Uyanık Tut durumu."
+          }
+        }
+      }
+    },
+    "The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabındaki başka bir iPhone’da açıkken Mac’in kendi uyarıları buraya da gelir. Bu iPhone’u susturmak için Ayarlar › Bildirimler’den kapat."
+          }
+        }
+      }
+    },
+    "Open Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’i Aç"
+          }
+        }
+      }
+    },
+    "Opens a Mac in Battistics Remote.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens a Mac in Battistics Remote."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir Mac’i Battistics Remote’ta açar."
+          }
+        }
+      }
+    },
+    "Update Battistics Remote to read this Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Battistics Remote to read this Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac için Battistics Remote’u güncelle"
+          }
+        }
+      }
+    },
+    "Battery Level": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery Level"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil Seviyesi"
+          }
+        }
+      }
+    },
+    "Keep Awake On": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Awake On"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut Açık"
+          }
+        }
+      }
+    },
+    "Answering": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answering"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yanıt Veriyor"
           }
         }
       }

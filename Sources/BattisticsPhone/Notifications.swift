@@ -17,12 +17,19 @@ enum Notifications {
         return value > 0 ? value : nil
     }
     static let refreshTask = "com.doguyilmaz.Battistics.Remote.refresh"
+    static let extendAction = "extend30"
+    private static let endingCategory = "keepawake.ending"
+    private static let endingLead: TimeInterval = 5 * 60
 
     static func requestPermission() async {
         _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
     }
 
     static func register() {
+        let extend = UNNotificationAction(identifier: extendAction, title: String(localized: "Add 30 Minutes"))
+        UNUserNotificationCenter.current().setNotificationCategories([
+            UNNotificationCategory(identifier: endingCategory, actions: [extend], intentIdentifiers: []),
+        ])
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTask, using: nil) { task in
             // BGTask is thread-safe but not marked Sendable.
             nonisolated(unsafe) let refresh = task
@@ -56,6 +63,7 @@ enum Notifications {
                 content.title = mac.name
                 content.body = alert.message
                 content.sound = .default
+                content.threadIdentifier = mac.id
                 try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             }
         }
@@ -69,6 +77,7 @@ enum Notifications {
         let content = UNMutableNotificationContent()
         content.title = mac.name
         content.body = failure
+        content.threadIdentifier = mac.id
         try? await UNUserNotificationCenter.current()
             .add(UNNotificationRequest(identifier: "\(mac.id).command", content: content, trigger: nil))
     }
@@ -83,12 +92,17 @@ enum Notifications {
         // and the background timer replace each other instead of stacking.
         let id = "\(mac.id).silent"
         let quietID = "\(mac.id).quiet"
+        let endingID = "\(mac.id).ending"
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: [id, quietID])
+        center.removePendingNotificationRequests(withIdentifiers: [id, quietID, endingID])
         // A fetch settled whether the Mac answers, which the quiet note left open.
         center.removeDeliveredNotifications(withIdentifiers: [quietID])
 
-        guard let reading, reading.reachable else { return }
+        guard let reading, reading.reachable else {
+            // A removed Mac takes its reminder with it.
+            if reading == nil { center.removeDeliveredNotifications(withIdentifiers: [endingID]) }
+            return
+        }
         // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
         center.removeDeliveredNotifications(withIdentifiers: [id])
         // On Hotspot the lid and unplug warnings no longer apply.
@@ -96,10 +110,28 @@ enum Notifications {
             center.removeDeliveredNotifications(withIdentifiers: ["\(mac.id).closedlid", "\(mac.id).unplugged"])
         }
 
+        // Added time or a stop makes "ends in 5 minutes" wrong.
+        if reading.status?.session?.deadline.map({ $0.timeIntervalSinceNow > endingLead + 30 }) ?? true {
+            center.removeDeliveredNotifications(withIdentifiers: [endingID])
+        }
+
         guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true,
               let status = reading.status,
               let session = status.session else {
             return
+        }
+
+        if let deadline = session.deadline, deadline.timeIntervalSinceNow - endingLead > 1 {
+            let content = UNMutableNotificationContent()
+            content.title = mac.name
+            content.body = String(localized: "Keep Awake ends in 5 minutes.")
+            content.sound = .default
+            content.threadIdentifier = mac.id
+            content.categoryIdentifier = endingCategory
+            content.userInfo = ["macID": mac.id]
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: deadline.timeIntervalSinceNow - endingLead,
+                                                            repeats: false)
+            center.add(UNNotificationRequest(identifier: endingID, content: content, trigger: trigger))
         }
 
         let fireAt = status.readAt.addingTimeInterval(DeliveryCadence.watchdogDelay(for: status))
@@ -171,6 +203,8 @@ private extension RemoteAlert {
             String(localized: "Unplugged on Wi‑Fi while Keep Awake is active. Turn on Personal Hotspot before putting your Mac in a bag so your tasks stay online.")
         case .closedLidWithoutHotspot:
             String(localized: "Lid closed on battery without Hotspot. Connect to Personal Hotspot if you are taking your Mac with you.")
+        case .runningHot:
+            String(localized: "Running hot during Keep Awake. Open the lid and keep the vents clear, or stop Keep Awake.")
         case .chargeReached(let percent):
             String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:

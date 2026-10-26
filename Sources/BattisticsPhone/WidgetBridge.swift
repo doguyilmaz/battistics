@@ -27,12 +27,18 @@ enum WidgetBridge {
             endActivities()
             return
         }
-        let snapshot = SharedSnapshot(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false)
+        let snapshot = SharedSnapshot(mac, reading: reading)
         if snapshot != SharedSnapshot.load() {
             snapshot.save()
             reloadWidgets()
         }
         syncActivity(mac, reading: reading)
+    }
+
+    static func publishAll(_ snapshots: [SharedSnapshot]) {
+        guard snapshots != SharedSnapshot.loadAll() else { return }
+        SharedSnapshot.saveAll(snapshots)
+        WidgetCenter.shared.reloadTimelines(ofKind: AllMacsEntry.kind)
     }
 
     private static func reloadWidgets() {
@@ -75,7 +81,7 @@ enum WidgetBridge {
             network: status.network,
             networkName: status.resolvedNetworkName(),
             lastUpdate: status.readAt,
-            offline: reachable ? nil : true
+            offline: !reachable
         )
         // Marks the activity stale even if the app never runs again, late
         // enough that throttled pushes alone do not trigger it.
@@ -103,5 +109,11 @@ enum WidgetBridge {
 
     private nonisolated static func end(_ id: String) async {
         await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?.end(nil, dismissalPolicy: .immediate)
+    }
+}
+
+extension SharedSnapshot {
+    init(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
+        self.init(macName: mac.name, status: reading?.status, reachable: reading?.reachable ?? false, macID: mac.id)
     }
 }

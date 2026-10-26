@@ -718,6 +718,23 @@
         }
       }
     },
+    "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı oturumlara izin vermek, gereken güç yardımcısını kurar. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
+          }
+        }
+      }
+    },
     "Allow…": {
       "extractionState": "manual",
       "localizations": {
@@ -1124,7 +1141,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağlayın."
+            "value": "Pil %@ seviyesinde. Mac’in çalışmaya devam etmesi gerekiyorsa güce bağla."
           }
         }
       }
@@ -1889,6 +1906,23 @@
         }
       }
     },
+    "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closed-lid tasks need the power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak kapalı görevler için güç yardımcısı gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
+          }
+        }
+      }
+    },
     "Color": {
       "localizations": {
         "tr": {
@@ -1915,7 +1949,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
+            "value": "Mac’i yanına alıyorsan Kişisel Erişim Noktası’na bağla."
           }
         }
       }
@@ -3296,13 +3330,13 @@
         }
       }
     },
-    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
+    "In Keep Awake, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
+            "value": "Uyanık Tut bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
           }
         }
       }
@@ -3678,17 +3712,6 @@
         }
       }
     },
-    "Learn the controls in a short guided tour, or find an answer below.": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kısa tanıtımla kontrolleri öğrenin veya aşağıda yanıt arayın."
-          }
-        }
-      }
-    },
     "Left": {
       "extractionState": "manual",
       "localizations": {
@@ -3949,6 +3972,17 @@
         }
       }
     },
+    "Mac is running hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ısınıyor"
+          }
+        }
+      }
+    },
     "Mac unplugged on Wi‑Fi": {
       "extractionState": "manual",
       "localizations": {
@@ -3956,17 +3990,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac Wi‑Fi’dayken güçten çıkarıldı"
-          }
-        }
-      }
-    },
-    "Make yourself at home": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Battistics’i keşfedin"
           }
         }
       }
@@ -4074,23 +4097,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ay"
-          }
-        }
-      }
-    },
-    "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısı gerekir; bu Mac’te kapak kapalı Uyanık Tut’u bir kez başlatarak kurulur. iPhone’dan başlatılan kapak kapalı oturum, pil %10’a indiğinde ve yüksek ısı baskısında her zaman durur."
           }
         }
       }
@@ -4610,6 +4616,17 @@
         }
       }
     },
+    "Open the lid and keep the vents clear, or stop Keep Awake.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapağı aç ve hava deliklerini açık bırak ya da Uyanık Tut’u durdur."
+          }
+        }
+      }
+    },
     "Open the main window at launch": {
       "extractionState": "manual",
       "localizations": {
@@ -4729,19 +4746,19 @@
         }
       }
     },
-    "Permission granted until Battistics quits.": {
+    "Permission granted. It locks again after 10 minutes without a change.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Permission granted until Battistics quits."
+            "value": "Permission granted. It locks again after 10 minutes without a change."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics kapanana kadar izin verildi."
+            "value": "İzin verildi. 10 dakika değişiklik yapılmazsa yeniden kilitlenir."
           }
         }
       }
@@ -5319,23 +5336,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bildirilen yük"
-          }
-        }
-      }
-    },
-    "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requires an already installed power helper. Only connect clients you trust; applications running as your macOS user can access this local connection."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güç yardımcısının önceden kurulmuş olması gerekir. Yalnızca güvendiğiniz istemcileri bağlayın; macOS kullanıcınızla çalışan uygulamalar bu yerel bağlantıya erişebilir."
           }
         }
       }
@@ -6669,7 +6669,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Belirlediğiniz süre doldu."
+            "value": "Belirlediğin süre doldu."
           }
         }
       }
@@ -6961,7 +6961,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı açın ki görevleri çevrimiçi kalsın."
+            "value": "Mac çantaya girmeden Kişisel Erişim Noktası’nı aç ki görevleri çevrimiçi kalsın."
           }
         }
       }
@@ -7467,19 +7467,19 @@
         }
       }
     },
-    "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+    "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet, aynı Apple ID’yi kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
+            "value": "Evet, aynı Apple Hesabı’nı kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
           }
         }
       }
@@ -7539,19 +7539,19 @@
         }
       }
     },
-    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
+    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
+            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple ID’yi kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
+            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple Hesabı’nı kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
           }
         }
       }

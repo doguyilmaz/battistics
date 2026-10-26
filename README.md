@@ -59,7 +59,8 @@ session. Fan speeds are not changed. Details: [session protection](docs/session-
 
 ### Terminal and AI tasks
 
-Turn on **Automation › Local automation**, then:
+Turn on **Automation › Local automation** and paste the line from **Copy
+Terminal setup** into your shell profile (`~/.zshrc`), then:
 
 ```sh
 battistics run --name Build -- swift build
@@ -75,7 +76,7 @@ Battistics Remote shows the Mac's battery and its last day, how long it lasts,
 its connection, lid and heat, its accessory batteries and busiest apps, and
 starts or stops Keep Awake, even with the lid closed in a bag. Widgets, a Lock
 Screen countdown and a Control Center control come with it. Turn on
-**iPhone** in Battistics; any iPhone on the same Apple ID finds the Mac through
+**iPhone** in Battistics; any iPhone on the same Apple Account finds the Mac through
 your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
 to join hotspots automatically uses the iPhone's hotspot. See
 [remote companion](docs/remote.md) and the [iPhone guide](https://battistics.apps.doguyilmaz.com/docs/iphone/).

@@ -93,8 +93,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         case displayOn, displayMaySleep, lidClosed
     }
 
-    public enum Origin: String, Codable, Sendable {
+    public enum Origin: String, Codable, Sendable, TolerantWireValue {
         case manual, profile, terminal, ai, phone
+        public static let fallback = Self.manual
     }
 
     public struct Session: Codable, Sendable, Equatable {
@@ -133,8 +134,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public init(at: Date, percent: Double) { self.at = at; self.percent = percent }
     }
 
-    public enum EndReason: String, Codable, Sendable {
+    public enum EndReason: String, Codable, Sendable, TolerantWireValue {
         case timer, user, phone, battery, thermal, client, failure
+        public static let fallback = Self.user
     }
 
     public struct LastEnd: Codable, Sendable, Equatable {
@@ -143,12 +145,16 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         public init(reason: EndReason, at: Date) { self.reason = reason; self.at = at }
     }
 
-    public enum Network: String, Codable, Sendable {
+    public enum Network: String, Codable, Sendable, TolerantWireValue {
         case wifi, hotspot, wired, other, offline
+        public static let fallback = Self.other
     }
 
-    public enum Thermal: String, Codable, Sendable {
+    public enum Thermal: String, Codable, Sendable, TolerantWireValue {
         case nominal, fair, serious, critical
+        public static let fallback = Self.nominal
+
+        public var isHot: Bool { self == .serious || self == .critical }
     }
 
     public struct Protection: Codable, Sendable, Equatable {
@@ -205,8 +211,6 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var macModel: String?
     /// macOS version string on the Mac (e.g. "macOS 15.4").
     public var osVersion: String?
-    /// Known Personal Hotspot / paired iPhone name observed by the Mac when available.
-    public var pairedPhoneName: String?
     public var readAt: Date
     public var battery: Battery?
     public var session: Session?
@@ -222,9 +226,6 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// The outcome of the newest phone command the Mac handled.
     public var lastCommand: CommandResult?
     public var extras: Extras?
-    /// Set by a Mac that posts its own alerts through iCloud, so a phone does
-    /// not repeat the ones it pushes.
-    public var pushesAlerts: Bool?
 
     public struct CommandResult: Codable, Sendable, Equatable {
         public var id: String
@@ -245,21 +246,18 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// shorter wait reports a healthy Mac as silent.
     public static let unheardDelay: TimeInterval = 30 * 60
 
-    /// The write interval the Mac promised in this reading. Missing means a Mac
-    /// build from before the field existed, which wrote every `heartbeat`.
-    public var heartbeatSeconds: TimeInterval?
+    /// The write interval the Mac promised in this reading.
+    public var heartbeatSeconds: TimeInterval
 
     public static func heartbeat(duringSession: Bool) -> TimeInterval {
         duringSession ? sessionHeartbeat : heartbeat
     }
 
-    public var expectedHeartbeat: TimeInterval { heartbeatSeconds ?? Self.heartbeat }
-
     /// After this moment, a fetch that returns no newer reading means the Mac
     /// is unreachable. Only a real fetch may conclude that; see `unheardDate`.
     public var staleDate: Date {
         let missed: Double = session == nil ? 2 : 4
-        return readAt.addingTimeInterval(expectedHeartbeat * missed)
+        return readAt.addingTimeInterval(heartbeatSeconds * missed)
     }
 
     /// When surfaces that cannot fetch stop presenting this reading as live.
@@ -305,13 +303,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         protection: Protection = .init(),
         macModel: String? = nil,
         osVersion: String? = nil,
-        pairedPhoneName: String? = nil,
-        heartbeatSeconds: TimeInterval? = nil
+        heartbeatSeconds: TimeInterval = RemoteStatus.heartbeat
     ) {
         self.machineName = machineName
         self.macModel = macModel
         self.osVersion = osVersion
-        self.pairedPhoneName = pairedPhoneName
         self.heartbeatSeconds = heartbeatSeconds
         self.readAt = readAt
         self.battery = battery

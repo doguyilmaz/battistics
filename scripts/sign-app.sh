@@ -36,6 +36,13 @@ done
 if [ -f "$APP/Contents/Helpers/battistics" ]; then
     codesign "${FLAGS[@]}" "$APP/Contents/Helpers/battistics"
 fi
-codesign "${FLAGS[@]}" --preserve-metadata=entitlements "$APP"
+# A Developer ID profile is what lets a release use iCloud and push outside
+# the App Store; without one the app keeps the base entitlements.
+if [ -n "${PROFILE:-}" ]; then
+    cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
+    codesign "${FLAGS[@]}" --entitlements "$(dirname "$0")/../Sources/BattisticsApp/Support/Battistics-Release.entitlements" "$APP"
+else
+    codesign "${FLAGS[@]}" --preserve-metadata=entitlements "$APP"
+fi
 codesign --verify --deep --strict "$APP"
 echo "Signed $APP with $IDENTITY"

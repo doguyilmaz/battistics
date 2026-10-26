@@ -17,12 +17,13 @@ struct PhoneApp: App {
                 .environment(store)
                 .environment(phone)
                 .onAppear { theme.apply() }
+                .onOpenURL { store.open($0) }
                 .onChange(of: theme) { theme.apply() }
         }
         .onChange(of: scenePhase) {
             if scenePhase == .background {
                 Notifications.schedule()
-                QuickActions.update(store.selected.flatMap { store.reading(for: $0) })
+                store.publishSelected()
             }
         }
     }
@@ -44,6 +45,26 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         notification.request.identifier.hasSuffix(".command") ? [.banner, .sound] : []
+    }
+
+    /// Opens the Mac an alert was about, or runs Add 30 Minutes from the
+    /// "ends in 5 minutes" reminder, also on the Lock Screen.
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                            didReceive response: UNNotificationResponse) async {
+        let request = response.notification.request
+        await Self.respond(to: response.actionIdentifier, identifier: request.identifier,
+                           macID: request.content.userInfo["macID"] as? String)
+    }
+
+    @MainActor
+    private static func respond(to action: String, identifier: String, macID: String?) async {
+        // Also on a launch for this action alone, before anything else has created the store.
+        let store = MacStore.shared
+        if action == Notifications.extendAction, let macID {
+            await RemoteIntentBridge.extend?(macID, 30)
+        } else if action == UNNotificationDefaultActionIdentifier {
+            store.show(notification: identifier)
+        }
     }
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,

@@ -46,9 +46,7 @@ final class KeepAwakeModel {
         didSet {
             UserDefaults.standard.set(mode.rawValue, forKey: Prefs.keepAwakeMode)
             if let session, session.mode != mode {
-                let profile = sessionOrigin == .profile ? sessionName : nil
-                start(mode: mode, duration: session.duration, now: session.startedAt,
-                      name: profile, origin: profile == nil ? .manual : .profile, continuing: session)
+                if mode == .lidClosed { switchToLidClosed(session) } else { restart(session, as: mode) }
             } else if mode != .lidClosed, approvalTask != nil {
                 // Nothing left to wait for once closed-lid is no longer wanted.
                 cancelApprovalWait()
@@ -217,7 +215,35 @@ final class KeepAwakeModel {
         }
     }
 
-    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool) {
+    private func restart(_ running: KeepAwakeSession, as mode: KeepAwakeMode) {
+        let profile = sessionOrigin == .profile ? sessionName : nil
+        start(mode: mode, duration: running.duration, now: running.startedAt,
+              name: profile, origin: profile == nil ? .manual : .profile, continuing: running)
+    }
+
+    /// Readies the power helper while the running session still holds the
+    /// Mac awake. Switching first would drop the session if macOS has yet to
+    /// approve the helper.
+    private func switchToLidClosed(_ running: KeepAwakeSession) {
+        guard let id = sessionID else { return }
+        cancelApprovalWait()
+        Task {
+            do {
+                try await helper.prepareForLidSleep()
+            } catch {
+                guard sessionID == id, mode == .lidClosed else { return }
+                showStartFailure(error, duration: running.duration, allowHelperSetup: true, switching: id)
+                return
+            }
+            guard sessionID == id, mode == .lidClosed, let session, session.mode != .lidClosed else { return }
+            restart(session, as: .lidClosed)
+        }
+    }
+
+    /// `switching` names a running session that turns closed-lid once the
+    /// helper is allowed, instead of a new one starting.
+    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool,
+                                  switching runningID: String? = nil) {
         isStoppedReasonInformational = false
         switch error {
         case StartFailure.protection(let event):
@@ -230,7 +256,7 @@ final class KeepAwakeModel {
             isStoppedReasonInformational = true
             errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
             helper.openLoginItemsSettings()
-            waitForHelperApproval(duration: duration)
+            waitForHelperApproval(duration: duration, switching: runningID)
         case PowerHelperClient.Failure.installFailed(let domain, let code):
             errorMessage = String(localized: "macOS did not install the power helper that closed-lid mode needs.") + " (\(domain) \(code))"
         case PowerHelperClient.Failure.outdated:
@@ -247,24 +273,33 @@ final class KeepAwakeModel {
     /// Polls a cheap registration read for a few minutes at most: no
     /// notification reports the approval, and returning to Battistics is not
     /// guaranteed to activate a menu bar app.
-    private func waitForHelperApproval(duration: KeepAwakeDuration) {
+    /// With `runningID`, the approval switches that session instead of starting one.
+    private func waitForHelperApproval(duration: KeepAwakeDuration, switching runningID: String? = nil) {
         approvalTask?.cancel()
+        let unchanged: (KeepAwakeModel) -> Bool = { model in
+            guard let runningID else { return model.session == nil }
+            return model.sessionID == runningID && model.session != nil
+        }
         approvalTask = Task { [weak self] in
             for _ in 0..<180 {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled, let self else { return }
                 // A different choice since then wins over the old request.
-                guard self.session == nil, self.mode == .lidClosed else { break }
+                guard unchanged(self), self.mode == .lidClosed else { break }
                 self.helper.refreshStatusIfChanged()
                 if self.helper.isInstalled {
                     self.approvalTask = nil
-                    self.start(mode: .lidClosed, duration: duration)
+                    if let session = self.session {
+                        if session.mode != .lidClosed { self.restart(session, as: .lidClosed) }
+                    } else {
+                        self.start(mode: .lidClosed, duration: duration)
+                    }
                     return
                 }
             }
             guard let self, !Task.isCancelled else { return }
             self.approvalTask = nil
-            if self.session == nil, self.mode == .lidClosed {
+            if unchanged(self), self.mode == .lidClosed {
                 self.isStoppedReasonInformational = false
                 self.errorMessage = String(localized: "Battistics was not allowed in Login Items in time. Allow it there, then turn Keep Awake on again.")
             }
@@ -443,9 +478,7 @@ final class KeepAwakeModel {
         guard !isChanging, let current = session,
               let new = current.extended(byMinutes: minutes, now: Date()) else { return false }
         guard assertion.take(mode: new.mode, until: new.deadline) else {
-            stop(reason: .failure)
-            isStoppedReasonInformational = false
-            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            refuseAssertion()
             return false
         }
         session = new
@@ -458,6 +491,13 @@ final class KeepAwakeModel {
         return true
     }
 
+    /// macOS would not hold the new assertion, so the session cannot go on.
+    private func refuseAssertion() {
+        stop(reason: .failure)
+        isStoppedReasonInformational = false
+        errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+    }
+
     /// A new duration counts from now. The closed-lid lease is untouched; it
     /// does not carry a deadline of its own.
     private func retime(_ current: KeepAwakeSession, to duration: KeepAwakeDuration) {
@@ -465,9 +505,7 @@ final class KeepAwakeModel {
         let now = Date()
         let new = KeepAwakeSession(mode: current.mode, duration: duration, startedAt: now)
         guard assertion.take(mode: new.mode, until: new.deadline, now: now) else {
-            stop(reason: .failure)
-            isStoppedReasonInformational = false
-            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            refuseAssertion()
             return
         }
         session = new

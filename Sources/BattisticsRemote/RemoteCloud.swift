@@ -130,8 +130,7 @@ public actor RemoteCloud {
                         snapshot.unreadable.insert(record.recordID.recordName)
                     }
                 case Self.commandType:
-                    if let request = try? RemoteWire.decode(RemoteRequest.self, from: payload),
-                       let mac = record["mac"] as? String {
+                    if let request = Self.request(from: payload), let mac = record["mac"] as? String {
                         snapshot.commands.append(.init(recordName: record.recordID.recordName, macID: mac, request: request))
                     }
                 default: break
@@ -145,6 +144,15 @@ public actor RemoteCloud {
             if !changes.moreComing { break }
         } while true
         return (snapshot, token)
+    }
+
+    /// A command from a newer phone, with a mode or policy this Mac does not
+    /// know, is answered as an invalid request instead of left to time out.
+    private static func request(from payload: Data) -> RemoteRequest? {
+        if let request = try? RemoteWire.decode(RemoteRequest.self, from: payload) { return request }
+        struct Envelope: Decodable { let id: String; let sentAt: Date }
+        return (try? RemoteWire.decode(Envelope.self, from: payload))
+            .map { RemoteRequest(id: $0.id, operation: .unknown, sentAt: $0.sentAt) }
     }
 
     public func publish(_ status: RemoteStatus, macID: String) async throws {
@@ -177,7 +185,8 @@ public actor RemoteCloud {
 
     /// An alert iOS shows on the account's phones straight from the push,
     /// even while Battistics Remote is not running. Push payloads cannot
-    /// carry encrypted fields, so the text names no Mac and no network.
+    /// carry encrypted fields, so the text names no Mac and no network; the
+    /// phone adds the Mac's name itself.
     public func post(title: String, body: String, collapseID: String) async throws {
         try await prepare()
         let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: UUID().uuidString, zoneID: Self.zoneID))
@@ -201,6 +210,9 @@ public actor RemoteCloud {
         info.alertLocalizationArgs = ["body"]
         info.soundName = "default"
         info.collapseIDKey = "collapse"
+        // Lets the phone's notification extension name the Mac.
+        info.shouldSendMutableContent = true
+        info.desiredKeys = ["collapse"]
         subscription.notificationInfo = info
         _ = try await database.modifySubscriptions(saving: [subscription], deleting: [])
     }
@@ -209,8 +221,9 @@ public actor RemoteCloud {
     /// or a recreated zone can remove it.
     public func hasAlertSubscription() async throws -> Bool {
         do {
-            _ = try await database.subscription(for: Self.alertSubscriptionID)
-            return true
+            let subscription = try await database.subscription(for: Self.alertSubscriptionID)
+            // One saved before the extension named the Mac is saved again.
+            return subscription.notificationInfo?.shouldSendMutableContent == true
         } catch let error as CKError where error.code == .unknownItem {
             return false
         }

@@ -61,9 +61,22 @@ struct BatteryCard: View {
             .animation(.snappy, value: battery.isCharging)
             .animation(.snappy, value: message)
             .onChange(of: battery.lowPowerPolicy) { message = nil }
+            .sensoryFeedback(.error, trigger: message) { $1 != nil }
         } else {
-            Label("This Mac has no battery", systemImage: "powerplug")
-                .card()
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label("This Mac has no battery", systemImage: "powerplug")
+                    Spacer(minLength: 4)
+                    powerMenu(nil)
+                }
+                if let message {
+                    Label(message, systemImage: "exclamationmark.circle.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                }
+            }
+            .card()
+            .sensoryFeedback(.error, trigger: message) { $1 != nil }
         }
     }
 
@@ -76,11 +89,11 @@ struct BatteryCard: View {
         return Text(battery.headline)
     }
 
-    private func powerMenu(_ battery: RemoteStatus.Battery) -> some View {
-        let lowPower = battery.lowPowerMode == true
+    private func powerMenu(_ battery: RemoteStatus.Battery?) -> some View {
+        let lowPower = battery?.lowPowerMode == true
         return Menu {
             Picker(selection: Binding(
-                get: { battery.lowPowerPolicy },
+                get: { battery?.lowPowerPolicy },
                 set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
             )) {
                 ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
@@ -97,10 +110,10 @@ struct BatteryCard: View {
             }
         } label: {
             Label {
-                Text(lowPower ? String(localized: "Low Power") : (battery.lowPowerPolicy?.compactBadge ?? String(localized: "Power")))
+                Text(lowPower ? String(localized: "Low Power") : (battery?.lowPowerPolicy?.compactBadge ?? String(localized: "Power")))
                     .contentTransition(.interpolate)
             } icon: {
-                Image(systemName: lowPower ? "leaf.fill" : (battery.lowPowerPolicy?.symbol ?? "bolt.circle"))
+                Image(systemName: lowPower ? "leaf.fill" : (battery?.lowPowerPolicy?.symbol ?? "bolt.circle"))
                     .contentTransition(.symbolEffect(.replace))
             }
             .font(.caption.weight(.semibold))

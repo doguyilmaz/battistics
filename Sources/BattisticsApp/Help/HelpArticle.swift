@@ -22,7 +22,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
     var answer: String {
         switch self {
         case .keepAwake:
-            String(localized: "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.")
+            String(localized: "In Keep Awake, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.")
         case .lowBattery:
             String(localized: "Yes. In Keep Awake → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.")
         case .warnings:
@@ -40,7 +40,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
         case .automation:
             String(localized: "Yes. Enable Local automation in Automation. Copy Terminal setup to use battistics run for a build or script; its exit ends Keep Awake, with a maximum of 12 hours. For an interactive AI terminal, copy the MCP configuration into a trusted client and ask it to start a task before work and stop it afterward. An open process alone cannot detect task completion. Manual stops, time limits, disconnection and battery or thermal protection can end Keep Awake sooner without killing your command. Closed-lid tasks require separate permission and an installed helper. Keep Battistics open.")
         case .phone:
-            String(localized: "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.")
+            String(localized: "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.")
         }
     }
 

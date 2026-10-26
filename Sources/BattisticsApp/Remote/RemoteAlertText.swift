@@ -20,6 +20,9 @@ extension RemoteAlert {
         case .closedLidWithoutHotspot:
             (String(localized: "Lid closed without Hotspot"),
              String(localized: "Connect the Mac to Personal Hotspot if you are taking it with you."))
+        case .runningHot:
+            (String(localized: "Mac is running hot"),
+             String(localized: "Open the lid and keep the vents clear, or stop Keep Awake."))
         case .chargeReached, .unreachable:
             nil
         }

@@ -69,6 +69,7 @@ struct KeepAwakeCard: View {
         .disabled(!reachable || operation != nil)
         .animation(.snappy, value: session != nil)
         .sensoryFeedback(.success, trigger: succeeded)
+        .sensoryFeedback(.error, trigger: message) { $1 != nil }
         .onChange(of: session) { message = nil }
         .onChange(of: mode) { message = nil }
         .onChange(of: minutes) { message = nil }
@@ -135,7 +136,9 @@ struct KeepAwakeCard: View {
             Label("Turn on Hotspot before the Mac goes in a bag.", systemImage: "personalhotspot")
                 .foregroundStyle(.secondary)
         } else if let session = status.session {
-            Text(session.origin.label)
+            // "AI task: Refactor" or "Profile: Overnight"; a phone's session is named after the phone.
+            let name = session.origin == .phone ? nil : session.name
+            Text(verbatim: [session.origin.label, name].compactMap { $0 }.joined(separator: ": "))
                 .foregroundStyle(.secondary)
         } else {
             Text(chosenMode.subtitle)

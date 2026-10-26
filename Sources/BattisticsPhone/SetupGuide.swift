@@ -5,6 +5,7 @@ import SwiftUI
 struct SetupGuide: View {
     @Environment(MacStore.self) private var store
     @Environment(LocalPhoneMonitor.self) private var phone
+    @Environment(\.dismiss) private var dismiss
 
     private static let download = URL(string: "https://battistics.apps.doguyilmaz.com/#download")!
 
@@ -84,10 +85,19 @@ struct SetupGuide: View {
             .card()
 
             if store.macs.isEmpty {
-                Button {
-                    store.selectedID = MacStore.localPhoneID
-                } label: {
-                    Label("Show This iPhone’s Battery", systemImage: "iphone")
+                VStack(spacing: 14) {
+                    Button {
+                        dismiss()
+                        withAnimation(.snappy) { store.showSample() }
+                    } label: {
+                        Label("Try a Sample Mac", systemImage: "laptopcomputer")
+                    }
+                    Button {
+                        dismiss()
+                        store.selectedID = MacStore.localPhoneID
+                    } label: {
+                        Label("Show This iPhone’s Battery", systemImage: "iphone")
+                    }
                 }
                 .padding(.top, 4)
             }

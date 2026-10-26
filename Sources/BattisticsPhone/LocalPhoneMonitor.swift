@@ -95,7 +95,7 @@ final class LocalPhoneMonitor {
 
     /// "Dogu’s iPhone (16e)", without repeating a model the name already ends with.
     var pickerName: String {
-        displayName.hasSuffix(shortModelName) ? displayName : "\(displayName) (\(shortModelName))"
+        shortModelName.isEmpty || displayName.hasSuffix(shortModelName) ? displayName : "\(displayName) (\(shortModelName))"
     }
 
     /// How the Mac labels sessions started here; not localized, since the Mac shows it as a name.
@@ -158,8 +158,10 @@ final class LocalPhoneMonitor {
         if unpluggedAt != before { UserDefaults.standard.set(unpluggedAt, forKey: Self.unpluggedKey) }
     }
 
-    /// A Mac joined to a hotspot reports its network name, which is this iPhone's name.
+    /// A Mac joined to a hotspot reports its network name, which is this
+    /// iPhone's name while this iPhone is the one sharing.
     func learnHotspotName(from readings: [String: MacStore.Reading]) {
+        guard Self.isSharingHotspot() else { return }
         let names = readings.values.compactMap { reading -> String? in
             guard reading.reachable, let status = reading.status, status.network == .hotspot else { return nil }
             return status.networkName?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -167,6 +169,21 @@ final class LocalPhoneMonitor {
         guard let name = names.first, !name.isEmpty, name != hotspotName else { return }
         hotspotName = name
         UserDefaults.standard.set(name, forKey: Self.hotspotKey)
+    }
+
+    /// Personal Hotspot gives this iPhone 172.20.10.1 on a bridge interface.
+    private static func isSharingHotspot() -> Bool {
+        var list: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&list) == 0, let first = list else { return false }
+        defer { freeifaddrs(list) }
+        for pointer in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            let entry = pointer.pointee
+            guard String(cString: entry.ifa_name).hasPrefix("bridge"),
+                  let address = entry.ifa_addr, address.pointee.sa_family == UInt8(AF_INET) else { continue }
+            let ip = address.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr }
+            if ip.s_addr == inet_addr("172.20.10.1") { return true }
+        }
+        return false
     }
 
     private func record(_ percent: Double) {
@@ -201,6 +218,21 @@ final class LocalPhoneMonitor {
 
     private static func marketingName(for identifier: String) -> (String, String) {
         let short: String? = switch identifier {
+        case "iPhone11,2": "XS"
+        case "iPhone11,4", "iPhone11,6": "XS Max"
+        case "iPhone11,8": "XR"
+        case "iPhone12,1": "11"
+        case "iPhone12,3": "11 Pro"
+        case "iPhone12,5": "11 Pro Max"
+        case "iPhone12,8", "iPhone14,6": "SE"
+        case "iPhone13,1": "12 mini"
+        case "iPhone13,2": "12"
+        case "iPhone13,3": "12 Pro"
+        case "iPhone13,4": "12 Pro Max"
+        case "iPhone14,4": "13 mini"
+        case "iPhone14,5": "13"
+        case "iPhone14,2": "13 Pro"
+        case "iPhone14,3": "13 Pro Max"
         case "iPhone14,7": "14"
         case "iPhone14,8": "14 Plus"
         case "iPhone15,2": "14 Pro"
@@ -221,7 +253,7 @@ final class LocalPhoneMonitor {
         case "iPhone18,5": "17e"
         default: nil
         }
-        guard let short else { return ("iPhone", identifier) }
+        guard let short else { return (identifier.hasPrefix("iPad") ? "iPad" : "iPhone", "") }
         return ("iPhone \(short)", short)
     }
 }

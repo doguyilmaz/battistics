@@ -8,9 +8,21 @@ struct MacEntry: TimelineEntry {
     let date: Date
     let snapshot: SharedSnapshot?
     let prefs: WidgetPreferences
+
+    var relevance: TimelineEntryRelevance? { snapshot.map { TimelineEntryRelevance(score: $0.relevance(at: date)) } }
 }
 
 extension SharedSnapshot {
+    /// Lifts a widget in a Smart Stack: a running session most, then a battery
+    /// at the level the Mac warns at.
+    func relevance(at date: Date) -> Float {
+        guard reachable, let status else { return 0 }
+        if status.session?.isActive(at: date) == true { return 1 }
+        if let battery = status.battery, !battery.onAdapter,
+           battery.percent <= (status.protection.warnAtPercent ?? 20) { return 0.5 }
+        return 0
+    }
+
     static func sample() -> SharedSnapshot {
         let name = SharedSnapshot.load()?.macName ?? "MacBook Pro"
         return SharedSnapshot(
@@ -64,10 +76,12 @@ struct KeepAwakeIntentButton: View {
                 }
                 .tint(.orange)
             }
+            .disabled(!reachable)
         } else {
             Button(intent: StartKeepAwakeLiveIntent()) {
                 Label("Awake 1h", systemImage: "cup.and.saucer.fill").frame(maxWidth: .infinity)
             }
+            .accessibilityLabel(Text("Keep Awake for 1 hour"))
             .disabled(!reachable)
         }
     }

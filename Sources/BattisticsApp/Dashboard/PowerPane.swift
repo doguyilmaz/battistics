@@ -160,7 +160,7 @@ struct PowerPane: View {
                 localized: "No password needed. Sleep timers apply to \(sourceName).")
         }
         if auth.isUnlocked {
-            return String(localized: "Permission granted until Battistics quits.")
+            return String(localized: "Permission granted. It locks again after 10 minutes without a change.")
         }
         return String(
             localized: "You will be asked for your administrator password on the first change.")

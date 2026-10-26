@@ -54,6 +54,28 @@ struct RemoteTests {
         #expect(request.operation == .unknown)
     }
 
+    @Test func valuesFromANewerMacKeepItsStatusReadable() throws {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        var status = RemoteStatus(machineName: "Mac", readAt: now,
+                                  session: .init(mode: .displayOn, origin: .manual, startedAt: now, deadline: nil),
+                                  lastEnd: .init(reason: .timer, at: now), network: .wifi, thermal: .fair)
+        status.lastCommand = .init(id: "c", failure: RemoteFailure(.busy))
+        var json = try JSONSerialization.jsonObject(with: RemoteWire.encode(status)) as! [String: Any]
+        var session = json["session"] as! [String: Any]
+        session["origin"] = "watch"
+        json["session"] = session
+        json["lastEnd"] = ["reason": "eclipse", "at": 1_000_000]
+        json["network"] = "satellite"
+        json["thermal"] = "molten"
+        json["lastCommand"] = ["id": "c", "failure": ["code": "quota", "message": "Später"]]
+        let decoded = try RemoteWire.decode(RemoteStatus.self, from: JSONSerialization.data(withJSONObject: json))
+        #expect(decoded.session?.origin == .manual)
+        #expect(decoded.lastEnd?.reason == .user)
+        #expect(decoded.network == .other)
+        #expect(decoded.thermal == .nominal)
+        #expect(decoded.lastCommand?.failure == RemoteFailure(.startFailed, "Später"))
+    }
+
     @Test func allowedDurationsIncludeUntilTurnedOffAndTelemetryRoundTrips() throws {
         #expect(RemoteRequest.allowedDurations.contains(0))
         #expect(RemoteRequest.allowedDurations == [0, 15, 30, 60, 120, 240, 360, 720])
@@ -87,18 +109,10 @@ struct RemoteTests {
         let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: readAt, deadline: nil)
         let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session,
                                   heartbeatSeconds: RemoteStatus.heartbeat(duringSession: true))
-        #expect(status.expectedHeartbeat == RemoteStatus.sessionHeartbeat)
+        #expect(status.heartbeatSeconds == RemoteStatus.sessionHeartbeat)
         #expect(status.staleDate == readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 4))
         #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 3)))
         #expect(!status.isFresh(at: status.staleDate))
-    }
-
-    @Test func olderMacWithoutHeartbeatFieldGetsTheSlowWindow() {
-        let readAt = Date(timeIntervalSince1970: 1_000_000)
-        let session = RemoteStatus.Session(mode: .displayOn, origin: .phone, startedAt: readAt, deadline: nil)
-        let status = RemoteStatus(machineName: "Mac", readAt: readAt, session: session)
-        #expect(status.expectedHeartbeat == RemoteStatus.heartbeat)
-        #expect(status.isFresh(at: readAt.addingTimeInterval(RemoteStatus.sessionHeartbeat * 5)))
     }
 
     @Test func watchdogFollowsHowReliablyPushesArrive() {
@@ -179,6 +193,19 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.pushed(from: below, to: status(percent: 80, adapter: true, session: false)).isEmpty)
         #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.unreachable.kind))
         #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
+    }
+
+    @Test func heatAlertsOnceWhenASessionRunsHot() {
+        var hot = status()
+        hot.thermal = .serious
+        #expect(RemoteAlert.alerts(from: status(), to: hot) == [.runningHot])
+        var hotter = hot
+        hotter.thermal = .critical
+        #expect(RemoteAlert.alerts(from: hot, to: hotter).isEmpty)
+        var idleHot = status(session: false)
+        idleHot.thermal = .critical
+        #expect(RemoteAlert.alerts(from: status(session: false), to: idleHot).isEmpty)
+        #expect(RemoteAlert.pushed(from: status(), to: hot) == [.runningHot])
     }
 
     @Test func silenceAlertsOnlyWhileASessionRan() {
