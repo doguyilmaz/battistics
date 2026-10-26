@@ -3330,13 +3330,13 @@
         }
       }
     },
-    "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
+    "In Keep Awake, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.": {
       "extractionState": "manual",
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güç bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
+            "value": "Uyanık Tut bölümünde sunumlar için Ekranı açık tut, indirmeler için Ekran uyuyabilsin veya kapak kapalı çalışmak için Kapak kapalıyken uyanık tut modunu seçin. Süreyi belirleyip Uyanık Tut’u açın. Oturum sırasında süreyi değiştirirseniz yeni süre o andan itibaren geçerli olur. Kapak kapalı modu güç yardımcısını gerektirir ve hem pilde hem adaptöre bağlıyken çalışır. Pilin bitmesi her modu kesintiye uğratabilir."
           }
         }
       }
@@ -4746,19 +4746,19 @@
         }
       }
     },
-    "Permission granted until Battistics quits.": {
+    "Permission granted. It locks again after 10 minutes without a change.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Permission granted until Battistics quits."
+            "value": "Permission granted. It locks again after 10 minutes without a change."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics kapanana kadar izin verildi."
+            "value": "İzin verildi. 10 dakika değişiklik yapılmazsa yeniden kilitlenir."
           }
         }
       }

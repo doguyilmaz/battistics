@@ -22,7 +22,7 @@ enum HelpArticle: String, CaseIterable, Identifiable {
     var answer: String {
         switch self {
         case .keepAwake:
-            String(localized: "In Power, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.")
+            String(localized: "In Keep Awake, choose Keep the display on for presentations, Let the display sleep for downloads, or Stay awake with the lid closed for closed-lid work. Pick a duration, then enable Keep Awake. Changing the duration during a session applies it from that moment. Closed-lid mode needs the power helper and works on battery or adapter. An empty battery can still interrupt any mode.")
         case .lowBattery:
             String(localized: "Yes. In Keep Awake → Session Protection, enable Stop Keep Awake on low battery and choose 5–50%. It is off by default, with 10% preselected. At or below the level, on battery power, Battistics ends the session and allows normal sleep. It never shuts down the Mac or closes apps. The rule needs Battistics running and a valid battery reading; it cannot guarantee protection against sudden power loss.")
         case .warnings:
