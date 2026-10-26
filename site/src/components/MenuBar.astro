@@ -103,10 +103,15 @@ const menus = [
     padding: 0 10px;
     font: 500 13.5px/1 var(--text);
     color: var(--ink);
-    background: color-mix(in oklab, var(--paper) 70%, transparent);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  /* Clear over the page like the macOS 26 menu bar, frosted once content slides under it. */
+  .menubar[data-scrolled] {
+    background: color-mix(in oklab, var(--paper) 72%, transparent);
     backdrop-filter: blur(24px) saturate(1.5);
     -webkit-backdrop-filter: blur(24px) saturate(1.5);
-    border-bottom: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+    border-bottom-color: color-mix(in oklab, var(--ink) 8%, transparent);
   }
   .menus { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; }
   .menus li { position: relative; }
@@ -193,6 +198,10 @@ const menus = [
   import { applyTint, statusItemHTML } from "../lib/statusItem";
 
   const bar = document.querySelector<HTMLElement>("[data-menubar]")!;
+  const nav = bar.closest<HTMLElement>(".menubar")!;
+  const frost = () => nav.toggleAttribute("data-scrolled", scrollY > 0);
+  frost();
+  addEventListener("scroll", frost, { passive: true });
   const titles = [...bar.querySelectorAll<HTMLButtonElement>("[data-bar-menu]")];
   let open: string | null = null;
   const show = (id: string | null) => {
