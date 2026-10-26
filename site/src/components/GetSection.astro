@@ -6,6 +6,7 @@ import batbattery from "../assets/icons/batbattery.png";
 import stats from "../assets/icons/stats.png";
 import DownloadButton from "./DownloadButton.astro";
 import BrewCommand from "./BrewCommand.astro";
+import { appStoreURL } from "../lib/links";
 
 const icons = [
   { id: "original", label: "Original", image: original },
@@ -27,6 +28,7 @@ const icons = [
     <DownloadButton />
     <BrewCommand />
   </div>
+  <p class="phone"><a href={appStoreURL}>Battistics Remote for iPhone is free on the App Store</a></p>
   <div class="picker" role="radiogroup" aria-label="App icon">
     <span>Four app icons to choose from:</span>
     {icons.map((icon, i) => (
@@ -76,6 +78,8 @@ const icons = [
   .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: min(100%, 500px); margin: 32px auto 0; text-align: left; }
   .actions :global(.download) { background: var(--charge); color: #0f1513; }
   .actions :global(.download small) { background: rgb(15 21 19 / 0.85); color: #e8efe9; }
+  .phone { margin: 18px 0 0; font-size: 0.95rem; }
+  .phone a { color: var(--ink-2); }
   .picker { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 36px; color: var(--ink-3); font-size: 0.92rem; }
   .picker span { margin-right: 4px; }
   .picker button { padding: 3px; border: 2px solid transparent; border-radius: 14px; background: none; cursor: pointer; }
