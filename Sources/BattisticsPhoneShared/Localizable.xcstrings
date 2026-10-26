@@ -6154,6 +6154,17 @@
           }
         }
       }
+    },
+    "The charge chart fills in over the next hours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj grafiği önümüzdeki saatlerde dolacak."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

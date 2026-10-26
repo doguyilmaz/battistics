@@ -143,6 +143,17 @@ struct PhoneDashboard: View {
                     .foregroundStyle(.secondary)
                     .labelStyle(TightLabel())
                 }
+            } else if phone.percent != nil {
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.xyaxis.line")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                    Text("The charge chart fills in over the next hours.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Divider()
             Button {
