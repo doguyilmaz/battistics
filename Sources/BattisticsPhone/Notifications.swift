@@ -22,7 +22,8 @@ enum Notifications {
 
     static func latchCharge(_ alerts: [RemoteAlert], macID: String, status: RemoteStatus?) -> [RemoteAlert] {
         var latched = Set(UserDefaults.standard.stringArray(forKey: chargedKey) ?? [])
-        if let status, let chargeTarget, RemoteAlert.chargeAlertRearms(at: status, target: chargeTarget) {
+        if let status, status.battery?.onAdapter == false
+            || chargeTarget.map({ RemoteAlert.chargeAlertRearms(at: status, target: $0) }) == true {
             latched.remove(macID)
         }
         var alerts = alerts

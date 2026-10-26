@@ -261,7 +261,11 @@ final class MacStore {
             if wanted {
                 defaults.set(false, forKey: Self.removalPendingKey)
                 let subscribed = try await cloud.hasAlertSubscription()
-                if !subscribed { try await cloud.subscribeToAlerts() }
+                if !subscribed {
+                    try await cloud.subscribeToAlerts()
+                    // Confirmed by the next refresh, which then leaves the Mac's alerts to iCloud.
+                    alertSubscriptionChecked = nil
+                }
                 // What the Mac posted while it was missing never reached this iPhone.
                 UserDefaults.standard.set(subscribed, forKey: Notifications.pushedKey)
             } else {
