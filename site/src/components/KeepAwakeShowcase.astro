@@ -301,6 +301,14 @@ const guards = [
     .head, .modes, .guards { grid-template-columns: minmax(0, 1fr); }
     .modes :global(.hint-start) { display: none; }
   }
+  @media (max-width: 560px) {
+    .durations span { flex-basis: 100%; margin: 0 0 4px; }
+    .durations button { flex: 1; padding-inline: 0; }
+    table { min-width: 520px; font-size: 0.9rem; }
+    /* The row names stay put while the three modes scroll under them. */
+    tbody th, thead th:first-child { position: sticky; left: 0; z-index: 1; background: #0d1311; }
+    caption { position: sticky; left: 0; }
+  }
 </style>
 
 <script>
