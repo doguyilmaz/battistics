@@ -6165,6 +6165,17 @@
           }
         }
       }
+    },
+    "iCloud storage is full.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud depolama alanı dolu."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -382,6 +382,8 @@ final class MacStore {
             String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
         case .networkUnavailable, .networkFailure:
             String(localized: "This iPhone is offline.")
+        case .quotaExceeded:
+            String(localized: "iCloud storage is full.")
         default:
             String(localized: "iCloud could not be reached. Try again in a moment.")
         }
