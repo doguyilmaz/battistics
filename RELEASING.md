@@ -32,7 +32,7 @@ Set these once with `gh secret set <NAME>`:
 | `APPLE_TEAM_ID` | 10 character team identifier |
 | `NOTARY_PASSWORD` | App-specific password for notarytool |
 | `SPARKLE_PRIVATE_KEY` | Sparkle EdDSA private key (see below) |
-| `MACOS_PROVISIONING_PROFILE` | Developer ID profile with iCloud and Push for `com.doguyilmaz.Battistics`, base64: `base64 -i Battistics_Developer_ID.provisionprofile \| pbcopy`. It must list the certificate in `MACOS_CERT_P12`. Without it a release has no iCloud and cannot reach the iPhone app. |
+| `MACOS_PROVISIONING_PROFILE` | Developer ID profile with iCloud and Push for `com.doguyilmaz.Battistics`, base64: `base64 -i Battistics_Developer_ID.provisionprofile \| pbcopy`. It must list the certificate in `MACOS_CERT_P12` (the one expiring in 2031); signing stops the release when it does not. Without it a release has no iCloud and cannot reach the iPhone app. |
 
 ## The Sparkle key
 
