@@ -61,6 +61,7 @@ struct BatteryCard: View {
             .animation(.snappy, value: battery.isCharging)
             .animation(.snappy, value: message)
             .onChange(of: battery.lowPowerPolicy) { message = nil }
+            .sensoryFeedback(.error, trigger: message) { $1 != nil }
         } else {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -75,6 +76,7 @@ struct BatteryCard: View {
                 }
             }
             .card()
+            .sensoryFeedback(.error, trigger: message) { $1 != nil }
         }
     }
 

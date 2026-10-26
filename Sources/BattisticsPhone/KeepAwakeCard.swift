@@ -69,6 +69,7 @@ struct KeepAwakeCard: View {
         .disabled(!reachable || operation != nil)
         .animation(.snappy, value: session != nil)
         .sensoryFeedback(.success, trigger: succeeded)
+        .sensoryFeedback(.error, trigger: message) { $1 != nil }
         .onChange(of: session) { message = nil }
         .onChange(of: mode) { message = nil }
         .onChange(of: minutes) { message = nil }
