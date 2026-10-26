@@ -51,6 +51,22 @@
   Battistics asks you to update Battistics Remote instead of looking live.
 - Switching a running session to closed-lid keeps the Mac awake while the
   power helper is set up.
+- Battistics Remote lists a Mac's accessory batteries and its busiest apps
+  with their share of energy, when you ask for them.
+- A Keep Mac Awake control for Control Center and the Action Button, each
+  keeping its own mode and duration, and an app icon menu that starts,
+  extends or stops Keep Awake.
+- Shortcuts and Siri can turn off a Mac's display and set its Low Power Mode.
+- Battistics Remote alerts when a charging Mac reaches a level you choose.
+- This iPhone shows its own battery, time left and charge rate over the last
+  hour.
+- Battistics alerts once when battery health drops, and again only if it
+  drops further.
+- An unreadable history file is set aside and a new one started, instead of
+  turning history off, and history import errors say what went wrong.
+- The menu bar beeps when a Low Power Mode change does not apply.
+- The popover no longer lists profiles or the terminal shortcut.
+- The Homebrew cask installs on Apple silicon only.
 
 ## 1.4.1
 
