@@ -5865,6 +5865,57 @@
           }
         }
       }
+    },
+    "%@ is not answering or has no battery.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is not answering or has no battery."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yanıt vermiyor ya da pili yok."
+          }
+        }
+      }
+    },
+    "Get Mac Battery Level": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Mac Battery Level"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Pil Seviyesini Al"
+          }
+        }
+      }
+    },
+    "Returns your Mac’s battery level, from 0 to 100.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Returns your Mac’s battery level, from 0 to 100."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inin pil seviyesini 0 ile 100 arasında verir."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

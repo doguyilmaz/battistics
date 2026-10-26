@@ -121,9 +121,34 @@ struct MacStatusIntent: AppIntent {
     }
 }
 
+/// A number for Shortcuts automations, such as a reminder when the Mac runs low.
+struct MacBatteryLevelIntent: AppIntent {
+    static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
+    static let title: LocalizedStringResource = "Get Mac Battery Level"
+    static let description = IntentDescription("Returns your Mac’s battery level, from 0 to 100.")
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ReturnsValue<Int> {
+        guard let mac = MacStore.shared.selected else { throw IntentFailure.notPaired }
+        await MacStore.shared.refreshAll()
+        guard let reading = MacStore.shared.reading(for: mac), reading.reachable,
+              let percent = reading.status?.battery?.percent else {
+            throw IntentFailure.noReading(mac.name)
+        }
+        return .result(value: percent)
+    }
+}
+
 enum IntentFailure: Error, CustomLocalizedStringResourceConvertible {
     case notPaired
-    var localizedStringResource: LocalizedStringResource { "Open Battistics Remote to connect to your Mac first." }
+    case noReading(String)
+
+    var localizedStringResource: LocalizedStringResource {
+        switch self {
+        case .notPaired: "Open Battistics Remote to connect to your Mac first."
+        case .noReading(let name): "\(name) is not answering or has no battery."
+        }
+    }
 }
 
 struct Shortcuts: AppShortcutsProvider {
