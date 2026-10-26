@@ -74,7 +74,7 @@ struct KeepAwakeActivityWidget: Widget {
                         .foregroundStyle(context.state.lowPowerMode ? PowerPalette.lowPower : (context.state.isCharging ? PowerPalette.charging : .orange))
                         .symbolEffect(.pulse, isActive: context.state.isCharging)
                     if let percent = context.state.batteryPercent {
-                        Text("\(percent)%")
+                        Text(percent.percentText)
                             .font(.caption2.weight(.semibold).monospacedDigit())
                     }
                 }
@@ -111,7 +111,7 @@ private struct LivePowerBadge: View {
                 Image(systemName: state.lowPowerMode ? "leaf.fill" : (state.isCharging ? "bolt.fill" : (state.onAdapter ? "powerplug.fill" : "battery.100")))
                     .font(.caption2.weight(.bold))
                     .symbolEffect(.pulse, isActive: state.isCharging)
-                Text("\(percent)%")
+                Text(percent.percentText)
                     .font(.caption.weight(.bold).monospacedDigit())
                 if let watts = state.watts, abs(watts) >= 1 {
                     Text(watts > 0 ? "+\(Int(watts.rounded())) W" : "\(Int(watts.rounded())) W")

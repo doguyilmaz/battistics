@@ -32,7 +32,7 @@ struct MacDashboard: View {
             if store.isSample && !DemoData.isEnabled { SampleBar() }
         }
         .task {
-            guard !store.isSample, UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true else { return }
+            guard !store.isSample, Notifications.isEnabled else { return }
             await Notifications.requestPermission()
         }
     }

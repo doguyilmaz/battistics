@@ -41,6 +41,6 @@ struct ChargeSparkline: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Charge over the last 24 hours"))
-        .accessibilityValue(Text("From \(Int(points.first?.percent ?? 0))% to \(Int(points.last?.percent ?? 0))%"))
+        .accessibilityValue(Text("From \(Int(points.first?.percent ?? 0).percentText) to \(Int(points.last?.percent ?? 0).percentText)"))
     }
 }

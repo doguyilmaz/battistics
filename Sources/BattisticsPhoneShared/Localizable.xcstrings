@@ -69,23 +69,6 @@
         }
       }
     },
-    "%lld%%": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%%%lld"
-          }
-        }
-      }
-    },
     "%lldh": {
       "extractionState": "manual",
       "localizations": {
@@ -307,36 +290,36 @@
         }
       }
     },
-    "Battery %lld%%.": {
+    "Battery %@.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battery %lld%%."
+            "value": "Battery %@."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %%%lld."
+            "value": "Pil %@."
           }
         }
       }
     },
-    "Battery is at %lld%%. Connect power if the Mac must keep running.": {
+    "Battery is at %@. Connect power if the Mac must keep running.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battery is at %lld%%. Connect power if the Mac must keep running."
+            "value": "Battery is at %@. Connect power if the Mac must keep running."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %%%lld. Mac çalışmaya devam etmeliyse güce bağla."
+            "value": "Pil %@. Mac çalışmaya devam etmeliyse güce bağla."
           }
         }
       }
@@ -630,19 +613,19 @@
         }
       }
     },
-    "From %lld%% to %lld%%": {
+    "From %@ to %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "From %lld%% to %lld%%"
+            "value": "From %@ to %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%%%1$lld → %%%2$lld"
+            "value": "%1$@ → %2$@"
           }
         }
       }
@@ -1900,7 +1883,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "1sa Uyanık"
+            "value": "1 sa Uyanık"
           }
         }
       }
@@ -3214,19 +3197,19 @@
         }
       }
     },
-    "Charge: %lld%%": {
+    "Charge: %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Charge: %lld%%"
+            "value": "Charge: %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj: %%%lld"
+            "value": "Şarj: %@"
           }
         }
       }
@@ -3418,19 +3401,19 @@
         }
       }
     },
-    "Health: %lld%%": {
+    "Health: %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Health: %lld%%"
+            "value": "Health: %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sağlık: %%%lld"
+            "value": "Sağlık: %@"
           }
         }
       }
@@ -4438,36 +4421,36 @@
         }
       }
     },
-    "%@ %lld%%": {
+    "%@ %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ %lld%%"
+            "value": "%@ %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ %%%2$lld"
+            "value": "%1$@ %2$@"
           }
         }
       }
     },
-    "Health %lld%%": {
+    "Health %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Health %lld%%"
+            "value": "Health %@"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sağlık %%%lld"
+            "value": "Sağlık %@"
           }
         }
       }
@@ -5033,19 +5016,19 @@
         }
       }
     },
-    "%@%lld%% per hour": {
+    "%@ per hour": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@%lld%% per hour"
+            "value": "%@ per hour"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saatte %@%%%lld"
+            "value": "Saatte %@"
           }
         }
       }
@@ -5339,36 +5322,36 @@
         }
       }
     },
-    "%lld%% charged": {
+    "%@ charged": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld%% charged"
+            "value": "%@ charged"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%%%lld şarj"
+            "value": "%@ şarj"
           }
         }
       }
     },
-    "%lld%% used": {
+    "%@ used": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld%% used"
+            "value": "%@ used"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%%%lld kullanıldı"
+            "value": "%@ kullanıldı"
           }
         }
       }
@@ -6168,6 +6151,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ada’nın iPhone’u"
+          }
+        }
+      }
+    },
+    "The charge chart fills in over the next hours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj grafiği önümüzdeki saatlerde dolacak."
+          }
+        }
+      }
+    },
+    "iCloud storage is full.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud depolama alanı dolu."
           }
         }
       }

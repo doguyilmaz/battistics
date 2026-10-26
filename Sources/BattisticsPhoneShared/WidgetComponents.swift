@@ -79,7 +79,10 @@ struct KeepAwakeIntentButton: View {
             .disabled(!reachable)
         } else {
             Button(intent: StartKeepAwakeLiveIntent()) {
-                Label("Awake 1h", systemImage: "cup.and.saucer.fill").frame(maxWidth: .infinity)
+                Label("Awake 1h", systemImage: "cup.and.saucer.fill")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity)
             }
             .accessibilityLabel(Text("Keep Awake for 1 hour"))
             .disabled(!reachable)
@@ -108,7 +111,7 @@ enum WidgetHelpers {
 
     static func healthText(_ battery: RemoteStatus.Battery) -> Text? {
         battery.healthPercent.map {
-            Text("\(Image(systemName: "heart.fill")) \($0)%").accessibilityLabel(Text("Health \($0)%"))
+            Text("\(Image(systemName: "heart.fill")) \($0.percentText)").accessibilityLabel(Text("Health \($0.percentText)"))
         }
     }
 

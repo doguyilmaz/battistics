@@ -7,6 +7,7 @@ import UserNotifications
 /// timer when Keep Awake is active: no third-party server, no cost.
 enum Notifications {
     static let enabledKey = "notificationsEnabled"
+    static var isEnabled: Bool { UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true }
     /// Whether iCloud shows the Mac's own alerts on this phone, so the app does not repeat them.
     static let pushedKey = "alertPushesSubscribed"
     /// Charge level to report while a Mac charges; 0 is off.
@@ -51,7 +52,7 @@ enum Notifications {
 
     @MainActor
     static func deliver(_ results: [(MacStore.Mac, [RemoteAlert])]) async {
-        guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true else { return }
+        guard isEnabled else { return }
         let center = UNUserNotificationCenter.current()
         let delivered = Set(await center.deliveredNotifications().map(\.request.identifier))
         for (mac, alerts) in results {
@@ -80,6 +81,15 @@ enum Notifications {
         content.threadIdentifier = mac.id
         try? await UNUserNotificationCenter.current()
             .add(UNNotificationRequest(identifier: "\(mac.id).command", content: content, trigger: nil))
+    }
+
+    /// A control or widget used before any Mac shares with this account.
+    @MainActor
+    static func reportNoMac() async {
+        let content = UNMutableNotificationContent()
+        content.body = String(localized: "Open Battistics Remote to connect to your Mac first.")
+        try? await UNUserNotificationCenter.current()
+            .add(UNNotificationRequest(identifier: "nomac.command", content: content, trigger: nil))
     }
 
     /// Maintains a rolling local notification while a Keep Awake session is
@@ -115,7 +125,7 @@ enum Notifications {
             center.removeDeliveredNotifications(withIdentifiers: [endingID])
         }
 
-        guard UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true,
+        guard isEnabled,
               let status = reading.status,
               let session = status.session else {
             return
@@ -196,7 +206,7 @@ private extension RemoteAlert {
             if let reason { String(localized: "Keep Awake ended: \(reason.label).") }
             else { String(localized: "Keep Awake ended.") }
         case .batteryLow(let percent):
-            String(localized: "Battery is at \(percent)%. Connect power if the Mac must keep running.")
+            String(localized: "Battery is at \(percent.percentText). Connect power if the Mac must keep running.")
         case .batteryRunsOut(let minutes):
             String(localized: "The battery lasts about \(DurationLabel.long(minutes: minutes)), less than the Keep Awake session.")
         case .unpluggedWithoutHotspot:

@@ -87,8 +87,8 @@ struct MacDetailsView: View {
         if let model = status.macModel { lines.append(model) }
         if let os = status.osVersion { lines.append(os) }
         if let battery = status.battery {
-            lines.append(String(localized: "Charge: \(battery.percent)%"))
-            if let health = battery.healthPercent { lines.append(String(localized: "Health: \(health)%")) }
+            lines.append(String(localized: "Charge: \(battery.percent.percentText)"))
+            if let health = battery.healthPercent { lines.append(String(localized: "Health: \(health.percentText)")) }
             if let cycles = battery.cycleCount { lines.append(String(localized: "Cycles: \(cycles)")) }
             if let design = battery.designCapacityMah, let full = battery.maxCapacityMah {
                 lines.append(String(localized: "Capacity: \(full) / \(design) mAh"))

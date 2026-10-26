@@ -47,7 +47,7 @@ struct MacWidgetView: View {
 
     private func charge(_ battery: RemoteStatus.Battery, size: CGFloat) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Text("\(battery.percent)%")
+            Text(battery.percent.percentText)
                 .font(.system(size: size, weight: .bold, design: .rounded))
                 .foregroundStyle(PowerPalette.batteryTint(battery))
                 .minimumScaleFactor(0.8)
@@ -275,7 +275,7 @@ struct MacTelemetryWidgetView: View {
                 }
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(battery.percent)%")
+                        Text(battery.percent.percentText)
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(tint)
                         Text(snapshot.reachable ? WidgetHelpers.subtitle(battery) : String(localized: "Offline"))
@@ -367,7 +367,7 @@ private struct AllMacsLine: View {
                 .frame(width: 16)
             Text(snapshot.macName).lineLimit(1)
             Spacer(minLength: 2)
-            Text(snapshot.status?.battery.map { "\($0.percent)%" } ?? "–")
+            Text(snapshot.status?.battery.map { $0.percent.percentText } ?? "–")
                 .fontWeight(.bold)
                 .monospacedDigit()
         }
@@ -414,7 +414,7 @@ private struct AllMacsRow: View {
             }
             Spacer(minLength: 4)
             if let battery {
-                Text("\(battery.percent)%")
+                Text(battery.percent.percentText)
                     .font(.system(.title3, design: .rounded, weight: .bold).monospacedDigit())
                     .foregroundStyle(tint)
                     .widgetAccentable()

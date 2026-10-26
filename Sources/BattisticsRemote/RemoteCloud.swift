@@ -69,7 +69,8 @@ public actor RemoteCloud {
         let info = CKSubscription.NotificationInfo()
         info.shouldSendContentAvailable = true
         subscription.notificationInfo = info
-        subscribed = (try? await database.modifySubscriptions(saving: [subscription], deleting: [])) != nil
+        let saved = try? await database.modifySubscriptions(saving: [subscription], deleting: [])
+        subscribed = saved?.saveResults.values.allSatisfy { (try? $0.get()) != nil } ?? false
     }
 
     /// The whole zone is a handful of small records, so it is read in full.
@@ -214,7 +215,8 @@ public actor RemoteCloud {
         info.shouldSendMutableContent = true
         info.desiredKeys = ["collapse"]
         subscription.notificationInfo = info
-        _ = try await database.modifySubscriptions(saving: [subscription], deleting: [])
+        let saved = try await database.modifySubscriptions(saving: [subscription], deleting: [])
+        for result in saved.saveResults.values { _ = try result.get() }
     }
 
     /// Whether the account still holds the alert subscription; another phone

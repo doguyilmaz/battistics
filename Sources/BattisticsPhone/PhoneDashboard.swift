@@ -70,8 +70,9 @@ struct PhoneDashboard: View {
     /// "−8% per hour" from this app's own readings; "Steady" once an hour shows no change.
     private var rateText: String {
         if let rate = phone.chargeRate {
-            let value = Int(rate.rounded())
-            return String(localized: "\(value > 0 ? "+" : "")\(value)% per hour")
+            let change = (rate.rounded() / 100).formatted(.percent.precision(.fractionLength(0))
+                .sign(strategy: .always(includingZero: false)))
+            return String(localized: "\(change) per hour")
         }
         let recent = phone.chargeHistory.filter { -$0.at.timeIntervalSinceNow <= 90 * 60 }
         guard let first = recent.first, let last = recent.last,
@@ -134,14 +135,25 @@ struct PhoneDashboard: View {
                 ChargeSparkline(points: phone.chargeHistory, tint: tint, height: nil)
                 if totals.gained + totals.used > 0 {
                     HStack(spacing: 14) {
-                        Label(String(localized: "\(totals.gained)% charged"), systemImage: "arrow.up")
-                        Label(String(localized: "\(totals.used)% used"), systemImage: "arrow.down")
+                        Label(String(localized: "\(totals.gained.percentText) charged"), systemImage: "arrow.up")
+                        Label(String(localized: "\(totals.used.percentText) used"), systemImage: "arrow.down")
                         Spacer(minLength: 0)
                     }
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(.secondary)
                     .labelStyle(TightLabel())
                 }
+            } else if phone.percent != nil {
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.xyaxis.line")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                    Text("The charge chart fills in over the next hours.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Divider()
             Button {
@@ -189,7 +201,7 @@ struct PhoneDashboard: View {
                         if reading?.reachable != true {
                             Text("Offline").foregroundStyle(.secondary)
                         } else if let percent = reading?.status?.battery?.percent {
-                            Text("\(percent)%").monospacedDigit().foregroundStyle(.secondary)
+                            Text(percent.percentText).monospacedDigit().foregroundStyle(.secondary)
                         }
                         Image(systemName: "chevron.right")
                             .font(.footnote.weight(.semibold))

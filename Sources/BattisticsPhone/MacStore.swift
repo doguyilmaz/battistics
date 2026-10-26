@@ -64,7 +64,8 @@ final class MacStore {
         macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (saved == Self.localPhoneID ? nil : saved)
         selectedID = saved
         RemoteIntentBridge.start = { [weak self] mode, minutes in
-            guard let self, let mac = self.remoteMac else { return }
+            guard let self else { return }
+            guard let mac = self.remoteMac else { return await Notifications.reportNoMac() }
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] id in
@@ -237,7 +238,7 @@ final class MacStore {
     /// never does, since another iPhone on the account may still want it.
     func syncAlertSubscription(removing: Bool = false) async {
         alertSubscriptionChecked = .now
-        let wanted = UserDefaults.standard.object(forKey: Notifications.enabledKey) as? Bool ?? true
+        let wanted = Notifications.isEnabled
         let defaults = UserDefaults.standard
         // Kept until iCloud confirms, so an offline switch-off is retried.
         if removing { defaults.set(true, forKey: Self.removalPendingKey) }
@@ -381,6 +382,8 @@ final class MacStore {
             String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
         case .networkUnavailable, .networkFailure:
             String(localized: "This iPhone is offline.")
+        case .quotaExceeded:
+            String(localized: "iCloud storage is full.")
         default:
             String(localized: "iCloud could not be reached. Try again in a moment.")
         }

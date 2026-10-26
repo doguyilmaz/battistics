@@ -8,10 +8,12 @@ struct BatteryCard: View {
     let reachable: Bool
     /// Why a Low Power or display command failed, shown here rather than in Keep Awake.
     @State private var message: String?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         if let battery = status.battery {
             let tint = reachable ? PowerPalette.batteryTint(battery) : .secondary
+            let pills = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 8)) : AnyLayout(HStackLayout(spacing: 8))
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 14) {
                     BatteryGauge(percent: battery.percent, symbol: battery.symbol, tint: tint,
@@ -25,12 +27,13 @@ struct BatteryCard: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.85)
+                        if typeSize.isAccessibilitySize { powerMenu(battery).padding(.top, 4) }
                     }
                     Spacer(minLength: 4)
-                    powerMenu(battery)
+                    if !typeSize.isAccessibilitySize { powerMenu(battery) }
                 }
 
-                HStack(spacing: 8) {
+                pills {
                     MetricPill(label: String(localized: "Power"),
                                value: battery.flowText ?? "0 W",
                                symbol: "bolt.fill",
@@ -92,17 +95,20 @@ struct BatteryCard: View {
     private func powerMenu(_ battery: RemoteStatus.Battery?) -> some View {
         let lowPower = battery?.lowPowerMode == true
         return Menu {
-            Picker(selection: Binding(
-                get: { battery?.lowPowerPolicy },
-                set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
-            )) {
-                ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
-                    Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
+            // macOS offers the four-way choice only on a Mac with a battery.
+            if let battery {
+                Picker(selection: Binding(
+                    get: { battery.lowPowerPolicy },
+                    set: { policy in if let policy { run { await store.setLowPower(mac, policy: policy) } } }
+                )) {
+                    ForEach(RemoteStatus.LowPowerPolicy.allCases, id: \.self) { policy in
+                        Label(policy.label, systemImage: policy.symbol).tag(Optional(policy))
+                    }
+                } label: {
+                    Label("Low Power Mode on the Mac", systemImage: "leaf")
                 }
-            } label: {
-                Label("Low Power Mode on the Mac", systemImage: "leaf")
+                .pickerStyle(.menu)
             }
-            .pickerStyle(.menu)
             Button {
                 run { await store.sleepDisplay(mac) }
             } label: {
