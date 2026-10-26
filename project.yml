@@ -283,6 +283,7 @@ targets:
     sources:
       - path: Sources/BattisticsPhoneAlerts
       - path: Sources/BattisticsPhoneShared/SharedSnapshot.swift
+      - path: Sources/BattisticsPhoneShared/AlertActions.swift
     dependencies:
       - package: BattisticsCore
         product: BattisticsRemote

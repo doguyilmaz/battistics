@@ -1,3 +1,4 @@
+import BattisticsRemote
 import CloudKit
 import UserNotifications
 
@@ -14,10 +15,14 @@ final class NotificationService: UNNotificationServiceExtension {
             return contentHandler(request.content)
         }
         let macID = String(collapse[..<dot])
-        if let name = SharedSnapshot.loadAll().first(where: { $0.macID == macID })?.macName {
+        let snapshot = SharedSnapshot.loadAll().first { $0.macID == macID }
+        if let name = snapshot?.macName {
             content.subtitle = content.title
             content.title = name
             content.threadIdentifier = macID
+        }
+        if let kind = RemoteAlert.Kind(rawValue: String(collapse[collapse.index(after: dot)...])) {
+            AlertActions.tag(content, macID: macID, kind: kind, status: snapshot?.status)
         }
         contentHandler(content)
     }

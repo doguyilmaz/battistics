@@ -28,9 +28,9 @@ enum Notifications {
 
     static func register() {
         let extend = UNNotificationAction(identifier: extendAction, title: String(localized: "Add 30 Minutes"))
-        UNUserNotificationCenter.current().setNotificationCategories([
+        UNUserNotificationCenter.current().setNotificationCategories(AlertActions.categories.union([
             UNNotificationCategory(identifier: endingCategory, actions: [extend], intentIdentifiers: []),
-        ])
+        ]))
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTask, using: nil) { task in
             // BGTask is thread-safe but not marked Sendable.
             nonisolated(unsafe) let refresh = task
@@ -65,6 +65,7 @@ enum Notifications {
                 content.body = alert.message
                 content.sound = .default
                 content.threadIdentifier = mac.id
+                AlertActions.tag(content, macID: mac.id, kind: alert.kind, status: MacStore.shared.reading(for: mac)?.status)
                 try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             }
         }

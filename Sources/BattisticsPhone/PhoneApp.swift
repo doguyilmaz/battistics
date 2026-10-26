@@ -47,8 +47,8 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         notification.request.identifier.hasSuffix(".command") ? [.banner, .sound] : []
     }
 
-    /// Opens the Mac an alert was about, or runs Add 30 Minutes from the
-    /// "ends in 5 minutes" reminder, also on the Lock Screen.
+    /// Opens the Mac an alert was about, or runs an alert's button: Add 30
+    /// Minutes, or Stop Keep Awake, also on the Lock Screen.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
                                             didReceive response: UNNotificationResponse) async {
         let request = response.notification.request
@@ -62,6 +62,8 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         let store = MacStore.shared
         if action == Notifications.extendAction, let macID {
             await RemoteIntentBridge.extend?(macID, 30)
+        } else if action == AlertActions.stopAction, let macID {
+            await RemoteIntentBridge.stop?(macID)
         } else if action == UNNotificationDefaultActionIdentifier {
             store.show(notification: identifier)
         }
