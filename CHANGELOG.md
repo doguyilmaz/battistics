@@ -46,6 +46,9 @@
 - Try a Sample Mac shows the iPhone app before a Mac is set up.
 - Battistics Remote widgets move up a Smart Stack while Keep Awake runs or
   the battery runs low, and show a desktop Mac's network and heat.
+- Alerts the Mac pushes name that Mac on the iPhone and group by Mac. The
+  Keep Awake card names a profile or task, and a Mac running a newer
+  Battistics asks you to update Battistics Remote instead of looking live.
 - Switching a running session to closed-lid keeps the Mac awake while the
   power helper is set up.
 
