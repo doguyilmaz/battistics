@@ -24,12 +24,17 @@ enum WidgetBridge {
         guard let mac else {
             SharedSnapshot.clear()
             reloadWidgets()
+            if #available(iOS 18.0, *) { ControlCenter.shared.reloadAllControls() }
             return
         }
         let snapshot = SharedSnapshot(mac, reading: reading)
-        if SharedSnapshot.load().map(snapshot.differsNoticeably) ?? true {
-            snapshot.save()
+        let saved = SharedSnapshot.load()
+        guard snapshot != saved else { return }
+        // Saved every time, so any reload shows the newest reading.
+        snapshot.save()
+        if saved.map(snapshot.differsNoticeably) ?? true || reloadDue {
             reloadWidgets()
+            if #available(iOS 18.0, *) { ControlCenter.shared.reloadAllControls() }
         }
     }
 
@@ -48,16 +53,25 @@ enum WidgetBridge {
 
     static func publishAll(_ snapshots: [SharedSnapshot]) {
         let saved = SharedSnapshot.loadAll()
-        guard snapshots.count != saved.count || zip(snapshots, saved).contains(where: { $0.differsNoticeably(from: $1) })
-        else { return }
+        guard snapshots != saved else { return }
         SharedSnapshot.saveAll(snapshots)
         // A widget set to one Mac reads it from here too.
-        WidgetCenter.shared.reloadAllTimelines()
+        if snapshots.count != saved.count || zip(snapshots, saved).contains(where: { $0.differsNoticeably(from: $1) })
+            || reloadDue {
+            reloadWidgets()
+        }
     }
+
+    /// Each reload in the background spends WidgetKit's daily budget, so
+    /// widgets reload for what they show, and otherwise only well before the
+    /// reading they hold is old enough to call the Mac unheard.
+    private static var lastReload = Date.distantPast
+
+    private static var reloadDue: Bool { -lastReload.timeIntervalSinceNow > RemoteStatus.unheardDelay / 2 }
 
     private static func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
-        if #available(iOS 18.0, *) { ControlCenter.shared.reloadAllControls() }
+        lastReload = .now
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
