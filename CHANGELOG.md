@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.1
+
+- Battistics Remote says Bag Ready when a closed-lid session reaches
+  Personal Hotspot while the lid is still open, so you know it is safe to
+  close it.
+- A Mac set up from another Mac's backup shows up on the iPhone as itself
+  instead of taking the other Mac's place and answering its commands.
+- A command from the iPhone that went unanswered no longer runs on the Mac
+  up to two minutes later.
+
 ## 1.5.0
 
 - Battistics Remote for iPhone: battery and its last day, time left,
