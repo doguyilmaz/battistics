@@ -3,11 +3,13 @@ import SwiftUI
 
 struct ConditionsGrid: View {
     let status: RemoteStatus
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         let isHotspot = status.network == .hotspot
         let name = status.resolvedNetworkName()
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+        let columns = typeSize.isAccessibilitySize ? 1 : 2
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: columns), spacing: 10) {
             StatTile(title: name == nil ? String(localized: "Network") : status.network.label,
                      value: name ?? status.network.label,
                      symbol: status.network.symbol,

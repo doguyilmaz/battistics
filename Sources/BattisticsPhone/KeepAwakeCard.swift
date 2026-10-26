@@ -14,6 +14,7 @@ struct KeepAwakeCard: View {
     @State private var confirmingWiFi = false
     @State private var showingHotspotHelp = false
     @State private var succeeded = 0
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private static let durations = [15, 30, 60, 120, 240, 720, 0]
 
@@ -96,27 +97,38 @@ struct KeepAwakeCard: View {
             }
             .pickerStyle(.segmented)
 
-            HStack(spacing: 6) {
-                ForEach(Self.durations, id: \.self) { value in
-                    let selected = value == minutes
-                    Button {
-                        minutes = value
-                    } label: {
-                        Text(DurationLabel.short(value))
-                            .font(.subheadline.weight(.semibold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .frame(maxWidth: .infinity, minHeight: 36)
-                            .background(selected ? Color.accentColor : Color(.tertiarySystemFill), in: .capsule)
-                            .foregroundStyle(selected ? Color.white : Color.primary)
+            Group {
+                // Seven chips in one row leave no room at accessibility sizes.
+                if typeSize.isAccessibilitySize {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 4), spacing: 6) {
+                        durationChips
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(DurationLabel.spoken(minutes: value))
-                    .accessibilityAddTraits(selected ? .isSelected : [])
+                } else {
+                    HStack(spacing: 6) { durationChips }
                 }
             }
             .sensoryFeedback(.selection, trigger: minutes)
             .animation(.snappy, value: minutes)
+        }
+    }
+
+    private var durationChips: some View {
+        ForEach(Self.durations, id: \.self) { value in
+            let selected = value == minutes
+            Button {
+                minutes = value
+            } label: {
+                Text(DurationLabel.short(value))
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .background(selected ? Color.accentColor : Color(.tertiarySystemFill), in: .capsule)
+                    .foregroundStyle(selected ? Color.white : Color.primary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(DurationLabel.spoken(minutes: value))
+            .accessibilityAddTraits(selected ? .isSelected : [])
         }
     }
 

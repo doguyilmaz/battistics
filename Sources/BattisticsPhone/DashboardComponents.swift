@@ -139,6 +139,7 @@ struct StatTile: View {
     let symbol: String
     var tint: Color = .accentColor
     var highlighted = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         HStack(spacing: 8) {
@@ -151,7 +152,7 @@ struct StatTile: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(value)
                     .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
+                    .lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
                     .minimumScaleFactor(0.7)
                 Text(title)
                     .font(.caption)
