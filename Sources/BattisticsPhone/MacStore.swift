@@ -87,6 +87,14 @@ final class MacStore {
 
     private var triesSample: Bool { isSample && !DemoData.isEnabled }
 
+    var remoteMacs: [Mac] { triesSample ? [] : macs }
+
+    /// A Mac picked in Shortcuts, else `remoteMac`.
+    func remoteMac(id: String?) -> Mac? {
+        guard let id else { return remoteMac }
+        return remoteMacs.first { $0.id == id }
+    }
+
     /// The Mac a widget or Live Activity names, else the selected one.
     private func mac(_ id: String?) -> Mac? {
         guard !triesSample else { return nil }
