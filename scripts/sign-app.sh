@@ -41,6 +41,15 @@ fi
 if [ -n "${PROFILE:-}" ]; then
     cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
     codesign "${FLAGS[@]}" --entitlements "$(dirname "$0")/../Sources/BattisticsApp/Support/Battistics-Release.entitlements" "$APP"
+    # macOS refuses to launch an app whose profile does not list its signing certificate.
+    python3 - "$PROFILE" "$APP" <<'PY'
+import plistlib, subprocess, sys, tempfile
+profile = plistlib.loads(subprocess.run(["security", "cms", "-D", "-i", sys.argv[1]], capture_output=True, check=True).stdout)
+out = tempfile.mkdtemp() + "/cert"
+subprocess.run(["codesign", "-d", f"--extract-certificates={out}", sys.argv[2]], capture_output=True, check=True)
+if open(out + "0", "rb").read() not in profile["DeveloperCertificates"]:
+    sys.exit("The provisioning profile does not list the certificate that signed the app.")
+PY
 else
     codesign "${FLAGS[@]}" --preserve-metadata=entitlements "$APP"
 fi
