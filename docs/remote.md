@@ -13,7 +13,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - Turning sharing off while offline keeps retrying the delete until it lands, so phones never keep a ghost of the Mac.
 - Details › Remove Mac, offered while a Mac is not answering, deletes its record for an erased or sold Mac. A Mac that still shares sees the deletion in its next change read and publishes again at once.
 - A status or command written by a newer build stays readable: an unknown operation is answered as an invalid request ("Update Battistics"), and a status the phone cannot decode keeps that Mac's last reading instead of removing it.
-- The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s during a Keep Awake session or for 2 minutes after a command, every 15 s otherwise. macOS throttles silent pushes, so a push only triggers an extra poll.
+- The Mac polls with `RemoteCloud.fetchChanges()` (change token, deltas only): every 4 s for 2 minutes after a command, every 15 s otherwise, also during a Keep Awake session. macOS throttles silent pushes, so a push only triggers an extra poll.
 - `publish` builds the cheap status first and compares it with the last one sent. History and `pmset` are read only when something changed or the heartbeat is due. The heartbeat is published even when reading commands fails, and CloudKit's `retryAfter` is honoured.
 - Handled command ids are remembered until their records are deleted, so a failed delete never runs a command twice.
 - A full read without this Mac's record (a lost zone, or one another device recreated) makes the Mac publish at once instead of waiting for the heartbeat.

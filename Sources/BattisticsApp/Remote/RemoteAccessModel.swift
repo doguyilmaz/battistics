@@ -316,8 +316,7 @@ final class RemoteAccessModel {
     }
 
     /// Polls for phone commands because macOS throttles silent pushes: every
-    /// few seconds while a session runs or right after a command, otherwise
-    /// slower. Each poll is a delta fetch, so an idle zone costs one small
+    /// few seconds right after a command, otherwise slower. Each poll is a delta fetch, so an idle zone costs one small
     /// request. Stops while sharing is off and nothing is left to withdraw.
     private func startTicker() {
         guard ticker == nil, cloud != nil else { return }
@@ -351,9 +350,11 @@ final class RemoteAccessModel {
         }
     }
 
+    /// Not faster during a session: one polled every few seconds for hours
+    /// keeps the radios busy, over cellular on Hotspot.
     private var pollInterval: TimeInterval {
         let recentCommand = lastCommandAt.map { -$0.timeIntervalSinceNow < 120 } ?? false
-        return awake.isActive || recentCommand ? 4 : 15
+        return recentCommand ? 4 : 15
     }
 
     private static func describe(_ error: Error) -> String {
