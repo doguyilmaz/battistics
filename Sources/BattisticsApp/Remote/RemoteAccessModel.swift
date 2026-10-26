@@ -3,6 +3,7 @@ import BattisticsCore
 import BattisticsRemote
 import CloudKit
 import Foundation
+import IOKit
 import Observation
 import SystemConfiguration
 
@@ -89,12 +90,7 @@ final class RemoteAccessModel {
         self.cloud = cloud
         self.chargeHistory = chargeHistory
         self.battery = battery
-        if let saved = UserDefaults.standard.string(forKey: Prefs.remoteMacID) {
-            macID = saved
-        } else {
-            macID = UUID().uuidString
-            UserDefaults.standard.set(macID, forKey: Prefs.remoteMacID)
-        }
+        macID = Self.savedMacID()
         enabled = UserDefaults.standard.bool(forKey: Prefs.remoteEnabled)
         closedLidAllowed = UserDefaults.standard.bool(forKey: Prefs.remoteClosedLidAllowed)
         network.onChange = { [weak self] in self?.publishSoon() }
@@ -602,6 +598,33 @@ final class RemoteAccessModel {
             return "\(friendly) (\(raw))"
         }
         return raw
+    }
+}
+
+private extension RemoteAccessModel {
+    /// Kept with the hardware it was made on, so a Mac set up from another
+    /// Mac's backup shares as itself instead of answering for that Mac.
+    static func savedMacID() -> String {
+        let defaults = UserDefaults.standard
+        let hardware = platformUUID()
+        if let saved = defaults.string(forKey: Prefs.remoteMacID) {
+            let owner = defaults.string(forKey: Prefs.remoteMacHardware)
+            // An ID saved before the hardware was recorded stays with this Mac.
+            if owner == nil { defaults.set(hardware, forKey: Prefs.remoteMacHardware) }
+            if owner == nil || hardware == nil || owner == hardware { return saved }
+        }
+        let id = UUID().uuidString
+        defaults.set(id, forKey: Prefs.remoteMacID)
+        defaults.set(hardware, forKey: Prefs.remoteMacHardware)
+        return id
+    }
+
+    static func platformUUID() -> String? {
+        let expert = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        guard expert != IO_OBJECT_NULL else { return nil }
+        defer { IOObjectRelease(expert) }
+        return IORegistryEntryCreateCFProperty(expert, kIOPlatformUUIDKey as CFString, kCFAllocatorDefault, 0)?
+            .takeRetainedValue() as? String
     }
 }
 
