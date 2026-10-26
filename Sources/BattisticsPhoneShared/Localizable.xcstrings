@@ -5950,6 +5950,23 @@
           }
         }
       }
+    },
+    "The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabındaki başka bir iPhone’da açıkken Mac’in kendi uyarıları buraya da gelir. Bu iPhone’u susturmak için Ayarlar › Bildirimler’den kapat."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
