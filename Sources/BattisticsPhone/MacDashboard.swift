@@ -23,9 +23,6 @@ struct MacDashboard: View {
                     MacExtrasCard(mac: mac, status: status, reachable: reachable)
                 }
                 .animation(.snappy, value: reachable)
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, minHeight: 240)
             }
         }
         .safeAreaInset(edge: .bottom) {

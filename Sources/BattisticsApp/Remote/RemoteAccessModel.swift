@@ -154,8 +154,9 @@ final class RemoteAccessModel {
                 guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
                 lastCommand = .init(id: command.request.id, failure: await handle(command.request))
                 lastCommandAt = .now
-                // Each answer goes out before the next command replaces it, or that phone waits in vain.
-                if mine.count > 1 { try? await publish(force: true) }
+                // Each answer goes out before the next command replaces it, or that phone
+                // waits in vain; the last goes out with the publish below.
+                if command.recordName != mine.last?.recordName { try? await publish(force: true) }
                 handled = true
             }
             // Alerts only need to live long enough to be pushed. A delta fetch
