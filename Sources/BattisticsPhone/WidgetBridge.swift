@@ -38,7 +38,8 @@ enum WidgetBridge {
     static func publishAll(_ snapshots: [SharedSnapshot]) {
         guard snapshots != SharedSnapshot.loadAll() else { return }
         SharedSnapshot.saveAll(snapshots)
-        WidgetCenter.shared.reloadTimelines(ofKind: AllMacsEntry.kind)
+        // A widget set to one Mac reads it from here too.
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private static func reloadWidgets() {

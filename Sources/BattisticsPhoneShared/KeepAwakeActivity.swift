@@ -33,9 +33,9 @@ struct KeepAwakeActivityAttributes: ActivityAttributes {
 /// Bridges widget and Live Activity button intents to `MacStore` in the host app.
 @MainActor
 enum RemoteIntentBridge {
-    /// Minutes 0 means until turned off.
-    static var start: ((RemoteStatus.Mode, Int) async -> Void)?
-    /// Given the Live Activity's own Mac; nil means the selected one.
+    /// Each takes the Mac of the widget or Live Activity it came from; nil
+    /// means the selected one. Minutes 0 means until turned off.
+    static var start: ((String?, RemoteStatus.Mode, Int) async -> Void)?
     static var stop: ((String?) async -> Void)?
     static var extend: ((String?, Int) async -> Void)?
     static var sleepDisplay: (() async -> Void)?
@@ -47,9 +47,18 @@ struct StartKeepAwakeLiveIntent: LiveActivityIntent {
     static let description = IntentDescription("Starts a 1-hour Keep Awake session on your computer.")
     static let isDiscoverable = false
 
+    @Parameter(title: "Mac")
+    var macID: String?
+
+    init() {}
+
+    init(macID: String?) {
+        self.macID = macID
+    }
+
     @MainActor
     func perform() async throws -> some IntentResult {
-        await RemoteIntentBridge.start?(.displayMaySleep, 60)
+        await RemoteIntentBridge.start?(macID, .displayMaySleep, 60)
         return .result()
     }
 }
@@ -170,7 +179,7 @@ struct SetKeepAwakeIntent: SetValueIntent, LiveActivityIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         if value {
-            await RemoteIntentBridge.start?(mode.mode, duration.rawValue)
+            await RemoteIntentBridge.start?(nil, mode.mode, duration.rawValue)
         } else {
             await RemoteIntentBridge.stop?(nil)
         }

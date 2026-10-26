@@ -63,9 +63,10 @@ final class MacStore {
         let saved = UserDefaults.standard.string(forKey: "selectedMac")
         macID = UserDefaults.standard.string(forKey: "remoteMac") ?? (saved == Self.localPhoneID ? nil : saved)
         selectedID = saved
-        RemoteIntentBridge.start = { [weak self] mode, minutes in
+        RemoteIntentBridge.start = { [weak self] id, mode, minutes in
             guard let self else { return }
-            guard let mac = self.remoteMac else { return await Notifications.reportNoMac() }
+            guard let mac = self.mac(id) else { return await Notifications.reportNoMac() }
+            self.follow(mac)
             await Notifications.report(await self.start(mac, mode: mode, minutes: minutes), for: mac)
         }
         RemoteIntentBridge.stop = { [weak self] id in

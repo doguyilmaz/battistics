@@ -6209,6 +6209,40 @@
           }
         }
       }
+    },
+    "Chosen in App": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chosen in App"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulamada Seçili"
+          }
+        }
+      }
+    },
+    "Choose which Mac the widget shows.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which Mac the widget shows."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget’ın göstereceği Mac’i seç."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

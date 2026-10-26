@@ -98,7 +98,7 @@ struct MacWidgetView: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.orange)
             } else if snapshot.reachable {
-                KeepAwakeIntentButton(running: false, reachable: true)
+                KeepAwakeIntentButton(macID: snapshot.macID, running: false, reachable: true)
                     .font(.caption2.weight(.semibold))
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
@@ -165,7 +165,7 @@ struct MacWidgetView: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
-            KeepAwakeIntentButton(running: activeSession(status) != nil, reachable: snapshot.reachable)
+            KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(status) != nil, reachable: snapshot.reachable)
                 .font(.caption2.weight(.semibold))
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
@@ -233,8 +233,8 @@ struct MacWidgetView: View {
                     }
                 }
                 Spacer(minLength: 4)
-                KeepAwakeIntentButton(running: activeSession(status) != nil, reachable: snapshot.reachable,
-                                      addsTime: activeSession(status)?.deadline != nil)
+                KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(status) != nil,
+                                      reachable: snapshot.reachable, addsTime: activeSession(status)?.deadline != nil)
                     .font(.caption.weight(.semibold))
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)

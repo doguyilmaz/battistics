@@ -56,6 +56,7 @@ struct SessionTimerText: View {
 /// Stop while a session runs, with 30 more minutes when there is room;
 /// otherwise a one-hour start.
 struct KeepAwakeIntentButton: View {
+    let macID: String?
     let running: Bool
     let reachable: Bool
     var addsTime = false
@@ -64,21 +65,21 @@ struct KeepAwakeIntentButton: View {
         if running {
             HStack(spacing: 6) {
                 if addsTime {
-                    Button(intent: ExtendKeepAwakeLiveIntent(macID: nil, minutes: 30)) {
+                    Button(intent: ExtendKeepAwakeLiveIntent(macID: macID, minutes: 30)) {
                         Label("30 min", systemImage: "plus")
                     }
                     .buttonStyle(.bordered)
                     .tint(.orange)
                     .accessibilityLabel(Text("Add 30 minutes"))
                 }
-                Button(intent: StopKeepAwakeLiveIntent()) {
+                Button(intent: StopKeepAwakeLiveIntent(macID: macID)) {
                     Label("Stop", systemImage: "stop.fill").frame(maxWidth: .infinity)
                 }
                 .tint(.orange)
             }
             .disabled(!reachable)
         } else {
-            Button(intent: StartKeepAwakeLiveIntent()) {
+            Button(intent: StartKeepAwakeLiveIntent(macID: macID)) {
                 Label("Awake 1h", systemImage: "cup.and.saucer.fill")
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
