@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.0
 
 - Battistics Remote for iPhone: battery and its last day, time left,
   connection, lid, heat and Keep Awake for the Macs on your Apple Account, with
