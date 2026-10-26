@@ -173,9 +173,18 @@ struct MacStatusIntent: AppIntent {
         guard entity.isAnswering, let status = MacStore.shared.reading(for: mac)?.status else {
             return .result(value: entity, dialog: "\(mac.name) is not answering.")
         }
-        let battery = status.battery.map { String(localized: "Battery \($0.percent.percentText).") } ?? ""
-        let awake = status.session == nil ? String(localized: "Keep Awake is off.") : String(localized: "Keep Awake is on.")
-        return .result(value: entity, dialog: "\(battery) \(awake)")
+        var sentences: [String] = []
+        if let battery = status.battery {
+            sentences.append(String(localized: "Battery \(battery.percent.percentText)."))
+            if let time = battery.timeText { sentences.append(time + ".") }
+        }
+        if let deadline = status.session?.deadline, deadline > .now {
+            let minutes = Int((deadline.timeIntervalSinceNow / 60).rounded(.up))
+            sentences.append(String(localized: "Keep Awake is on for another \(DurationLabel.long(minutes: minutes))."))
+        } else {
+            sentences.append(status.session == nil ? String(localized: "Keep Awake is off.") : String(localized: "Keep Awake is on."))
+        }
+        return .result(value: entity, dialog: "\(sentences.joined(separator: " "))")
     }
 }
 

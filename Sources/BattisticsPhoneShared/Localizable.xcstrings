@@ -6176,6 +6176,17 @@
           }
         }
       }
+    },
+    "Keep Awake is on for another %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut %@ daha açık."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
