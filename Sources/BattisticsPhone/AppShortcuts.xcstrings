@@ -140,7 +140,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı uyut"
+            "value": "${applicationName} ile bilgisayarımı uyku moduna al"
           }
         }
       }
