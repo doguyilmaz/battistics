@@ -200,9 +200,10 @@ final class MacStore {
         // A cancelled refresh says nothing about the Macs, nor one that ended
         // after the sample replaced them.
         guard !Task.isCancelled, !isSample else { return [] }
+        // Settled before alerts are filtered, so one posted while another
+        // iPhone had removed the subscription is raised here instead.
         if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 120 }) ?? true {
-            alertSubscriptionChecked = .now
-            Task { await syncAlertSubscription() }
+            await syncAlertSubscription()
         }
         return await apply(snapshot)
     }
@@ -257,12 +258,17 @@ final class MacStore {
         do {
             if wanted {
                 defaults.set(false, forKey: Self.removalPendingKey)
-                if try await !cloud.hasAlertSubscription() { try await cloud.subscribeToAlerts() }
-            } else if defaults.bool(forKey: Self.removalPendingKey) {
-                try await cloud.unsubscribeFromAlerts()
-                defaults.set(false, forKey: Self.removalPendingKey)
+                let subscribed = try await cloud.hasAlertSubscription()
+                if !subscribed { try await cloud.subscribeToAlerts() }
+                // What the Mac posted while it was missing never reached this iPhone.
+                UserDefaults.standard.set(subscribed, forKey: Notifications.pushedKey)
+            } else {
+                if defaults.bool(forKey: Self.removalPendingKey) {
+                    try await cloud.unsubscribeFromAlerts()
+                    defaults.set(false, forKey: Self.removalPendingKey)
+                }
+                UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
             }
-            UserDefaults.standard.set(wanted, forKey: Notifications.pushedKey)
         } catch {
             UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
         }
