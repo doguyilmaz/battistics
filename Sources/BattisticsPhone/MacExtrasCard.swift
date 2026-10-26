@@ -37,7 +37,7 @@ struct MacExtrasCard: View {
                             Text(accessory.detail.map { "\(accessory.name) · \($0)" } ?? accessory.name)
                                 .lineLimit(1)
                             Spacer()
-                            Text("\(accessory.percent)%")
+                            Text(accessory.percent.percentText)
                                 .monospacedDigit()
                                 .foregroundStyle(accessory.percent <= 15 ? .orange : .secondary)
                         }

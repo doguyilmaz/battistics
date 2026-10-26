@@ -108,7 +108,7 @@ enum WidgetHelpers {
 
     static func healthText(_ battery: RemoteStatus.Battery) -> Text? {
         battery.healthPercent.map {
-            Text("\(Image(systemName: "heart.fill")) \($0)%").accessibilityLabel(Text("Health \($0)%"))
+            Text("\(Image(systemName: "heart.fill")) \($0.percentText)").accessibilityLabel(Text("Health \($0.percentText)"))
         }
     }
 

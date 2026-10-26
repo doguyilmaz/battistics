@@ -76,7 +76,7 @@ struct MacLockScreenDetailView: View {
                     .minimumScaleFactor(0.7)
                 Spacer(minLength: 2)
                 if let battery {
-                    Text("\(battery.percent)%")
+                    Text(battery.percent.percentText)
                         .font(.system(.subheadline, design: .rounded, weight: .heavy).monospacedDigit())
                         .fixedSize()
                 }

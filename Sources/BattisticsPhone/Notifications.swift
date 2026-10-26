@@ -196,7 +196,7 @@ private extension RemoteAlert {
             if let reason { String(localized: "Keep Awake ended: \(reason.label).") }
             else { String(localized: "Keep Awake ended.") }
         case .batteryLow(let percent):
-            String(localized: "Battery is at \(percent)%. Connect power if the Mac must keep running.")
+            String(localized: "Battery is at \(percent.percentText). Connect power if the Mac must keep running.")
         case .batteryRunsOut(let minutes):
             String(localized: "The battery lasts about \(DurationLabel.long(minutes: minutes)), less than the Keep Awake session.")
         case .unpluggedWithoutHotspot:

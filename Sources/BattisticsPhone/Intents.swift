@@ -173,7 +173,7 @@ struct MacStatusIntent: AppIntent {
         guard entity.isAnswering, let status = MacStore.shared.reading(for: mac)?.status else {
             return .result(value: entity, dialog: "\(mac.name) is not answering.")
         }
-        let battery = status.battery.map { String(localized: "Battery \($0.percent)%.") } ?? ""
+        let battery = status.battery.map { String(localized: "Battery \($0.percent.percentText).") } ?? ""
         let awake = status.session == nil ? String(localized: "Keep Awake is off.") : String(localized: "Keep Awake is on.")
         return .result(value: entity, dialog: "\(battery) \(awake)")
     }
