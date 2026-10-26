@@ -31,7 +31,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 - The Mac posts the alerts it can see itself (session ended, battery low or running out, unplugged or lid closed away from Hotspot, running hot) as short-lived `Event` records after each publish (`RemoteAlert.pushed`). Phones hold one CloudKit query subscription on `Event` (`remote-alerts`), so iOS shows them straight from the push, without the silent-push throttling and while the app is not running. No server, no cost.
 - Push payloads cannot carry encrypted fields, so an `Event` holds only a title and a sentence in the Mac's language and a collapse id; no Mac name, network or reading beyond the percentage or time the alert is about. The Mac deletes them after 10 minutes.
 - The phone's notification service extension (`BattisticsPhoneAlerts`) reads the Mac id from the collapse id and adds the Mac's name and its thread from the phone's own copy (`SharedSnapshot.loadAll`), so the name never leaves the device.
-- Every Mac pushes its own alerts; a phone whose subscription is saved skips those kinds locally, leaving it the charge target and "stopped answering". The collapse id equals the local notification id, so the two replace each other instead of stacking.
+- Every Mac pushes its own alerts; a phone whose subscription iCloud has accepted skips those kinds locally, and one whose save iCloud refused keeps raising them itself, leaving it the charge target and "stopped answering". The collapse id equals the local notification id, so the two replace each other instead of stacking.
 - CloudKit does not push a change to the device that made it, so a Mac never shows its own alerts; one that receives another Mac's alert removes it.
 
 ## iPhone app
