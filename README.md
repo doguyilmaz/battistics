@@ -59,7 +59,8 @@ session. Fan speeds are not changed. Details: [session protection](docs/session-
 
 ### Terminal and AI tasks
 
-Turn on **Automation › Local automation**, then:
+Turn on **Automation › Local automation** and paste the line from **Copy
+Terminal setup** into your shell profile (`~/.zshrc`), then:
 
 ```sh
 battistics run --name Build -- swift build

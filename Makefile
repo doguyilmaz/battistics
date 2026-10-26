@@ -1,10 +1,8 @@
 APP = dist/Battistics.app
 DERIVED = .build/xcode
-SPARKLE_BIN = $(DERIVED)/SourcePackages/artifacts/sparkle/Sparkle/bin
 SIGN_IDENTITY ?= -
-VERSION = $(shell /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Sources/BattisticsApp/Support/Info.plist)
 
-.PHONY: gen build test app run run-icloud install dmg appcast release tap metrics clean
+.PHONY: gen build test app run run-icloud install dmg tap metrics clean
 
 # The app resolves the same package versions as `swift test`; only Sparkle,
 # pinned exactly in project.yml, is added on top.
@@ -62,27 +60,8 @@ install: app
 dmg: app
 	bash scripts/make-dmg.sh
 
-appcast:
-	rm -rf dist/release && mkdir -p dist/release
-	cp dist/Battistics-$(VERSION).dmg dist/release/
-	$(SPARKLE_BIN)/generate_appcast dist/release \
-		--download-url-prefix "https://github.com/doguyilmaz/battistics/releases/download/v$(VERSION)/"
-	# generate_appcast names its output after SUFeedURL in the app's
-	# Info.plist, so it already writes appcast-2.xml. The mv is only a guard
-	# in case that ever stops being true.
-	[ -f dist/release/appcast-2.xml ] || mv dist/release/appcast.xml dist/release/appcast-2.xml
-	cp scripts/legacy-appcast.xml dist/release/appcast.xml
-
-release: appcast
-	awk -v want="## $(VERSION)" '$$0 == want { f = 1; next } /^## / { if (f) exit } f' \
-		CHANGELOG.md > dist/release/notes.md
-	gh release create v$(VERSION) dist/release/Battistics-$(VERSION).dmg \
-		dist/release/appcast-2.xml dist/release/appcast.xml \
-		--title "Battistics-$(VERSION)" --notes-file dist/release/notes.md
-	./scripts/update-tap.sh $(VERSION) dist/release/Battistics-$(VERSION).dmg
-
 # Only needed if the release job's cask step was skipped or failed.
-# VERSION is the working tree's placeholder, so ask GitHub what shipped.
+# The working tree's version is a placeholder, so ask GitHub what shipped.
 # Override with `make tap V=1.2.0`.
 tap:
 	@./scripts/update-tap.sh $(if $(V),$(V),$(shell gh release view --json tagName --jq '.tagName' | sed 's/^v//'))

@@ -53,18 +53,13 @@ WARNING: losing this key strands existing users on their current version.
 Updates signed with a different key are rejected by installed apps. Keep the
 Keychain item backed up.
 
-## Manual fallback
+## When a release run fails
 
-If CI is unavailable, a full release can run locally:
-
-```sh
-make test
-SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" make dmg
-xcrun notarytool submit dist/Battistics-*.dmg --keychain-profile battistics --wait
-xcrun stapler staple dist/Battistics-*.dmg
-make appcast   # requires the Sparkle key in the login Keychain
-make release   # needs gh auth
-```
+The release job pushes the tag before the macOS build. If signing or
+notarization fails after that, fix the cause and use **Re-run failed jobs** on
+that run; "Re-run all jobs" and new pushes to main stop at "already tagged".
+To start over instead, delete the tag (`git push --delete origin vX.Y.Z`) and
+push again.
 
 The `battistics` notary profile is stored in the login Keychain
 (`notarytool store-credentials`). Signing note: `make app` re-signs
