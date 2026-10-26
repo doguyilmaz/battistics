@@ -2,10 +2,6 @@ import AppKit
 import BattisticsCore
 import SwiftUI
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 /// Runs with a separate bundle identifier and temporary socket. It acquires
 /// short-lived idle/display assertions only; it never installs a helper or
 /// enables closed-lid mode on the development Mac.

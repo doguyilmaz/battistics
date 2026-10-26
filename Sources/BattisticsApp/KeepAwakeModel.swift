@@ -230,16 +230,9 @@ final class KeepAwakeModel {
         Task {
             do {
                 try await helper.prepareForLidSleep()
-            } catch PowerHelperClient.Failure.needsApproval {
-                guard sessionID == id, mode == .lidClosed else { return }
-                isStoppedReasonInformational = true
-                errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
-                helper.openLoginItemsSettings()
-                waitForHelperApproval(duration: running.duration, switching: id)
-                return
             } catch {
                 guard sessionID == id, mode == .lidClosed else { return }
-                showStartFailure(error, duration: running.duration, allowHelperSetup: true)
+                showStartFailure(error, duration: running.duration, allowHelperSetup: true, switching: id)
                 return
             }
             guard sessionID == id, mode == .lidClosed, let session, session.mode != .lidClosed else { return }
@@ -247,7 +240,10 @@ final class KeepAwakeModel {
         }
     }
 
-    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool) {
+    /// `switching` names a running session that turns closed-lid once the
+    /// helper is allowed, instead of a new one starting.
+    private func showStartFailure(_ error: Error, duration: KeepAwakeDuration, allowHelperSetup: Bool,
+                                  switching runningID: String? = nil) {
         isStoppedReasonInformational = false
         switch error {
         case StartFailure.protection(let event):
@@ -260,7 +256,7 @@ final class KeepAwakeModel {
             isStoppedReasonInformational = true
             errorMessage = String(localized: "Allow Battistics in System Settings > General > Login Items & Extensions. Closed-lid Keep Awake starts as soon as it is allowed.")
             helper.openLoginItemsSettings()
-            waitForHelperApproval(duration: duration)
+            waitForHelperApproval(duration: duration, switching: runningID)
         case PowerHelperClient.Failure.installFailed(let domain, let code):
             errorMessage = String(localized: "macOS did not install the power helper that closed-lid mode needs.") + " (\(domain) \(code))"
         case PowerHelperClient.Failure.outdated:
@@ -482,9 +478,7 @@ final class KeepAwakeModel {
         guard !isChanging, let current = session,
               let new = current.extended(byMinutes: minutes, now: Date()) else { return false }
         guard assertion.take(mode: new.mode, until: new.deadline) else {
-            stop(reason: .failure)
-            isStoppedReasonInformational = false
-            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            refuseAssertion()
             return false
         }
         session = new
@@ -497,6 +491,13 @@ final class KeepAwakeModel {
         return true
     }
 
+    /// macOS would not hold the new assertion, so the session cannot go on.
+    private func refuseAssertion() {
+        stop(reason: .failure)
+        isStoppedReasonInformational = false
+        errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+    }
+
     /// A new duration counts from now. The closed-lid lease is untouched; it
     /// does not carry a deadline of its own.
     private func retime(_ current: KeepAwakeSession, to duration: KeepAwakeDuration) {
@@ -504,9 +505,7 @@ final class KeepAwakeModel {
         let now = Date()
         let new = KeepAwakeSession(mode: current.mode, duration: duration, startedAt: now)
         guard assertion.take(mode: new.mode, until: new.deadline, now: now) else {
-            stop(reason: .failure)
-            isStoppedReasonInformational = false
-            errorMessage = String(localized: "macOS did not accept the Keep Awake request. Try again.")
+            refuseAssertion()
             return
         }
         session = new

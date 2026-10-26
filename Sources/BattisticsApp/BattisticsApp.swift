@@ -63,10 +63,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 @main
 struct BattisticsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate

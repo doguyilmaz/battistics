@@ -3,10 +3,6 @@ import BattisticsCore
 import BattisticsRemote
 import SwiftUI
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 /// Runs the Mac side of the iPhone companion without iCloud: the same command
 /// handling and status the CloudKit records carry. Takes only short-lived
 /// idle/display assertions; never installs the helper.

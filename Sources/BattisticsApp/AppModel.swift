@@ -240,11 +240,11 @@ final class AppModel {
         }
     }
 
-    // MARK: - Background power sampling (single coalesced tick, toggleable)
+    // MARK: - Background power sampling
 
     /// Power samples ride on the sensor reads that already happen, at least
     /// every 15 seconds, instead of a second timer reading the battery again.
-    func restartPowerSampling() {
+    func samplePowerOnNextRead() {
         lastPowerSampleAt = nil
     }
 
@@ -443,4 +443,8 @@ extension BatterySnapshot {
         }
         return String(localized: "On battery")
     }
+}
+
+extension Notification.Name {
+    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
 }

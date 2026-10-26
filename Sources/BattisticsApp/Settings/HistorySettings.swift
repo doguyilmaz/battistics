@@ -16,7 +16,7 @@ struct HistorySettings: View {
             Section {
                 Toggle("Record power and temperature", isOn: $samplingEnabled)
                     .onChange(of: samplingEnabled) {
-                        model.restartPowerSampling()
+                        model.samplePowerOnNextRead()
                     }
                 if samplingEnabled {
                     Picker("Sampling interval", selection: $samplingInterval) {
@@ -26,7 +26,7 @@ struct HistorySettings: View {
                         Text("5 minutes").tag(300.0)
                     }
                     .onChange(of: samplingInterval) {
-                        model.restartPowerSampling()
+                        model.samplePowerOnNextRead()
                     }
                 }
             } header: {

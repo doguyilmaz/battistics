@@ -3,10 +3,6 @@ import BattisticsCore
 import Observation
 import SwiftUI
 
-extension Notification.Name {
-    static let battisticsSelectPane = Notification.Name("battisticsSelectPane")
-}
-
 @main
 @MainActor
 struct TourHarness {
