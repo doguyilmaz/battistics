@@ -55,11 +55,12 @@ public enum RemoteAlert: Equatable, Sendable {
     /// `current` is nil when the Mac did not answer; `previous` is nil before
     /// the first reading and `.some(nil)` after an unanswered one.
     /// `chargeTarget` is the charge level the user wants to hear about while the Mac charges.
+    /// A Mac silent after its timed session ran out most likely slept before saying so.
     public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?,
-                              chargeTarget: Int? = nil) -> [RemoteAlert] {
+                              chargeTarget: Int? = nil, now: Date = Date()) -> [RemoteAlert] {
         switch (previous, current) {
         case (.some(.some(let previous)), .some(let current)): changes(from: previous, to: current, chargeTarget: chargeTarget)
-        case (.some(.some(let previous)), .none): previous.session != nil ? [.unreachable] : []
+        case (.some(.some(let previous)), .none): previous.session?.isActive(at: now) == true ? [.unreachable] : []
         default: []
         }
     }
@@ -70,7 +71,9 @@ public enum RemoteAlert: Equatable, Sendable {
            battery.percent >= chargeTarget, let before = previous.battery, before.percent < chargeTarget {
             alerts.append(.chargeReached(percent: battery.percent))
         }
-        if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
+        // An end first reported long after it happened, by a Mac that slept through it, is old news.
+        if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone,
+           current.lastEnd.map({ current.readAt.timeIntervalSince($0.at) < 10 * 60 }) ?? true {
             alerts.append(.sessionEnded(current.lastEnd?.reason))
         }
         if current.session != nil, current.thermal.isHot, !previous.thermal.isHot {

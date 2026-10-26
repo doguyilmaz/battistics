@@ -81,7 +81,7 @@ struct HotspotCard: View {
         if !reachable {
             return ("antenna.radiowaves.left.and.right.slash", .orange,
                     String(localized: "Can’t reach \(mac.name)"),
-                    status.session == nil
+                    status.session?.isActive(at: .now) != true
                         ? String(localized: "Asleep, or away from Wi‑Fi without Hotspot.")
                         : String(localized: "It was keeping awake. If it left Wi‑Fi, turn on Hotspot."))
         }

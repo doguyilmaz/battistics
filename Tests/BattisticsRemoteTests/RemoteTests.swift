@@ -248,9 +248,19 @@ struct RemoteAlertTests {
     }
 
     @Test func silenceAlertsOnlyWhileASessionRan() {
-        #expect(RemoteAlert.alerts(from: status(), to: nil) == [.unreachable])
-        #expect(RemoteAlert.alerts(from: status(session: false), to: nil).isEmpty)
-        #expect(RemoteAlert.alerts(from: .some(nil), to: nil).isEmpty)
+        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now) == [.unreachable])
+        #expect(RemoteAlert.alerts(from: status(session: false), to: nil, now: now).isEmpty)
+        #expect(RemoteAlert.alerts(from: .some(nil), to: nil, now: now).isEmpty)
+        // Its timer ran out, so the Mac most likely slept before reporting the end.
+        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now.addingTimeInterval(7300)).isEmpty)
+    }
+
+    @Test func anEndReportedLongAfterItHappenedStaysSilent() {
+        var late = status(session: false, ended: .timer)
+        late.readAt = now.addingTimeInterval(3 * 3600)
+        #expect(RemoteAlert.alerts(from: status(), to: late).isEmpty)
+        late.readAt = now.addingTimeInterval(60)
+        #expect(RemoteAlert.alerts(from: status(), to: late) == [.sessionEnded(.timer)])
     }
 
     @Test func unplugOrClosingLidOnWiFiDuringSessionAlertsForHotspot() {
