@@ -164,6 +164,8 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             case .critical: .critical
             @unknown default: .serious
             }
+        }
+    }
 
     public struct Protection: Codable, Sendable, Equatable {
         public var stopAtPercent: Int?
@@ -175,6 +177,9 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
             self.warnAtPercent = warnAtPercent
             self.closedLidAllowed = closedLidAllowed
         }
+
+        /// The level the phone treats as low, also when the Mac's own warning is off.
+        public var lowBatteryPercent: Int { warnAtPercent ?? 20 }
     }
 
     /// Sampled on the Mac only when a phone asks, since measuring costs a few seconds of work.

@@ -19,7 +19,7 @@ extension SharedSnapshot {
         guard reachable, let status else { return 0 }
         if status.session?.isActive(at: date) == true { return 1 }
         if let battery = status.battery, !battery.onAdapter,
-           battery.percent <= (status.protection.warnAtPercent ?? 20) { return 0.5 }
+           battery.percent <= status.protection.lowBatteryPercent { return 0.5 }
         return 0
     }
 
