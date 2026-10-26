@@ -199,7 +199,7 @@ struct KeepAwakeCard: View {
 
     private func start(_ mode: RemoteStatus.Mode) {
         run { await store.start(mac, mode: mode, minutes: minutes) }
-        Task { await Notifications.requestPermission() }
+        if !store.isSample { Task { await Notifications.requestPermission() } }
     }
 
     private func run(_ action: @escaping () async -> String?) {
