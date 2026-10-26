@@ -51,6 +51,7 @@ struct MacWidgetView: View {
                 .font(.system(size: size, weight: .bold, design: .rounded))
                 .foregroundStyle(PowerPalette.batteryTint(battery))
                 .minimumScaleFactor(0.8)
+                .widgetAccentable()
             WidgetHelpers.powerIcon(battery).font(.caption)
         }
     }
@@ -386,6 +387,7 @@ private struct AllMacsRow: View {
             Image(systemName: snapshot.status?.macSymbol(reachable: snapshot.reachable) ?? "laptopcomputer")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(tint)
+                .widgetAccentable()
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 1) {
                 Text(snapshot.macName)
@@ -415,6 +417,7 @@ private struct AllMacsRow: View {
                 Text("\(battery.percent)%")
                     .font(.system(.title3, design: .rounded, weight: .bold).monospacedDigit())
                     .foregroundStyle(tint)
+                    .widgetAccentable()
             }
         }
     }
