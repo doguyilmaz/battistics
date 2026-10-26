@@ -79,7 +79,10 @@ struct KeepAwakeIntentButton: View {
             .disabled(!reachable)
         } else {
             Button(intent: StartKeepAwakeLiveIntent()) {
-                Label("Awake 1h", systemImage: "cup.and.saucer.fill").frame(maxWidth: .infinity)
+                Label("Awake 1h", systemImage: "cup.and.saucer.fill")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity)
             }
             .accessibilityLabel(Text("Keep Awake for 1 hour"))
             .disabled(!reachable)
