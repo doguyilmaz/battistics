@@ -6379,6 +6379,23 @@
           }
         }
       }
+    },
+    "%@ now stays awake until %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ now stays awake until %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ artık %2$@ saatine kadar uyanık kalacak."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
