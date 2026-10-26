@@ -47,7 +47,7 @@ struct MacQuery: EntityQuery {
 struct StartKeepAwakeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake"
-    static let description = IntentDescription("Starts Keep Awake on your Mac.")
+    static let description = IntentDescription("Starts Keep Awake on your computer.")
 
     @Parameter(title: "Mode", default: .displayMaySleep) var mode: KeepAwakeMode
     @Parameter(title: "Duration", default: .hour) var duration: KeepAwakeDuration
@@ -69,7 +69,7 @@ struct StartKeepAwakeIntent: LiveActivityIntent {
 struct StopKeepAwakeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Let Mac Sleep"
-    static let description = IntentDescription("Stops Keep Awake on your Mac.")
+    static let description = IntentDescription("Stops Keep Awake on your computer.")
 
     @Parameter(title: "Mac") var target: MacEntity?
 
@@ -93,7 +93,7 @@ enum IntentExtension: Int, AppEnum {
 struct AddKeepAwakeTimeIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Add Time to Keep Awake"
-    static let description = IntentDescription("Adds time to the Keep Awake session running on your Mac.")
+    static let description = IntentDescription("Adds time to the Keep Awake session running on your computer.")
 
     @Parameter(title: "Time", default: .thirty) var time: IntentExtension
 
@@ -122,7 +122,7 @@ enum IntentLowPower: String, AppEnum {
 struct SetMacLowPowerIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Set Mac Low Power Mode"
-    static let description = IntentDescription("Chooses when your Mac uses Low Power Mode.")
+    static let description = IntentDescription("Chooses when your computer uses Low Power Mode.")
 
     /// No default, so Siri and the shortcut tile ask instead of overwriting the Mac's choice.
     @Parameter(title: "Low Power Mode") var setting: IntentLowPower
@@ -146,7 +146,7 @@ struct SetMacLowPowerIntent: AppIntent {
 struct TurnOffMacDisplayIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Turn Off Mac Display"
-    static let description = IntentDescription("Puts your Mac’s display to sleep. The Mac keeps running.")
+    static let description = IntentDescription("Puts your computer’s display to sleep. The computer keeps running.")
 
     @Parameter(title: "Mac") var target: MacEntity?
 
@@ -161,7 +161,7 @@ struct TurnOffMacDisplayIntent: AppIntent {
 struct MacStatusIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Check Mac"
-    static let description = IntentDescription("Tells you your Mac’s battery and whether it is kept awake.")
+    static let description = IntentDescription("Tells you your computer’s battery and whether it is kept awake.")
 
     @Parameter(title: "Mac") var target: MacEntity?
 
@@ -182,7 +182,7 @@ struct MacStatusIntent: AppIntent {
 /// Opens the app on a Mac, from Shortcuts, Siri or Spotlight.
 struct OpenMacIntent: OpenIntent {
     static let title: LocalizedStringResource = "Open Mac"
-    static let description = IntentDescription("Opens a Mac in Battistics Remote.")
+    static let description = IntentDescription("Opens a computer in Battistics Remote.")
 
     @Parameter(title: "Mac") var target: MacEntity
 
@@ -197,7 +197,7 @@ struct OpenMacIntent: OpenIntent {
 struct MacBatteryLevelIntent: AppIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
     static let title: LocalizedStringResource = "Get Mac Battery Level"
-    static let description = IntentDescription("Returns your Mac’s battery level, from 0 to 100.")
+    static let description = IntentDescription("Returns your computer’s battery level, from 0 to 100.")
 
     @Parameter(title: "Mac") var target: MacEntity?
 
@@ -227,20 +227,20 @@ enum IntentFailure: Error, CustomLocalizedStringResourceConvertible {
 
 struct Shortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: StartKeepAwakeIntent(), phrases: ["Keep my Mac awake with \(.applicationName)"],
+        AppShortcut(intent: StartKeepAwakeIntent(), phrases: ["Keep my computer awake with \(.applicationName)"],
                     shortTitle: "Keep Awake", systemImageName: "cup.and.saucer.fill")
-        AppShortcut(intent: StopKeepAwakeIntent(), phrases: ["Let my Mac sleep with \(.applicationName)"],
+        AppShortcut(intent: StopKeepAwakeIntent(), phrases: ["Let my computer sleep with \(.applicationName)"],
                     shortTitle: "Let Sleep", systemImageName: "moon.zzz")
-        AppShortcut(intent: AddKeepAwakeTimeIntent(), phrases: ["Keep my Mac awake longer with \(.applicationName)"],
+        AppShortcut(intent: AddKeepAwakeTimeIntent(), phrases: ["Keep my computer awake longer with \(.applicationName)"],
                     shortTitle: "Add Time", systemImageName: "plus.circle")
-        AppShortcut(intent: MacStatusIntent(), phrases: ["Check my Mac with \(.applicationName)"],
+        AppShortcut(intent: MacStatusIntent(), phrases: ["Check my computer with \(.applicationName)"],
                     shortTitle: "Check Mac", systemImageName: "laptopcomputer")
-        AppShortcut(intent: SetMacLowPowerIntent(), phrases: ["Set my Mac’s Low Power Mode with \(.applicationName)"],
+        AppShortcut(intent: SetMacLowPowerIntent(), phrases: ["Set my computer’s Low Power Mode with \(.applicationName)"],
                     shortTitle: "Mac Low Power", systemImageName: "leaf")
-        AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my Mac’s display with \(.applicationName)"],
+        AppShortcut(intent: TurnOffMacDisplayIntent(), phrases: ["Turn off my computer’s display with \(.applicationName)"],
                     shortTitle: "Display Off", systemImageName: "display")
         AppShortcut(intent: OpenMacIntent(), phrases: ["Open \(\.$target) in \(.applicationName)",
-                                                       "Open my Mac in \(.applicationName)"],
+                                                       "Open my computer in \(.applicationName)"],
                     shortTitle: "Open Mac", systemImageName: "arrow.up.forward.app")
     }
 }

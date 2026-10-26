@@ -43,7 +43,7 @@ enum RemoteIntentBridge {
 struct StartKeepAwakeLiveIntent: LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake for 1 Hour"
-    static let description = IntentDescription("Starts a 1-hour Keep Awake session on your Mac.")
+    static let description = IntentDescription("Starts a 1-hour Keep Awake session on your computer.")
     static let isDiscoverable = false
 
     @MainActor
@@ -55,7 +55,7 @@ struct StartKeepAwakeLiveIntent: LiveActivityIntent {
 
 struct StopKeepAwakeLiveIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Stop Keep Awake"
-    static let description = IntentDescription("Stops the active Keep Awake session on your Mac.")
+    static let description = IntentDescription("Stops the active Keep Awake session on your computer.")
     static let isDiscoverable = false
 
     @Parameter(title: "Mac")
@@ -76,7 +76,7 @@ struct StopKeepAwakeLiveIntent: LiveActivityIntent {
 
 struct ExtendKeepAwakeLiveIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Add Time to Keep Awake"
-    static let description = IntentDescription("Adds time to the Keep Awake session on your Mac.")
+    static let description = IntentDescription("Adds time to the Keep Awake session on your computer.")
     static let isDiscoverable = false
 
     @Parameter(title: "Mac")
@@ -125,7 +125,7 @@ enum KeepAwakeDuration: Int, AppEnum {
 @available(iOS 18.0, *)
 struct KeepAwakeControlConfiguration: ControlConfigurationIntent {
     static let title: LocalizedStringResource = "Keep Mac Awake"
-    static let description = IntentDescription("Choose the mode and how long this control keeps your Mac awake.")
+    static let description = IntentDescription("Choose the mode and how long this control keeps your computer awake.")
 
     @Parameter(title: "Mode", default: .displayMaySleep) var mode: KeepAwakeMode
     @Parameter(title: "Duration", default: .hour) var duration: KeepAwakeDuration
@@ -136,7 +136,7 @@ struct KeepAwakeControlConfiguration: ControlConfigurationIntent {
 struct SetKeepAwakeIntent: SetValueIntent, LiveActivityIntent {
     static let authenticationPolicy = IntentAuthenticationPolicy.requiresAuthentication
     static let title: LocalizedStringResource = "Keep Mac Awake"
-    static let description = IntentDescription("Keeps your Mac awake, or lets it sleep again.")
+    static let description = IntentDescription("Keeps your computer awake, or lets it sleep again.")
     static let isDiscoverable = false
 
     @Parameter(title: "Keep Awake")
