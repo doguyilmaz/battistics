@@ -55,11 +55,9 @@ Keychain item backed up.
 
 ## When a release run fails
 
-The release job pushes the tag before the macOS build. If signing or
-notarization fails after that, fix the cause and use **Re-run failed jobs** on
-that run; "Re-run all jobs" and new pushes to main stop at "already tagged".
-To start over instead, delete the tag (`git push --delete origin vX.Y.Z`) and
-push again.
+The tag is created with the GitHub release, after the build, so a run that
+fails in signing or notarization leaves no tag. Fix the cause and re-run the
+workflow or push again.
 
 The `battistics` notary profile is stored in the login Keychain
 (`notarytool store-credentials`). Signing note: `make app` re-signs
