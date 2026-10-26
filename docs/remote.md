@@ -71,7 +71,7 @@ The iPhone companion (`Sources/BattisticsPhone`, widgets in `Sources/BattisticsP
 
 ## Signing and release
 
-- Mac iCloud signing is opt-in: `make run-icloud` sets `BATTISTICS_ENTITLEMENTS` and team `5MYT4VYJFC`. CI, `make build`, `make app` and Developer ID builds have no iCloud and show "not signed for iCloud" in the iPhone pane. `make build` and the test harnesses write to the same folder, so run `make run-icloud` again after them; a separate folder would move the app away from its registered power helper and Location permission.
+- Mac iCloud signing is opt-in: `make run-icloud` sets `BATTISTICS_ENTITLEMENTS` and team `5MYT4VYJFC`. `make build`, the CI test build and `make app` without `PROFILE` have no iCloud and show "not signed for iCloud" in the iPhone pane; a release has it when the profile secret is set. `make build` and the test harnesses write to the same folder, so run `make run-icloud` again after them; a separate folder would move the app away from its registered power helper and Location permission.
 - A release reaches iCloud when the `MACOS_PROVISIONING_PROFILE` secret holds the Developer ID profile: `scripts/sign-app.sh` embeds it and signs the app with `Battistics-Release.entitlements` (Production container, production push). Locally, `make app SIGN_IDENTITY=... PROFILE=<path>` does the same. The `MacStatus`, `Command` and `Event` schema is deployed to Production. A Mac and a phone only see each other in the same environment, so a Debug phone build pairs with a Debug Mac build, and the App Store app with a release.
 
 ## Verified on a device
