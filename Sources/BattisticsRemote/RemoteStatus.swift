@@ -207,8 +207,6 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var macModel: String?
     /// macOS version string on the Mac (e.g. "macOS 15.4").
     public var osVersion: String?
-    /// Known Personal Hotspot / paired iPhone name observed by the Mac when available.
-    public var pairedPhoneName: String?
     public var readAt: Date
     public var battery: Battery?
     public var session: Session?
@@ -301,13 +299,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
         protection: Protection = .init(),
         macModel: String? = nil,
         osVersion: String? = nil,
-        pairedPhoneName: String? = nil,
         heartbeatSeconds: TimeInterval = RemoteStatus.heartbeat
     ) {
         self.machineName = machineName
         self.macModel = macModel
         self.osVersion = osVersion
-        self.pairedPhoneName = pairedPhoneName
         self.heartbeatSeconds = heartbeatSeconds
         self.readAt = readAt
         self.battery = battery

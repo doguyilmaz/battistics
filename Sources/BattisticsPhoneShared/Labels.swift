@@ -76,20 +76,10 @@ extension RemoteStatus.Network {
 }
 
 extension RemoteStatus {
-    /// The Wi‑Fi or Hotspot name; on a Hotspot without one, the paired iPhone's name.
-    func resolvedNetworkName(fallbackHotspot: String? = nil) -> String? {
-        if let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
-            return name
-        }
-        if network == .hotspot {
-            if let paired = pairedPhoneName?.trimmingCharacters(in: .whitespacesAndNewlines), !paired.isEmpty {
-                return paired
-            }
-            if let fallback = fallbackHotspot?.trimmingCharacters(in: .whitespacesAndNewlines), !fallback.isEmpty {
-                return fallback
-            }
-        }
-        return nil
+    /// The Wi‑Fi or Hotspot name, if the Mac could read it.
+    func resolvedNetworkName() -> String? {
+        guard let name = networkName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else { return nil }
+        return name
     }
 }
 

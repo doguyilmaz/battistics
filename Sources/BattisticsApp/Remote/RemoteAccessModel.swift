@@ -558,7 +558,6 @@ final class RemoteAccessModel {
             ),
             macModel: Self.hardwareModel,
             osVersion: Self.osVersion,
-            pairedPhoneName: network.preferredHotspotPhoneName,
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras
