@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Battistics Remote for iPhone: battery and its last day, time left,
-  connection, lid, heat and Keep Awake for the Macs on your Apple ID, with
+  connection, lid, heat and Keep Awake for the Macs on your Apple Account, with
   start and stop, push alerts, Siri shortcuts, widgets and a Lock Screen
   countdown. Off by default on the Mac; everything goes through your private
   iCloud, with nothing to pair.
@@ -35,6 +35,13 @@
 - The Mac sends its alerts to the iPhone through iCloud, so they arrive at
   once, also while Battistics Remote is closed.
 - The Mac answers the iPhone promptly while its window is closed.
+- Battistics Remote reminds you five minutes before Keep Awake ends, with a
+  button to add 30 minutes, and warns when a session runs hot.
+- An All Macs widget, Get Mac Battery Level for Shortcuts, and Siri starts
+  Keep Awake in any mode, also until turned off.
+- Try a Sample Mac shows the iPhone app before a Mac is set up.
+- Switching a running session to closed-lid keeps the Mac awake while the
+  power helper is set up.
 
 ## 1.4.1
 
