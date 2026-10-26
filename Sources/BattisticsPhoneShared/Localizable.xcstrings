@@ -268,7 +268,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin verin."
+            "value": "Mac’teki Battistics’te iPhone’dan kapak kapalı oturumlara izin ver."
           }
         }
       }
@@ -336,7 +336,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pil %%%lld. Mac çalışmaya devam etmeliyse güce bağlayın."
+            "value": "Pil %%%lld. Mac çalışmaya devam etmeliyse güce bağla."
           }
         }
       }
@@ -1016,7 +1016,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hotspot olmadan pilde kapak kapatıldı. Mac’i yanınıza alıyorsanız Kişisel Erişim Noktası’na bağlayın."
+            "value": "Hotspot olmadan pilde kapak kapatıldı. Mac’i yanına alıyorsan Kişisel Erişim Noktası’na bağla."
           }
         }
       }
@@ -1407,7 +1407,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut açıkken yanıt vermeyi bıraktı. Devam eden bir iş varsa Kişisel Erişim Noktası’na bağlayın veya Wi‑Fi’yi kontrol edin."
+            "value": "Uyanık Tut açıkken yanıt vermeyi bıraktı. Devam eden bir iş varsa Kişisel Erişim Noktası’na bağla veya Wi‑Fi’yi kontrol et."
           }
         }
       }
@@ -1577,7 +1577,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinizin çevrimiçi kalması için Kişisel Erişim Noktası’nı açın."
+            "value": "Uyanık Tut açıkken Wi‑Fi’de şarjdan çıkarıldı. Mac’i çantaya koymadan önce işlerinin çevrimiçi kalması için Kişisel Erişim Noktası’nı aç."
           }
         }
       }
@@ -1679,7 +1679,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mac’leriniz"
+            "value": "Mac’lerin"
           }
         }
       }
@@ -1696,7 +1696,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud’a ulaşılamadı. Birazdan tekrar deneyin."
+            "value": "iCloud’a ulaşılamadı. Birazdan tekrar dene."
           }
         }
       }
@@ -5555,7 +5555,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu kontrolün Mac’inizi hangi modda ve ne kadar uyanık tutacağını seçin."
+            "value": "Bu kontrolün Mac’ini hangi modda ve ne kadar uyanık tutacağını seç."
           }
         }
       }
@@ -5572,7 +5572,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Battistics Remote’ta seçtiğiniz Mac’i, seçtiğiniz modda ve sürede uyanık tutar."
+            "value": "Battistics Remote’ta seçtiğin Mac’i, seçtiğin modda ve sürede uyanık tutar."
           }
         }
       }
