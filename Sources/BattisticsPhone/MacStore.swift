@@ -72,6 +72,11 @@ final class MacStore {
             guard let self, let mac = self.mac(id) else { return }
             await Notifications.report(await self.stop(mac), for: mac)
         }
+        RemoteIntentBridge.sleepDisplay = { [weak self] in
+            guard let self else { return }
+            guard let mac = self.remoteMac else { return await Notifications.reportNoMac() }
+            await Notifications.report(await self.sleepDisplay(mac), for: mac)
+        }
         RemoteIntentBridge.extend = { [weak self] id, minutes in
             guard let self, let mac = self.mac(id) else { return }
             await Notifications.report(await self.extend(mac, minutes: minutes), for: mac)
