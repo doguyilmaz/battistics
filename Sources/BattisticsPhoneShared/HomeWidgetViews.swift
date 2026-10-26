@@ -9,9 +9,11 @@ struct MacWidgetView: View {
 
     private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
-    /// The timeline reloads at a deadline with the same snapshot, so an ended session is judged here.
-    private func activeSession(_ status: RemoteStatus) -> RemoteStatus.Session? {
-        status.session.flatMap { $0.isActive(at: entry.date) ? $0 : nil }
+    /// The timeline reloads at a deadline with the same snapshot, so an ended
+    /// session is judged here; a Mac that went quiet shows none.
+    private func activeSession(_ snapshot: SharedSnapshot) -> RemoteStatus.Session? {
+        guard snapshot.reachable else { return nil }
+        return snapshot.status?.session.flatMap { $0.isActive(at: entry.date) ? $0 : nil }
     }
 
     var body: some View {
@@ -87,7 +89,7 @@ struct MacWidgetView: View {
                 desktop(status, size: 24, network: true)
             }
             Spacer(minLength: 0)
-            if let session = activeSession(status), snapshot.reachable {
+            if let session = activeSession(snapshot) {
                 HStack {
                     Label(session.mode.label, systemImage: session.deadline == nil ? "infinity" : session.mode.symbol)
                         .lineLimit(1)
@@ -142,7 +144,7 @@ struct MacWidgetView: View {
 
     private func sessionPanel(_ snapshot: SharedSnapshot, _ status: RemoteStatus) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            if let session = activeSession(status) {
+            if let session = activeSession(snapshot) {
                 Label(session.mode.label, systemImage: session.deadline == nil ? "infinity" : session.mode.symbol)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.orange)
@@ -165,7 +167,7 @@ struct MacWidgetView: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
-            KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(status) != nil, reachable: snapshot.reachable)
+            KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(snapshot) != nil, reachable: snapshot.reachable)
                 .font(.caption2.weight(.semibold))
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
@@ -215,13 +217,16 @@ struct MacWidgetView: View {
             Spacer(minLength: 0)
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
-                    if let session = activeSession(status) {
+                    if let session = activeSession(snapshot) {
                         Label(session.mode.label, systemImage: session.deadline == nil ? "infinity" : session.mode.symbol)
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.orange)
                         SessionTimerText(session: session)
                             .font(.subheadline.weight(.bold).monospacedDigit())
                             .frame(maxWidth: 90, alignment: .leading)
+                    } else if !snapshot.reachable {
+                        Text("Offline")
+                            .font(.caption.weight(.semibold))
                     } else {
                         Text(snapshot.bagReady ? String(localized: "Bag Ready") : String(localized: "Keep Awake is off"))
                             .font(.caption.weight(.semibold))
@@ -233,8 +238,8 @@ struct MacWidgetView: View {
                     }
                 }
                 Spacer(minLength: 4)
-                KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(status) != nil,
-                                      reachable: snapshot.reachable, addsTime: activeSession(status)?.deadline != nil)
+                KeepAwakeIntentButton(macID: snapshot.macID, running: activeSession(snapshot) != nil,
+                                      reachable: snapshot.reachable, addsTime: activeSession(snapshot)?.deadline != nil)
                     .font(.caption.weight(.semibold))
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
