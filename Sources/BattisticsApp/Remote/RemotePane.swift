@@ -29,7 +29,7 @@ struct RemotePane: View {
                 }
             } header: {
                 InfoHeader("Battistics Remote",
-                           info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.",
+                           info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.",
                            "Needs the power helper, set up by starting closed-lid Keep Awake on this Mac once. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.")
             }
 

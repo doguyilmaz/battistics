@@ -7467,19 +7467,19 @@
         }
       }
     },
-    "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
+    "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple ID. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
+            "value": "Yes, with Battistics Remote on an iPhone that uses the same Apple Account. In Battistics › iPhone, turn on Show this Mac in Battistics Remote; the Mac appears in the app by itself. The phone shows battery and time left, connection, lid, heat, accessory batteries and the busiest apps, and can start Keep Awake for a set time or until turned off, or stop it. Everything goes through your private iCloud, encrypted; nothing is opened on this Mac. With no Wi‑Fi, set Wi‑Fi › Ask to join hotspots to Automatic so the Mac uses your iPhone’s hotspot."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evet, aynı Apple ID’yi kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
+            "value": "Evet, aynı Apple Hesabı’nı kullanan bir iPhone’daki Battistics Remote ile. Battistics › iPhone’da Bu Mac’i Battistics Remote’ta göster’i açın; Mac uygulamada kendiliğinden görünür. Telefon pili ve kalan süreyi, bağlantıyı, kapağı, ısıyı, aksesuar pillerini ve en çok enerji kullanan uygulamaları gösterir; Uyanık Tut’u belirli bir süre ya da kapatılana kadar başlatabilir veya durdurabilir. Her şey şifreli olarak özel iCloud’unuzdan geçer; bu Mac’te hiçbir şey dışarıya açılmaz. Wi‑Fi yoksa Wi‑Fi › Hotspot’lara katılmayı sor’u Otomatik yapın; Mac iPhone’unuzun hotspot’unu kullanır."
           }
         }
       }
@@ -7539,19 +7539,19 @@
         }
       }
     },
-    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
+    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple ID; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
+            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple ID’yi kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
+            "value": "iPhone’unuz pili, bağlantıyı ve Uyanık Tut’u görür, onu başlatıp durdurabilir. İki cihaz aynı Apple Hesabı’nı kullanır; her şey şifreli olarak özel iCloud’unuzdan geçer. Bu Mac’te hiçbir şey dışarıya açılmaz."
           }
         }
       }
