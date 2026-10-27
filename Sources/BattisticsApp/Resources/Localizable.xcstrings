@@ -7913,6 +7913,28 @@
           }
         }
       }
+    },
+    "Awake · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık · %@"
+          }
+        }
+      }
+    },
+    "Turn off Keep Awake": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyanık Tut’u kapat"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
