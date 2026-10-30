@@ -114,10 +114,8 @@ final class RemoteAccessModel {
         }
         observeSession()
         observePowerSettings()
-        if cloud != nil {
-            sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
-                                        didWake: { [weak self] in self?.woke() })
-        }
+        sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
+                                    didWake: { [weak self] in self?.woke() })
         startTicker()
         updateNapActivity()
         if enabled, cloud != nil {
@@ -196,13 +194,14 @@ final class RemoteAccessModel {
     }
 
     /// The system is already committed to sleep, shutdown or restart. Keep Awake
-    /// ends here, in the last status the phone will see until wake.
+    /// ends here, whether or not phones are told, and a sharing Mac says so
+    /// in the last status the phone will see until wake.
     private func goingToSleep() async {
-        guard enabled, cloud != nil else { return }
-        if awake.isActive || awake.isChanging { awake.stop(reason: .slept) }
+        awake.endForSleep()
         // macOS waits 8 seconds at most, and the save and push still follow.
         let deadline = Date.now.addingTimeInterval(2)
         while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(100)) }
+        guard enabled, cloud != nil else { return }
         sleptAt = .now
         try? await publish(force: true, quick: true)
     }

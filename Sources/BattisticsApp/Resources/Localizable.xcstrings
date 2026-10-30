@@ -3562,6 +3562,17 @@
         }
       }
     },
+    "Keep Awake ended when the Mac went to sleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uykuya geçtiği için Uyanık Tut sona erdi."
+          }
+        }
+      }
+    },
     "Keep Awake stopped": {
       "extractionState": "manual",
       "localizations": {
