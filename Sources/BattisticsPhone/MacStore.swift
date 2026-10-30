@@ -55,6 +55,7 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
+    @ObservationIgnored private var pendingRead: PendingRead?
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
     /// The Macs Siri and Spotlight last offered by name.
@@ -202,26 +203,47 @@ final class MacStore {
         }
         defer { slow.cancel() }
         do {
-            snapshot = try await cloud.fetch()
+            snapshot = try await sharedRead()
             slow.cancel()
             problem = nil
+        } catch is CancellationError {
+            return []
         } catch {
-            if !Task.isCancelled && !isSample {
-                problem = Self.describe(error)
-                checking = false
-            }
+            guard !isSample else { return [] }
+            problem = Self.describe(error)
+            checking = false
             return []
         }
-        defer { checking = false }
-        // A cancelled refresh says nothing about the Macs, nor one that ended
-        // after the sample replaced them.
-        guard !Task.isCancelled, !isSample else { return [] }
+        // One that ended after the sample replaced the Macs says nothing about them.
+        guard !isSample else { return [] }
+        let first = checking
+        checking = false
+        let subscriptionDue = alertSubscriptionChecked.map { -$0.timeIntervalSinceNow > 120 } ?? true
         // Settled before alerts are filtered, so one posted while another
-        // iPhone had removed the subscription is raised here instead.
-        if alertSubscriptionChecked.map({ -$0.timeIntervalSinceNow > 120 }) ?? true {
-            await syncAlertSubscription()
+        // iPhone had removed the subscription is raised here instead. The
+        // first read of a launch shows the Macs first and settles it after.
+        if subscriptionDue, !first { await syncAlertSubscription() }
+        let alerts = await apply(snapshot)
+        if subscriptionDue, first { await syncAlertSubscription() }
+        return alerts
+    }
+
+    /// A read runs in its own task. A caller cancelled midway, such as the
+    /// home screen's loop when the notification prompt makes the scene
+    /// inactive or a background refresh that ran out of time, stops waiting
+    /// at once; the read goes on instead of sending iCloud back to the start,
+    /// and the next refresh takes its answer.
+    private func sharedRead() async throws -> RemoteCloud.Snapshot {
+        if let pending = pendingRead, let finished = pending.finishedAt, -finished.timeIntervalSinceNow > 5 {
+            pendingRead = nil
         }
-        return await apply(snapshot)
+        let pending = pendingRead ?? PendingRead(cloud)
+        pendingRead = pending
+        while pending.result == nil {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        if pendingRead === pending { pendingRead = nil }
+        return try pending.result!.get()
     }
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
@@ -404,7 +426,7 @@ final class MacStore {
         if triesSample { return }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
         WidgetBridge.publishAll(macs.map { SharedSnapshot($0, reading: readings[$0.id]) })
-        WidgetBridge.syncActivities(macs.map { ($0, readings[$0.id]) })
+        WidgetBridge.syncActivities(macs.map { ($0, readings[$0.id]) }, confirmed: !checking)
         QuickActions.update(selected.flatMap { readings[$0.id] })
         if macs != shortcutMacs {
             shortcutMacs = macs
@@ -438,6 +460,20 @@ final class MacStore {
             String(localized: "iCloud storage is full.")
         default:
             String(localized: "iCloud could not be reached. Try again in a moment.")
+        }
+    }
+}
+
+@MainActor
+private final class PendingRead {
+    private(set) var result: Result<RemoteCloud.Snapshot, Error>?
+    private(set) var finishedAt: Date?
+
+    init(_ cloud: RemoteCloud) {
+        let task = Task { try await cloud.fetch() }
+        Task {
+            result = await task.result
+            finishedAt = .now
         }
     }
 }

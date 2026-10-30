@@ -40,7 +40,9 @@ enum WidgetBridge {
 
     /// One countdown per Mac, so picking another Mac in the app leaves a
     /// running one on the Lock Screen.
-    static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)]) {
+    /// `confirmed` is false before this launch's first read, when a saved
+    /// reading too old to be live says nothing about the Mac.
+    static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) {
         let ids = Set(macs.map(\.mac.id))
         // A Mac that stopped sharing takes its countdown with it.
         for activity in Activity<KeepAwakeActivityAttributes>.activities where !ids.contains(activity.attributes.macID) {
@@ -48,7 +50,10 @@ enum WidgetBridge {
             changes.append(Task { await end(id) })
         }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        for (mac, reading) in macs { syncActivity(mac, reading: reading) }
+        for (mac, reading) in macs {
+            if !confirmed, reading?.reachable != true { continue }
+            syncActivity(mac, reading: reading)
+        }
     }
 
     static func publishAll(_ snapshots: [SharedSnapshot]) {
