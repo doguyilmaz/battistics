@@ -9,50 +9,56 @@ struct CloudKitOperations: Sendable {
         var records: [CKRecord.ID: Result<CKRecord, Error>] = [:]
         var deletions: [CKRecord.ID: CKRecord.RecordType] = [:]
         var token: CKServerChangeToken?
-        var zoneError: Error?
+        var moreComing = false
     }
 
     private let submit: @Sendable (CKDatabaseOperation) -> Void
+    private let readPage: @Sendable (CKServerChangeToken?) async throws -> Changes
     private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "CloudKit")
 
-    init(database: CKDatabase) { submit = { database.add($0) } }
+    init(database: CKDatabase) {
+        submit = { database.add($0) }
+        readPage = { token in
+            // The same batch boundary used by the working build (3). Do not
+            // replace this with fetchAllChanges + operation-wide completion:
+            // the account's first page must not depend on that aggregate tail.
+            let page = try await database.recordZoneChanges(inZoneWith: RemoteCloud.zoneID, since: token)
+            return Changes(
+                records: page.modificationResultsByID.mapValues { $0.map { $0.record } },
+                deletions: Dictionary(page.deletions.map { ($0.recordID, $0.recordType) }, uniquingKeysWith: { _, new in new }),
+                token: page.changeToken, moreComing: page.moreComing)
+        }
+    }
 
-    /// An operation-level seam: tests execute the real callback and deadline
-    /// code without an iCloud account, signed app or a live network.
-    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void) { self.submit = submit }
+    /// Operation-backed requests can be exercised without a signed account.
+    /// Zone reads use the separate native-page seam below.
+    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void) {
+        self.submit = submit
+        readPage = { _ in throw CKError(.internalError) }
+    }
+
+    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void,
+         readPage: @escaping @Sendable (CKServerChangeToken?) async throws -> Changes) {
+        self.submit = submit
+        self.readPage = readPage
+    }
 
     func changes(since token: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> Changes {
-        let configuration = CKFetchRecordZoneChangesOperation.ZoneConfiguration(previousServerChangeToken: token)
-        let operation = CKFetchRecordZoneChangesOperation(
-            recordZoneIDs: [RemoteCloud.zoneID], configurationsByRecordZoneID: [RemoteCloud.zoneID: configuration])
-        operation.fetchAllChanges = true
-        let buffer = CloudKitBuffer(Changes())
-        return try await perform(operation, until: deadline) { finish in
-            operation.recordWasChangedBlock = { id, result in
-                buffer.update { $0.records[id] = result; $0.deletions[id] = nil }
+        let started = ContinuousClock.now
+        do {
+            let changes = try await RemoteDeadline.perform(until: deadline) {
+                try await readPage(token)
             }
-            operation.recordWithIDWasDeletedBlock = { id, type in
-                buffer.update { $0.records[id] = nil; $0.deletions[id] = type }
-            }
-            operation.recordZoneFetchResultBlock = { _, result in
-                buffer.update { changes in
-                    switch result {
-                    case .success(let page): changes.token = page.serverChangeToken
-                    case .failure(let error): changes.zoneError = error
-                    }
-                }
-            }
-            operation.fetchRecordZoneChangesResultBlock = { result in
-                finish(Result {
-                    try result.get()
-                    let changes = buffer.read()
-                    if let error = changes.zoneError { throw error }
-                    // A failed record is not a missing Mac. Do not advance the
-                    // token or let a full fetch erase the phone's saved Macs.
-                    for record in changes.records.values { _ = try record.get() }
-                    return changes
-                })
-            }
+            // Preserve the partial-failure fix: an unreadable record is not
+            // evidence that a Mac has disappeared.
+            for record in changes.records.values { _ = try record.get() }
+            Self.logger.notice("Zone page received in \(String(describing: started.duration(to: .now)), privacy: .public): \(changes.records.count) records, \(changes.deletions.count) deletions, more \(changes.moreComing)")
+            return changes
+        } catch {
+            let domain = (error as NSError).domain
+            let code = (error as NSError).code
+            Self.logger.error("Zone page failed in \(String(describing: started.duration(to: .now)), privacy: .public), domain \(domain, privacy: .public), code \(code)")
+            throw error
         }
     }
 

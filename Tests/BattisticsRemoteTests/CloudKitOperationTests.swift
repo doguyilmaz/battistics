@@ -5,30 +5,38 @@ import Testing
 
 @Suite("CloudKit operation boundary")
 struct CloudKitOperationTests {
-    @Test func fetchingAnExistingZoneDoesNotWriteBeforeReading() async throws {
+    private static func acceptBootstrap(_ operation: CKDatabaseOperation) {
+        if let zone = operation as? CKModifyRecordZonesOperation {
+            zone.modifyRecordZonesResultBlock?(.success(()))
+        } else if let subscription = operation as? CKModifySubscriptionsOperation {
+            subscription.modifySubscriptionsResultBlock?(.success(()))
+        } else { Issue.record("Unexpected bootstrap operation \(operation)") }
+    }
+
+    @Test func bootstrapPrecedesTheFirstPageAndIsReused() async throws {
         let submitted = CloudKitBuffer<[String]>([])
-        let operations = CloudKitOperations { operation in
+        let operations = CloudKitOperations(submit: { operation in
             submitted.update { $0.append(String(describing: type(of: operation))) }
-            if let fetch = operation as? CKFetchRecordZoneChangesOperation {
-                let record = CKRecord(recordType: RemoteCloud.statusType, recordID: .init(recordName: "mac", zoneID: RemoteCloud.zoneID))
-                record.encryptedValues["payload"] = try! RemoteWire.encode(RemoteStatus(machineName: "Mac", readAt: .now))
-                fetch.recordWasChangedBlock?(record.recordID, .success(record))
-                fetch.fetchRecordZoneChangesResultBlock?(.success(()))
-            } else if let subscription = operation as? CKModifySubscriptionsOperation {
-                subscription.modifySubscriptionsResultBlock?(.success(()))
-            } else { Issue.record("Unexpected operation \(operation)") }
-        }
-        let snapshot = try await RemoteCloud(operations: operations).fetch()
+            Self.acceptBootstrap(operation)
+        }, readPage: { _ in
+            submitted.update { $0.append("native-page") }
+            let record = CKRecord(recordType: RemoteCloud.statusType, recordID: .init(recordName: "mac", zoneID: RemoteCloud.zoneID))
+            record.encryptedValues["payload"] = try RemoteWire.encode(RemoteStatus(machineName: "Mac", readAt: .now))
+            return .init(records: [record.recordID: .success(record)])
+        })
+        let cloud = RemoteCloud(operations: operations)
+        let snapshot = try await cloud.fetch()
+        _ = try await cloud.fetch()
         #expect(snapshot.statuses["mac"]?.machineName == "Mac")
-        #expect(submitted.read().first == "CKFetchRecordZoneChangesOperation")
+        #expect(submitted.read().first == "CKModifyRecordZonesOperation")
+        #expect(submitted.read().filter { $0 == "CKModifyRecordZonesOperation" }.count == 1)
+        #expect(submitted.read().filter { $0 == "native-page" }.count == 2)
     }
 
     @Test func aFailedRecordIsNotReportedAsAnEmptySuccessfulSnapshot() async {
-        let cloud = RemoteCloud(operations: .init { operation in
-            guard let fetch = operation as? CKFetchRecordZoneChangesOperation else { return }
-            fetch.recordWasChangedBlock?(.init(recordName: "mac", zoneID: RemoteCloud.zoneID), .failure(CKError(.permissionFailure)))
-            fetch.fetchRecordZoneChangesResultBlock?(.success(()))
-        })
+        let cloud = RemoteCloud(operations: .init(submit: Self.acceptBootstrap, readPage: { _ in
+            .init(records: [.init(recordName: "mac", zoneID: RemoteCloud.zoneID): .failure(CKError(.permissionFailure))])
+        }))
         do {
             _ = try await cloud.fetch()
             Issue.record("A failed record must not remove the cached Mac")
@@ -38,12 +46,10 @@ struct CloudKitOperationTests {
     }
 
     @Test func inaccessibleEncryptedPayloadIsNotAMissingMac() async {
-        let cloud = RemoteCloud(operations: .init { operation in
-            guard let fetch = operation as? CKFetchRecordZoneChangesOperation else { return }
+        let cloud = RemoteCloud(operations: .init(submit: Self.acceptBootstrap, readPage: { _ in
             let record = CKRecord(recordType: RemoteCloud.statusType, recordID: .init(recordName: "mac", zoneID: RemoteCloud.zoneID))
-            fetch.recordWasChangedBlock?(record.recordID, .success(record))
-            fetch.fetchRecordZoneChangesResultBlock?(.success(()))
-        })
+            return .init(records: [record.recordID: .success(record)])
+        }))
         await #expect(throws: CKError.self) { try await cloud.fetch() }
     }
 
@@ -90,11 +96,10 @@ struct CloudKitOperationTests {
 
     @Test func theServerRetryAfterIsRespected() async throws {
         let count = CloudKitBuffer(0)
-        let cloud = RemoteCloud(operations: .init { operation in
+        let cloud = RemoteCloud(operations: .init(submit: Self.acceptBootstrap, readPage: { _ in
             count.update { $0 += 1 }
-            (operation as? CKFetchRecordZoneChangesOperation)?.fetchRecordZoneChangesResultBlock?(
-                .failure(CKError(.requestRateLimited, userInfo: [CKErrorRetryAfterKey: 60.0])))
-        })
+            throw CKError(.requestRateLimited, userInfo: [CKErrorRetryAfterKey: 60.0])
+        }))
         for _ in 0..<2 {
             do { _ = try await cloud.fetch(); Issue.record("Expected throttling") }
             catch { #expect((error as? CKError)?.code == .requestRateLimited) }
@@ -132,12 +137,13 @@ struct CloudKitOperationTests {
     }
 
     @Test func stalledDiscoveryAndSubscriptionDoNotHoldUpACommand() async throws {
-        let discoveryEntered = RemoteTestGate<CKFetchRecordZoneChangesOperation>()
+        let discoveryEntered = RemoteTestGate<Bool>()
+        let discoveryPage = RemoteTestGate<CloudKitOperations.Changes>()
         let subscriptionEntered = RemoteTestGate<CKModifySubscriptionsOperation>()
         let request = RemoteRequest(operation: .stop)
-        let operations = CloudKitOperations { operation in
-            if let discovery = operation as? CKFetchRecordZoneChangesOperation {
-                Task { await discoveryEntered.finish(discovery) }
+        let operations = CloudKitOperations(submit: { operation in
+            if let zone = operation as? CKModifyRecordZonesOperation {
+                zone.modifyRecordZonesResultBlock?(.success(()))
             } else if let subscription = operation as? CKModifySubscriptionsOperation {
                 Task { await subscriptionEntered.finish(subscription) }
             } else if let write = operation as? CKModifyRecordsOperation {
@@ -150,18 +156,39 @@ struct CloudKitOperationTests {
                 record.encryptedValues["payload"] = try! RemoteWire.encode(status)
                 read.perRecordResultBlock?(record.recordID, .success(record))
                 read.fetchRecordsResultBlock?(.success(()))
-            } else { Issue.record("A known Mac needs no zone creation before a command") }
-        }
+            } else { Issue.record("Unexpected command operation") }
+        }, readPage: { _ in
+            await discoveryEntered.finish(true)
+            return await discoveryPage.value()
+        })
         let cloud = RemoteCloud(operations: operations)
         let background = Task { try await cloud.fetch(until: .now.advanced(by: .seconds(2))) }
-        let discovery = await discoveryEntered.value()
+        _ = await discoveryEntered.value()
         let started = ContinuousClock.now
         let answer = try await RemoteCommandExecutor.execute(request, to: "mac", cloud: cloud)
         #expect(answer.lastCommand?.id == request.id)
         #expect(started.duration(to: .now) < .seconds(2))
-        discovery.fetchRecordZoneChangesResultBlock?(.success(()))
+        await discoveryPage.finish(.init())
         _ = try await background.value
         let subscription = await subscriptionEntered.value()
         subscription.modifySubscriptionsResultBlock?(.success(()))
+    }
+
+    @Test func aNativePageDoesNotWaitForAnAggregateOperationCallback() async throws {
+        let operations = CloudKitOperations(submit: { _ in
+            Issue.record("A native zone page must not be submitted as an aggregate operation")
+        }, readPage: { _ in .init(moreComing: true) })
+        let page = try await operations.changes(since: nil, until: .now.advanced(by: .seconds(2)))
+        #expect(page.moreComing)
+    }
+
+    @Test func aMissingContinuationCursorDoesNotReplayPageOne() async {
+        let reads = CloudKitBuffer(0)
+        let cloud = RemoteCloud(operations: .init(submit: Self.acceptBootstrap, readPage: { _ in
+            reads.update { $0 += 1 }
+            return .init(moreComing: true)
+        }))
+        await #expect(throws: CKError.self) { try await cloud.fetch() }
+        #expect(reads.read() == 1)
     }
 }

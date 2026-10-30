@@ -149,10 +149,11 @@ public actor RemoteCloud {
         }
     }
 
-    /// Creates a missing zone once, but never writes before reading an existing one.
+    /// Keep the first-contact setup used by build (3). Preparation is cached
+    /// for this process; reads must not race ahead of account/zone bootstrap.
     private func guarded<T>(until deadline: ContinuousClock.Instant, _ body: () async throws -> T) async throws -> T {
+        try await prepare(until: deadline)
         do {
-            // An existing private zone needs no write before its first read.
             let result = try await body()
             prepared = true
             scheduleSubscription()
@@ -172,42 +173,63 @@ public actor RemoteCloud {
 
     private func read(since start: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
         var snapshot = Snapshot(isFull: start == nil)
-        let changes = try await operations.changes(since: start, until: deadline)
-        for modification in changes.records.values {
-            let record = try modification.get()
-            if record.recordType == Self.eventType {
-                snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
-                continue
-            }
-            guard let payload = record.encryptedValues["payload"] as? Data else {
-                // Inaccessible encrypted data is not evidence that the Mac
-                // stopped sharing. Keep it rather than returning an empty list.
-                if record.recordType == Self.statusType { throw CKError(.internalError) }
-                continue
-            }
-            switch record.recordType {
-            case Self.statusType:
-                statusRecords[record.recordID.recordName] = record
-                if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
-                    snapshot.statuses[record.recordID.recordName] = status
-                } else {
-                    snapshot.unreadable.insert(record.recordID.recordName)
+        var commands: [String: Command] = [:]
+        var token = start
+        while true {
+            let changes = try await operations.changes(since: token, until: deadline)
+            for modification in changes.records.values {
+                let record = try modification.get()
+                if record.recordType == Self.eventType {
+                    snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
+                    snapshot.removedRecords.remove(record.recordID.recordName)
+                    continue
                 }
-            case Self.commandType:
-                if let request = Self.request(from: payload), let mac = record["mac"] as? String {
-                    snapshot.commands.append(.init(recordName: record.recordID.recordName, macID: mac, request: request))
+                guard let payload = record.encryptedValues["payload"] as? Data else {
+                    // Inaccessible encrypted data is not evidence that the Mac
+                    // stopped sharing. Keep it rather than returning an empty list.
+                    if record.recordType == Self.statusType { throw CKError(.internalError) }
+                    continue
                 }
-            default: break
+                switch record.recordType {
+                case Self.statusType:
+                    statusRecords[record.recordID.recordName] = record
+                    if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
+                        snapshot.statuses[record.recordID.recordName] = status
+                        snapshot.unreadable.remove(record.recordID.recordName)
+                    } else {
+                        snapshot.statuses[record.recordID.recordName] = nil
+                        snapshot.unreadable.insert(record.recordID.recordName)
+                    }
+                    snapshot.removedStatuses.remove(record.recordID.recordName)
+                    snapshot.removedRecords.remove(record.recordID.recordName)
+                case Self.commandType:
+                    if let request = Self.request(from: payload), let mac = record["mac"] as? String {
+                        commands[record.recordID.recordName] = .init(recordName: record.recordID.recordName, macID: mac, request: request)
+                        snapshot.removedRecords.remove(record.recordID.recordName)
+                    }
+                default: break
+                }
             }
-        }
-        for (id, type) in changes.deletions {
-            snapshot.removedRecords.insert(id.recordName)
-            if type == Self.statusType {
-                statusRecords[id.recordName] = nil
-                snapshot.removedStatuses.insert(id.recordName)
+            for (id, type) in changes.deletions {
+                snapshot.removedRecords.insert(id.recordName)
+                snapshot.events[id.recordName] = nil
+                commands[id.recordName] = nil
+                if type == Self.statusType {
+                    snapshot.statuses[id.recordName] = nil
+                    snapshot.unreadable.remove(id.recordName)
+                    statusRecords[id.recordName] = nil
+                    snapshot.removedStatuses.insert(id.recordName)
+                }
             }
+            token = changes.token
+            if !changes.moreComing {
+                snapshot.commands = Array(commands.values)
+                return (snapshot, token)
+            }
+            // The SDK supplies a cursor with every successful page. Refuse a
+            // bad adapter response rather than replaying page one indefinitely.
+            guard token != nil else { throw CKError(.internalError) }
         }
-        return (snapshot, changes.token)
     }
 
     /// A command from a newer phone, with a mode or policy this Mac does not
