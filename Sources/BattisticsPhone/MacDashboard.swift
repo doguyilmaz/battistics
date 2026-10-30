@@ -11,7 +11,7 @@ struct MacDashboard: View {
 
         DashboardPage(glow: reading?.status.map { Glow($0, reachable: reachable) } ?? .offline,
                       refresh: { await store.refreshAll() }) {
-            StatusLine(reading: reading, checking: store.checking, problem: store.problem
+            StatusLine(reading: reading, checking: store.checking, waiting: store.waitingForUpdate, problem: store.problem
                        ?? (store.outdated.contains(mac.id) ? String(localized: "Update Battistics Remote to read this Mac") : nil))
             if let status = reading?.status {
                 Group {
@@ -70,6 +70,7 @@ private struct SampleBar: View {
 private struct StatusLine: View {
     let reading: MacStore.Reading?
     let checking: Bool
+    let waiting: Bool
     let problem: String?
 
     var body: some View {
@@ -80,6 +81,8 @@ private struct StatusLine: View {
                 .frame(width: 8, height: 8)
             if let problem {
                 Text(problem)
+            } else if waiting {
+                Text(String(localized: "Updating your Mac's status…", table: "RemoteSync"))
             } else if let readAt = reading?.status?.readAt {
                 if reading?.reachable == true {
                     Text("Updated \(Ago.text(readAt))")

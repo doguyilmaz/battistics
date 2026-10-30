@@ -45,7 +45,8 @@ enum WidgetBridge {
     static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) {
         let ids = Set(macs.map(\.mac.id))
         // A Mac that stopped sharing takes its countdown with it.
-        for activity in Activity<KeepAwakeActivityAttributes>.activities where !ids.contains(activity.attributes.macID) {
+        for activity in Activity<KeepAwakeActivityAttributes>.activities
+        where confirmed && !ids.contains(activity.attributes.macID) {
             let id = activity.id
             changes.append(Task { await end(id) })
         }

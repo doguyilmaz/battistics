@@ -30,9 +30,11 @@ final class MacStore {
     private(set) var pending: [String: RemoteRequest.Operation] = [:]
     /// Why iCloud could not be read, in the user's language.
     private(set) var problem: String?
-    /// Until this launch's first read settles, a saved reading too old to be
+    /// Until this launch's first successful read, a saved reading too old to be
     /// live says nothing about the Mac, so it shows as updating, not offline.
     private(set) var checking = true
+    /// Progress is not an error and must not make the status indicator orange.
+    private(set) var waitingForUpdate = false
     /// Macs whose status is too new for this app to read.
     private(set) var outdated: Set<String> = []
     var selectedID: String? {
@@ -55,9 +57,11 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
-    @ObservationIgnored private var pendingRead: PendingRead?
+    @ObservationIgnored private var reader: RemoteRead<RemoteCloud.Snapshot>?
+    @ObservationIgnored private var subscriptionWork: Task<Void, Never>?
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
+    @ObservationIgnored private var commandAnsweredAt: [String: Date] = [:]
     /// The Macs Siri and Spotlight last offered by name.
     @ObservationIgnored private var shortcutMacs: [Mac] = []
 
@@ -194,16 +198,15 @@ final class MacStore {
         refreshing = true
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
-        // Cancelling a slow read would only make iCloud start over, so it
-        // runs on and the status line says why nothing has arrived yet.
+        waitingForUpdate = false
         let slow = Task { [weak self] in
             try? await Task.sleep(for: Self.slowRead)
             guard !Task.isCancelled else { return }
-            self?.problem = String(localized: "iCloud is slow to answer. Still waiting.")
+            self?.waitingForUpdate = true
         }
-        defer { slow.cancel() }
+        defer { slow.cancel(); waitingForUpdate = false }
         do {
-            snapshot = try await sharedRead()
+            snapshot = try await readSnapshot()
             slow.cancel()
             problem = nil
         } catch is CancellationError {
@@ -211,39 +214,36 @@ final class MacStore {
         } catch {
             guard !isSample else { return [] }
             problem = Self.describe(error)
-            checking = false
             return []
         }
         // One that ended after the sample replaced the Macs says nothing about them.
         guard !isSample else { return [] }
-        let first = checking
         checking = false
         let subscriptionDue = alertSubscriptionChecked.map { -$0.timeIntervalSinceNow > 120 } ?? true
-        // Settled before alerts are filtered, so one posted while another
-        // iPhone had removed the subscription is raised here instead. The
-        // first read of a launch shows the Macs first and settles it after.
-        if subscriptionDue, !first { await syncAlertSubscription() }
         let alerts = await apply(snapshot)
-        if subscriptionDue, first { await syncAlertSubscription() }
+        // Notification housekeeping is independent of readings and commands.
+        // Until confirmed, this phone retains the existing local-alert fallback.
+        if subscriptionDue, subscriptionWork == nil {
+            subscriptionWork = Task { [weak self] in
+                await self?.syncAlertSubscription()
+                self?.subscriptionWork = nil
+            }
+        }
         return alerts
     }
 
-    /// A read runs in its own task. A caller cancelled midway, such as the
-    /// home screen's loop when the notification prompt makes the scene
-    /// inactive or a background refresh that ran out of time, stops waiting
-    /// at once; the read goes on instead of sending iCloud back to the start,
-    /// and the next refresh takes its answer.
-    private func sharedRead() async throws -> RemoteCloud.Snapshot {
-        if let pending = pendingRead, let finished = pending.finishedAt, -finished.timeIntervalSinceNow > 5 {
-            pendingRead = nil
+    private func readSnapshot() async throws -> RemoteCloud.Snapshot {
+        let active: RemoteRead<RemoteCloud.Snapshot>
+        if let reader {
+            active = reader
+        } else {
+            let cloud = cloud
+            active = RemoteRead(timeout: .seconds(45)) {
+                try await cloud.fetch(until: .now.advanced(by: .seconds(45)))
+            }
+            reader = active
         }
-        let pending = pendingRead ?? PendingRead(cloud)
-        pendingRead = pending
-        while pending.result == nil {
-            try await Task.sleep(for: .milliseconds(100))
-        }
-        if pendingRead === pending { pendingRead = nil }
-        return try pending.result!.get()
+        return try await active.value()
     }
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
@@ -251,6 +251,8 @@ final class MacStore {
         // Also a Mac never read before, so setup can say why it does not appear.
         outdated = snapshot.unreadable
         for (id, status) in snapshot.statuses {
+            // A direct command answer may have arrived while discovery ran.
+            if let current = readings[id]?.status, current.readAt > status.readAt { continue }
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
@@ -272,6 +274,7 @@ final class MacStore {
         }
         // A Mac that stopped sharing is gone, not silent.
         for id in readings.keys where snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {
+            if commandAnsweredAt[id].map({ $0 > snapshot.requestedAt }) == true { continue }
             readings[id] = nil
             Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
         }
@@ -290,6 +293,8 @@ final class MacStore {
     /// alert itself. Only turning the switch off removes it; a routine check
     /// never does, since another iPhone on the account may still want it.
     func syncAlertSubscription(removing: Bool = false) async {
+        // Sample controls must not contact or change the real iCloud account.
+        guard !isSample else { return }
         alertSubscriptionChecked = .now
         let wanted = Notifications.isEnabled
         let defaults = UserDefaults.standard
@@ -322,7 +327,10 @@ final class MacStore {
     /// again as soon as it sees its record gone.
     func forget(_ mac: Mac) async -> String? {
         // A refresh already under way would put the Mac back after this.
-        while refreshing { try? await Task.sleep(for: .milliseconds(200)) }
+        while refreshing {
+            do { try await Task.sleep(for: .milliseconds(200)) }
+            catch { return String(localized: "Cancelled.") }
+        }
         refreshing = true
         defer { refreshing = false }
         do {
@@ -370,16 +378,14 @@ final class MacStore {
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
         var request = request
+        guard !sending.contains(mac.id) else {
+            return String(localized: "Wait for the current change to finish.", table: "RemoteSync")
+        }
         request.deviceName = LocalPhoneMonitor.shared.commandName
-        // Shown at once, also while an earlier command to this Mac is out.
+        // A second change to the same Mac is refused, not queued indefinitely.
         let locks = request.operation != .inspect
         if locks { pending[mac.id] = request.operation }
         defer { if locks, pending[mac.id] == request.operation { pending[mac.id] = nil } }
-        // The Mac reports one answer at a time, so a second command waits
-        // instead of hiding the first one's answer.
-        while sending.contains(mac.id) {
-            do { try await Task.sleep(for: .milliseconds(200)) } catch { return String(localized: "Cancelled.") }
-        }
         sending.insert(mac.id)
         defer { sending.remove(mac.id) }
         request.sentAt = .now
@@ -392,26 +398,22 @@ final class MacStore {
             return nil
         }
         do {
-            try await cloud.send(request, to: mac.id)
+            let status = try await RemoteCommandExecutor.execute(request, to: mac.id, cloud: cloud)
+            commandAnsweredAt[mac.id] = .now
+            if readings[mac.id]?.status.map({ $0.readAt <= status.readAt }) ?? true {
+                let reading = Reading(status: status, reachable: status.isFresh())
+                readings[mac.id] = reading
+                Notifications.syncWatchdog(for: mac, reading: reading)
+                save()
+            }
+            return status.lastCommand?.failure.map(Self.message)
+        } catch is CancellationError {
+            return String(localized: "Cancelled.")
+        } catch is RemoteDeadline.Failure {
+            return String(localized: "The change wasn't confirmed. Check your Mac's status before trying again.", table: "RemoteSync")
         } catch {
             return Self.describe(error)
         }
-        // Long enough for an idle Mac's poll, its fetch and its write, counted
-        // in time since each refresh takes longer on a slow connection.
-        let giveUp = request.sentAt.addingTimeInterval(RemoteRequest.answerWait)
-        while Date.now < giveUp {
-            do { try await Task.sleep(for: .seconds(1.5)) } catch { break }
-            // Through refreshAll, so this read and a push's never apply out of order.
-            await refreshAll()
-            if let result = readings[mac.id]?.status?.lastCommand, result.id == request.id {
-                return result.failure.map(Self.message)
-            }
-        }
-        // Never run a command the user has stopped waiting for, also when the
-        // caller was cancelled, which would cancel a delete made in its task.
-        let cloud = cloud
-        await Task { try? await cloud.delete([request.id]) }.value
-        return String(localized: "\(mac.name) did not answer. It may be asleep or offline.")
     }
 
     private func save() {
@@ -446,11 +448,13 @@ final class MacStore {
         }
     }
 
-    /// iCloud's first answers after an install or an update can take
-    /// tens of seconds.
+    /// Neutral progress wording; only the actual request failure is an error.
     private static let slowRead: Duration = .seconds(15)
 
     private static func describe(_ error: Error) -> String {
+        if error is RemoteDeadline.Failure {
+            return String(localized: "Couldn't update right now. Check your connection and try again.", table: "RemoteSync")
+        }
         return switch (error as? CKError)?.code {
         case .notAuthenticated:
             String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
@@ -460,20 +464,6 @@ final class MacStore {
             String(localized: "iCloud storage is full.")
         default:
             String(localized: "iCloud could not be reached. Try again in a moment.")
-        }
-    }
-}
-
-@MainActor
-private final class PendingRead {
-    private(set) var result: Result<RemoteCloud.Snapshot, Error>?
-    private(set) var finishedAt: Date?
-
-    init(_ cloud: RemoteCloud) {
-        let task = Task { try await cloud.fetch() }
-        Task {
-            result = await task.result
-            finishedAt = .now
         }
     }
 }
