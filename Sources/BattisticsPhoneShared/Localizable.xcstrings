@@ -511,6 +511,23 @@
         }
       }
     },
+    "Updating…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updating…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güncelleniyor…"
+          }
+        }
+      }
+    },
     "Connecting…": {
       "extractionState": "manual",
       "localizations": {
@@ -1663,6 +1680,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac’lerin"
+          }
+        }
+      }
+    },
+    "iCloud is slow to answer. Trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is slow to answer. Trying again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud geç yanıt veriyor. Yeniden deneniyor."
           }
         }
       }

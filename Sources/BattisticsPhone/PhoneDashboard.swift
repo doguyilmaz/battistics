@@ -201,7 +201,8 @@ struct PhoneDashboard: View {
                             .lineLimit(1)
                         Spacer()
                         if reading?.reachable != true {
-                            Text("Offline").foregroundStyle(.secondary)
+                            Text(store.checking && reading?.status?.sleptAt == nil ? "Updating…" : "Offline")
+                                .foregroundStyle(.secondary)
                         } else if let percent = reading?.status?.battery?.percent {
                             Text(percent.percentText).monospacedDigit().foregroundStyle(.secondary)
                         }

@@ -11,7 +11,7 @@ struct MacDashboard: View {
 
         DashboardPage(glow: reading?.status.map { Glow($0, reachable: reachable) } ?? .offline,
                       refresh: { await store.refreshAll() }) {
-            StatusLine(reading: reading, problem: store.problem
+            StatusLine(reading: reading, checking: store.checking, problem: store.problem
                        ?? (store.outdated.contains(mac.id) ? String(localized: "Update Battistics Remote to read this Mac") : nil))
             if let status = reading?.status {
                 Group {
@@ -69,19 +69,22 @@ private struct SampleBar: View {
 
 private struct StatusLine: View {
     let reading: MacStore.Reading?
+    let checking: Bool
     let problem: String?
 
     var body: some View {
         HStack(spacing: 6) {
             Circle()
                 .fill(problem != nil ? .orange : reading?.reachable == true ? .green
-                      : reading?.status?.sleptAt != nil ? .gray : .orange)
+                      : reading?.status?.sleptAt != nil || checking ? .gray : .orange)
                 .frame(width: 8, height: 8)
             if let problem {
                 Text(problem)
             } else if let readAt = reading?.status?.readAt {
                 if reading?.reachable == true {
                     Text("Updated \(Ago.text(readAt))")
+                } else if checking, reading?.status?.sleptAt == nil {
+                    Text("Updating…")
                 } else if let sleptAt = reading?.status?.sleptAt {
                     Text("Went to sleep \(Ago.text(sleptAt))")
                 } else {
