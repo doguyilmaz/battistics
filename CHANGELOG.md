@@ -1,12 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.5.3
 
 - Keep Awake ends when the Mac sleeps, shuts down or restarts, and does not
   start again on wake; Battistics says why. The iPhone gets one alert that it
   ended and drops the Lock Screen countdown, instead of repeating that the
-  Mac stopped answering. Battistics Remote 1.5.2 and earlier show such an end as
-  stopped by you until updated.
+  Mac stopped answering.
 
 ## 1.5.2
 
