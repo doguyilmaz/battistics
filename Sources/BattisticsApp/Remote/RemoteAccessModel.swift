@@ -114,10 +114,8 @@ final class RemoteAccessModel {
         }
         observeSession()
         observePowerSettings()
-        if cloud != nil {
-            sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
-                                        didWake: { [weak self] in self?.woke() })
-        }
+        sleepWatcher = SleepWatcher(willSleep: { [weak self] in await self?.goingToSleep() },
+                                    didWake: { [weak self] in self?.woke() })
         startTicker()
         updateNapActivity()
         if enabled, cloud != nil {
@@ -195,12 +193,17 @@ final class RemoteAccessModel {
         }
     }
 
-    /// Phones then show the Mac asleep instead of silent, and are told if it
-    /// slept during Keep Awake.
+    /// The system is already committed to sleep, shutdown or restart. Keep Awake
+    /// ends here, whether or not phones are told, and a sharing Mac says so
+    /// in the last status the phone will see until wake.
     private func goingToSleep() async {
+        awake.endForSleep()
+        // macOS waits 8 seconds at most, and the save and push still follow.
+        let deadline = Date.now.addingTimeInterval(2)
+        while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(100)) }
         guard enabled, cloud != nil else { return }
         sleptAt = .now
-        try? await publish(force: true)
+        try? await publish(force: true, quick: true)
     }
 
     private func woke() {
@@ -224,11 +227,13 @@ final class RemoteAccessModel {
     }
 
     /// One at a time, so an older reading never lands after a newer one.
-    private func publish(force: Bool) async throws {
+    /// `quick` reuses the last published history and power settings instead
+    /// of reading them again.
+    private func publish(force: Bool, quick: Bool = false) async throws {
         let previous = publishing
         let next = Task { [weak self] in
             _ = await previous?.result
-            try await self?.publishNow(force: force)
+            try await self?.publishNow(force: force, quick: quick)
         }
         publishing = next
         try await next.value
@@ -236,7 +241,7 @@ final class RemoteAccessModel {
 
     /// Compares the cheap part of the status first, so a poll that changes
     /// nothing costs no history query and no `pmset` spawn.
-    private func publishNow(force: Bool) async throws {
+    private func publishNow(force: Bool, quick: Bool = false) async throws {
         guard enabled, let cloud else { return }
         var status = status()
         status.lastCommand = lastCommand
@@ -245,7 +250,7 @@ final class RemoteAccessModel {
             return
         }
         let cheap = status
-        status = await enriched(status)
+        status = quick ? reusingEnrichment(status) : await enriched(status)
         guard enabled else { return }
         try await cloud.publish(status, macID: macID)
         // Sharing was turned off while the save was in flight: take the record back down.
@@ -546,6 +551,17 @@ final class RemoteAccessModel {
             if let sourceActive = battery.onAdapter ? power.ac?.lowPowerMode : power.battery?.lowPowerMode {
                 battery.lowPowerMode = sourceActive
             }
+            status.battery = battery
+        }
+        return status
+    }
+
+    private func reusingEnrichment(_ cheap: RemoteStatus) -> RemoteStatus {
+        var status = cheap
+        status.chargeHistory = lastStatus?.chargeHistory
+        if var battery = status.battery, let last = lastStatus?.battery {
+            battery.lowPowerPolicy = last.lowPowerPolicy
+            battery.lowPowerMode = last.lowPowerMode
             status.battery = battery
         }
         return status

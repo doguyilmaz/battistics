@@ -23,6 +23,8 @@ Start Keep Awake from the popover, the **Keep Awake** pane, a profile, the termi
 
 All three work on battery or adapter and end on their timer even if Battistics is suspended.
 
+If the Mac sleeps, shuts down or restarts during a session anyway, Keep Awake ends and does not start again when the Mac wakes.
+
 ## Profiles
 
 | Profile | Duration | Display |

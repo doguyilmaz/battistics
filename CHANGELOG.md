@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.3
+
+- Keep Awake ends when the Mac sleeps, shuts down or restarts, and does not
+  start again on wake; Battistics says why. The iPhone gets one alert that it
+  ended and drops the Lock Screen countdown, instead of repeating that the
+  Mac stopped answering.
+
 ## 1.5.2
 
 - The popover shows Keep Awake as a chip in its header again, with a stop

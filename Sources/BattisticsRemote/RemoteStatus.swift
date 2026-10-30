@@ -135,7 +135,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     }
 
     public enum EndReason: String, Codable, Sendable, TolerantWireValue {
-        case timer, user, phone, battery, thermal, client, failure
+        case timer, user, phone, battery, thermal, client, failure, slept
         public static let fallback = Self.user
     }
 

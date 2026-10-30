@@ -1701,6 +1701,23 @@
         }
       }
     },
+    "Mac went to sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac went to sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uykuya geçti"
+          }
+        }
+      }
+    },
     "macOS ended it": {
       "extractionState": "manual",
       "localizations": {
@@ -2326,23 +2343,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac normal şekilde uyuyabilir"
-          }
-        }
-      }
-    },
-    "Mac not answering": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac not answering"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac yanıt vermiyor"
           }
         }
       }

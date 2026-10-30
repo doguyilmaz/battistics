@@ -49,6 +49,7 @@ extension RemoteStatus.EndReason {
         case .thermal: String(localized: "Heat protection")
         case .client: String(localized: "Task finished")
         case .failure: String(localized: "macOS ended it")
+        case .slept: String(localized: "Mac went to sleep")
         }
     }
 }

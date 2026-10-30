@@ -298,6 +298,15 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.alerts(from: status(session: false), to: idle, now: now).isEmpty)
     }
 
+    @Test func sleepOrShutdownEndsTheSessionOnce() {
+        var asleep = status(session: false, ended: .slept)
+        asleep.sleptAt = now
+        #expect(RemoteAlert.alerts(from: status(), to: asleep, now: now) == [.sessionEnded(.slept)])
+        #expect(RemoteAlert.pushed(from: status(), to: asleep) == [.sessionEnded(.slept)])
+        #expect(RemoteAlert.alerts(from: asleep, to: asleep, now: now).isEmpty)
+        #expect(RemoteAlert.alerts(from: asleep, to: asleep, now: now.addingTimeInterval(8 * 3600)).isEmpty)
+    }
+
     @Test func theMacDropsAnEndItReportsLongAfterItHappened() {
         var late = status(session: false, ended: .timer)
         late.readAt = now.addingTimeInterval(3 * 3600)

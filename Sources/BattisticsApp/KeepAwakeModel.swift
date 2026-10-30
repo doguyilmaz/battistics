@@ -311,6 +311,17 @@ final class KeepAwakeModel {
         approvalTask = nil
     }
 
+    /// Sleep, shutdown or restart ends a session for good; it does not
+    /// pick up again on wake.
+    func endForSleep() {
+        guard isActive || isChanging else { return }
+        let hadSession = session != nil
+        stop(reason: .slept)
+        guard hadSession else { return }
+        isStoppedReasonInformational = true
+        errorMessage = String(localized: "Keep Awake ended when the Mac went to sleep.")
+    }
+
     func stop(reason: RemoteStatus.EndReason = .user) {
         if let session {
             // A timer that ran out while the Mac slept ended at its deadline, not at the wake.

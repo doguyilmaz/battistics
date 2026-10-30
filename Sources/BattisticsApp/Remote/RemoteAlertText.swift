@@ -43,6 +43,7 @@ extension RemoteAlert {
         case .thermal: String(localized: "Heat protection stopped it.")
         case .client: String(localized: "The task finished.")
         case .failure: String(localized: "macOS ended it.")
+        case .slept: String(localized: "The Mac went to sleep.")
         }
     }
 }
