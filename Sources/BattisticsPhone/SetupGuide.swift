@@ -51,6 +51,9 @@ struct SetupGuide: View {
                 if let problem = store.problem {
                     Label(problem, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
+                } else if store.checking, !store.isSample {
+                    Label(String(localized: "Looking for your Mac…", table: "RemoteSync"), systemImage: "arrow.triangle.2.circlepath")
+                        .foregroundStyle(.secondary)
                 } else if store.remoteMacs.isEmpty, !store.outdated.isEmpty {
                     Label("Update Battistics Remote to read this Mac", systemImage: "arrow.down.app")
                         .foregroundStyle(.orange)

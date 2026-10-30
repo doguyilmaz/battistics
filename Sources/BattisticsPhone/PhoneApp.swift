@@ -35,8 +35,10 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         Notifications.register()
-        application.registerForRemoteNotifications()
-        Task { await MacStore.shared.syncAlertSubscription() }
+        if !DemoData.isEnabled {
+            application.registerForRemoteNotifications()
+            Task { await MacStore.shared.syncAlertSubscription() }
+        }
         return true
     }
 

@@ -159,9 +159,10 @@ final class RemoteAccessModel {
                 guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
                 lastCommand = .init(id: command.request.id, failure: await handle(command.request))
                 lastCommandAt = .now
-                // Each answer goes out before the next command replaces it, or that phone
-                // waits in vain; the last goes out with the publish below.
-                if command.recordName != mine.last?.recordName { try? await publish(force: true) }
+                // Acknowledgement is on the critical path; deleting commands,
+                // rereading history and power settings are not. Publish every
+                // answer before housekeeping, including the last in the batch.
+                try await publish(force: true, quick: command.request.operation != .setLowPower)
                 handled = true
             }
             // Alerts only need to live long enough to be pushed. A delta fetch

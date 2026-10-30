@@ -1,0 +1,36 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Updating your Mac's status…": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": { "stringUnit": { "state": "translated", "value": "Mac’in durumu güncelleniyor…" } }
+      }
+    },
+    "Looking for your Mac…": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": { "stringUnit": { "state": "translated", "value": "Mac’in aranıyor…" } }
+      }
+    },
+    "Wait for the current change to finish.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": { "stringUnit": { "state": "translated", "value": "Devam eden işlemin bitmesini bekle." } }
+      }
+    },
+    "The change wasn't confirmed. Check your Mac's status before trying again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": { "stringUnit": { "state": "translated", "value": "İşlem doğrulanamadı. Yeniden denemeden önce Mac’in durumunu kontrol et." } }
+      }
+    },
+    "Couldn't update right now. Check your connection and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": { "stringUnit": { "state": "translated", "value": "Şu anda güncellenemedi. Bağlantını kontrol edip yeniden dene." } }
+      }
+    }
+  },
+  "version": "1.0"
+}

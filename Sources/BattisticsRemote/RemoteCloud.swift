@@ -13,11 +13,15 @@ public actor RemoteCloud {
     static let alertSubscriptionID = "remote-alerts"
 
     public struct Snapshot: Sendable {
+        /// Phone-side time, used to keep an earlier discovery read from
+        /// removing a Mac that just confirmed a command.
+        public var requestedAt = Date.now
         public var statuses: [String: RemoteStatus] = [:]
         /// Status records written by a newer build that this one cannot read.
         public var unreadable: Set<String> = []
         /// Status records deleted since the previous read, such as a Mac a phone removed.
         public var removedStatuses: Set<String> = []
+        var removedRecords: Set<String> = []
         public var commands: [Command] = []
         /// Alert records by name, with when they were posted.
         public var events: [String: Date] = [:]
@@ -31,16 +35,23 @@ public actor RemoteCloud {
         public let request: RemoteRequest
     }
 
-    private let database: CKDatabase
+    private let operations: CloudKitOperations
     private var prepared = false
+    private var preparing: Task<Void, Error>?
     private var subscribed = false
     private var subscribing = false
+    private var zoneGeneration = 0
+    private var retryAt: Date?
     private var statusRecords: [String: CKRecord] = [:]
     private var changeToken: CKServerChangeToken?
+    private var snapshotToken: CKServerChangeToken?
+    private var snapshotCache: Snapshot?
 
     public init() {
-        database = CKContainer(identifier: Self.containerID).privateCloudDatabase
+        operations = CloudKitOperations(database: CKContainer(identifier: Self.containerID).privateCloudDatabase)
     }
+
+    init(operations: CloudKitOperations) { self.operations = operations }
 
     /// Whether this process is signed for the container; CloudKit traps
     /// instead of throwing when it is not.
@@ -58,102 +69,145 @@ public actor RemoteCloud {
     /// Creates the zone and a silent push subscription for changes in it.
     /// Subscriptions belong to the account, not the device, so every device
     /// saves the same one.
-    public func prepare() async throws {
+    public func prepare(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(45))) async throws {
         if !prepared {
-            let zones = try await database.modifyRecordZones(saving: [CKRecordZone(zoneID: Self.zoneID)], deleting: [])
-            for result in zones.saveResults.values { _ = try result.get() }
+            let work: Task<Void, Error>
+            if let preparing {
+                work = preparing
+            } else {
+                let operations = operations
+                work = Task { try await operations.createZone(until: deadline) }
+                preparing = work
+            }
+            defer { preparing = nil }
+            try await work.value
             prepared = true
         }
-        // Polling still works without pushes, so the subscription is saved
-        // beside the caller's request instead of before it, and a failed one
-        // only retries.
-        guard !subscribed, !subscribing else { return }
-        subscribing = true
-        Task { await subscribe() }
+        scheduleSubscription()
     }
 
-    private func subscribe() async {
+    private func scheduleSubscription() {
+        guard !subscribed, !subscribing else { return }
+        subscribing = true
+        let generation = zoneGeneration
+        Task { await subscribe(generation: generation) }
+    }
+
+    private func subscribe(generation: Int) async {
         defer { subscribing = false }
         let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: "remote-zone")
         let info = CKSubscription.NotificationInfo()
         info.shouldSendContentAvailable = true
         subscription.notificationInfo = info
-        let saved = try? await database.modifySubscriptions(saving: [subscription], deleting: [])
-        subscribed = saved?.saveResults.values.allSatisfy { (try? $0.get()) != nil } ?? false
+        do {
+            try await attempt {
+                try await operations.modifySubscriptions(saving: [subscription], until: .now.advanced(by: .seconds(30)))
+            }
+            if generation == zoneGeneration { subscribed = true }
+        } catch {
+            // A failed push subscription does not stop a direct read or command.
+        }
     }
 
-    /// The whole zone is a handful of small records, so it is read in full.
-    public func fetch() async throws -> Snapshot {
-        try await guarded { try await self.read(since: nil).snapshot }
+    /// A complete snapshot for the phone, assembled from deltas after the
+    /// first read. A ten-second refresh must not replay the zone's history.
+    public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(45))) async throws -> Snapshot {
+        try await attempt {
+            try await guarded(until: deadline) {
+                let result: (snapshot: Snapshot, token: CKServerChangeToken?)
+                do {
+                    result = try await self.read(since: self.snapshotToken, until: deadline)
+                } catch let error as CKError where error.code == .changeTokenExpired {
+                    self.snapshotCache = nil
+                    self.snapshotToken = nil
+                    self.subscribed = false
+                    result = try await self.read(since: nil, until: deadline)
+                }
+                let full = (self.snapshotCache ?? Snapshot()).applying(result.snapshot)
+                self.snapshotCache = full
+                self.snapshotToken = result.token
+                return full
+            }
+        }
     }
 
     /// Only what changed since the previous call, for callers that poll often.
-    public func fetchChanges() async throws -> Snapshot {
-        try await guarded {
-            let result: (snapshot: Snapshot, token: CKServerChangeToken?)
-            do {
-                result = try await self.read(since: self.changeToken)
-            } catch let error as CKError where error.code == .changeTokenExpired {
-                // Also what another device recreating the zone looks like,
-                // which took this zone's subscription with the old one.
-                self.subscribed = false
-                self.statusRecords = [:]
-                result = try await self.read(since: nil)
+    public func fetchChanges(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
+        try await attempt {
+            try await guarded(until: deadline) {
+                let result: (snapshot: Snapshot, token: CKServerChangeToken?)
+                do {
+                    result = try await self.read(since: self.changeToken, until: deadline)
+                } catch let error as CKError where error.code == .changeTokenExpired {
+                    self.subscribed = false
+                    self.statusRecords = [:]
+                    result = try await self.read(since: nil, until: deadline)
+                }
+                self.changeToken = result.token
+                return result.snapshot
             }
-            self.changeToken = result.token
-            return result.snapshot
         }
     }
 
-    /// Sets the zone up again on the next call after iCloud lost it.
-    private func guarded<T>(_ body: () async throws -> T) async throws -> T {
-        try await prepare()
+    /// Creates a missing zone once, but never writes before reading an existing one.
+    private func guarded<T>(until deadline: ContinuousClock.Instant, _ body: () async throws -> T) async throws -> T {
         do {
-            return try await body()
+            // An existing private zone needs no write before its first read.
+            let result = try await body()
+            prepared = true
+            scheduleSubscription()
+            return result
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             prepared = false
             subscribed = false
+            zoneGeneration += 1
             changeToken = nil
+            snapshotToken = nil
+            snapshotCache = nil
             statusRecords = [:]
-            throw error
+            try await prepare(until: deadline)
+            return try await body()
         }
     }
 
-    private func read(since start: CKServerChangeToken?) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
+    private func read(since start: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
         var snapshot = Snapshot(isFull: start == nil)
-        var token = start
-        repeat {
-            let changes = try await database.recordZoneChanges(inZoneWith: Self.zoneID, since: token)
-            for case .success(let modification) in changes.modificationResultsByID.values {
-                let record = modification.record
-                if record.recordType == Self.eventType {
-                    snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
-                    continue
-                }
-                guard let payload = record.encryptedValues["payload"] as? Data else { continue }
-                switch record.recordType {
-                case Self.statusType:
-                    statusRecords[record.recordID.recordName] = record
-                    if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
-                        snapshot.statuses[record.recordID.recordName] = status
-                    } else {
-                        snapshot.unreadable.insert(record.recordID.recordName)
-                    }
-                case Self.commandType:
-                    if let request = Self.request(from: payload), let mac = record["mac"] as? String {
-                        snapshot.commands.append(.init(recordName: record.recordID.recordName, macID: mac, request: request))
-                    }
-                default: break
-                }
+        let changes = try await operations.changes(since: start, until: deadline)
+        for modification in changes.records.values {
+            let record = try modification.get()
+            if record.recordType == Self.eventType {
+                snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
+                continue
             }
-            for deletion in changes.deletions where deletion.recordType == Self.statusType {
-                statusRecords[deletion.recordID.recordName] = nil
-                snapshot.removedStatuses.insert(deletion.recordID.recordName)
+            guard let payload = record.encryptedValues["payload"] as? Data else {
+                // Inaccessible encrypted data is not evidence that the Mac
+                // stopped sharing. Keep it rather than returning an empty list.
+                if record.recordType == Self.statusType { throw CKError(.internalError) }
+                continue
             }
-            token = changes.changeToken
-            if !changes.moreComing { break }
-        } while true
-        return (snapshot, token)
+            switch record.recordType {
+            case Self.statusType:
+                statusRecords[record.recordID.recordName] = record
+                if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
+                    snapshot.statuses[record.recordID.recordName] = status
+                } else {
+                    snapshot.unreadable.insert(record.recordID.recordName)
+                }
+            case Self.commandType:
+                if let request = Self.request(from: payload), let mac = record["mac"] as? String {
+                    snapshot.commands.append(.init(recordName: record.recordID.recordName, macID: mac, request: request))
+                }
+            default: break
+            }
+        }
+        for (id, type) in changes.deletions {
+            snapshot.removedRecords.insert(id.recordName)
+            if type == Self.statusType {
+                statusRecords[id.recordName] = nil
+                snapshot.removedStatuses.insert(id.recordName)
+            }
+        }
+        return (snapshot, changes.token)
     }
 
     /// A command from a newer phone, with a mode or policy this Mac does not
@@ -165,31 +219,46 @@ public actor RemoteCloud {
             .map { RemoteRequest(id: $0.id, operation: .unknown, sentAt: $0.sentAt) }
     }
 
-    public func publish(_ status: RemoteStatus, macID: String) async throws {
-        try await prepare()
-        let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
-        let record: CKRecord
-        if let cached = statusRecords[macID] {
-            record = cached
-        } else if let existing = try? await database.record(for: id) {
-            record = existing
-        } else {
-            record = CKRecord(recordType: Self.statusType, recordID: id)
-        }
-        record.encryptedValues["payload"] = try RemoteWire.encode(status)
-        let saved = try await database.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys)
-        for result in saved.saveResults.values {
-            statusRecords[macID] = try result.get()
+    public func publish(_ status: RemoteStatus, macID: String,
+                        until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
+        try await attempt {
+            try await prepare(until: deadline)
+            let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
+            let record: CKRecord
+            if let cached = statusRecords[macID] {
+                record = cached
+            } else if let existing = try await operations.record(id, until: deadline) {
+                record = existing
+            } else {
+                record = CKRecord(recordType: Self.statusType, recordID: id)
+            }
+            record.encryptedValues["payload"] = try RemoteWire.encode(status)
+            let saved = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
+            statusRecords[macID] = saved[id]
         }
     }
 
-    public func send(_ request: RemoteRequest, to macID: String) async throws {
-        try await prepare()
-        let record = CKRecord(recordType: Self.commandType, recordID: .init(recordName: request.id, zoneID: Self.zoneID))
-        record["mac"] = macID
-        record.encryptedValues["payload"] = try RemoteWire.encode(request)
-        let saved = try await database.modifyRecords(saving: [record], deleting: [])
-        for result in saved.saveResults.values { _ = try result.get() }
+    public func send(_ request: RemoteRequest, to macID: String,
+                     until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
+        try await attempt {
+            try await guarded(until: deadline) {
+                let record = CKRecord(recordType: Self.commandType, recordID: .init(recordName: request.id, zoneID: Self.zoneID))
+                record["mac"] = macID
+                record.encryptedValues["payload"] = try RemoteWire.encode(request)
+                _ = try await operations.modifyRecords(saving: [record], until: deadline)
+            }
+        }
+    }
+
+    /// A command answer reads only its Mac, independent of discovery and alert
+    /// subscriptions. No zone replay or unrelated Mac can hold the answer up.
+    public func status(macID: String, until deadline: ContinuousClock.Instant) async throws -> RemoteStatus? {
+        try await attempt {
+            let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
+            guard let record = try await operations.record(id, until: deadline) else { return nil }
+            guard let payload = record.encryptedValues["payload"] as? Data else { throw CKError(.internalError) }
+            return try RemoteWire.decode(RemoteStatus.self, from: payload)
+        }
     }
 
     /// An alert iOS shows on the account's phones straight from the push,
@@ -197,13 +266,15 @@ public actor RemoteCloud {
     /// carry encrypted fields, so the text names no Mac and no network; the
     /// phone adds the Mac's name itself.
     public func post(title: String, body: String, collapseID: String) async throws {
-        try await prepare()
-        let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: UUID().uuidString, zoneID: Self.zoneID))
-        record["title"] = title
-        record["body"] = body
-        record["collapse"] = collapseID
-        let saved = try await database.modifyRecords(saving: [record], deleting: [])
-        for result in saved.saveResults.values { _ = try result.get() }
+        let deadline = ContinuousClock.now.advanced(by: .seconds(30))
+        try await attempt {
+            try await prepare(until: deadline)
+            let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: UUID().uuidString, zoneID: Self.zoneID))
+            record["title"] = title
+            record["body"] = body
+            record["collapse"] = collapseID
+            _ = try await operations.modifyRecords(saving: [record], until: deadline)
+        }
     }
 
     /// Shows alert records as notifications on this device's account. The
@@ -223,37 +294,44 @@ public actor RemoteCloud {
         info.shouldSendMutableContent = true
         info.desiredKeys = ["collapse"]
         subscription.notificationInfo = info
-        let saved = try await database.modifySubscriptions(saving: [subscription], deleting: [])
-        for result in saved.saveResults.values { _ = try result.get() }
+        try await attempt {
+            try await operations.modifySubscriptions(saving: [subscription], until: .now.advanced(by: .seconds(30)))
+        }
     }
 
     /// Whether the account still holds the alert subscription; another phone
     /// or a recreated zone can remove it.
     public func hasAlertSubscription() async throws -> Bool {
-        do {
-            let subscription = try await database.subscription(for: Self.alertSubscriptionID)
+        try await attempt {
+            let subscription = try await operations.subscription(Self.alertSubscriptionID, until: .now.advanced(by: .seconds(30)))
             // One saved before the extension named the Mac is saved again.
-            return subscription.notificationInfo?.shouldSendMutableContent == true
-        } catch let error as CKError where error.code == .unknownItem {
-            return false
+            return subscription?.notificationInfo?.shouldSendMutableContent == true
         }
     }
 
     public func unsubscribeFromAlerts() async throws {
-        let result = try await database.modifySubscriptions(saving: [], deleting: [Self.alertSubscriptionID])
-        for case .failure(let error) in result.deleteResults.values
-        where (error as? CKError)?.code != .unknownItem {
-            throw error
+        try await attempt {
+            try await operations.modifySubscriptions(deleting: [Self.alertSubscriptionID], until: .now.advanced(by: .seconds(30)))
         }
     }
 
-    public func delete(_ recordNames: [String]) async throws {
+    public func delete(_ recordNames: [String], until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
         guard !recordNames.isEmpty else { return }
+        try await attempt {
+            _ = try await operations.modifyRecords(deleting: recordNames.map { .init(recordName: $0, zoneID: Self.zoneID) }, until: deadline)
+        }
         for name in recordNames { statusRecords[name] = nil }
-        let result = try await database.modifyRecords(
-            saving: [], deleting: recordNames.map { .init(recordName: $0, zoneID: Self.zoneID) })
-        for case .failure(let error) in result.deleteResults.values
-        where (error as? CKError)?.code != .unknownItem {
+    }
+
+    private func attempt<Value>(_ body: () async throws -> Value) async throws -> Value {
+        if let retryAt, retryAt > .now {
+            throw CKError(.requestRateLimited, userInfo: [CKErrorRetryAfterKey: retryAt.timeIntervalSinceNow])
+        }
+        do { return try await body() }
+        catch {
+            if let seconds = (error as? CKError)?.retryAfterSeconds {
+                retryAt = .now.addingTimeInterval(seconds)
+            }
             throw error
         }
     }
