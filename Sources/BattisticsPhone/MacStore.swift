@@ -35,6 +35,7 @@ final class MacStore {
     private(set) var checking = true
     /// Progress is not an error and must not make the status indicator orange.
     private(set) var waitingForUpdate = false
+    private(set) var commandDiagnostic: String?
     /// Macs whose status is too new for this app to read.
     private(set) var outdated: Set<String> = []
     var selectedID: String? {
@@ -62,6 +63,7 @@ final class MacStore {
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
     @ObservationIgnored private var commandAnsweredAt: [String: Date] = [:]
+    @ObservationIgnored private var lastConnectionIssue = "none"
     /// The Macs Siri and Spotlight last offered by name.
     @ObservationIgnored private var shortcutMacs: [Mac] = []
 
@@ -209,10 +211,13 @@ final class MacStore {
             snapshot = try await readSnapshot()
             slow.cancel()
             problem = nil
+            lastConnectionIssue = "none"
         } catch is CancellationError {
+            lastConnectionIssue = "waiter-cancelled"
             return []
         } catch {
             guard !isSample else { return [] }
+            lastConnectionIssue = Self.diagnosticError(error)
             problem = Self.describe(error)
             return []
         }
@@ -244,6 +249,20 @@ final class MacStore {
             reader = active
         }
         return try await active.value()
+    }
+
+    /// Only the user-triggered copy action calls this. Reading diagnostics does
+    /// not refresh iCloud or include names, record IDs, network names or payloads.
+    func copyConnectionDetails() async {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info["CFBundleVersion"] as? String ?? "?"
+        let header = "Battistics Remote \(version) (\(build))\n" +
+            "checking=\(checking) refreshing=\(refreshing) savedMacs=\(readings.count)\n" +
+            "lastRefresh=\(lastConnectionIssue)\n" +
+            "lastCommand=\(commandDiagnostic ?? (pending.isEmpty ? "none" : "pending"))\n"
+        let details = isSample ? "sample-data; no iCloud request" : await cloud.connectionReport()
+        UIPasteboard.general.string = header + details
     }
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
@@ -381,6 +400,7 @@ final class MacStore {
         guard !sending.contains(mac.id) else {
             return String(localized: "Wait for the current change to finish.", table: "RemoteSync")
         }
+        commandDiagnostic = nil
         request.deviceName = LocalPhoneMonitor.shared.commandName
         // A second change to the same Mac is refused, not queued indefinitely.
         let locks = request.operation != .inspect
@@ -406,12 +426,19 @@ final class MacStore {
                 Notifications.syncWatchdog(for: mac, reading: reading)
                 save()
             }
-            return status.lastCommand?.failure.map(Self.message)
+            if let failure = status.lastCommand?.failure {
+                commandDiagnostic = "remote-refusal \(failure.code.rawValue)"
+                return Self.message(failure)
+            }
+            return nil
         } catch is CancellationError {
+            commandDiagnostic = "cancelled"
             return String(localized: "Cancelled.")
         } catch is RemoteDeadline.Failure {
+            commandDiagnostic = "deadline"
             return String(localized: "The change wasn't confirmed. Check your Mac's status before trying again.", table: "RemoteSync")
         } catch {
+            commandDiagnostic = Self.diagnosticError(error)
             return Self.describe(error)
         }
     }
@@ -450,6 +477,12 @@ final class MacStore {
 
     /// Neutral progress wording; only the actual request failure is an error.
     private static let slowRead: Duration = .seconds(15)
+
+    private static func diagnosticError(_ error: Error) -> String {
+        let ns = error as NSError
+        let kind = error is RemoteDeadline.Failure ? "deadline" : error is CancellationError ? "cancelled" : "framework"
+        return "\(kind) \(ns.domain)/\(ns.code)"
+    }
 
     private static func describe(_ error: Error) -> String {
         if error is RemoteDeadline.Failure {

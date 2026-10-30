@@ -46,12 +46,21 @@ public actor RemoteCloud {
     private var changeToken: CKServerChangeToken?
     private var snapshotToken: CKServerChangeToken?
     private var snapshotCache: Snapshot?
+    private var discoveryStep = "not-started"
 
     public init() {
         operations = CloudKitOperations(database: CKContainer(identifier: Self.containerID).privateCloudDatabase)
     }
 
     init(operations: CloudKitOperations) { self.operations = operations }
+
+    /// Local metadata only: no network call, record names or account identifiers.
+    public func connectionReport() -> String {
+        "sync=native-page-bootstrap+trace1\n" +
+        "discovery=\(discoveryStep) prepared=\(prepared) cursor=\(snapshotToken != nil) " +
+        "cachedMacs=\(snapshotCache?.statuses.count ?? 0) unreadableMacs=\(snapshotCache?.unreadable.count ?? 0)\n" +
+        operations.connectionReport()
+    }
 
     /// Whether this process is signed for the container; CloudKit traps
     /// instead of throwing when it is not.
@@ -112,7 +121,8 @@ public actor RemoteCloud {
     /// A complete snapshot for the phone, assembled from deltas after the
     /// first read. A ten-second refresh must not replay the zone's history.
     public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(45))) async throws -> Snapshot {
-        try await attempt {
+        discoveryStep = "preparation"
+        return try await attempt {
             try await guarded(until: deadline) {
                 let result: (snapshot: Snapshot, token: CKServerChangeToken?)
                 do {
@@ -176,7 +186,9 @@ public actor RemoteCloud {
         var commands: [String: Command] = [:]
         var token = start
         while true {
+            discoveryStep = "zone-page"
             let changes = try await operations.changes(since: token, until: deadline)
+            discoveryStep = "record-decoding"
             for modification in changes.records.values {
                 let record = try modification.get()
                 if record.recordType == Self.eventType {
@@ -224,6 +236,7 @@ public actor RemoteCloud {
             token = changes.token
             if !changes.moreComing {
                 snapshot.commands = Array(commands.values)
+                discoveryStep = "complete"
                 return (snapshot, token)
             }
             // The SDK supplies a cursor with every successful page. Refuse a
