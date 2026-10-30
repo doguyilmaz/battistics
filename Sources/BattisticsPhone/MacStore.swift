@@ -193,8 +193,17 @@ final class MacStore {
         refreshing = true
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
+        // Cancelling a slow read would only make iCloud start over, so it
+        // runs on and the status line says why nothing has arrived yet.
+        let slow = Task { [weak self] in
+            try? await Task.sleep(for: Self.slowRead)
+            guard !Task.isCancelled else { return }
+            self?.problem = String(localized: "iCloud is slow to answer. Still waiting.")
+        }
+        defer { slow.cancel() }
         do {
-            snapshot = try await Self.withTimeout(Self.fetchTimeout) { [cloud] in try await cloud.fetch() }
+            snapshot = try await cloud.fetch()
+            slow.cancel()
             problem = nil
         } catch {
             if !Task.isCancelled && !isSample {
@@ -415,28 +424,11 @@ final class MacStore {
         }
     }
 
-    /// iCloud lets a request hang for a minute before failing it, which
-    /// right after a launch kept the Mac looking offline that long.
-    private static let fetchTimeout: Duration = .seconds(15)
-
-    private struct TimedOut: Error {}
-
-    private static func withTimeout<T: Sendable>(_ limit: Duration,
-                                                 _ body: @escaping @Sendable () async throws -> T) async throws -> T {
-        try await withThrowingTaskGroup(of: T.self) { group in
-            group.addTask { try await body() }
-            group.addTask {
-                try await Task.sleep(for: limit)
-                throw TimedOut()
-            }
-            defer { group.cancelAll() }
-            guard let first = try await group.next() else { throw TimedOut() }
-            return first
-        }
-    }
+    /// iCloud's first answers after an install or an update can take
+    /// tens of seconds.
+    private static let slowRead: Duration = .seconds(15)
 
     private static func describe(_ error: Error) -> String {
-        if error is TimedOut { return String(localized: "iCloud is slow to answer. Trying again.") }
         return switch (error as? CKError)?.code {
         case .notAuthenticated:
             String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
