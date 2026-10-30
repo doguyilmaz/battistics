@@ -7701,6 +7701,17 @@
         }
       }
     },
+    "The Mac went to sleep.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uykuya geçti."
+          }
+        }
+      }
+    },
     "macOS ended it.": {
       "extractionState": "manual",
       "localizations": {

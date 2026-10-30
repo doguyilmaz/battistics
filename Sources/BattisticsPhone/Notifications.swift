@@ -124,9 +124,12 @@ enum Notifications {
         // A fetch settled whether the Mac answers, which the quiet note left open.
         center.removeDeliveredNotifications(withIdentifiers: [quietID])
 
-        guard let reading, reading.reachable else {
-            // A removed Mac takes its reminder with it.
-            if reading == nil { center.removeDeliveredNotifications(withIdentifiers: [endingID]) }
+        guard let reading, reading.reachable, reading.status?.session?.isActive(at: .now) == true else {
+            let sessionOver = reading == nil || reading?.status?.sleptAt != nil
+                || reading?.status?.session?.isActive(at: .now) != true
+            if sessionOver {
+                center.removeDeliveredNotifications(withIdentifiers: [id, quietID, endingID])
+            }
             return
         }
         // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
@@ -166,7 +169,8 @@ enum Notifications {
 
         let fireAt = status.readAt.addingTimeInterval(DeliveryCadence.watchdogDelay(for: status))
         if let deadline = session.deadline, deadline <= fireAt { return }
-        let delay = max(60, fireAt.timeIntervalSinceNow)
+        guard fireAt.timeIntervalSinceNow > 1 else { return }
+        let delay = fireAt.timeIntervalSinceNow
 
         let lastSeen = status.readAt.formatted(date: .omitted, time: .shortened)
         let content = UNMutableNotificationContent()

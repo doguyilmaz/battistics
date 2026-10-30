@@ -238,9 +238,10 @@ private struct RunningView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Group {
-                        if let range = session.countdownRange, active {
+                        if let range = session.countdownRange, active,
+                           range.upperBound.timeIntervalSince(range.lowerBound) >= 1 {
                             Text(timerInterval: range, countsDown: true)
-                        } else if session.deadline == nil {
+                        } else if session.deadline == nil, session.startedAt <= context.date {
                             Text(session.startedAt, style: .timer)
                         } else {
                             Text("Time is up")
@@ -256,7 +257,8 @@ private struct RunningView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                if let range = session.countdownRange, active {
+                if let range = session.countdownRange, active,
+                   range.upperBound.timeIntervalSince(range.lowerBound) >= 1 {
                     ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                         .tint(.orange)
                 } else {

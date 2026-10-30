@@ -75,24 +75,15 @@ enum WidgetBridge {
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
-        // A sleeping Mac is not kept awake, whatever its last session said.
-        if reading?.status?.sleptAt != nil {
+        // Asleep, silent, or finished: the lock-screen countdown has to leave.
+        // A fetch is what decides silence, so a missed push alone does not.
+        guard reading?.reachable == true, reading?.status?.sleptAt == nil,
+              let status = reading?.status, let session = status.session,
+              session.isActive(at: .now) else {
             endActivities(of: mac.id)
             return
         }
-        guard let status = reading?.status, let session = status.session else {
-            // Only a Mac that is answering can tell us its session ended.
-            if reading?.reachable == true { endActivities(of: mac.id) }
-            return
-        }
-        if let deadline = session.deadline, deadline <= .now {
-            endActivities(of: mac.id)
-            return
-        }
-        let reachable = reading?.reachable == true
         let existing = Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id }
-        // Never start a new activity for a Mac that has gone silent.
-        if !reachable && existing == nil { return }
 
         let state = KeepAwakeActivityAttributes.ContentState(
             mode: session.mode,
@@ -107,7 +98,7 @@ enum WidgetBridge {
             network: status.network,
             networkName: status.resolvedNetworkName(),
             lastUpdate: status.readAt,
-            offline: !reachable
+            offline: false
         )
         // Marks the activity stale even if the app never runs again, late
         // enough that throttled pushes alone do not trigger it.

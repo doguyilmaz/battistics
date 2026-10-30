@@ -7,9 +7,12 @@ import IOKit.pwr_mgt
 @MainActor
 final class SleepWatcher {
     // From IOKit/IOMessage.h, whose function-like macros Swift does not import.
+    private static let canSystemPowerOff: natural_t = 0xE000_0240
+    private static let systemWillPowerOff: natural_t = 0xE000_0250
     private static let canSystemSleep: natural_t = 0xE000_0270
     private static let systemWillSleep: natural_t = 0xE000_0280
     private static let systemHasPoweredOn: natural_t = 0xE000_0300
+    private static let systemWillRestart: natural_t = 0xE000_0310
 
     private let willSleep: @MainActor () async -> Void
     private let didWake: @MainActor () -> Void
@@ -39,9 +42,9 @@ final class SleepWatcher {
 
     private func handle(_ message: natural_t, token: Int) {
         switch message {
-        case Self.canSystemSleep:
+        case Self.canSystemSleep, Self.canSystemPowerOff:
             IOAllowPowerChange(rootPort, token)
-        case Self.systemWillSleep:
+        case Self.systemWillSleep, Self.systemWillPowerOff, Self.systemWillRestart:
             pendingSleep = token
             Task {
                 await willSleep()

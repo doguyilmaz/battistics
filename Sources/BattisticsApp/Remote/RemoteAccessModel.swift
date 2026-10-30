@@ -195,10 +195,13 @@ final class RemoteAccessModel {
         }
     }
 
-    /// Phones then show the Mac asleep instead of silent, and are told if it
-    /// slept during Keep Awake.
+    /// The system is already committed to sleep, shutdown or restart. Keep Awake
+    /// ends here, in the last status the phone will see until wake.
     private func goingToSleep() async {
         guard enabled, cloud != nil else { return }
+        if awake.isActive || awake.isChanging { awake.stop(reason: .slept) }
+        let deadline = Date.now.addingTimeInterval(6)
+        while awake.isChanging, Date.now < deadline { try? await Task.sleep(for: .milliseconds(100)) }
         sleptAt = .now
         try? await publish(force: true)
     }

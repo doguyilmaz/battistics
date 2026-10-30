@@ -29,7 +29,7 @@ struct KeepAwakeActivityWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     VStack(alignment: .trailing, spacing: 2) {
-                        if let range = context.state.countdownRange {
+                        if let range = context.state.shownCountdown {
                             Text(timerInterval: range, countsDown: true)
                                 .font(.system(.subheadline, design: .rounded, weight: .bold))
                                 .monospacedDigit()
@@ -39,7 +39,7 @@ struct KeepAwakeActivityWidget: Widget {
                             Text("Remaining")
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(.secondary)
-                        } else {
+                        } else if context.state.deadline == nil, context.state.startedAt <= .now {
                             Text(context.state.startedAt, style: .timer)
                                 .font(.system(.subheadline, design: .rounded, weight: .bold))
                                 .monospacedDigit()
@@ -49,12 +49,16 @@ struct KeepAwakeActivityWidget: Widget {
                             Label("Until turned off", systemImage: "infinity")
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(.secondary)
+                        } else {
+                            Text("Time is up")
+                                .font(.system(.subheadline, design: .rounded, weight: .bold))
+                                .foregroundStyle(.orange)
                         }
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(spacing: 8) {
-                        if let range = context.state.countdownRange {
+                        if let range = context.state.shownCountdown {
                             ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                                 .tint(context.state.powerColor)
                         }
@@ -72,25 +76,28 @@ struct KeepAwakeActivityWidget: Widget {
                 HStack(spacing: 4) {
                     Image(systemName: context.state.isCharging ? "bolt.fill" : (context.state.lowPowerMode ? "leaf.fill" : "cup.and.saucer.fill"))
                         .foregroundStyle(context.state.lowPowerMode ? PowerPalette.lowPower : (context.state.isCharging ? PowerPalette.charging : .orange))
-                        .symbolEffect(.pulse, isActive: context.state.isCharging)
                     if let percent = context.state.batteryPercent {
                         Text(percent.percentText)
                             .font(.caption2.weight(.semibold).monospacedDigit())
                     }
                 }
             } compactTrailing: {
-                if let range = context.state.countdownRange {
+                if let range = context.state.shownCountdown {
                     Text(timerInterval: range, countsDown: true)
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.orange)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 52, alignment: .trailing)
-                } else {
+                } else if context.state.deadline == nil, context.state.startedAt <= .now {
                     Text(context.state.startedAt, style: .timer)
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.orange)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 46, alignment: .trailing)
+                } else {
+                    Text("Time is up")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
                 }
             } minimal: {
                 Image(systemName: context.state.isCharging ? "bolt.fill" : "cup.and.saucer.fill")
@@ -110,7 +117,6 @@ private struct LivePowerBadge: View {
             HStack(spacing: 4) {
                 Image(systemName: state.lowPowerMode ? "leaf.fill" : (state.isCharging ? "bolt.fill" : (state.onAdapter ? "powerplug.fill" : "battery.100")))
                     .font(.caption2.weight(.bold))
-                    .symbolEffect(.pulse, isActive: state.isCharging)
                 Text(percent.percentText)
                     .font(.caption.weight(.bold).monospacedDigit())
                 if let watts = state.watts, abs(watts) >= 1 {
@@ -138,6 +144,14 @@ private extension KeepAwakeActivityAttributes.ContentState {
 
     var powerColor: Color {
         lowPowerMode ? PowerPalette.lowPower : (isCharging || onAdapter ? PowerPalette.charging : .orange)
+    }
+
+    /// `Text(timerInterval:)` requires a range that has not ended.
+    var shownCountdown: ClosedRange<Date>? {
+        guard let range = countdownRange,
+              range.upperBound.timeIntervalSince(range.lowerBound) >= 1,
+              range.upperBound > .now else { return nil }
+        return range
     }
 }
 
@@ -187,7 +201,7 @@ private struct LockScreenLiveActivityView: View {
                 Spacer(minLength: 6)
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    if let range = state.countdownRange {
+                    if let range = state.shownCountdown {
                         Text(timerInterval: range, countsDown: true)
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
@@ -195,7 +209,7 @@ private struct LockScreenLiveActivityView: View {
                         Text("Remaining")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(.white.opacity(0.65))
-                    } else {
+                    } else if state.deadline == nil, state.startedAt <= .now {
                         Text(state.startedAt, style: .timer)
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
@@ -203,6 +217,10 @@ private struct LockScreenLiveActivityView: View {
                         Label("Until turned off", systemImage: "infinity")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(.white.opacity(0.65))
+                    } else {
+                        Text("Time is up")
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .monospacedDigit()
                     }
                 }
                 .foregroundStyle(offline ? .gray : .orange)
@@ -210,7 +228,7 @@ private struct LockScreenLiveActivityView: View {
                 .frame(width: 100, alignment: .trailing)
             }
 
-            if let range = state.countdownRange {
+            if let range = state.shownCountdown {
                 ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
                     .tint(offline ? .gray : state.powerColor)
             }
