@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import IOKit
 import IOKit.pwr_mgt
 
@@ -14,9 +14,14 @@ final class SleepWatcher {
     private static let systemHasPoweredOn: natural_t = 0xE000_0300
     private static let systemWillRestart: natural_t = 0xE000_0310
 
+    /// Apps are asked to quit before IOKit announces a shutdown or restart,
+    /// so the quit itself is where the app hears of one.
+    private static weak var current: SleepWatcher?
+
     private let willSleep: @MainActor () async -> Void
     private let didWake: @MainActor () -> Void
     private var pendingSleep: Int?
+    private var pendingQuit = false
     nonisolated(unsafe) private var rootPort: io_connect_t = 0
     nonisolated(unsafe) private var notifyPort: IONotificationPortRef?
     nonisolated(unsafe) private var notifier: io_object_t = 0
@@ -31,6 +36,39 @@ final class SleepWatcher {
             MainActor.assumeIsolated { watcher.handle(message, token: Int(bitPattern: argument)) }
         }, &notifier)
         if let notifyPort { IONotificationPortSetDispatchQueue(notifyPort, .main) }
+        Self.current = self
+    }
+
+    /// For `applicationShouldTerminate`: a quit for a shutdown or restart
+    /// waits for `willSleep`, as sleep does.
+    static func shouldTerminate(_ app: NSApplication) -> NSApplication.TerminateReply {
+        guard let watcher = current, isPowerOffQuit else { return .terminateNow }
+        guard !watcher.pendingQuit else { return .terminateLater }
+        watcher.pendingQuit = true
+        Task {
+            await watcher.willSleep()
+            watcher.allowQuit(app)
+        }
+        Task {
+            try? await Task.sleep(for: .seconds(8))
+            watcher.allowQuit(app)
+        }
+        return .terminateLater
+    }
+
+    private static var isPowerOffQuit: Bool {
+        guard let event = NSAppleEventManager.shared().currentAppleEvent,
+              event.eventClass == AEEventClass(kCoreEventClass),
+              event.eventID == AEEventID(kAEQuitApplication),
+              let reason = event.attributeDescriptor(forKeyword: AEKeyword(kAEQuitReason))?.enumCodeValue
+        else { return false }
+        return reason == OSType(kAEShutDown) || reason == OSType(kAERestart)
+    }
+
+    private func allowQuit(_ app: NSApplication) {
+        guard pendingQuit else { return }
+        pendingQuit = false
+        app.reply(toApplicationShouldTerminate: true)
     }
 
     deinit {

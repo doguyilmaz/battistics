@@ -2347,23 +2347,6 @@
         }
       }
     },
-    "Mac not answering": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac not answering"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac yanıt vermiyor"
-          }
-        }
-      }
-    },
     "Manufactured": {
       "extractionState": "manual",
       "localizations": {

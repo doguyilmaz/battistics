@@ -9,6 +9,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        MainActor.assumeIsolated { SleepWatcher.shouldTerminate(sender) }
+    }
+
     /// iCloud's silent push for the iPhone companion's zone. Alerts another
     /// Mac on the account posts for the phones arrive here too and are
     /// taken down, since they are not about this Mac.

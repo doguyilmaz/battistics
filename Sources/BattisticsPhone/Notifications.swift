@@ -128,7 +128,7 @@ enum Notifications {
             let sessionOver = reading == nil || reading?.status?.sleptAt != nil
                 || reading?.status?.session?.isActive(at: .now) != true
             if sessionOver {
-                center.removeDeliveredNotifications(withIdentifiers: [id, quietID, endingID])
+                center.removeDeliveredNotifications(withIdentifiers: [id, quietID, endingID, "\(mac.id).bagready"])
             }
             return
         }

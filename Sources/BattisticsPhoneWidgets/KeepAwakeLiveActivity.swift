@@ -63,7 +63,7 @@ struct KeepAwakeActivityWidget: Widget {
                                 .tint(context.state.powerColor)
                         }
                         HStack(spacing: 6) {
-                            Text(context.state.offline ? String(localized: "Mac not answering") : context.state.headline)
+                            Text(context.state.headline)
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
@@ -160,8 +160,6 @@ private struct LockScreenLiveActivityView: View {
 
     var body: some View {
         let state = context.state
-        // `offline` comes from a real fetch; stale only means the phone heard nothing new.
-        let offline = state.offline
         let isHotspot = state.network == .hotspot
 
         VStack(alignment: .leading, spacing: 10) {
@@ -178,11 +176,11 @@ private struct LockScreenLiveActivityView: View {
             HStack(alignment: .center, spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill((offline ? Color.gray : .orange).opacity(0.20))
+                        .fill(Color.orange.opacity(0.20))
                         .frame(width: 36, height: 36)
-                    Image(systemName: offline ? "wifi.slash" : state.mode.symbol)
+                    Image(systemName: state.mode.symbol)
                         .font(.callout.weight(.bold))
-                        .foregroundStyle(offline ? .gray : .orange)
+                        .foregroundStyle(.orange)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -223,18 +221,18 @@ private struct LockScreenLiveActivityView: View {
                             .monospacedDigit()
                     }
                 }
-                .foregroundStyle(offline ? .gray : .orange)
+                .foregroundStyle(.orange)
                 // Timer text claims all the width it is offered in a widget; bound it.
                 .frame(width: 100, alignment: .trailing)
             }
 
             if let range = state.shownCountdown {
                 ProgressView(timerInterval: range, countsDown: true) { EmptyView() } currentValueLabel: { EmptyView() }
-                    .tint(offline ? .gray : state.powerColor)
+                    .tint(state.powerColor)
             }
 
             HStack(spacing: 8) {
-                LiveFreshness(state: state, quiet: offline || context.isStale)
+                LiveFreshness(state: state, quiet: context.isStale)
                 Spacer(minLength: 8)
                 LiveActions(context: context, size: .small)
             }
@@ -269,7 +267,6 @@ private struct LiveActions: View {
         }
         .controlSize(size)
         .fixedSize()
-        .disabled(context.state.offline)
     }
 }
 

@@ -97,8 +97,7 @@ enum WidgetBridge {
             lidClosed: status.lidClosed,
             network: status.network,
             networkName: status.resolvedNetworkName(),
-            lastUpdate: status.readAt,
-            offline: false
+            lastUpdate: status.readAt
         )
         // Marks the activity stale even if the app never runs again, late
         // enough that throttled pushes alone do not trigger it.
