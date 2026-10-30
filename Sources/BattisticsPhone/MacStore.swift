@@ -30,6 +30,9 @@ final class MacStore {
     private(set) var pending: [String: RemoteRequest.Operation] = [:]
     /// Why iCloud could not be read, in the user's language.
     private(set) var problem: String?
+    /// Until this launch's first read settles, a saved reading too old to be
+    /// live says nothing about the Mac, so it shows as updating, not offline.
+    private(set) var checking = true
     /// Macs whose status is too new for this app to read.
     private(set) var outdated: Set<String> = []
     var selectedID: String? {
@@ -191,12 +194,16 @@ final class MacStore {
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
         do {
-            snapshot = try await cloud.fetch()
+            snapshot = try await Self.withTimeout(Self.fetchTimeout) { [cloud] in try await cloud.fetch() }
             problem = nil
         } catch {
-            if !Task.isCancelled && !isSample { problem = Self.describe(error) }
+            if !Task.isCancelled && !isSample {
+                problem = Self.describe(error)
+                checking = false
+            }
             return []
         }
+        defer { checking = false }
         // A cancelled refresh says nothing about the Macs, nor one that ended
         // after the sample replaced them.
         guard !Task.isCancelled, !isSample else { return [] }
@@ -408,8 +415,29 @@ final class MacStore {
         }
     }
 
+    /// iCloud lets a request hang for a minute before failing it, which
+    /// right after a launch kept the Mac looking offline that long.
+    private static let fetchTimeout: Duration = .seconds(15)
+
+    private struct TimedOut: Error {}
+
+    private static func withTimeout<T: Sendable>(_ limit: Duration,
+                                                 _ body: @escaping @Sendable () async throws -> T) async throws -> T {
+        try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask { try await body() }
+            group.addTask {
+                try await Task.sleep(for: limit)
+                throw TimedOut()
+            }
+            defer { group.cancelAll() }
+            guard let first = try await group.next() else { throw TimedOut() }
+            return first
+        }
+    }
+
     private static func describe(_ error: Error) -> String {
-        switch (error as? CKError)?.code {
+        if error is TimedOut { return String(localized: "iCloud is slow to answer. Trying again.") }
+        return switch (error as? CKError)?.code {
         case .notAuthenticated:
             String(localized: "Sign in to iCloud on this iPhone with the same Apple Account as your Mac.")
         case .networkUnavailable, .networkFailure:
