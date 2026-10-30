@@ -34,6 +34,7 @@ public actor RemoteCloud {
     private let database: CKDatabase
     private var prepared = false
     private var subscribed = false
+    private var subscribing = false
     private var statusRecords: [String: CKRecord] = [:]
     private var changeToken: CKServerChangeToken?
 
@@ -63,8 +64,16 @@ public actor RemoteCloud {
             for result in zones.saveResults.values { _ = try result.get() }
             prepared = true
         }
-        // Polling still works without pushes, so a failed subscription only retries.
-        guard !subscribed else { return }
+        // Polling still works without pushes, so the subscription is saved
+        // beside the caller's request instead of before it, and a failed one
+        // only retries.
+        guard !subscribed, !subscribing else { return }
+        subscribing = true
+        Task { await subscribe() }
+    }
+
+    private func subscribe() async {
+        defer { subscribing = false }
         let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: "remote-zone")
         let info = CKSubscription.NotificationInfo()
         info.shouldSendContentAvailable = true

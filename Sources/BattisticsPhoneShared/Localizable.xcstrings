@@ -1684,19 +1684,19 @@
         }
       }
     },
-    "iCloud is slow to answer. Trying again.": {
+    "iCloud is slow to answer. Still waiting.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud is slow to answer. Trying again."
+            "value": "iCloud is slow to answer. Still waiting."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud geç yanıt veriyor. Yeniden deneniyor."
+            "value": "iCloud geç yanıt veriyor, bekleniyor."
           }
         }
       }
