@@ -43,20 +43,33 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
     /// Over the app, an alert shows as a banner unless its Mac is on screen,
     /// and stays in Notification Center either way. A refused quick action or
     /// intent always shows.
+    ///
+    /// The completion handlers are called on the main thread: UIKit aborts
+    /// when the one for a tapped notification arrives on another, which an
+    /// `async` nonisolated variant does on a cold launch.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+                                            willPresent notification: UNNotification,
+                                            withCompletionHandler completionHandler: @escaping @Sendable (UNNotificationPresentationOptions) -> Void) {
         let identifier = notification.request.identifier
-        if identifier.hasSuffix(".command") { return [.banner, .sound] }
-        return await MacStore.shared.isShowing(alert: identifier) ? [.list] : [.banner, .sound, .list]
+        Task { @MainActor in
+            if identifier.hasSuffix(".command") { return completionHandler([.banner, .sound]) }
+            completionHandler(MacStore.shared.isShowing(alert: identifier) ? [.list] : [.banner, .sound, .list])
+        }
     }
 
     /// Opens the Mac an alert was about, or runs an alert's button: Add 30
     /// Minutes, or Stop Keep Awake, also on the Lock Screen.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                            didReceive response: UNNotificationResponse) async {
+                                            didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping @Sendable () -> Void) {
         let request = response.notification.request
-        await Self.respond(to: response.actionIdentifier, identifier: request.identifier,
-                           macID: request.content.userInfo["macID"] as? String)
+        let action = response.actionIdentifier
+        let identifier = request.identifier
+        let macID = request.content.userInfo["macID"] as? String
+        Task { @MainActor in
+            await Self.respond(to: action, identifier: identifier, macID: macID)
+            completionHandler()
+        }
     }
 
     @MainActor
