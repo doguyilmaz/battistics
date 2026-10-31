@@ -45,11 +45,6 @@ public actor RemoteCloud {
 
     init(operations: CloudKitOperations) { self.operations = operations }
 
-    /// Local metadata only: no network call, record names or account identifiers.
-    public func connectionReport() -> String {
-        "sync=query2 prepared=\(prepared) subscribed=\(subscribed)\n" + operations.connectionReport()
-    }
-
     /// Whether this process is signed for the container; CloudKit traps
     /// instead of throwing when it is not.
     public static var isEntitled: Bool {

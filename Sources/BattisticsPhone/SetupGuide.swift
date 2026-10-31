@@ -76,12 +76,6 @@ struct SetupGuide: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(store.refreshing)
-                Button {
-                    Task { await store.copyConnectionDetails() }
-                } label: {
-                    Label(String(localized: "Copy connection details", table: "RemoteSync"), systemImage: "doc.on.doc")
-                }
-                .font(.footnote)
             }
             .font(.subheadline)
             .card()

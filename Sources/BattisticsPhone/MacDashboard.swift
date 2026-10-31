@@ -13,15 +13,6 @@ struct MacDashboard: View {
                       refresh: { await store.refreshAll() }) {
             StatusLine(reading: reading, checking: store.checking, waiting: store.waitingForUpdate, problem: store.problem
                        ?? (store.outdated.contains(mac.id) ? String(localized: "Update Battistics Remote to read this Mac") : nil))
-            if store.problem != nil || store.waitingForUpdate || !reachable
-                || store.pending[mac.id] != nil || store.commandDiagnostic != nil {
-                Button {
-                    Task { await store.copyConnectionDetails() }
-                } label: {
-                    Label(String(localized: "Copy connection details", table: "RemoteSync"), systemImage: "doc.on.doc")
-                }
-                .font(.footnote)
-            }
             if let status = reading?.status {
                 Group {
                     BatteryCard(mac: mac, status: status, reachable: reachable)

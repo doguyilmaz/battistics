@@ -1,12 +1,6 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Copy connection details": {
-      "extractionState": "manual",
-      "localizations": {
-        "tr": { "stringUnit": { "state": "translated", "value": "Bağlantı ayrıntılarını kopyala" } }
-      }
-    },
     "Updating your Mac's status…": {
       "extractionState": "manual",
       "localizations": {
