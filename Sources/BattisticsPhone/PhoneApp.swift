@@ -98,7 +98,7 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
         -> UIBackgroundFetchResult {
         if application.applicationState != .active { DeliveryCadence.recordBackgroundDelivery() }
         LocalPhoneMonitor.shared.refresh()
-        await MacStore.shared.refreshAll()
+        await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
         return .newData
     }
 }

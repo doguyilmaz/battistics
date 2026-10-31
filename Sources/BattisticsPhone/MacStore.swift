@@ -185,12 +185,17 @@ final class MacStore {
 
     // MARK: Reading
 
+    /// iOS ends a background wake after about 30 seconds without warning, and
+    /// the widgets, Live Activity and alerts still need time after the read.
+    static let backgroundRead: Duration = .seconds(20)
+
     /// Reads every Mac and returns the alerts their changes call for.
     @discardableResult
-    func refreshAll() async -> [(Mac, [RemoteAlert])] {
+    func refreshAll(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async -> [(Mac, [RemoteAlert])] {
         // A push during a refresh may carry a newer change, and its handler
         // must not complete before that change is read.
         while refreshing {
+            guard .now < deadline else { return [] }
             do { try await Task.sleep(for: .milliseconds(200)) } catch { return [] }
         }
         if isSample { return [] }
@@ -205,7 +210,7 @@ final class MacStore {
         }
         defer { slow.cancel(); waitingForUpdate = false }
         do {
-            snapshot = try await cloud.fetch()
+            snapshot = try await cloud.fetch(until: deadline)
             slow.cancel()
             problem = nil
         } catch is CancellationError {
