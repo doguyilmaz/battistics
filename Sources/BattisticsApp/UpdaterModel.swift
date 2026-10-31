@@ -13,6 +13,7 @@ private let updateNotificationID = "battistics.update"
 final class UpdaterModel {
     @ObservationIgnored private let controller: SPUStandardUpdaterController
     @ObservationIgnored private let reminders: UpdateReminders
+    @ObservationIgnored private let relaunch = RelaunchNotifier()
     @ObservationIgnored private let notificationHandler: UpdateNotificationHandler
     @ObservationIgnored private var cancellables = Set<AnyCancellable>()
 
@@ -40,7 +41,7 @@ final class UpdaterModel {
         self.reminders = reminders
         controller = SPUStandardUpdaterController(
             startingUpdater: true,
-            updaterDelegate: nil,
+            updaterDelegate: relaunch,
             userDriverDelegate: reminders
         )
         notificationHandler = UpdateNotificationHandler()
@@ -97,6 +98,17 @@ final class UpdaterModel {
         try? await center.add(
             UNNotificationRequest(identifier: updateNotificationID, content: content, trigger: nil))
     }
+}
+
+private final class RelaunchNotifier: NSObject, SPUUpdaterDelegate {
+    func updaterWillRelaunchApplication(_ updater: SPUUpdater) {
+        NotificationCenter.default.post(name: .battisticsWillRelaunchForUpdate, object: nil)
+    }
+}
+
+extension Notification.Name {
+    /// Posted on the main thread right before Sparkle quits to relaunch the installed update.
+    static let battisticsWillRelaunchForUpdate = Notification.Name("battisticsWillRelaunchForUpdate")
 }
 
 /// Sparkle's gentle reminders. An accessory app's background alert would

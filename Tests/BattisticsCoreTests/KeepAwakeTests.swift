@@ -70,3 +70,45 @@ struct KeepAwakeTests {
         #expect(KeepAwakeMode.lidClosed.assertionType == "PreventUserIdleSystemSleep")
     }
 }
+
+@Suite("Keep awake handover")
+struct KeepAwakeHandoverTests {
+    private let saved = Date(timeIntervalSince1970: 1_700_000_000)
+
+    private func handover(_ duration: KeepAwakeDuration = .oneHour) -> KeepAwakeHandover {
+        KeepAwakeHandover(
+            session: KeepAwakeSession(mode: .displayOn, duration: duration, startedAt: saved.addingTimeInterval(-600)),
+            origin: "manual", name: nil, savedAt: saved, uptime: 1000)
+    }
+
+    @Test func quickRelaunchResumes() {
+        #expect(handover().outcome(now: saved.addingTimeInterval(8), uptime: 1008) == .resume)
+    }
+
+    @Test func sleepInBetweenEndsIt() {
+        #expect(handover().outcome(now: saved.addingTimeInterval(60), uptime: 1010) == .slept)
+    }
+
+    @Test func restartInBetweenEndsIt() {
+        #expect(handover().outcome(now: saved.addingTimeInterval(60), uptime: 40) == .slept)
+    }
+
+    @Test func deadlinePassedInBetweenEndsIt() {
+        let quarter = handover(.fifteenMinutes)
+        #expect(quarter.outcome(now: saved.addingTimeInterval(400), uptime: 1400) == .expired)
+    }
+
+    @Test func slowRelaunchIsNotAnUpdate() {
+        #expect(handover(.indefinite).outcome(now: saved.addingTimeInterval(300), uptime: 1300) == .stale)
+    }
+
+    @Test func clockSetBackIsNotTrusted() {
+        #expect(handover().outcome(now: saved.addingTimeInterval(-30), uptime: 1010) == .stale)
+    }
+
+    @Test func roundTripsThroughJSON() throws {
+        let original = handover()
+        let decoded = try JSONDecoder().decode(KeepAwakeHandover.self, from: JSONEncoder().encode(original))
+        #expect(decoded == original)
+    }
+}

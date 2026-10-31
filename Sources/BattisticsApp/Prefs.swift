@@ -138,6 +138,7 @@ enum Prefs {
 
     static let keepAwakeMode = "keepAwakeMode"
     static let keepAwakeDuration = "keepAwakeDuration"
+    static let keepAwakeHandover = "keepAwakeHandover"
     static let keepAwakeMenuBarIcon = "keepAwakeMenuBarIcon"
     static let keepAwakeStopOnLowBattery = "keepAwakeStopOnLowBattery"
     static let keepAwakeStopPercent = "keepAwakeStopPercent"

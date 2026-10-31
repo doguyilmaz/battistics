@@ -35,6 +35,7 @@ final class KeepAwakeModel {
     @ObservationIgnored private let notice = KeepAwakeNoticeController()
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var wakeObserver: NSObjectProtocol?
+    @ObservationIgnored private var relaunchObserver: NSObjectProtocol?
     /// Waits, bounded, for the user to allow the helper in Login Items, then
     /// starts the closed-lid session they asked for.
     private var approvalTask: Task<Void, Never>?
@@ -105,6 +106,13 @@ final class KeepAwakeModel {
         ) { [weak self] _ in
             DispatchQueue.main.async { self?.reconcileAfterWakeOrActivation() }
         }
+        // Synchronous: the process quits right after Sparkle posts this.
+        relaunchObserver = NotificationCenter.default.addObserver(
+            forName: .battisticsWillRelaunchForUpdate, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.saveForRelaunch() }
+        }
+        resumeAfterUpdate()
     }
 
     @discardableResult
@@ -184,12 +192,7 @@ final class KeepAwakeModel {
                 sessionName = name
                 sessionOrigin = origin
                 scheduleExpiry(for: new, now: Date())
-                if mode == .lidClosed {
-                    renewalActivity = ProcessInfo.processInfo.beginActivity(
-                        options: .userInitiatedAllowingIdleSystemSleep,
-                        reason: "Renewing the closed-lid Keep Awake lease")
-                    renewLease(sessionID: id)
-                }
+                if mode == .lidClosed { beginRenewing(sessionID: id) }
             } catch PowerHelperClient.Failure.unknownLeaseStatus {
                 // An unrecognized wire result does not authorize rollback.
                 stopAfterLeaseFailure(nil, sessionID: id, releaseFailed: releasingPrevious)
@@ -311,6 +314,91 @@ final class KeepAwakeModel {
         approvalTask = nil
     }
 
+    private func saveForRelaunch() {
+        guard let session, !isChanging else { return }
+        let handover = KeepAwakeHandover(session: session, origin: sessionOrigin.rawValue, name: sessionName,
+                                         savedAt: Date(), uptime: ProcessInfo.processInfo.systemUptime)
+        UserDefaults.standard.set(try? JSONEncoder().encode(handover), forKey: Prefs.keepAwakeHandover)
+    }
+
+    /// Picks up the session an update relaunch interrupted, before anything
+    /// publishes this Mac's status, so the iPhone sees it carry on.
+    private func resumeAfterUpdate() {
+        let defaults = UserDefaults.standard
+        guard let data = defaults.data(forKey: Prefs.keepAwakeHandover) else { return }
+        defaults.removeObject(forKey: Prefs.keepAwakeHandover)
+        guard let handover = try? JSONDecoder().decode(KeepAwakeHandover.self, from: data) else { return }
+        let saved = handover.session
+        switch handover.outcome(now: Date(), uptime: ProcessInfo.processInfo.systemUptime) {
+        case .resume: break
+        case .expired:
+            lastEnd = .init(reason: .timer, at: saved.deadline ?? handover.savedAt)
+            return
+        case .slept:
+            lastEnd = .init(reason: .slept, at: handover.savedAt)
+            return
+        case .stale:
+            lastEnd = .init(reason: .failure, at: handover.savedAt)
+            return
+        }
+        let origin = RemoteStatus.Origin(rawValue: handover.origin) ?? .manual
+        // Their client's connection closed with the old process, and a client never reconnects to a session.
+        guard origin != .terminal, origin != .ai else {
+            lastEnd = .init(reason: .client, at: handover.savedAt)
+            return
+        }
+        if let event = safety.blockingEvent(unattended: Self.isUnattended(origin: origin, mode: saved.mode)) {
+            lastEnd = .init(reason: event == .thermalStop ? .thermal : .battery, at: Date())
+            showSafetyReason(event, id: UUID().uuidString)
+            return
+        }
+        guard saved.mode != .lidClosed || helper.isInstalled,
+              assertion.take(mode: saved.mode, until: saved.deadline) else {
+            lastEnd = .init(reason: .failure, at: Date())
+            return
+        }
+        let id = UUID().uuidString
+        sessionID = id
+        session = saved
+        sessionName = handover.name
+        sessionOrigin = origin
+        scheduleExpiry(for: saved, now: Date())
+        safety.startSession()
+        if saved.mode == .lidClosed { reacquireLease(sessionID: id) }
+    }
+
+    /// The old process's lease ended with its connection, so the helper
+    /// already turned sleep back on; this takes the lid over again at once.
+    private func reacquireLease(sessionID id: String) {
+        isChanging = true
+        Task {
+            defer { isChanging = false }
+            do {
+                let result = try await helper.acquireLidSleepLease(id) { [weak self] in self?.sessionID == id }
+                guard sessionID == id else {
+                    if result == .success { _ = await cleanUpAcquisition(sessionID: id) }
+                    return
+                }
+                guard result == .success else {
+                    stopAfterLeaseFailure(result, sessionID: id)
+                    return
+                }
+                beginRenewing(sessionID: id)
+            } catch PowerHelperClient.Failure.unknownLeaseStatus {
+                stopAfterLeaseFailure(nil, sessionID: id)
+            } catch {
+                let confirmed = helper.hasLidSleepLeaseSession(id) ? await cleanUpAcquisition(sessionID: id) : true
+                guard sessionID == id else { return }
+                if confirmed {
+                    stopAfterLeaseFailure(nil, sessionID: id)
+                } else {
+                    lastEnd = .init(reason: .failure, at: Date())
+                    clearLocalSession()
+                }
+            }
+        }
+    }
+
     /// Sleep, shutdown or restart ends a session for good; it does not
     /// pick up again on wake.
     func endForSleep() {
@@ -401,6 +489,13 @@ final class KeepAwakeModel {
                 errorMessage = String(localized: "macOS could not put the display to sleep.")
             }
         }
+    }
+
+    private func beginRenewing(sessionID id: String) {
+        renewalActivity = ProcessInfo.processInfo.beginActivity(
+            options: .userInitiatedAllowingIdleSystemSleep,
+            reason: "Renewing the closed-lid Keep Awake lease")
+        renewLease(sessionID: id)
     }
 
     private func renewLease(sessionID id: String) {
