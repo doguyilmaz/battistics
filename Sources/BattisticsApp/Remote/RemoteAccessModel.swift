@@ -63,11 +63,6 @@ final class RemoteAccessModel {
     @ObservationIgnored private var sleptAt: Date?
     @ObservationIgnored private var sleepWatcher: SleepWatcher?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
-    /// Ran but not yet deleted, so a failed delete neither runs a command
-    /// twice nor leaves its record behind: the delete is retried next sync.
-    @ObservationIgnored private var handledCommands: Set<String> = []
-    /// Alert records seen in the zone, by when they were posted.
-    @ObservationIgnored private var events: [String: Date] = [:]
     /// Retried with the next publish until they land or go stale.
     @ObservationIgnored private var unsentAlerts: [(alert: RemoteAlert, at: Date)] = []
     @ObservationIgnored private var runtimeAlertSession: Date?
@@ -124,6 +119,12 @@ final class RemoteAccessModel {
         }
     }
 
+    /// Alert records this Mac posted, kept across relaunches until deleted.
+    private var postedEvents: [String: Date] {
+        get { UserDefaults.standard.dictionary(forKey: Prefs.remotePostedEvents) as? [String: Date] ?? [:] }
+        set { UserDefaults.standard.set(newValue, forKey: Prefs.remotePostedEvents) }
+    }
+
     /// False for builds not signed for iCloud, such as local ad-hoc builds.
     var isAvailable: Bool { cloud != nil }
 
@@ -141,37 +142,26 @@ final class RemoteAccessModel {
         var handled = false
         var recordMissing = false
         do {
-            let snapshot = try await cloud.fetchChanges()
+            let inbox = try await cloud.inbox(macID: macID)
             // After a relaunch, alerts compare against what the phones last saw.
-            if lastStatus == nil { lastStatus = snapshot.statuses[macID] }
-            recordMissing = (snapshot.isFull && snapshot.statuses[macID] == nil)
-                || snapshot.removedStatuses.contains(macID)
-            // Left behind by a phone whose delete failed for a Mac that is gone; seen at launch.
-            for command in snapshot.commands where command.macID != macID
-                && -command.request.sentAt.timeIntervalSinceNow > 10 * 60 {
-                handledCommands.insert(command.recordName)
-            }
-            let mine = snapshot.commands
-                .filter { $0.macID == macID && !handledCommands.contains($0.recordName) }
-                .sorted { $0.request.sentAt < $1.request.sentAt }
-            for command in mine {
-                handledCommands.insert(command.recordName)
-                guard -command.request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime else { continue }
-                lastCommand = .init(id: command.request.id, failure: await handle(command.request))
+            if lastStatus == nil { lastStatus = inbox.status }
+            recordMissing = inbox.status == nil
+            // The slot keeps its last command. One answered before a relaunch
+            // is named in this Mac's own record, so it never runs twice.
+            let answered = lastCommand?.id ?? inbox.status?.lastCommand?.id
+            if let request = inbox.command, request.id != answered,
+               -request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime {
+                lastCommand = .init(id: request.id, failure: await handle(request))
                 lastCommandAt = .now
-                // Acknowledgement is on the critical path; deleting commands,
-                // rereading history and power settings are not. Publish every
-                // answer before housekeeping, including the last in the batch.
-                try await publish(force: true, quick: command.request.operation != .setLowPower)
+                try await publish(force: true, quick: request.operation != .setLowPower)
                 handled = true
             }
-            // Alerts only need to live long enough to be pushed. A delta fetch
-            // shows each one once, so they are remembered until they expire.
-            events.merge(snapshot.events) { $1 }
-            let expired = events.filter { -$0.value.timeIntervalSinceNow > 10 * 60 }.keys
-            try await cloud.delete(Array(handledCommands) + expired)
-            handledCommands.removeAll()
-            for name in expired { events[name] = nil }
+            // Alerts only need to live long enough to be pushed.
+            let expired = postedEvents.filter { -$0.value.timeIntervalSinceNow > 10 * 60 }.keys
+            if !expired.isEmpty {
+                try await cloud.delete(Array(expired))
+                postedEvents = postedEvents.filter { !expired.contains($0.key) }
+            }
         } catch {
             failure = error
         }
@@ -276,8 +266,10 @@ final class RemoteAccessModel {
         var failed: [(alert: RemoteAlert, at: Date)] = []
         for item in unsentAlerts {
             guard let text = item.alert.pushText else { continue }
+            let name = UUID().uuidString
+            postedEvents[name] = .now
             do {
-                try await cloud.post(title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
+                try await cloud.post(name, title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
             } catch {
                 failed.append(item)
             }
@@ -312,8 +304,8 @@ final class RemoteAccessModel {
         guard let cloud else { return }
         let removed: Bool
         do {
-            try await cloud.delete([macID] + events.keys)
-            events.removeAll()
+            try await cloud.delete([macID, RemoteCloud.commandRecordName(for: macID)] + postedEvents.keys)
+            postedEvents = [:]
             removed = true
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             removed = true

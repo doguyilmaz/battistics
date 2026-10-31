@@ -2,8 +2,10 @@ import CloudKit
 import Foundation
 
 /// The iCloud side of the companion: one private zone holding a status record
-/// per Mac and short-lived command records from phones. Payloads live in
-/// encrypted fields, so only the account's own devices can read them.
+/// and a command slot per Mac. Payloads live in encrypted fields, so only the
+/// account's own devices can read them. Reads ask for records as they are now,
+/// by query or by name, so first contact costs one request however long the
+/// account has used Battistics.
 public actor RemoteCloud {
     public static let containerID = "iCloud.com.doguyilmaz.Battistics"
     static let zoneID = CKRecordZone.ID(zoneName: "Remote")
@@ -19,20 +21,13 @@ public actor RemoteCloud {
         public var statuses: [String: RemoteStatus] = [:]
         /// Status records written by a newer build that this one cannot read.
         public var unreadable: Set<String> = []
-        /// Status records deleted since the previous read, such as a Mac a phone removed.
-        public var removedStatuses: Set<String> = []
-        var removedRecords: Set<String> = []
-        public var commands: [Command] = []
-        /// Alert records by name, with when they were posted.
-        public var events: [String: Date] = [:]
-        /// Read from the start rather than as changes, so a missing record is really missing.
-        public var isFull = false
     }
 
-    public struct Command: Sendable {
-        public let recordName: String
-        public let macID: String
-        public let request: RemoteRequest
+    /// What a Mac reads each poll: its own record and its command slot.
+    public struct Inbox: Sendable {
+        /// Nil when the record is gone, such as after a phone removed this Mac.
+        public var status: RemoteStatus?
+        public var command: RemoteRequest?
     }
 
     private let operations: CloudKitOperations
@@ -43,10 +38,6 @@ public actor RemoteCloud {
     private var zoneGeneration = 0
     private var retryAt: Date?
     private var statusRecords: [String: CKRecord] = [:]
-    private var changeToken: CKServerChangeToken?
-    private var snapshotToken: CKServerChangeToken?
-    private var snapshotCache: Snapshot?
-    private var discoveryStep = "not-started"
 
     public init() {
         operations = CloudKitOperations(database: CKContainer(identifier: Self.containerID).privateCloudDatabase)
@@ -56,10 +47,7 @@ public actor RemoteCloud {
 
     /// Local metadata only: no network call, record names or account identifiers.
     public func connectionReport() -> String {
-        "sync=native-page-bootstrap+trace1\n" +
-        "discovery=\(discoveryStep) prepared=\(prepared) cursor=\(snapshotToken != nil) " +
-        "cachedMacs=\(snapshotCache?.statuses.count ?? 0) unreadableMacs=\(snapshotCache?.unreadable.count ?? 0)\n" +
-        operations.connectionReport()
+        "sync=query2 prepared=\(prepared) subscribed=\(subscribed)\n" + operations.connectionReport()
     }
 
     /// Whether this process is signed for the container; CloudKit traps
@@ -118,130 +106,77 @@ public actor RemoteCloud {
         }
     }
 
-    /// A complete snapshot for the phone, assembled from deltas after the
-    /// first read. A ten-second refresh must not replay the zone's history.
-    public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(45))) async throws -> Snapshot {
-        discoveryStep = "preparation"
-        return try await attempt {
-            try await guarded(until: deadline) {
-                let result: (snapshot: Snapshot, token: CKServerChangeToken?)
-                do {
-                    result = try await self.read(since: self.snapshotToken, until: deadline)
-                } catch let error as CKError where error.code == .changeTokenExpired {
-                    self.snapshotCache = nil
-                    self.snapshotToken = nil
-                    self.subscribed = false
-                    result = try await self.read(since: nil, until: deadline)
-                }
-                let full = (self.snapshotCache ?? Snapshot()).applying(result.snapshot)
-                self.snapshotCache = full
-                self.snapshotToken = result.token
-                return full
+    /// Every sharing Mac, for the phone. A zone no Mac has created yet means
+    /// no Mac shares, so reading never waits for zone setup.
+    public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
+        try await attempt {
+            var snapshot = Snapshot()
+            let records: [CKRecord]
+            do {
+                records = try await operations.query(Self.statusType, until: deadline)
+            } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
+                return snapshot
             }
+            for record in records {
+                let name = record.recordID.recordName
+                // Inaccessible encrypted data is not evidence that the Mac
+                // stopped sharing. Fail rather than return an empty list.
+                guard let payload = record.encryptedValues["payload"] as? Data else { throw CKError(.internalError) }
+                if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
+                    snapshot.statuses[name] = status
+                } else {
+                    snapshot.unreadable.insert(name)
+                }
+            }
+            prepared = true
+            scheduleSubscription()
+            return snapshot
         }
     }
 
-    /// Only what changed since the previous call, for callers that poll often.
-    public func fetchChanges(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
+    /// This Mac's record and its command slot, read by name in one request.
+    public func inbox(macID: String, until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Inbox {
         try await attempt {
             try await guarded(until: deadline) {
-                let result: (snapshot: Snapshot, token: CKServerChangeToken?)
-                do {
-                    result = try await self.read(since: self.changeToken, until: deadline)
-                } catch let error as CKError where error.code == .changeTokenExpired {
-                    self.subscribed = false
-                    self.statusRecords = [:]
-                    result = try await self.read(since: nil, until: deadline)
+                let statusID = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
+                let commandID = Self.commandRecordID(for: macID)
+                let records = try await self.operations.records([statusID, commandID], until: deadline)
+                var inbox = Inbox()
+                if let record = records[statusID] {
+                    self.statusRecords[macID] = record
+                    guard let payload = record.encryptedValues["payload"] as? Data else { throw CKError(.internalError) }
+                    // One this build cannot read is replaced by the next publish.
+                    inbox.status = try? RemoteWire.decode(RemoteStatus.self, from: payload)
+                } else {
+                    self.statusRecords[macID] = nil
                 }
-                self.changeToken = result.token
-                return result.snapshot
+                if let payload = records[commandID]?.encryptedValues["payload"] as? Data {
+                    inbox.command = Self.request(from: payload)
+                }
+                return inbox
             }
         }
     }
 
-    /// Keep the first-contact setup used by build (3). Preparation is cached
-    /// for this process; reads must not race ahead of account/zone bootstrap.
+    /// One slot per Mac, overwritten by each command. A Mac answers one change
+    /// at a time and a phone never sends a second before the first is answered.
+    public static func commandRecordName(for macID: String) -> String { "command.\(macID)" }
+
+    static func commandRecordID(for macID: String) -> CKRecord.ID {
+        .init(recordName: commandRecordName(for: macID), zoneID: zoneID)
+    }
+
     private func guarded<T>(until deadline: ContinuousClock.Instant, _ body: () async throws -> T) async throws -> T {
         try await prepare(until: deadline)
         do {
-            let result = try await body()
-            prepared = true
-            scheduleSubscription()
-            return result
+            return try await body()
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
             prepared = false
             subscribed = false
             zoneGeneration += 1
-            changeToken = nil
-            snapshotToken = nil
-            snapshotCache = nil
             statusRecords = [:]
             try await prepare(until: deadline)
             return try await body()
-        }
-    }
-
-    private func read(since start: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> (snapshot: Snapshot, token: CKServerChangeToken?) {
-        var snapshot = Snapshot(isFull: start == nil)
-        var commands: [String: Command] = [:]
-        var token = start
-        while true {
-            discoveryStep = "zone-page"
-            let changes = try await operations.changes(since: token, until: deadline)
-            discoveryStep = "record-decoding"
-            for modification in changes.records.values {
-                let record = try modification.get()
-                if record.recordType == Self.eventType {
-                    snapshot.events[record.recordID.recordName] = record.creationDate ?? .distantPast
-                    snapshot.removedRecords.remove(record.recordID.recordName)
-                    continue
-                }
-                guard let payload = record.encryptedValues["payload"] as? Data else {
-                    // Inaccessible encrypted data is not evidence that the Mac
-                    // stopped sharing. Keep it rather than returning an empty list.
-                    if record.recordType == Self.statusType { throw CKError(.internalError) }
-                    continue
-                }
-                switch record.recordType {
-                case Self.statusType:
-                    statusRecords[record.recordID.recordName] = record
-                    if let status = try? RemoteWire.decode(RemoteStatus.self, from: payload) {
-                        snapshot.statuses[record.recordID.recordName] = status
-                        snapshot.unreadable.remove(record.recordID.recordName)
-                    } else {
-                        snapshot.statuses[record.recordID.recordName] = nil
-                        snapshot.unreadable.insert(record.recordID.recordName)
-                    }
-                    snapshot.removedStatuses.remove(record.recordID.recordName)
-                    snapshot.removedRecords.remove(record.recordID.recordName)
-                case Self.commandType:
-                    if let request = Self.request(from: payload), let mac = record["mac"] as? String {
-                        commands[record.recordID.recordName] = .init(recordName: record.recordID.recordName, macID: mac, request: request)
-                        snapshot.removedRecords.remove(record.recordID.recordName)
-                    }
-                default: break
-                }
-            }
-            for (id, type) in changes.deletions {
-                snapshot.removedRecords.insert(id.recordName)
-                snapshot.events[id.recordName] = nil
-                commands[id.recordName] = nil
-                if type == Self.statusType {
-                    snapshot.statuses[id.recordName] = nil
-                    snapshot.unreadable.remove(id.recordName)
-                    statusRecords[id.recordName] = nil
-                    snapshot.removedStatuses.insert(id.recordName)
-                }
-            }
-            token = changes.token
-            if !changes.moreComing {
-                snapshot.commands = Array(commands.values)
-                discoveryStep = "complete"
-                return (snapshot, token)
-            }
-            // The SDK supplies a cursor with every successful page. Refuse a
-            // bad adapter response rather than replaying page one indefinitely.
-            guard token != nil else { throw CKError(.internalError) }
         }
     }
 
@@ -277,10 +212,11 @@ public actor RemoteCloud {
                      until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
         try await attempt {
             try await guarded(until: deadline) {
-                let record = CKRecord(recordType: Self.commandType, recordID: .init(recordName: request.id, zoneID: Self.zoneID))
+                let record = CKRecord(recordType: Self.commandType, recordID: Self.commandRecordID(for: macID))
+                // Read by Battistics 1.5.3, which finds commands in the zone's changes.
                 record["mac"] = macID
                 record.encryptedValues["payload"] = try RemoteWire.encode(request)
-                _ = try await operations.modifyRecords(saving: [record], until: deadline)
+                _ = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
             }
         }
     }
@@ -300,11 +236,11 @@ public actor RemoteCloud {
     /// even while Battistics Remote is not running. Push payloads cannot
     /// carry encrypted fields, so the text names no Mac and no network; the
     /// phone adds the Mac's name itself.
-    public func post(title: String, body: String, collapseID: String) async throws {
+    public func post(_ recordName: String, title: String, body: String, collapseID: String) async throws {
         let deadline = ContinuousClock.now.advanced(by: .seconds(30))
         try await attempt {
             try await prepare(until: deadline)
-            let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: UUID().uuidString, zoneID: Self.zoneID))
+            let record = CKRecord(recordType: Self.eventType, recordID: .init(recordName: recordName, zoneID: Self.zoneID))
             record["title"] = title
             record["body"] = body
             record["collapse"] = collapseID

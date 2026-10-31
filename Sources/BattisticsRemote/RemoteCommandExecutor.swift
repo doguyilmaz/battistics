@@ -10,7 +10,9 @@ public enum RemoteCommandExecutor {
         try await execute(request, macID: macID, timeout: .seconds(RemoteRequest.answerWait), pollInterval: .seconds(1.5),
                           write: { request, deadline in try await cloud.send(request, to: macID, until: deadline) },
                           read: { deadline in try await cloud.status(macID: macID, until: deadline) },
-                          cleanup: { id in try? await cloud.delete([id], until: .now.advanced(by: .seconds(5))) })
+                          cleanup: { _ in
+                              try? await cloud.delete([RemoteCloud.commandRecordName(for: macID)], until: .now.advanced(by: .seconds(5)))
+                          })
     }
 
     static func execute(

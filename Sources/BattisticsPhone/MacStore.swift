@@ -243,8 +243,8 @@ final class MacStore {
             active = reader
         } else {
             let cloud = cloud
-            active = RemoteRead(timeout: .seconds(45)) {
-                try await cloud.fetch(until: .now.advanced(by: .seconds(45)))
+            active = RemoteRead(timeout: .seconds(30)) {
+                try await cloud.fetch(until: .now.advanced(by: .seconds(30)))
             }
             reader = active
         }
@@ -353,7 +353,7 @@ final class MacStore {
         refreshing = true
         defer { refreshing = false }
         do {
-            try await cloud.delete([mac.id])
+            try await cloud.delete([mac.id, RemoteCloud.commandRecordName(for: mac.id)])
         } catch {
             return Self.describe(error)
         }

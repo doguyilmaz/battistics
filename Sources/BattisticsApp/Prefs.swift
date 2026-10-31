@@ -154,6 +154,7 @@ enum Prefs {
     static let remoteMacID = "remoteMacID"
     static let remoteMacHardware = "remoteMacHardware"
     static let remoteWithdrawPending = "remoteWithdrawPending"
+    static let remotePostedEvents = "remotePostedEvents"
     static let helperRegisteredVersion = "helperRegisteredVersion"
     static let readBluetoothBatteries = "readBluetoothBatteries"
 

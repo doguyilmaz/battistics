@@ -5,90 +5,75 @@ import os
 /// The SDK's convenience async calls do not expose operation lifetime or QoS.
 /// Keep those policies at the CloudKit boundary, not in a polling UI task.
 struct CloudKitOperations: Sendable {
-    struct Changes: Sendable {
-        var records: [CKRecord.ID: Result<CKRecord, Error>] = [:]
-        var deletions: [CKRecord.ID: CKRecord.RecordType] = [:]
-        var token: CKServerChangeToken?
-        var moreComing = false
-    }
-
     private let submit: @Sendable (CKDatabaseOperation) -> Void
-    private let readPage: @Sendable (CKServerChangeToken?) async throws -> Changes
     private let trace = RemoteConnectionTrace()
     private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "CloudKit")
 
     init(database: CKDatabase) {
         submit = { database.add($0) }
-        readPage = { token in
-            // The same batch boundary used by the working build (3). Do not
-            // replace this with fetchAllChanges + operation-wide completion:
-            // the account's first page must not depend on that aggregate tail.
-            let page = try await database.recordZoneChanges(inZoneWith: RemoteCloud.zoneID, since: token)
-            return Changes(
-                records: page.modificationResultsByID.mapValues { $0.map { $0.record } },
-                deletions: Dictionary(page.deletions.map { ($0.recordID, $0.recordType) }, uniquingKeysWith: { _, new in new }),
-                token: page.changeToken, moreComing: page.moreComing)
-        }
     }
 
-    /// Operation-backed requests can be exercised without a signed account.
-    /// Zone reads use the separate native-page seam below.
     init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void) {
         self.submit = submit
-        readPage = { _ in throw CKError(.internalError) }
     }
 
-    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void,
-         readPage: @escaping @Sendable (CKServerChangeToken?) async throws -> Changes) {
-        self.submit = submit
-        self.readPage = readPage
-    }
-
-    func changes(since token: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> Changes {
-        let started = ContinuousClock.now
-        let id = UUID().uuidString
-        trace.record(.started, phase: .zonePage, id: id)
-        do {
-            let changes = try await RemoteDeadline.perform(until: deadline) {
-                try await readPage(token)
+    /// The records of one type as they are now. Never the zone's change log:
+    /// every heartbeat a Mac ever wrote stays in that log, and replaying it
+    /// grows slower for as long as the account uses Battistics.
+    func query(_ recordType: CKRecord.RecordType, until deadline: ContinuousClock.Instant) async throws -> [CKRecord] {
+        var records: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        repeat {
+            let operation = cursor.map { CKQueryOperation(cursor: $0) }
+                ?? CKQueryOperation(query: CKQuery(recordType: recordType, predicate: NSPredicate(value: true)))
+            operation.zoneID = RemoteCloud.zoneID
+            let page = CloudKitBuffer<[Result<CKRecord, Error>]>([])
+            let trace = trace
+            let requestID = operation.operationID
+            cursor = try await perform(operation, phase: .query, until: deadline) { finish in
+                operation.recordMatchedBlock = { _, result in
+                    page.update { $0.append(result) }
+                    trace.record(.item(result.map { _ in () }), phase: .query, id: requestID)
+                }
+                operation.queryResultBlock = { result in
+                    finish(Result { try result.get() })
+                }
             }
-            // Preserve the partial-failure fix: an unreadable record is not
-            // evidence that a Mac has disappeared.
-            for record in changes.records.values { _ = try record.get() }
-            trace.record(.finished, phase: .zonePage, id: id)
-            Self.logger.notice("Zone page received in \(String(describing: started.duration(to: .now)), privacy: .public): \(changes.records.count) records, \(changes.deletions.count) deletions, more \(changes.moreComing)")
-            return changes
-        } catch {
-            trace.record(.failed(error), phase: .zonePage, id: id)
-            let domain = (error as NSError).domain
-            let code = (error as NSError).code
-            Self.logger.error("Zone page failed in \(String(describing: started.duration(to: .now)), privacy: .public), domain \(domain, privacy: .public), code \(code)")
-            throw error
+            // An unreadable record is not evidence that a Mac has disappeared.
+            records += try page.read().map { try $0.get() }
+        } while cursor != nil
+        return records
+    }
+
+    /// Missing records are left out of the result.
+    func records(_ ids: [CKRecord.ID], until deadline: ContinuousClock.Instant) async throws -> [CKRecord.ID: CKRecord] {
+        let operation = CKFetchRecordsOperation(recordIDs: ids)
+        let found = CloudKitBuffer<[CKRecord.ID: CKRecord]>([:])
+        let failure = CloudKitBuffer<Error?>(nil)
+        let trace = trace
+        let requestID = operation.operationID
+        return try await perform(operation, phase: .recordRead, until: deadline) { finish in
+            operation.perRecordResultBlock = { id, result in
+                trace.record(.item(result.map { _ in () }), phase: .recordRead, id: requestID)
+                switch result {
+                case .success(let record): found.update { $0[id] = record }
+                case .failure(let error as CKError) where error.code == .unknownItem: break
+                case .failure(let error): failure.update { $0 = error }
+                }
+            }
+            operation.fetchRecordsResultBlock = { result in
+                finish(Result {
+                    if let error = failure.read() { throw error }
+                    // Only missing records are left in a partial failure here.
+                    if case .failure(let error) = result, (error as? CKError)?.code != .partialFailure { throw error }
+                    return found.read()
+                })
+            }
         }
     }
 
     func record(_ id: CKRecord.ID, until deadline: ContinuousClock.Instant) async throws -> CKRecord? {
-        let operation = CKFetchRecordsOperation(recordIDs: [id])
-        let buffer = CloudKitBuffer<Result<CKRecord, Error>?>(nil)
-        let trace = trace
-        let requestID = operation.operationID
-        do {
-            return try await perform(operation, phase: .recordRead, until: deadline) { finish in
-                operation.perRecordResultBlock = { _, result in
-                    buffer.update { $0 = result }
-                    trace.record(.item(result.map { _ in () }), phase: .recordRead, id: requestID)
-                }
-                operation.fetchRecordsResultBlock = { result in
-                    finish(Result {
-                        if let record = buffer.read() { return try record.get() }
-                        try result.get()
-                        throw CKError(.internalError)
-                    })
-                }
-            }
-        } catch let error as CKError where error.code == .unknownItem {
-            return nil
-        }
+        try await records([id], until: deadline)[id]
     }
 
     func modifyRecords(saving records: [CKRecord] = [], deleting ids: [CKRecord.ID] = [],

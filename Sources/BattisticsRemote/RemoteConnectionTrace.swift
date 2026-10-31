@@ -5,7 +5,7 @@ import Foundation
 /// account identifiers, localized error descriptions or error userInfo.
 final class RemoteConnectionTrace: Sendable {
     enum Phase: String, Sendable {
-        case zonePage = "zone-page"
+        case query = "query"
         case zoneSetup = "zone-setup"
         case recordRead = "record-read"
         case recordWrite = "record-write"

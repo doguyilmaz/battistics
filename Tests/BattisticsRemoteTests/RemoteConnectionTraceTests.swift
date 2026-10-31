@@ -11,9 +11,9 @@ struct RemoteConnectionTraceTests {
             NSLocalizedDescriptionKey: "private-person@example.test at Private Mac",
             "token": "secret-token-do-not-copy", "record": "private-record-id"
         ])
-        trace.record(.failed(error), phase: .zonePage, id: "ABCDEF12")
+        trace.record(.failed(error), phase: .query, id: "ABCDEF12")
         let report = trace.report()
-        #expect(report.contains("zone-page"))
+        #expect(report.contains("query"))
         #expect(report.contains("CKErrorDomain/9"))
         for privateValue in ["private-person", "Private Mac", "secret-token", "private-record-id", "example.test"] {
             #expect(!report.contains(privateValue))
@@ -22,9 +22,9 @@ struct RemoteConnectionTraceTests {
 
     @Test func traceIsBounded() {
         let trace = RemoteConnectionTrace()
-        for i in 0..<30 { trace.record(.started, phase: .zonePage, id: "req\(i)") }
+        for i in 0..<30 { trace.record(.started, phase: .query, id: "req\(i)") }
         let report = trace.report()
-        #expect(report.split(separator: "\n").filter { $0.contains("zone-page") }.count == 20)
+        #expect(report.split(separator: "\n").filter { $0.contains("query") }.count == 20)
         #expect(report.hasPrefix("clock="))
         #expect(report.contains("req29"))
         #expect(!report.contains("req0 "))
@@ -39,16 +39,12 @@ struct RemoteConnectionTraceTests {
     }
 
     @Test func copyingAReportDoesNotStartACloudKitRequest() async {
-        let cloud = RemoteCloud(operations: .init(submit: { _ in
+        let cloud = RemoteCloud(operations: .init { _ in
             Issue.record("Diagnostics must not submit an operation")
-        }, readPage: { _ in
-            Issue.record("Diagnostics must not read a page")
-            return .init()
-        }))
+        })
         let report = await cloud.connectionReport()
-        #expect(report.contains("native-page-bootstrap+trace1"))
-        #expect(report.contains("discovery=not-started"))
-        #expect(report.contains("cachedMacs=0"))
+        #expect(report.contains("sync=query2"))
+        #expect(report.contains("prepared=false"))
     }
 
     @Test func itemCompletionIsVisibleEvenIfAggregateCompletionNeverArrives() async throws {
