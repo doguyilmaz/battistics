@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.4
+
+- Battistics Remote connects at once, also on a new iPhone or after the Mac
+  restarts. Both read only what is in iCloud now, instead of every change
+  since sharing was turned on, which took longer each day.
+
 ## 1.5.3
 
 - Keep Awake ends when the Mac sleeps, shuts down or restarts, and does not
