@@ -5,8 +5,11 @@ struct HelpPane: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var query = ""
     @State private var assistant = HelpAssistantModel()
+    @State private var askedEmpty = false
+    @FocusState private var fieldFocused: Bool
 
     private var articles: [HelpArticle] { HelpArticle.matching(query) }
+    private var question: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     var body: some View {
         Form {
@@ -22,23 +25,37 @@ struct HelpPane: View {
                 }
             }
             Section {
-                TextField("Search help or ask a question", text: $query, axis: .vertical)
-                    .lineLimit(1...3)
-                    .onSubmit { assistant.ask(query) }
-                    .tourTarget(.help)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                    TextField("Search help or ask a question", text: $query, axis: .vertical)
+                        .textFieldStyle(.plain)
+                        .lineLimit(1...3)
+                        .focused($fieldFocused)
+                        .onSubmit(ask)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(.background, in: RoundedRectangle(cornerRadius: 7))
+                .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(fieldFocused ? Color.accentColor : .secondary.opacity(0.4)))
+                .tourTarget(.help)
+                .onChange(of: query) { if !question.isEmpty { askedEmpty = false } }
                 HStack {
                     if assistant.isResponding {
                         ProgressView().controlSize(.small)
                         Text("Thinking on this Mac…").font(.caption)
                         Spacer()
                         Button("Cancel") { assistant.cancel() }
-                    } else {
-                        Button("Ask On-Device AI") { assistant.ask(query) }
-                            .disabled(!assistant.available || query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || query.count > 600)
-                        Spacer()
-                        if !assistant.available {
-                            Button("Check Availability") { assistant.refreshAvailability() }
+                    } else if assistant.available {
+                        Button("Ask On-Device AI", action: ask)
+                            .disabled(query.count > 600)
+                        if askedEmpty {
+                            Text("Type a question first.").font(.caption).foregroundStyle(.secondary)
                         }
+                        Spacer()
+                    } else {
+                        Text(assistant.availabilityMessage).font(.caption).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Check Availability") { assistant.refreshAvailability() }
                     }
                 }
                 if query.count > 600 {
@@ -77,6 +94,15 @@ struct HelpPane: View {
         .task { assistant.refreshAvailability() }
         .onChange(of: scenePhase) { if scenePhase == .active { assistant.refreshAvailability() } }
         .onDisappear { assistant.cancel() }
+    }
+
+    private func ask() {
+        guard !question.isEmpty else {
+            askedEmpty = true
+            fieldFocused = true
+            return
+        }
+        assistant.ask(query)
     }
 }
 

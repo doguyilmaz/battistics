@@ -3685,6 +3685,17 @@
         }
       }
     },
+    "Type a question first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önce bir soru yazın."
+          }
+        }
+      }
+    },
     "Know before power runs low": {
       "extractionState": "manual",
       "localizations": {
