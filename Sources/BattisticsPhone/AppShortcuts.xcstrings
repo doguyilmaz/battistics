@@ -1,150 +1,134 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "Check my computer with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check my computer with ${applicationName}"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Check my computer with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check my computer with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı kontrol et"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımı kontrol et"
           }
         }
       }
     },
-    "Keep my computer awake longer with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep my computer awake longer with ${applicationName}"
+    "Keep my computer awake longer with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep my computer awake longer with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı daha uzun uyanık tut"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımı daha uzun uyanık tut"
           }
         }
       }
     },
-    "Keep my computer awake with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keep my computer awake with ${applicationName}"
+    "Keep my computer awake with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep my computer awake with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı uyanık tut"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımı uyanık tut"
           }
         }
       }
     },
-    "Let my computer sleep with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Let my computer sleep with ${applicationName}"
+    "Let my computer sleep with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let my computer sleep with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı uyut"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımı uyut"
           }
         }
       }
     },
-    "Open ${target} in ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open ${target} in ${applicationName}"
+    "Open ${target} in ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open ${target} in ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile ${target} aç"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile ${target} aç"
           }
         }
       }
     },
-    "Open my computer in ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open my computer in ${applicationName}"
+    "Put my computer to sleep with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put my computer to sleep with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı aç"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımı uyku moduna al"
           }
         }
       }
     },
-    "Set my computer’s Low Power Mode with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set my computer’s Low Power Mode with ${applicationName}"
+    "Set my computer’s Low Power Mode with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set my computer’s Low Power Mode with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımın Düşük Güç Modunu ayarla"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımın Düşük Güç Modunu ayarla"
           }
         }
       }
     },
-    "Turn off my computer’s display with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn off my computer’s display with ${applicationName}"
+    "Turn off my computer’s display with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn off my computer’s display with ${applicationName}"
           }
         },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımın ekranını kapat"
-          }
-        }
-      }
-    },
-    "Put my computer to sleep with ${applicationName}": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Put my computer to sleep with ${applicationName}"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} ile bilgisayarımı uyku moduna al"
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ile bilgisayarımın ekranını kapat"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
