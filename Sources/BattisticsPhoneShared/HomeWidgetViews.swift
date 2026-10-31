@@ -90,12 +90,15 @@ struct MacWidgetView: View {
             }
             Spacer(minLength: 0)
             if let session = activeSession(snapshot) {
-                HStack {
-                    Label(session.mode.label, systemImage: session.deadline == nil ? "infinity" : session.mode.symbol)
+                VStack(alignment: .leading, spacing: 1) {
+                    Label(session.mode.label, systemImage: session.mode.symbol)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
-                    Spacer(minLength: 2)
-                    SessionTimerText(session: session).monospacedDigit().multilineTextAlignment(.trailing).frame(maxWidth: 60, alignment: .trailing)
+                    Label {
+                        SessionTimerText(session: session).monospacedDigit()
+                    } icon: {
+                        Image(systemName: session.deadline == nil ? "infinity" : "timer")
+                    }
                 }
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.orange)

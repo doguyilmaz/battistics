@@ -46,9 +46,10 @@ struct KeepAwakeActivityWidget: Widget {
                                 .foregroundStyle(.orange)
                                 .multilineTextAlignment(.trailing)
                                 .frame(width: 78, alignment: .trailing)
-                            Label("Until turned off", systemImage: "infinity")
+                            Label("No limit", systemImage: "infinity")
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         } else {
                             Text("Time is up")
                                 .font(.system(.subheadline, design: .rounded, weight: .bold))
@@ -212,9 +213,10 @@ private struct LockScreenLiveActivityView: View {
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .monospacedDigit()
                             .multilineTextAlignment(.trailing)
-                        Label("Until turned off", systemImage: "infinity")
+                        Label("No limit", systemImage: "infinity")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(1)
                     } else {
                         Text("Time is up")
                             .font(.system(.title2, design: .rounded, weight: .bold))

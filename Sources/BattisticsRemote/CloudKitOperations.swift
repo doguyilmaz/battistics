@@ -5,74 +5,68 @@ import os
 /// The SDK's convenience async calls do not expose operation lifetime or QoS.
 /// Keep those policies at the CloudKit boundary, not in a polling UI task.
 struct CloudKitOperations: Sendable {
-    struct Changes: Sendable {
-        var records: [CKRecord.ID: Result<CKRecord, Error>] = [:]
-        var deletions: [CKRecord.ID: CKRecord.RecordType] = [:]
-        var token: CKServerChangeToken?
-        var zoneError: Error?
-    }
-
     private let submit: @Sendable (CKDatabaseOperation) -> Void
     private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "CloudKit")
 
-    init(database: CKDatabase) { submit = { database.add($0) } }
+    init(database: CKDatabase) {
+        submit = { database.add($0) }
+    }
 
-    /// An operation-level seam: tests execute the real callback and deadline
-    /// code without an iCloud account, signed app or a live network.
-    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void) { self.submit = submit }
+    init(submit: @escaping @Sendable (CKDatabaseOperation) -> Void) {
+        self.submit = submit
+    }
 
-    func changes(since token: CKServerChangeToken?, until deadline: ContinuousClock.Instant) async throws -> Changes {
-        let configuration = CKFetchRecordZoneChangesOperation.ZoneConfiguration(previousServerChangeToken: token)
-        let operation = CKFetchRecordZoneChangesOperation(
-            recordZoneIDs: [RemoteCloud.zoneID], configurationsByRecordZoneID: [RemoteCloud.zoneID: configuration])
-        operation.fetchAllChanges = true
-        let buffer = CloudKitBuffer(Changes())
-        return try await perform(operation, until: deadline) { finish in
-            operation.recordWasChangedBlock = { id, result in
-                buffer.update { $0.records[id] = result; $0.deletions[id] = nil }
-            }
-            operation.recordWithIDWasDeletedBlock = { id, type in
-                buffer.update { $0.records[id] = nil; $0.deletions[id] = type }
-            }
-            operation.recordZoneFetchResultBlock = { _, result in
-                buffer.update { changes in
-                    switch result {
-                    case .success(let page): changes.token = page.serverChangeToken
-                    case .failure(let error): changes.zoneError = error
-                    }
+    /// The records of one type as they are now. Never the zone's change log:
+    /// every heartbeat a Mac ever wrote stays in that log, and replaying it
+    /// grows slower for as long as the account uses Battistics.
+    func query(_ recordType: CKRecord.RecordType, until deadline: ContinuousClock.Instant) async throws -> [CKRecord] {
+        var records: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        repeat {
+            let operation = cursor.map { CKQueryOperation(cursor: $0) }
+                ?? CKQueryOperation(query: CKQuery(recordType: recordType, predicate: NSPredicate(value: true)))
+            operation.zoneID = RemoteCloud.zoneID
+            let page = CloudKitBuffer<[Result<CKRecord, Error>]>([])
+            cursor = try await perform(operation, until: deadline) { finish in
+                operation.recordMatchedBlock = { _, result in
+                    page.update { $0.append(result) }
+                }
+                operation.queryResultBlock = { result in
+                    finish(Result { try result.get() })
                 }
             }
-            operation.fetchRecordZoneChangesResultBlock = { result in
+            // An unreadable record is not evidence that a Mac has disappeared.
+            records += try page.read().map { try $0.get() }
+        } while cursor != nil
+        return records
+    }
+
+    /// Missing records are left out of the result.
+    func records(_ ids: [CKRecord.ID], until deadline: ContinuousClock.Instant) async throws -> [CKRecord.ID: CKRecord] {
+        let operation = CKFetchRecordsOperation(recordIDs: ids)
+        let found = CloudKitBuffer<[CKRecord.ID: CKRecord]>([:])
+        let failure = CloudKitBuffer<Error?>(nil)
+        return try await perform(operation, until: deadline) { finish in
+            operation.perRecordResultBlock = { id, result in
+                switch result {
+                case .success(let record): found.update { $0[id] = record }
+                case .failure(let error as CKError) where error.code == .unknownItem: break
+                case .failure(let error): failure.update { $0 = error }
+                }
+            }
+            operation.fetchRecordsResultBlock = { result in
                 finish(Result {
-                    try result.get()
-                    let changes = buffer.read()
-                    if let error = changes.zoneError { throw error }
-                    // A failed record is not a missing Mac. Do not advance the
-                    // token or let a full fetch erase the phone's saved Macs.
-                    for record in changes.records.values { _ = try record.get() }
-                    return changes
+                    if let error = failure.read() { throw error }
+                    // Only missing records are left in a partial failure here.
+                    if case .failure(let error) = result, (error as? CKError)?.code != .partialFailure { throw error }
+                    return found.read()
                 })
             }
         }
     }
 
     func record(_ id: CKRecord.ID, until deadline: ContinuousClock.Instant) async throws -> CKRecord? {
-        let operation = CKFetchRecordsOperation(recordIDs: [id])
-        let buffer = CloudKitBuffer<Result<CKRecord, Error>?>(nil)
-        do {
-            return try await perform(operation, until: deadline) { finish in
-                operation.perRecordResultBlock = { _, result in buffer.update { $0 = result } }
-                operation.fetchRecordsResultBlock = { result in
-                    finish(Result {
-                        if let record = buffer.read() { return try record.get() }
-                        try result.get()
-                        throw CKError(.internalError)
-                    })
-                }
-            }
-        } catch let error as CKError where error.code == .unknownItem {
-            return nil
-        }
+        try await records([id], until: deadline)[id]
     }
 
     func modifyRecords(saving records: [CKRecord] = [], deleting ids: [CKRecord.ID] = [],
@@ -132,7 +126,9 @@ struct CloudKitOperations: Sendable {
         let buffer = CloudKitBuffer<Result<CKSubscription, Error>?>(nil)
         do {
             return try await perform(operation, until: deadline) { finish in
-                operation.perSubscriptionResultBlock = { _, result in buffer.update { $0 = result } }
+                operation.perSubscriptionResultBlock = { _, result in
+                    buffer.update { $0 = result }
+                }
                 operation.fetchSubscriptionsResultBlock = { result in
                     finish(Result {
                         if let subscription = buffer.read() { return try subscription.get() }
@@ -209,4 +205,5 @@ struct CloudKitOperations: Sendable {
             throw error
         }
     }
+
 }

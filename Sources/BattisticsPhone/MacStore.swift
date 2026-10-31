@@ -57,7 +57,6 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
-    @ObservationIgnored private var reader: RemoteRead<RemoteCloud.Snapshot>?
     @ObservationIgnored private var subscriptionWork: Task<Void, Never>?
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
@@ -186,12 +185,17 @@ final class MacStore {
 
     // MARK: Reading
 
+    /// iOS ends a background wake after about 30 seconds without warning, and
+    /// the widgets, Live Activity and alerts still need time after the read.
+    static let backgroundRead: Duration = .seconds(20)
+
     /// Reads every Mac and returns the alerts their changes call for.
     @discardableResult
-    func refreshAll() async -> [(Mac, [RemoteAlert])] {
+    func refreshAll(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async -> [(Mac, [RemoteAlert])] {
         // A push during a refresh may carry a newer change, and its handler
         // must not complete before that change is read.
         while refreshing {
+            guard .now < deadline else { return [] }
             do { try await Task.sleep(for: .milliseconds(200)) } catch { return [] }
         }
         if isSample { return [] }
@@ -206,7 +210,7 @@ final class MacStore {
         }
         defer { slow.cancel(); waitingForUpdate = false }
         do {
-            snapshot = try await readSnapshot()
+            snapshot = try await cloud.fetch(until: deadline)
             slow.cancel()
             problem = nil
         } catch is CancellationError {
@@ -230,20 +234,6 @@ final class MacStore {
             }
         }
         return alerts
-    }
-
-    private func readSnapshot() async throws -> RemoteCloud.Snapshot {
-        let active: RemoteRead<RemoteCloud.Snapshot>
-        if let reader {
-            active = reader
-        } else {
-            let cloud = cloud
-            active = RemoteRead(timeout: .seconds(45)) {
-                try await cloud.fetch(until: .now.advanced(by: .seconds(45)))
-            }
-            reader = active
-        }
-        return try await active.value()
     }
 
     private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
@@ -334,7 +324,7 @@ final class MacStore {
         refreshing = true
         defer { refreshing = false }
         do {
-            try await cloud.delete([mac.id])
+            try await cloud.delete([mac.id, RemoteCloud.commandRecordName(for: mac.id)])
         } catch {
             return Self.describe(error)
         }

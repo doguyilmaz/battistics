@@ -54,7 +54,7 @@ enum Notifications {
             schedule()
             let work = Task { @MainActor in
                 LocalPhoneMonitor.shared.refresh()
-                _ = await MacStore.shared.refreshAll()
+                _ = await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
                 refresh.setTaskCompleted(success: !Task.isCancelled)
             }
             refresh.expirationHandler = { work.cancel() }
