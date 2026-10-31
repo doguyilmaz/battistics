@@ -139,13 +139,18 @@ struct StatTile: View {
     let symbol: String
     var tint: Color = .accentColor
     var highlighted = false
+    /// A state that changes rarely, such as the lid, flashes once when it does.
+    var flashesOnChange = false
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: symbol)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(tint)
+                .contentTransition(.symbolEffect(.replace))
+                .symbolEffect(.bounce, options: .nonRepeating, value: flashesOnChange && !reduceMotion ? value : "")
                 .frame(width: 30, height: 30)
                 .background(tint.opacity(0.12), in: .circle)
                 .accessibilityHidden(true)
@@ -154,6 +159,7 @@ struct StatTile: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
                     .minimumScaleFactor(0.7)
+                    .contentTransition(.interpolate)
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -172,7 +178,32 @@ struct StatTile: View {
         .overlay {
             if highlighted { RoundedRectangle(cornerRadius: 18).strokeBorder(tint.opacity(0.4), lineWidth: 1) }
         }
+        .overlay {
+            if flashesOnChange { ChangeFlash(tint: tint, trigger: value) }
+        }
+        .animation(.snappy, value: value)
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// A tinted fill and border that fade out about a second after the value changes.
+private struct ChangeFlash: View {
+    let tint: Color
+    let trigger: String
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 18)
+            .fill(tint.opacity(0.14))
+            .strokeBorder(tint.opacity(0.6), lineWidth: 1.5)
+            .keyframeAnimator(initialValue: 0.0, trigger: trigger) { view, opacity in
+                view.opacity(opacity)
+            } keyframes: { _ in
+                LinearKeyframe(1, duration: 0.15)
+                LinearKeyframe(1, duration: 0.6)
+                CubicKeyframe(0, duration: 0.9)
+            }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 }
 

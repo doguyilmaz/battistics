@@ -14,17 +14,20 @@ struct ConditionsGrid: View {
                      value: name ?? status.network.label,
                      symbol: status.network.symbol,
                      tint: status.network == .offline ? .orange : (isHotspot ? PowerPalette.hotspot : .accentColor),
-                     highlighted: isHotspot)
+                     highlighted: isHotspot,
+                     flashesOnChange: true)
             if let battery = status.battery {
                 StatTile(title: String(localized: "Lid"),
                          value: status.lidClosed == true ? String(localized: "Closed") : String(localized: "Open"),
-                         symbol: status.lidClosed == true ? "laptopcomputer.slash" : "laptopcomputer")
+                         symbol: status.lidClosed == true ? "laptopcomputer.slash" : "laptopcomputer",
+                         flashesOnChange: true)
                 StatTile(title: String(localized: "Power Adapter"),
                          value: battery.onAdapter
                             ? battery.adapterWatts.map { "\($0) W" } ?? String(localized: "Connected")
                             : String(localized: "Not connected"),
                          symbol: battery.onAdapter ? "powerplug.fill" : "powerplug",
-                         tint: battery.onAdapter ? PowerPalette.charging : .accentColor)
+                         tint: battery.onAdapter ? PowerPalette.charging : .accentColor,
+                         flashesOnChange: true)
                 StatTile(title: String(localized: "Battery stop"),
                          value: status.protection.stopAtPercent?.percentText ?? String(localized: "Off"),
                          symbol: "shield.lefthalf.filled")
