@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.5
+
+- A Keep Awake session keeps running through an app update, and the
+  iPhone sees it carry on. Sessions from the terminal or an AI client
+  still end with their client.
+- Battistics Remote drops the Lock Screen countdown as soon as the
+  "Keep Awake ended" alert arrives, also while the app is in the
+  background.
+- Help's question has a proper search field, and Ask On-Device AI says
+  why it is unavailable right where the button is.
+
 ## 1.5.4
 
 - Battistics Remote connects at once, also on a new iPhone or after the Mac
