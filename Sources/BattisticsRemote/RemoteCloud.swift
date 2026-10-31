@@ -258,6 +258,8 @@ public actor RemoteCloud {
         info.collapseIDKey = "collapse"
         // Lets the phone's notification extension name the Mac.
         info.shouldSendMutableContent = true
+        // Also wakes the app, which ends a Live Activity the alert says is over.
+        info.shouldSendContentAvailable = true
         info.desiredKeys = ["collapse"]
         subscription.notificationInfo = info
         try await attempt {
@@ -270,8 +272,9 @@ public actor RemoteCloud {
     public func hasAlertSubscription() async throws -> Bool {
         try await attempt {
             let subscription = try await operations.subscription(Self.alertSubscriptionID, until: .now.advanced(by: .seconds(30)))
-            // One saved before the extension named the Mac is saved again.
+            // One saved before these options existed is saved again.
             return subscription?.notificationInfo?.shouldSendMutableContent == true
+                && subscription?.notificationInfo?.shouldSendContentAvailable == true
         }
     }
 
