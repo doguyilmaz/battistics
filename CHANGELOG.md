@@ -5,6 +5,12 @@
 - Battistics Remote connects at once, also on a new iPhone or after the Mac
   restarts. Both read only what is in iCloud now, instead of every change
   since sharing was turned on, which took longer each day.
+- The Mac answers a command from the iPhone as soon as it runs, before
+  tidying up iCloud, so the iPhone hears back sooner.
+- Alerts the Mac posts to iCloud are removed after 10 minutes, also when the
+  Mac restarts in between; before, a restart left them there.
+- Update Battistics Remote on the iPhone too: earlier versions cannot send
+  commands to this Mac.
 
 ## 1.5.3
 
