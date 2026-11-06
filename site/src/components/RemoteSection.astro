@@ -5,6 +5,7 @@ import charging from "../assets/shots/phone-charging.png";
 import liveActivity from "../assets/shots/live-activity.png";
 import { symbolHTML } from "../lib/symbols";
 import { appStoreURL } from "../lib/links";
+import qrSVG from "../assets/app-store-qr.svg?raw";
 
 const features = [
   { icon: "laptopcomputer", title: "The whole battery, anywhere", text: "Charge and its last day, time left, power, health and heat, plus the network the Mac is on and whether its lid is shut." },
@@ -21,7 +22,18 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
 <section class="remote" id="iphone" aria-labelledby="iphone-title">
   <div class="head">
     <div>
-      <a class="store" href={appStoreURL}><Fragment set:html={symbolHTML("iphone", 14)} />Free on the App Store</a>
+      <div class="store-row">
+        <a class="store" href={appStoreURL}><Fragment set:html={symbolHTML("iphone", 14)} />Free on the App Store</a>
+        <div class="qr" data-qr>
+          <button type="button" class="qr-toggle" aria-expanded="false" aria-controls="app-store-qr" aria-label="Show a QR code for your iPhone">
+            <Fragment set:html={symbolHTML("qrcode", 15)} />
+          </button>
+          <div class="qr-card" id="app-store-qr" role="img" aria-label="QR code for Battistics Remote on the App Store">
+            <Fragment set:html={qrSVG} />
+            <span aria-hidden="true">Scan with your iPhone</span>
+          </div>
+        </div>
+      </div>
       <h2 id="iphone-title">Your Mac, from your iPhone</h2>
     </div>
     <p class="lede">
@@ -64,14 +76,31 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
   </div>
 </section>
 
+<script>
+  for (const qr of document.querySelectorAll<HTMLElement>("[data-qr]")) {
+    const toggle = qr.querySelector("button")!;
+    const setOpen = (open: boolean) => {
+      qr.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    toggle.addEventListener("click", () => setOpen(!qr.classList.contains("open")));
+    document.addEventListener("click", (event) => {
+      if (!qr.contains(event.target as Node)) setOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+  }
+</script>
+
 <style>
   .remote { max-width: var(--page); margin: 0 auto; padding: clamp(110px, 14vw, 170px) var(--gutter) 0; }
   .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 56px; align-items: end; }
+  .store-row { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; }
   .store {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 18px;
     padding: 7px 14px 7px 12px;
     border-radius: 999px;
     font-weight: 600;
@@ -81,6 +110,55 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     text-decoration: none;
   }
   .store:hover { background: #000; }
+  .qr { position: relative; }
+  .qr-toggle {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: #111;
+    cursor: pointer;
+  }
+  .qr-toggle:hover, .qr.open .qr-toggle { background: #000; }
+  .qr-toggle:focus-visible { outline: 3px solid var(--accent-b); outline-offset: 3px; }
+  .qr-card {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 10px);
+    left: 50%;
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+    width: 168px;
+    padding: 14px 14px 10px;
+    border-radius: 18px;
+    color: #111;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08), 0 24px 48px -16px rgb(10 30 20 / 0.45);
+    font: 600 0.8rem/1.2 var(--text);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    translate: -50% -4px;
+    scale: 0.97;
+    transform-origin: top center;
+    transition: opacity 160ms ease-out, translate 160ms ease-out, scale 160ms ease-out, visibility 0s 160ms;
+  }
+  .qr-card :global(svg) { display: block; width: 140px; height: 140px; }
+  .qr:hover .qr-card, .qr.open .qr-card {
+    opacity: 1;
+    visibility: visible;
+    translate: -50% 0;
+    scale: 1;
+    transition-delay: 0s;
+  }
+  @media (hover: none) { .qr { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .qr-card { transition: none; } }
   h2 {
     margin: 0;
     font: 720 clamp(2.3rem, 4.6vw, 3.6rem) / 1 var(--display);
