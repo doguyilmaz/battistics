@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.6
+
+- The iPhone pane has a QR code for Battistics Remote on the App Store:
+  scan it with the iPhone to get the app.
+- Report a Problem emails battistics@doguyilmaz.com.
+
 ## 1.5.5
 
 - A Keep Awake session keeps running through an app update, and the
