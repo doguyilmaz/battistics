@@ -8,7 +8,7 @@ import Foundation
 /// difference between this and crash telemetry, and it is what lets the About
 /// pane keep promising that updates are the only traffic Battistics makes.
 enum IssueReporter {
-    static let email = "hello@doguyilmaz.com"
+    static let email = "battistics@doguyilmaz.com"
     private static let repository = "https://github.com/doguyilmaz/battistics"
 
     static var appVersion: String {

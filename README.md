@@ -27,7 +27,7 @@ macOS 14+ · Apple Silicon</p>
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed, with ready-made profiles
 - Optional stop at a battery level or under heat, low-battery and unplug warnings
 - Keep Awake for terminal commands and AI tasks through a bundled CLI and local MCP server
-- Battistics Remote for iPhone: battery, connection and Keep Awake through your iCloud
+- [Battistics Remote for iPhone](https://apps.apple.com/app/id6827062128): battery, connection and Keep Awake through your iCloud
 - A short tour and searchable help, with optional on-device answers on macOS 26
 - CSV export and import of the full history
 - English and Turkish
@@ -72,7 +72,7 @@ AI clients use the bundled MCP server to start and stop a named task. See the
 
 ### iPhone
 
-Battistics Remote shows the Mac's battery and its last day, how long it lasts,
+[Battistics Remote](https://apps.apple.com/app/id6827062128), free on the App Store, shows the Mac's battery and its last day, how long it lasts,
 its connection, lid and heat, its accessory batteries and busiest apps, and
 starts or stops Keep Awake, even with the lid closed in a bag. Widgets, a Lock
 Screen countdown and a Control Center control come with it. Turn on
