@@ -11,7 +11,7 @@ const SIZES: Record<string, [number, number]> = {
   "bell.badge": [73, 78], internaldrive: [90, 62], "questionmark.circle": [76, 72], "thermometer.medium": [49, 78],
   "arrow.uturn.backward.circle": [76, 72], "battery.25percent": [109, 51], personalhotspot: [102, 59],
   "checkmark.seal.fill": [83, 81], "moon.zzz.fill": [73, 80], "sun.max.fill": [80, 76], "lock.fill": [61, 70],
-  icloud: [91, 63], "person.crop.circle.badge.xmark": [86, 77], "arrow.down.circle": [76, 72],
+  icloud: [91, 63], "person.crop.circle.badge.xmark": [86, 77], "arrow.down.circle": [76, 72], qrcode: [74, 67],
 };
 
 /** An inline symbol `height` px tall, in the current text colour. */

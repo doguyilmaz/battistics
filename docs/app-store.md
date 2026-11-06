@@ -6,6 +6,8 @@
 - Category: Utilities. Age rating: 4+.
 - Privacy Policy URL: https://www.doguyilmaz.com/legal/privacy/battistics
 - Support URL: https://battistics.apps.doguyilmaz.com
+- Contact email: battistics@doguyilmaz.com
+- Listing: https://apps.apple.com/app/id6827062128
 - App Privacy: Data Not Collected. The app reads its Mac through the user's
   own private iCloud database; nothing reaches the developer.
 - Encryption: exempt (`ITSAppUsesNonExemptEncryption` is false).

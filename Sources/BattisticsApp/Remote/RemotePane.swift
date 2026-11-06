@@ -27,6 +27,7 @@ struct RemotePane: View {
                     }
                     Toggle("Allow closed-lid sessions from iPhone", isOn: $remote.closedLidAllowed)
                 }
+                RemoteAppStoreRow()
             } header: {
                 InfoHeader("Battistics Remote",
                            info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.",
