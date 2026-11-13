@@ -74,7 +74,8 @@ jobs:
         run: |
           # The Mac target comes first in project.yml; the iPhone targets keep their own versions.
           perl -0pi -e 's/CFBundleShortVersionString: "[^"]*"/CFBundleShortVersionString: "$ENV{VERSION}"/' project.yml
-          perl -0pi -e 's/CFBundleVersion: "[^"]*"/CFBundleVersion: "$ENV{VERSION}"/' project.yml
+          # Build numbers are separate integers; the marketing version remains SemVer.
+          perl -0pi -e 's/CFBundleVersion: "[^"]*"/CFBundleVersion: "$ENV{GITHUB_RUN_NUMBER}"/' project.yml
 
       - name: Core tests
         run: swift test

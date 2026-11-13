@@ -22,7 +22,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
+	<string>1.5.7</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -35,7 +35,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>0.1.0</string>
+	<string>46</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSUIElement</key>
@@ -44,11 +44,11 @@
 	<string>Battistics reads the battery level that connected keyboards, mice and headphones publish over Bluetooth. It is only used to show those levels in the Peripherals view, and nothing leaves this Mac.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 Dogu Yilmaz · MIT License</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Battistics reads the current Wi‑Fi or Personal Hotspot network name so Battistics Remote on your iPhone can show which network your Mac is on.</string>
 	<key>NSLocationUsageDescription</key>
 	<string>Battistics reads the current Wi‑Fi or Personal Hotspot network name so Battistics Remote on your iPhone can show which network your Mac is on.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Battistics reads the current Wi‑Fi or Personal Hotspot network name so Battistics Remote on your iPhone can show which network your Mac is on.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Battistics reads the current Wi‑Fi or Personal Hotspot network name so Battistics Remote on your iPhone can show which network your Mac is on.</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
