@@ -68,11 +68,10 @@
     const target = (event.target as Element).closest<HTMLElement>("[data-zoom]");
     if (!target) return;
     const source = target instanceof HTMLImageElement ? target : target.querySelector("img");
-    const src = target.dataset.zoom || source?.currentSrc || source?.src;
-    if (!src) return;
+    if (!source) return;
     event.preventDefault();
-    image.src = src;
-    image.alt = source?.alt || target.dataset.caption || "";
+    image.src = target.dataset.zoom || source.currentSrc || source.src;
+    image.alt = source.alt;
     caption.textContent = target.dataset.caption ?? "";
     dialog.showModal();
   });
