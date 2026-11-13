@@ -1,0 +1,34 @@
+[
+  {
+    "action": "redirect",
+    "action_parameters": {
+      "from_value": {
+        "status_code": 301,
+        "target_url": {
+          "expression": "concat(\"https://battistics.doguyilmaz.com\", http.request.uri.path)"
+        },
+        "preserve_query_string": true
+      }
+    },
+    "description": "Battistics canonical domain",
+    "enabled": true,
+    "expression": "(http.host eq \"battistics.apps.doguyilmaz.com\")",
+    "ref": "battistics_canonical_domain"
+  },
+  {
+    "action": "redirect",
+    "action_parameters": {
+      "from_value": {
+        "status_code": 301,
+        "target_url": {
+          "value": "https://battistics.doguyilmaz.com/docs/privacy/"
+        },
+        "preserve_query_string": true
+      }
+    },
+    "description": "Battistics privacy policy canonical URL",
+    "enabled": true,
+    "expression": "(http.host in {\"doguyilmaz.com\" \"www.doguyilmaz.com\"} and http.request.uri.path in {\"/legal/privacy/battistics\" \"/legal/privacy/battistics/\"})",
+    "ref": "battistics_privacy_policy"
+  }
+]

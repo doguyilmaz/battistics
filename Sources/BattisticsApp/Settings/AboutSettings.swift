@@ -36,7 +36,7 @@ struct AboutSettings: View {
                         if let url = URL(string: "https://github.com/doguyilmaz") {
                             Link(destination: url) { Text(verbatim: "@doguyilmaz") }
                         }
-                        if let url = URL(string: "https://battistics.apps.doguyilmaz.com") {
+                        if let url = URL(string: "https://battistics.doguyilmaz.com") {
                             Link("Website", destination: url)
                         }
                         if let url = URL(string: "https://github.com/doguyilmaz/battistics") {

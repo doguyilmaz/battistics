@@ -65,10 +65,10 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")
-                    Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com")!) {
+                    Link(destination: URL(string: "https://battistics.doguyilmaz.com")!) {
                         Label("Website and Help", systemImage: "safari")
                     }
-                    Link(destination: URL(string: "https://www.doguyilmaz.com/legal/privacy/battistics")!) {
+                    Link(destination: URL(string: "https://battistics.doguyilmaz.com/docs/privacy/")!) {
                         Label("Privacy Policy", systemImage: "hand.raised")
                     }
                 }

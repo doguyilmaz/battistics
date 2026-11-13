@@ -70,7 +70,7 @@ struct DeveloperPane: View {
     }
 
     private func guideLink(_ title: LocalizedStringKey, path: String) -> some View {
-        Link(destination: URL(string: "https://battistics.apps.doguyilmaz.com/docs/\(path)")!) {
+        Link(destination: URL(string: "https://battistics.doguyilmaz.com/docs/\(path)")!) {
             Label(title, systemImage: "arrow.up.right.square")
         }
     }

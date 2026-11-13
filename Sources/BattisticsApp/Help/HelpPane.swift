@@ -16,7 +16,7 @@ struct HelpPane: View {
             Section {
                 HStack {
                     Button("Take a Tour…") { model.tourRequested = true }
-                    if let url = URL(string: "https://battistics.apps.doguyilmaz.com/docs/") {
+                    if let url = URL(string: "https://battistics.doguyilmaz.com/docs/") {
                         Link(destination: url) {
                             Label("Read the Documentation Online", systemImage: "book")
                         }
