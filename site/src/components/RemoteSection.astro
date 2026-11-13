@@ -186,8 +186,15 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     box-shadow: inset 0 0 0 1px #6a6f73, inset 0 0 0 3px #101213, 0 40px 70px -30px rgb(10 30 20 / 0.55);
     cursor: zoom-in;
   }
-  .phone.front { top: 10px; right: 6%; width: 280px; z-index: 2; }
-  .phone.back { top: 60px; left: 4%; width: 240px; transform: rotate(-6deg); filter: brightness(0.92); }
+  /* Continue each cropped screenshot's top-edge colours into its status bar. */
+  .phone.front {
+    --status-background: linear-gradient(90deg, #504322 0%, #554723 12.5%, #5f4b24 25%, #674e27 37.5%, #6a4f29 50%, #684c28 62.5%, #624728 75%, #574127 87.5%, #533c27 100%);
+    top: 10px; right: 6%; width: 280px; z-index: 2;
+  }
+  .phone.back {
+    --status-background: linear-gradient(90deg, #254735 0%, #264c37 12.5%, #28543b 25%, #29593f 37.5%, #2a5c40 50%, #295a3e 62.5%, #29543b 75%, #264c37 87.5%, #264834 100%);
+    top: 60px; left: 4%; width: 240px; transform: rotate(-6deg); filter: brightness(0.92);
+  }
   .screen { position: relative; overflow: hidden; border-radius: 41px; background: #000; aspect-ratio: 1170 / 2532; }
   .screen :global(img) { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; }
   .status {
@@ -196,9 +203,10 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 5.13%;
+    height: calc(130 / 2532 * 100%);
     padding: 2% 9% 0 11%;
     color: #fff;
+    background: var(--status-background);
   }
   .status :global(.time) { font: 600 12.5px/1 var(--text); letter-spacing: -0.01em; }
   .status :global(.icons) { display: flex; align-items: center; gap: 4px; }
