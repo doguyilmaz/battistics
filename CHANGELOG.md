@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.7
+
+- Keep Awake sends fewer repeated battery, heat and Wi-Fi warnings while
+  work continues in the background. Battery and heat protection still stop
+  a session immediately when needed.
+- Finishing a terminal or AI task and stopping Keep Awake yourself no
+  longer send an unnecessary iPhone alert.
+- Retrying an alert after an interrupted iCloud connection no longer
+  creates a second notification.
+- Update Battistics Remote on iPhone to 1.0.1 too: it removes false
+  missing-update alarms and keeps the Lock Screen activity visible when
+  the Mac's latest status is delayed.
+
 ## 1.5.6
 
 - The iPhone pane has a QR code for Battistics Remote on the App Store:

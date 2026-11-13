@@ -13,7 +13,8 @@ git tag v1.0.1
 git push origin v1.0.1
 ```
 
-The `Release` workflow stamps the version into `project.yml`, runs the core
+The `Release` workflow stamps the SemVer marketing version and its integer
+`GITHUB_RUN_NUMBER` build number into `project.yml`, runs the core
 tests, builds and signs the app, notarizes and staples the DMG, generates a
 Sparkle-signed `appcast-2.xml` and publishes them to a GitHub release. The
 `SUFeedURL` points at `releases/latest/download/appcast-2.xml`, so the feed URL
