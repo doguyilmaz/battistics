@@ -1,0 +1,50 @@
+---
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  id: string;
+  src: ImageMetadata;
+  alt: string;
+}
+
+const { id, src, alt } = Astro.props;
+const image = await getImage({ src, width: 600, format: "webp" });
+const width = 1170;
+const bodyHeight = src.height * width / src.width;
+const statusHeight = 130;
+const height = bodyHeight + statusHeight;
+const whiteIcons = `${id}-white-icons`;
+---
+
+<div class="screen">
+  <!-- All screen content, including the status bar, scales in this one viewBox. -->
+  <svg class="screen-image" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label={alt}>
+    <defs>
+      <filter id={whiteIcons} x="0" y="0" width="100%" height="100%">
+        <feFlood flood-color="#fff" />
+        <feComposite in2="SourceAlpha" operator="in" />
+      </filter>
+    </defs>
+    <svg width={width} height={statusHeight + 2} viewBox={`0 0 ${width} 1`} preserveAspectRatio="none" overflow="hidden" aria-hidden="true">
+      <image href={image.src} width={width} height={bodyHeight} preserveAspectRatio="none" />
+    </svg>
+    <image href={image.src} y={statusHeight} width={width} height={bodyHeight} preserveAspectRatio="none" />
+    <g aria-hidden="true">
+      <text class="time" x="129" y="92" fill="#fff">9:41</text>
+      <rect x="397" y="34" width="375" height="75" rx="37.5" fill="#000" />
+      <g filter={`url(#${whiteIcons})`}>
+        <image href="/symbols/cellularbars.png" x="797" y="55" width="67" height="44" />
+        <image href="/symbols/wifi.png" x="882" y="55" width="62" height="44" />
+        <image href="/symbols/battery.100percent.png" x="962" y="52" width="103" height="48" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .screen { overflow: hidden; border-radius: 41px; background: #000; }
+  .screen-image { display: block; width: 100%; height: auto; }
+  .time { font: 600 56px var(--text); letter-spacing: -0.56px; }
+  @media (max-width: 560px) { .screen { border-radius: 34px; } }
+</style>
