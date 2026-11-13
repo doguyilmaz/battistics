@@ -7,6 +7,11 @@ The product website is https://battistics.doguyilmaz.com. Cloudflare Worker
 
 From `site`, using the existing personal Cloudflare account:
 
+Use Bun `1.4.4`, pinned in `site/package.json`. The Cloudflare Workers Builds
+trigger also sets `BUN_VERSION=1.4.4` so dependency installation uses the same
+version. Update both pins together. The old build image's Bun `1.2.15` cannot
+read this repository's version-2 `bun.lock` format and fails before the build.
+
 ```sh
 rtk bun install --frozen-lockfile
 rtk bun run build

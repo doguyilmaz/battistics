@@ -2,6 +2,7 @@
   "name": "battistics-site",
   "private": true,
   "type": "module",
+  "packageManager": "bun@1.4.4",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
