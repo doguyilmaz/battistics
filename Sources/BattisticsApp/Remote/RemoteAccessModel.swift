@@ -63,9 +63,8 @@ final class RemoteAccessModel {
     @ObservationIgnored private var sleptAt: Date?
     @ObservationIgnored private var sleepWatcher: SleepWatcher?
     @ObservationIgnored private var extras: RemoteStatus.Extras?
-    /// Retried with the next publish until they land or go stale.
-    @ObservationIgnored private var unsentAlerts: [(alert: RemoteAlert, at: Date)] = []
-    @ObservationIgnored private var runtimeAlertSession: Date?
+    @ObservationIgnored private var alertOutbox = UserDefaults.standard.data(forKey: Prefs.remoteAlertOutbox)
+        .flatMap { try? RemoteWire.decode(RemoteAlertOutbox.self, from: $0) } ?? RemoteAlertOutbox()
     @ObservationIgnored private var publishing: Task<Void, Error>?
     @ObservationIgnored private var retryAt: Date?
     @ObservationIgnored private var cachedPower: (settings: PowerSettings?, at: Date)?
@@ -251,30 +250,25 @@ final class RemoteAccessModel {
         }
         lastCheap = cheap
         lastPublished = Date()
-        if let previous = lastStatus {
-            for alert in RemoteAlert.pushed(from: previous, to: status) {
-                // An estimate hovering around the session's end would otherwise ring each time it crosses.
-                if case .batteryRunsOut = alert {
-                    guard runtimeAlertSession != status.session?.startedAt else { continue }
-                    runtimeAlertSession = status.session?.startedAt
-                }
-                unsentAlerts.append((alert, .now))
-            }
-        }
+        alertOutbox.record(from: lastStatus, to: status)
+        saveAlertOutbox()
         lastStatus = status
-        unsentAlerts.removeAll { -$0.at.timeIntervalSinceNow > 10 * 60 }
-        var failed: [(alert: RemoteAlert, at: Date)] = []
-        for item in unsentAlerts {
+        for item in alertOutbox.pending {
+            guard enabled else { break }
             guard let text = item.alert.pushText else { continue }
-            let name = UUID().uuidString
-            postedEvents[name] = .now
+            postedEvents[item.id] = .now
             do {
-                try await cloud.post(name, title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
+                try await cloud.post(item.id, title: text.title, body: text.body, collapseID: "\(macID).\(item.alert.kind.rawValue)")
+                alertOutbox.acknowledge(item.id)
+                saveAlertOutbox()
             } catch {
-                failed.append(item)
+                // The persisted event keeps its id for the next publish.
             }
         }
-        unsentAlerts = failed
+    }
+
+    private func saveAlertOutbox() {
+        UserDefaults.standard.set(try? RemoteWire.encode(alertOutbox), forKey: Prefs.remoteAlertOutbox)
     }
 
     /// Coalesces bursts of changes into one write.
@@ -299,6 +293,8 @@ final class RemoteAccessModel {
         lastCheap = nil
         lastStatus = nil
         lastPublished = nil
+        alertOutbox = RemoteAlertOutbox()
+        saveAlertOutbox()
         problem = nil
         // Retried by the ticker until it lands, or phones keep a ghost of this Mac.
         guard let cloud else { return }

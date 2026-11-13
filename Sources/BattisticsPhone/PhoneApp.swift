@@ -53,8 +53,11 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
                                             willPresent notification: UNNotification,
                                             withCompletionHandler completionHandler: @escaping @Sendable (UNNotificationPresentationOptions) -> Void) {
         let identifier = notification.request.identifier
+        let isPassive = notification.request.content.interruptionLevel == .passive
         Task { @MainActor in
             if identifier.hasSuffix(".command") { return completionHandler([.banner, .sound]) }
+            guard Notifications.isEnabled else { return completionHandler([]) }
+            if isPassive { return completionHandler([.list]) }
             completionHandler(MacStore.shared.isShowing(alert: identifier) ? [.list] : [.banner, .sound, .list])
         }
     }
@@ -96,7 +99,6 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
         -> UIBackgroundFetchResult {
-        if application.applicationState != .active { DeliveryCadence.recordBackgroundDelivery() }
         LocalPhoneMonitor.shared.refresh()
         await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
         return .newData

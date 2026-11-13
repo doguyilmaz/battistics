@@ -2,7 +2,7 @@ import Foundation
 
 /// What the phone notifies about, decided from two readings of one Mac. Each
 /// alert fires once when its condition starts, never on every refresh.
-public enum RemoteAlert: Equatable, Sendable {
+public enum RemoteAlert: Codable, Equatable, Sendable {
     case sessionEnded(RemoteStatus.EndReason?)
     case batteryLow(percent: Int)
     case batteryRunsOut(minutesLeft: Int)
@@ -15,7 +15,7 @@ public enum RemoteAlert: Equatable, Sendable {
     case chargeReached(percent: Int)
     case unreachable
 
-    public enum Kind: String, Sendable {
+    public enum Kind: String, Codable, Sendable {
         case ended, battery, runtime, unplugged, closedlid, hot, bagready, asleep, charged, silent
 
         /// Whether stopping Keep Awake answers this alert. A low battery is
@@ -46,7 +46,7 @@ public enum RemoteAlert: Equatable, Sendable {
     }
 
     /// Kinds the Mac notices itself. The charge target is the phone's own
-    /// setting, and only a phone can tell that the Mac stopped answering.
+    /// setting; only successful phone reads can establish missing updates.
     public static let pushedKinds: Set<Kind> = [.ended, .battery, .runtime, .unplugged, .closedlid, .hot, .bagready, .asleep]
 
     /// A Mac held at a charge limit tops up across the target again and
@@ -70,7 +70,8 @@ public enum RemoteAlert: Equatable, Sendable {
     /// `current` is nil when the Mac did not answer; `previous` is nil before
     /// the first reading and `.some(nil)` after an unanswered one.
     /// `chargeTarget` is the charge level the user wants to hear about while the Mac charges.
-    /// A Mac silent after its timed session ran out most likely slept before saying so.
+    /// A missing reading is uncertainty, not an alert. RemoteSilenceState
+    /// confirms an old record through multiple successful reads instead.
     public static func alerts(from previous: RemoteStatus??, to current: RemoteStatus?,
                               chargeTarget: Int? = nil, now: Date = Date()) -> [RemoteAlert] {
         switch (previous, current) {
@@ -78,7 +79,6 @@ public enum RemoteAlert: Equatable, Sendable {
             // Nobody needs to hear that the Mac went to sleep hours ago.
             if let sleptAt = current.sleptAt, now.timeIntervalSince(sleptAt) > 10 * 60 { return [] }
             return changes(from: previous, to: current, chargeTarget: chargeTarget)
-        case (.some(.some(let previous)), .none): return previous.session?.isActive(at: now) == true ? [.unreachable] : []
         default: return []
         }
     }
@@ -93,15 +93,20 @@ public enum RemoteAlert: Equatable, Sendable {
            battery.percent >= chargeTarget, let before = previous.battery, before.percent < chargeTarget {
             alerts.append(.chargeReached(percent: battery.percent))
         }
-        if previous.session != nil, current.session == nil, current.lastEnd?.reason != .phone {
-            alerts.append(.sessionEnded(current.lastEnd?.reason))
+        if let session = previous.session, current.session == nil {
+            if let end = current.lastEnd {
+                if end.at >= session.startedAt, ![.user, .phone, .client].contains(end.reason) {
+                    alerts.append(.sessionEnded(end.reason))
+                }
+            } else {
+                alerts.append(.sessionEnded(nil))
+            }
         }
         if current.session != nil, current.thermal.isHot, !previous.thermal.isHot {
             alerts.append(.runningHot)
         }
-        if current.session?.mode == .lidClosed, current.isBagReady, !previous.isBagReady, current.lidClosed != true {
-            alerts.append(.bagReady)
-        }
+        // Bag Ready is visible on the dashboard and Live Activity. A normal
+        // network transition does not need a notification.
         if let battery = current.battery, !battery.onAdapter {
             let threshold = current.protection.lowBatteryPercent
             let wasAbove = previous.battery.map { $0.onAdapter || $0.percent > threshold } ?? true

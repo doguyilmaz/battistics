@@ -94,8 +94,8 @@ extension RemoteStatus {
         return battery == nil ? "desktopcomputer.trianglebadge.exclamationmark" : "laptopcomputer.slash"
     }
 
-    /// A Mac not answering is asleep when it said so before sleeping.
-    var silentLabel: String { sleptAt != nil ? String(localized: "Asleep") : String(localized: "Offline") }
+    /// Only an explicit sleep report establishes sleep; old telemetry is unknown.
+    var silentLabel: String { sleptAt != nil ? String(localized: "Asleep") : String(localized: "Status out of date") }
 }
 
 extension RemoteStatus.Thermal {

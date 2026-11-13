@@ -138,24 +138,6 @@ struct RemoteTests {
         #expect(!status.isFresh(at: status.staleDate))
     }
 
-    @Test func watchdogFollowsHowReliablyPushesArrive() {
-        let now = Date(timeIntervalSince1970: 1_000_000)
-        let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: now, deadline: nil)
-        let status = RemoteStatus(machineName: "Mac", readAt: now, session: session,
-                                  heartbeatSeconds: RemoteStatus.sessionHeartbeat)
-        let stale = RemoteStatus.sessionHeartbeat * 4 + 45
-        #expect(status.quietDelay == stale)
-        let steady = (1...8).map { now.addingTimeInterval(Double(-$0) * 120) }
-        #expect(status.watchdogDelay(backgroundDeliveries: steady, now: now) == stale)
-        let burst = (1...4).map { now.addingTimeInterval(Double(-$0) * 120) }
-        #expect(status.watchdogDelay(backgroundDeliveries: burst, now: now) == RemoteStatus.unheardDelay)
-        let throttled = (1...4).map { now.addingTimeInterval(Double(-$0) * 1500) }
-        #expect(status.watchdogDelay(backgroundDeliveries: throttled, now: now) == RemoteStatus.unheardDelay)
-        let patchy = [-1500, -900, -600, -120].map { now.addingTimeInterval(Double($0)) }
-        #expect(status.watchdogDelay(backgroundDeliveries: patchy, now: now) == 900)
-        #expect(status.watchdogDelay(backgroundDeliveries: [], now: now) == RemoteStatus.unheardDelay)
-    }
-
     @Test func phoneOnlySurfacesWaitLongerThanAFetch() {
         let readAt = Date(timeIntervalSince1970: 1_000_000)
         let session = RemoteStatus.Session(mode: .lidClosed, origin: .phone, startedAt: readAt, deadline: nil)
@@ -227,15 +209,15 @@ struct RemoteAlertTests {
         #expect(!RemoteAlert.pushedKinds.contains(RemoteAlert.chargeReached(percent: 80).kind))
     }
 
-    @Test func bagReadyFiresOnceWhenAClosedLidSessionReachesHotspotWithTheLidOpen() {
+    @Test func bagReadyIsDashboardInformationWithoutANotification() {
         var wifi = status()
         wifi.network = .wifi
         wifi.lidClosed = false
         wifi.protection.closedLidAllowed = true
         var hotspot = wifi
         hotspot.network = .hotspot
-        #expect(RemoteAlert.alerts(from: wifi, to: hotspot) == [.bagReady])
-        #expect(RemoteAlert.pushed(from: wifi, to: hotspot) == [.bagReady])
+        #expect(RemoteAlert.alerts(from: wifi, to: hotspot).isEmpty)
+        #expect(RemoteAlert.pushed(from: wifi, to: hotspot).isEmpty)
         #expect(RemoteAlert.alerts(from: hotspot, to: hotspot).isEmpty)
         var shut = hotspot
         shut.lidClosed = true
@@ -268,8 +250,8 @@ struct RemoteAlertTests {
         #expect(RemoteAlert.pushed(from: status(), to: hot) == [.runningHot])
     }
 
-    @Test func silenceAlertsOnlyWhileASessionRan() {
-        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now) == [.unreachable])
+    @Test func missingReadingsCannotProduceSilenceAlerts() {
+        #expect(RemoteAlert.alerts(from: status(), to: nil, now: now).isEmpty)
         #expect(RemoteAlert.alerts(from: status(session: false), to: nil, now: now).isEmpty)
         #expect(RemoteAlert.alerts(from: .some(nil), to: nil, now: now).isEmpty)
         // Its timer ran out, so the Mac most likely slept before reporting the end.

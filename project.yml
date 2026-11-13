@@ -244,6 +244,21 @@ targets:
           CLOUDKIT_ENVIRONMENT: Production
           APS_ENVIRONMENT: production
 
+  BattisticsPhoneTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources: [Tests/BattisticsPhoneTests]
+    dependencies:
+      - target: BattisticsPhone
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.doguyilmaz.Battistics.Remote.Tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Battistics Remote.app/Battistics Remote
+        BUNDLE_LOADER: $(TEST_HOST)
+        TARGETED_DEVICE_FAMILY: "1"
+
   BattisticsPhoneWidgets:
     type: app-extension
     platform: iOS
@@ -316,6 +331,11 @@ schemes:
         BattisticsPhone: all
     run:
       config: Debug
+    test:
+      config: Debug
+      commandLineArguments:
+        "-demo": true
+      targets: [BattisticsPhoneTests]
   Battistics:
     build:
       targets:

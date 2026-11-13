@@ -81,9 +81,9 @@ enum WidgetBridge {
     }
 
     private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
-        // Asleep, silent, or finished: the lock-screen countdown has to leave.
-        // A fetch is what decides silence, so a missed push alone does not.
-        guard reading?.reachable == true, reading?.status?.sleptAt == nil,
+        // An old status makes the activity stale; it does not establish that
+        // the background task or Keep Awake ended.
+        guard reading?.status?.sleptAt == nil,
               let status = reading?.status, let session = status.session,
               session.isActive(at: .now) else {
             endActivities(of: mac.id)

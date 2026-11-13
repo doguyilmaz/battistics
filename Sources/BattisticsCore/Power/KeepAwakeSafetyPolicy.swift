@@ -70,6 +70,7 @@ public struct KeepAwakeSafetyPolicy: Sendable {
 
     private var batteryWarningSent = false
     private var thermalWarningSent = false
+    private var thermalRecoveredSince: Date?
     private var wasOnAdapter: Bool?
 
     public init() {}
@@ -97,7 +98,7 @@ public struct KeepAwakeSafetyPolicy: Sendable {
     }
 
     public mutating func evaluate(
-        snapshot: BatterySnapshot?, thermalPressure: Bool, configuration: Configuration
+        snapshot: BatterySnapshot?, thermalPressure: Bool, configuration: Configuration, now: Date = Date()
     ) -> [Event] {
         if let stop = Self.stopReason(
             snapshot: snapshot, thermalPressure: thermalPressure, configuration: configuration
@@ -120,12 +121,18 @@ public struct KeepAwakeSafetyPolicy: Sendable {
             }
         } else { wasOnAdapter = nil }
         if thermalPressure {
+            thermalRecoveredSince = nil
             if !thermalWarningSent {
                 thermalWarningSent = true
                 events.append(.thermalWarning)
             }
-        } else {
-            thermalWarningSent = false
+        } else if thermalWarningSent {
+            let since = thermalRecoveredSince ?? now
+            thermalRecoveredSince = since
+            if now.timeIntervalSince(since) >= 10 * 60 {
+                thermalWarningSent = false
+                thermalRecoveredSince = nil
+            }
         }
         return events
     }

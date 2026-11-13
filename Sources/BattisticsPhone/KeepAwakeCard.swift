@@ -137,7 +137,7 @@ struct KeepAwakeCard: View {
         if !reachable {
             Text(status.sleptAt != nil
                  ? String(localized: "Asleep. Controls return when the Mac wakes.")
-                 : String(localized: "Offline. Controls return when the Mac answers."))
+                 : String(localized: "Status out of date. Refresh to use controls."))
                 .foregroundStyle(.secondary)
         } else if let message {
             Label(message, systemImage: "exclamationmark.circle.fill")
