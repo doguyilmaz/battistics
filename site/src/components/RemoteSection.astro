@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import PhoneScreen from "./PhoneScreen.astro";
 import bagReady from "../assets/shots/phone-dashboard.png";
 import charging from "../assets/shots/phone-charging.png";
 import liveActivity from "../assets/shots/live-activity.png";
@@ -16,7 +17,20 @@ const features = [
   { icon: "icloud", title: "Through your own iCloud", text: "Every Mac on your Apple Account shows up by itself. Nothing to pair, no server, no account, and Siri knows the Mac too." },
 ];
 
-const statusBar = `<span class="time">9:41</span><i class="island"></i><span class="icons">${symbolHTML("cellularbars", 10)}${symbolHTML("wifi", 10)}${symbolHTML("battery.100percent", 11)}</span>`;
+const phones = [
+  {
+    id: "charging-phone", position: "back", image: charging,
+    alt: "Battistics Remote showing a MacBook Pro charging, its last day and Keep Awake",
+    caption: "A MacBook Pro charging, with its last day and Keep Awake ready to start.",
+    label: "Enlarge: MacBook Pro charging",
+  },
+  {
+    id: "bag-phone", position: "front", image: bagReady,
+    alt: "Battistics Remote showing a MacBook Air kept awake with the lid closed and Bag Ready",
+    caption: "A MacBook Air kept awake with its lid closed, online through the iPhone's Hotspot: Bag Ready.",
+    label: "Enlarge: MacBook Air in Bag mode",
+  },
+];
 ---
 
 <section class="remote" id="iphone" aria-labelledby="iphone-title">
@@ -57,18 +71,11 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     </ul>
 
     <div class="devices">
-      <div class="phone back" role="button" tabindex="0" data-zoom={charging.src} data-caption="A MacBook Pro charging, with its last day and Keep Awake ready to start." aria-label="Enlarge: MacBook Pro charging">
-        <div class="screen">
-          <div class="status" aria-hidden="true" set:html={statusBar} />
-          <Image src={charging} alt="Battistics Remote showing a MacBook Pro charging, its last day and Keep Awake" widths={[300, 600]} sizes="250px" />
+      {phones.map((phone) => (
+        <div class:list={["phone", phone.position]} role="button" tabindex="0" data-zoom={phone.image.src} data-caption={phone.caption} aria-label={phone.label}>
+          <PhoneScreen id={phone.id} src={phone.image} alt={phone.alt} />
         </div>
-      </div>
-      <div class="phone front" role="button" tabindex="0" data-zoom={bagReady.src} data-caption="A MacBook Air kept awake with its lid closed, online through the iPhone's Hotspot: Bag Ready." aria-label="Enlarge: MacBook Air in Bag mode">
-        <div class="screen">
-          <div class="status" aria-hidden="true" set:html={statusBar} />
-          <Image src={bagReady} alt="Battistics Remote showing a MacBook Air kept awake with the lid closed and Bag Ready" widths={[300, 600]} sizes="280px" />
-        </div>
-      </div>
+      ))}
       <div class="activity" role="button" tabindex="0" data-zoom={liveActivity.src} data-caption="The Live Activity on the Lock Screen: time left, the connection, 30 more minutes and Stop." aria-label="Enlarge: the Live Activity">
         <Image src={liveActivity} alt="The Lock Screen Live Activity: MacBook Air, lid closed, 1:04:43 remaining, with 30 min and Stop buttons" widths={[340, 680]} sizes="340px" />
       </div>
@@ -186,31 +193,8 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     box-shadow: inset 0 0 0 1px #6a6f73, inset 0 0 0 3px #101213, 0 40px 70px -30px rgb(10 30 20 / 0.55);
     cursor: zoom-in;
   }
-  /* Continue each cropped screenshot's top-edge colours into its status bar. */
-  .phone.front {
-    --status-background: linear-gradient(90deg, #504322 0%, #554723 12.5%, #5f4b24 25%, #674e27 37.5%, #6a4f29 50%, #684c28 62.5%, #624728 75%, #574127 87.5%, #533c27 100%);
-    top: 10px; right: 6%; width: 280px; z-index: 2;
-  }
-  .phone.back {
-    --status-background: linear-gradient(90deg, #254735 0%, #264c37 12.5%, #28543b 25%, #29593f 37.5%, #2a5c40 50%, #295a3e 62.5%, #29543b 75%, #264c37 87.5%, #264834 100%);
-    top: 60px; left: 4%; width: 240px; transform: rotate(-6deg); filter: brightness(0.92);
-  }
-  .screen { position: relative; overflow: hidden; border-radius: 41px; background: #000; aspect-ratio: 1170 / 2532; }
-  .screen :global(img) { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; }
-  .status {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: calc(130 / 2532 * 100%);
-    padding: 2% 9% 0 11%;
-    color: #fff;
-    background: var(--status-background);
-  }
-  .status :global(.time) { font: 600 12.5px/1 var(--text); letter-spacing: -0.01em; }
-  .status :global(.icons) { display: flex; align-items: center; gap: 4px; }
-  .status :global(.island) { position: absolute; left: 50%; top: 26%; translate: -50% 0; width: 32%; height: 58%; border-radius: 999px; background: #000; }
+  .phone.front { top: 10px; right: 6%; width: 280px; z-index: 2; }
+  .phone.back { top: 60px; left: 4%; width: 240px; transform: rotate(-6deg); filter: brightness(0.92); }
   .activity {
     position: absolute;
     z-index: 3;
@@ -234,6 +218,5 @@ const statusBar = `<span class="time">9:41</span><i class="island"></i><span cla
     .devices { height: 520px; }
     .phone.front { width: 230px; right: 2%; border-radius: 42px; padding: 8px; }
     .phone.back { width: 190px; left: 0; }
-    .screen { border-radius: 34px; }
   }
 </style>
