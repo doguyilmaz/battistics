@@ -239,7 +239,16 @@ public actor RemoteCloud {
             record["title"] = title
             record["body"] = body
             record["collapse"] = collapseID
-            _ = try await operations.modifyRecords(saving: [record], until: deadline)
+            do {
+                _ = try await operations.modifyRecords(saving: [record], until: deadline)
+            } catch let error as CKError where error.code == .serverRecordChanged {
+                // A previous save may have reached iCloud before its response
+                // was lost. Reusing this event must not create another push.
+                let saved = try await operations.record(record.recordID, until: deadline)
+                guard saved?["title"] as? String == title,
+                      saved?["body"] as? String == body,
+                      saved?["collapse"] as? String == collapseID else { throw error }
+            }
         }
     }
 

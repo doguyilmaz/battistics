@@ -1,6 +1,91 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Before a timed session ends, when Keep Awake ends unexpectedly, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, repeated checks find no new Mac status, or it charges to the level you pick." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before a timed session ends, when Keep Awake ends unexpectedly, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, repeated checks find no new Mac status, or it charges to the level you pick."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Süreli oturum bitmeden önce; Uyanık Tut beklenmedik biçimde sona erdiğinde, Mac ısındığında, pili azaldığında veya oturuma yetmediğinde, Kişisel Erişim Noktası olmadan kapak kapandığında, tekrarlanan kontrollerde Mac’ten yeni durum alınamadığında ya da seçtiğiniz şarj düzeyine ulaşıldığında bildirim gönderilir."
+          }
+        }
+      }
+    },
+    "Status out of date. Refresh to use controls." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status out of date. Refresh to use controls."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durum güncel değil. Denetimleri kullanmak için yenileyin."
+          }
+        }
+      }
+    },
+    "Status out of date" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status out of date"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durum güncel değil"
+          }
+        }
+      }
+    },
+    "The Mac’s status is out of date. Check Battistics on the Mac if you need its current status." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Mac’s status is out of date. Check Battistics on the Mac if you need its current status."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac’in durumu güncel değil. Güncel duruma ihtiyacınız varsa Mac’te Battistics’i kontrol edin."
+          }
+        }
+      }
+    },
+    "No update from the Mac since %@. Check Battistics on the Mac if you need its current status." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No update from the Mac since %@. Check Battistics on the Mac if you need its current status."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac’ten %@ saatinden beri güncelleme gelmedi. Güncel duruma ihtiyacınız varsa Mac’te Battistics’i kontrol edin."
+          }
+        }
+      }
+    },
     "· %lld cycles" : {
       "extractionState" : "manual",
       "localizations" : {

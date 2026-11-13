@@ -63,6 +63,14 @@ final class MacStore {
     @ObservationIgnored private var commandAnsweredAt: [String: Date] = [:]
     /// The Macs Siri and Spotlight last offered by name.
     @ObservationIgnored private var shortcutMacs: [Mac] = []
+    @ObservationIgnored private var alertStates: [String: RemoteAlertState] =
+        UserDefaults.standard.data(forKey: "remoteAlertStates").flatMap {
+            try? RemoteWire.decode([String: RemoteAlertState].self, from: $0)
+        } ?? [:]
+    @ObservationIgnored private var silenceStates: [String: RemoteSilenceState] =
+        UserDefaults.standard.data(forKey: "remoteSilenceStates").flatMap {
+            try? RemoteWire.decode([String: RemoteSilenceState].self, from: $0)
+        } ?? [:]
 
     private init() {
         readings = DemoData.isEnabled ? DemoData.readings : Self.savedReadings()
@@ -214,9 +222,11 @@ final class MacStore {
             slow.cancel()
             problem = nil
         } catch is CancellationError {
+            interruptSilenceConfirmation()
             return []
         } catch {
             guard !isSample else { return [] }
+            interruptSilenceConfirmation()
             problem = Self.describe(error)
             return []
         }
@@ -249,24 +259,36 @@ final class MacStore {
             readings[id] = reading
             let mac = Mac(id: id, name: status.machineName)
             let pushed = UserDefaults.standard.bool(forKey: Notifications.pushedKey)
-            let macAlerts = Notifications.latchCharge(
+            var state = alertStates[id] ?? RemoteAlertState()
+            var macAlerts = state.filter(Notifications.latchCharge(
                 // A Mac that said it is going to sleep is not silent.
                 RemoteAlert.alerts(from: previous, to: fresh || status.sleptAt != nil ? status : nil,
                                    chargeTarget: Notifications.chargeTarget),
-                macID: id, status: fresh ? status : nil)
-                .filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
+                macID: id, status: fresh ? status : nil), status: status)
+            alertStates[id] = state
+            macAlerts = macAlerts.filter { !pushed || !RemoteAlert.pushedKinds.contains($0.kind) }
+            var silence = silenceStates[id] ?? RemoteSilenceState()
+            if Notifications.isEnabled {
+                if silence.observe(status) { macAlerts.append(.unreachable) }
+            } else {
+                silence.interrupt()
+            }
+            silenceStates[id] = silence
             alerts.append((mac, macAlerts))
-            Notifications.syncWatchdog(for: mac, reading: reading)
+            await Notifications.syncReminders(for: mac, reading: reading)
         }
         // Its last readable status stays, but no longer as live.
         for id in snapshot.unreadable where readings[id] != nil {
             readings[id]?.reachable = false
+            silenceStates[id]?.interrupt()
         }
         // A Mac that stopped sharing is gone, not silent.
         for id in readings.keys where snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {
             if commandAnsweredAt[id].map({ $0 > snapshot.requestedAt }) == true { continue }
             readings[id] = nil
-            Notifications.syncWatchdog(for: Mac(id: id, name: ""), reading: nil)
+            alertStates[id] = nil
+            silenceStates[id] = nil
+            await Notifications.syncReminders(for: Mac(id: id, name: ""), reading: nil)
         }
         save()
         await WidgetBridge.settle()
@@ -283,6 +305,7 @@ final class MacStore {
     /// alert itself. Only turning the switch off removes it; a routine check
     /// never does, since another iPhone on the account may still want it.
     func syncAlertSubscription(removing: Bool = false) async {
+        if !Notifications.isEnabled { Notifications.cancelAll() }
         // Sample controls must not contact or change the real iCloud account.
         guard !isSample else { return }
         alertSubscriptionChecked = .now
@@ -309,7 +332,11 @@ final class MacStore {
                 UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
             }
         } catch {
-            UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
+            // A failed check does not establish that an accepted subscription
+            // disappeared. Switching to local alerts here can duplicate pushes.
+            if let error = error as? CKError, [.zoneNotFound, .userDeletedZone].contains(error.code) {
+                defaults.set(false, forKey: Notifications.pushedKey)
+            }
         }
     }
 
@@ -329,7 +356,9 @@ final class MacStore {
             return Self.describe(error)
         }
         readings[mac.id] = nil
-        Notifications.syncWatchdog(for: mac, reading: nil)
+        await Notifications.syncReminders(for: mac, reading: nil)
+        alertStates[mac.id] = nil
+        silenceStates[mac.id] = nil
         save()
         return nil
     }
@@ -393,7 +422,10 @@ final class MacStore {
             if readings[mac.id]?.status.map({ $0.readAt <= status.readAt }) ?? true {
                 let reading = Reading(status: status, reachable: status.isFresh())
                 readings[mac.id] = reading
-                Notifications.syncWatchdog(for: mac, reading: reading)
+                var silence = silenceStates[mac.id] ?? RemoteSilenceState()
+                _ = silence.observe(status)
+                silenceStates[mac.id] = silence
+                await Notifications.syncReminders(for: mac, reading: reading)
                 save()
             }
             return status.lastCommand?.failure.map(Self.message)
@@ -408,7 +440,18 @@ final class MacStore {
 
     private func save() {
         UserDefaults.standard.set(try? RemoteWire.encode(readings), forKey: "readings")
+        saveAlertStates()
         publishSelected()
+    }
+
+    private func saveAlertStates() {
+        UserDefaults.standard.set(try? RemoteWire.encode(alertStates), forKey: "remoteAlertStates")
+        UserDefaults.standard.set(try? RemoteWire.encode(silenceStates), forKey: "remoteSilenceStates")
+    }
+
+    private func interruptSilenceConfirmation() {
+        for id in silenceStates.keys { silenceStates[id]?.interrupt() }
+        saveAlertStates()
     }
 
     /// Hands the selected Mac to widgets, the Live Activity and quick actions.

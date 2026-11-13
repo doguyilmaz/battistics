@@ -3,8 +3,8 @@ import BattisticsRemote
 import UIKit
 import UserNotifications
 
-/// Local notifications from background refresh and a rolling local watchdog
-/// timer when Keep Awake is active: no third-party server, no cost.
+/// Notifications for observed events and known session deadlines. Missing
+/// background updates never schedule a speculative notification.
 enum Notifications {
     static let enabledKey = "notificationsEnabled"
     static var isEnabled: Bool { UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true }
@@ -37,13 +37,13 @@ enum Notifications {
     static let refreshTask = "com.doguyilmaz.Battistics.Remote.refresh"
     static let extendAction = "extend30"
     private static let endingCategory = "keepawake.ending"
-    private static let endingLead: TimeInterval = 5 * 60
 
     static func requestPermission() async {
         _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
     }
 
     static func register() {
+        Task { await removeLegacySilenceReminders() }
         let extend = UNNotificationAction(identifier: extendAction, title: String(localized: "Add 30 Minutes"))
         UNUserNotificationCenter.current().setNotificationCategories(AlertActions.categories.union([
             UNNotificationCategory(identifier: endingCategory, actions: [extend], intentIdentifiers: []),
@@ -71,19 +71,32 @@ enum Notifications {
     static func deliver(_ results: [(MacStore.Mac, [RemoteAlert])]) async {
         guard isEnabled else { return }
         let center = UNUserNotificationCenter.current()
-        let delivered = Set(await center.deliveredNotifications().map(\.request.identifier))
         for (mac, alerts) in results {
             for alert in alerts {
+                guard isEnabled else { return }
                 let id = "\(mac.id).\(alert.kind.rawValue)"
-                // The watchdog already said so under this identifier; adding it again sounds twice.
-                if alert == .unreachable, delivered.contains(id) { continue }
                 let content = UNMutableNotificationContent()
                 content.title = mac.name
-                content.body = alert.message
+                if alert == .unreachable {
+                    // A command or newer refresh may have resolved this while
+                    // widget/activity updates were being awaited.
+                    guard let status = MacStore.shared.reading(for: mac)?.status,
+                          !status.isFresh(), status.sleptAt == nil,
+                          status.session?.isActive(at: .now) == true,
+                          Date.now >= status.unheardDate else { continue }
+                    let lastSeen = status.readAt.formatted(date: .omitted, time: .shortened)
+                    content.body = String(localized: "No update from the Mac since \(lastSeen). Check Battistics on the Mac if you need its current status.")
+                } else {
+                    content.body = alert.message
+                }
                 content.sound = .default
                 content.threadIdentifier = mac.id
                 AlertActions.tag(content, macID: mac.id, kind: alert.kind, status: MacStore.shared.reading(for: mac)?.status)
                 try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
+                if !isEnabled {
+                    center.removePendingNotificationRequests(withIdentifiers: [id])
+                    center.removeDeliveredNotifications(withIdentifiers: [id])
+                }
             }
         }
     }
@@ -110,18 +123,12 @@ enum Notifications {
             .add(UNNotificationRequest(identifier: "nomac.command", content: content, trigger: nil))
     }
 
-    /// Maintains a rolling local notification while a Keep Awake session is
-    /// active, for a Mac that goes quiet while the app is suspended. Each
-    /// fresh reading pushes it forward and clears one already delivered; how
-    /// far ahead depends on how reliably pushes reach this phone right now.
+    /// Cleans obsolete reminders and maintains only the known session end.
     @MainActor
-    static func syncWatchdog(for mac: MacStore.Mac, reading: MacStore.Reading?) {
-        // Shares the `.unreachable` alert identifier, so a foreground refresh
-        // and the background timer replace each other instead of stacking.
+    static func syncReminders(for mac: MacStore.Mac, reading: MacStore.Reading?) async {
         let (id, quietID, endingID) = AlertActions.reminderIDs(macID: mac.id)
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id, quietID, endingID])
-        // A fetch settled whether the Mac answers, which the quiet note left open.
         center.removeDeliveredNotifications(withIdentifiers: [quietID])
 
         guard let reading, reading.reachable, reading.status?.session?.isActive(at: .now) == true else {
@@ -132,7 +139,7 @@ enum Notifications {
             }
             return
         }
-        // The Mac is answering again: an earlier "stopped answering" alert is now wrong.
+        // A fresh reading resolves an earlier missing-update notice.
         center.removeDeliveredNotifications(withIdentifiers: [id])
         // On Hotspot the lid and unplug warnings no longer apply.
         if reading.status?.network == .hotspot {
@@ -144,82 +151,44 @@ enum Notifications {
         }
 
         // Added time or a stop makes "ends in 5 minutes" wrong.
-        if reading.status?.session?.deadline.map({ $0.timeIntervalSinceNow > endingLead + 30 }) ?? true {
+        if reading.status?.session?.deadline.map({ $0.timeIntervalSinceNow > RemoteReminderPolicy.endingLead + 30 }) ?? true {
             center.removeDeliveredNotifications(withIdentifiers: [endingID])
         }
 
         guard isEnabled,
               let status = reading.status,
-              let session = status.session else {
+              let fireAt = RemoteReminderPolicy.endingDate(for: status) else {
             return
         }
 
-        if let deadline = session.deadline, deadline.timeIntervalSinceNow - endingLead > 1 {
-            let content = UNMutableNotificationContent()
-            content.title = mac.name
-            content.body = String(localized: "Keep Awake ends in 5 minutes.")
-            content.sound = .default
-            content.threadIdentifier = mac.id
-            content.categoryIdentifier = endingCategory
-            content.userInfo = ["macID": mac.id]
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: deadline.timeIntervalSinceNow - endingLead,
-                                                            repeats: false)
-            center.add(UNNotificationRequest(identifier: endingID, content: content, trigger: trigger))
-        }
-
-        let fireAt = status.readAt.addingTimeInterval(DeliveryCadence.watchdogDelay(for: status))
-        if let deadline = session.deadline, deadline <= fireAt { return }
-        guard fireAt.timeIntervalSinceNow > 1 else { return }
-        let delay = fireAt.timeIntervalSinceNow
-
-        let lastSeen = status.readAt.formatted(date: .omitted, time: .shortened)
         let content = UNMutableNotificationContent()
         content.title = mac.name
-        if status.network == .hotspot {
-            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. It may be out of Personal Hotspot range.")
-        } else if session.mode == .lidClosed || status.battery?.onAdapter == false {
-            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. If it left Wi‑Fi, turn on Personal Hotspot so it can reconnect.")
-        } else {
-            content.body = String(localized: "No word from the Mac since \(lastSeen) during Keep Awake. Open Battistics to check it.")
-        }
+        content.body = String(localized: "Keep Awake ends in 5 minutes.")
         content.sound = .default
         content.threadIdentifier = mac.id
-
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
-        center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
-
-        // While pushes arrive too unevenly to warn early, a silent note in
-        // Notification Center says only that no update came.
-        let quietDelay = status.readAt.addingTimeInterval(status.quietDelay).timeIntervalSinceNow
-        guard quietDelay < delay - 60 else { return }
-        let quiet = UNMutableNotificationContent()
-        quiet.title = mac.name
-        quiet.body = String(localized: "Last update at \(lastSeen). iOS sometimes holds updates back, so this may be nothing. You get an alert if the Mac stays silent.")
-        quiet.interruptionLevel = .passive
-        quiet.threadIdentifier = mac.id
-        let quietTrigger = UNTimeIntervalNotificationTrigger(timeInterval: max(60, quietDelay), repeats: false)
-        center.add(UNNotificationRequest(identifier: quietID, content: quiet, trigger: quietTrigger))
-    }
-}
-
-/// Remembers when background pushes actually reached this phone, for
-/// `RemoteStatus.watchdogDelay`.
-enum DeliveryCadence {
-    private static let key = "backgroundDeliveries"
-    private static let window: TimeInterval = 90 * 60
-
-    /// Called for every background wake that fetched the Mac's status.
-    static func recordBackgroundDelivery(at date: Date = .now) {
-        let recent = deliveries().filter { date.timeIntervalSince($0) < window }
-        UserDefaults.standard.set((recent + [date]).suffix(16).map(\.timeIntervalSince1970), forKey: key)
+        content.categoryIdentifier = endingCategory
+        content.userInfo = ["macID": mac.id]
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: fireAt.timeIntervalSinceNow, repeats: false)
+        try? await center.add(UNNotificationRequest(identifier: endingID, content: content, trigger: trigger))
+        // The switch may have changed while the notification was added.
+        if !isEnabled { center.removePendingNotificationRequests(withIdentifiers: [endingID]) }
     }
 
-    static func watchdogDelay(for status: RemoteStatus, now: Date = .now) -> TimeInterval {
-        status.watchdogDelay(backgroundDeliveries: deliveries().filter { now.timeIntervalSince($0) < window }, now: now)
+    /// Runs immediately on switch-off, including when iCloud is unavailable.
+    static func cancelAll() {
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+        center.removeAllDeliveredNotifications()
     }
 
-    private static func deliveries() -> [Date] {
-        (UserDefaults.standard.array(forKey: key) as? [Double] ?? []).map(Date.init(timeIntervalSince1970:))
+    /// Upgrade cleanup also covers Macs no longer present in this app's cache.
+    static func removeLegacySilenceReminders() async {
+        let center = UNUserNotificationCenter.current()
+        let pending = await center.pendingNotificationRequests().map(\.identifier)
+        center.removePendingNotificationRequests(withIdentifiers: pending.filter { $0.hasSuffix(".silent") || $0.hasSuffix(".quiet") })
+        let delivered = await center.deliveredNotifications().map(\.request.identifier)
+        center.removeDeliveredNotifications(withIdentifiers: delivered.filter { $0.hasSuffix(".silent") || $0.hasSuffix(".quiet") })
+        UserDefaults.standard.removeObject(forKey: "backgroundDeliveries")
     }
 }
 
@@ -246,7 +215,7 @@ private extension RemoteAlert {
         case .chargeReached(let percent):
             String(localized: "Charged to \(percent.percentText). You can unplug it.")
         case .unreachable:
-            String(localized: "Stopped answering while Keep Awake was on. Connect to Personal Hotspot or check Wi‑Fi if a task is running.")
+            String(localized: "The Mac’s status is out of date. Check Battistics on the Mac if you need its current status.")
         }
     }
 }

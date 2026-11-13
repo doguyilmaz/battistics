@@ -12,8 +12,8 @@ enum AlertActions {
         return [UNNotificationCategory(identifier: stopCategory, actions: [stop], intentIdentifiers: [])]
     }
 
-    /// What the app schedules ahead for a Mac during a session: the warning
-    /// that it went quiet, the quiet note before it, and "ends in 5 minutes".
+    /// Legacy silence identifiers remain here for upgrade cleanup; only
+    /// the known "ends in 5 minutes" reminder is still scheduled.
     static func reminderIDs(macID: String) -> (silent: String, quiet: String, ending: String) {
         ("\(macID).\(RemoteAlert.Kind.silent.rawValue)", "\(macID).quiet", "\(macID).ending")
     }

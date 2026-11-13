@@ -98,10 +98,14 @@ struct KeepAwakeSafetyTests {
 
     @Test func thermalWarningRearmsAfterRecoveryAndOptionalStopWorksOnAC() {
         var policy = KeepAwakeSafetyPolicy()
-        #expect(policy.evaluate(snapshot: battery(100, ac: true), thermalPressure: true, configuration: .init()) == [.thermalWarning])
-        #expect(policy.evaluate(snapshot: nil, thermalPressure: true, configuration: .init()).isEmpty)
-        #expect(policy.evaluate(snapshot: nil, thermalPressure: false, configuration: .init()).isEmpty)
-        #expect(policy.evaluate(snapshot: nil, thermalPressure: true, configuration: .init()) == [.thermalWarning])
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        #expect(policy.evaluate(snapshot: battery(100, ac: true), thermalPressure: true, configuration: .init(), now: now) == [.thermalWarning])
+        #expect(policy.evaluate(snapshot: nil, thermalPressure: false, configuration: .init(), now: now.addingTimeInterval(60)).isEmpty)
+        #expect(policy.evaluate(snapshot: nil, thermalPressure: true, configuration: .init(), now: now.addingTimeInterval(120)).isEmpty)
+        for seconds in stride(from: 180.0, through: 780, by: 60) {
+            #expect(policy.evaluate(snapshot: nil, thermalPressure: false, configuration: .init(), now: now.addingTimeInterval(seconds)).isEmpty)
+        }
+        #expect(policy.evaluate(snapshot: nil, thermalPressure: true, configuration: .init(), now: now.addingTimeInterval(840)) == [.thermalWarning])
         #expect(policy.evaluate(snapshot: battery(100, ac: true), thermalPressure: true,
                                configuration: .init(stopOnThermalPressure: true)) == [.thermalStop])
     }

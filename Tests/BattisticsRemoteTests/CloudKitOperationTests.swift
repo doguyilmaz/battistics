@@ -5,6 +5,47 @@ import Testing
 
 @Suite("CloudKit operation boundary")
 struct CloudKitOperationTests {
+    @Test func retryingAnUncertainEventSaveDoesNotCreateAnotherPush() async throws {
+        let stored = CloudKitBuffer<CKRecord?>(nil)
+        let creations = CloudKitBuffer(0)
+        let writes = CloudKitBuffer<[String]>([])
+        let cloud = RemoteCloud(operations: .init { operation in
+            if let zone = operation as? CKModifyRecordZonesOperation {
+                zone.modifyRecordZonesResultBlock?(.success(()))
+            } else if let subscription = operation as? CKModifySubscriptionsOperation {
+                subscription.modifySubscriptionsResultBlock?(.success(()))
+            } else if let write = operation as? CKModifyRecordsOperation {
+                for record in write.recordsToSave ?? [] {
+                    writes.update { $0.append(record.recordID.recordName) }
+                    let error: CKError
+                    if stored.read() == nil {
+                        stored.update { $0 = record }
+                        creations.update { $0 += 1 }
+                        error = CKError(.networkFailure)
+                    } else {
+                        error = CKError(.serverRecordChanged)
+                    }
+                    write.perRecordSaveBlock?(record.recordID, .failure(error))
+                }
+                write.modifyRecordsResultBlock?(.failure(CKError(.partialFailure)))
+            } else if let read = operation as? CKFetchRecordsOperation, let record = stored.read() {
+                read.perRecordResultBlock?(record.recordID, .success(record))
+                read.fetchRecordsResultBlock?(.success(()))
+            } else {
+                Issue.record("Unexpected event operation: \(operation)")
+            }
+        })
+        await #expect(throws: CKError.self) {
+            try await cloud.post("one-event", title: "Hot", body: "Check the Mac", collapseID: "mac.hot")
+        }
+        try await cloud.post("one-event", title: "Hot", body: "Check the Mac", collapseID: "mac.hot")
+        #expect(creations.read() == 1)
+        #expect(writes.read() == ["one-event", "one-event"])
+        await #expect(throws: CKError.self) {
+            try await cloud.post("one-event", title: "Different", body: "Check the Mac", collapseID: "mac.hot")
+        }
+    }
+
     private static func statusRecord(_ name: String, _ status: RemoteStatus? = RemoteStatus(machineName: "Mac", readAt: .now)) -> CKRecord {
         let record = CKRecord(recordType: RemoteCloud.statusType, recordID: .init(recordName: name, zoneID: RemoteCloud.zoneID))
         if let status { record.encryptedValues["payload"] = try! RemoteWire.encode(status) }

@@ -15,6 +15,7 @@ struct SettingsView: View {
                 Section {
                     Toggle("Notifications", isOn: $notify)
                         .onChange(of: notify) {
+                            if !notify { Notifications.cancelAll() }
                             if notify { Task { await Notifications.requestPermission(); await readPermission() } }
                             Task { await MacStore.shared.syncAlertSubscription(removing: !notify) }
                         }
@@ -36,7 +37,7 @@ struct SettingsView: View {
                     }
                 } footer: {
                     if notify {
-                        Text("Before and when Keep Awake ends, when the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, the Mac stops answering, or it charges to the level you pick.")
+                        Text("Before a timed session ends, when Keep Awake ends unexpectedly, the Mac runs hot, its battery runs low or will not last the session, the lid closes away from Hotspot, repeated checks find no new Mac status, or it charges to the level you pick.")
                     } else {
                         // iCloud alert subscriptions belong to the account, not to one iPhone.
                         Text("The Mac’s own alerts still arrive here while another iPhone on your Apple Account has them on. To silence this iPhone, turn them off in Settings › Notifications.")
