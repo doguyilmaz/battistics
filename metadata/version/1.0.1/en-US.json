@@ -1,8 +1,8 @@
 {
   "description": "Battistics Remote is the iPhone companion to Battistics, the free Mac app. It needs a Mac running Battistics, signed in to iCloud with the same Apple Account.\n\nSee your Macs at a glance: charge, time left, power, battery health, heat and whether the lid is closed. Start Keep Awake for a set time or until you turn it off, add time, or stop it.\n\n- Home Screen and Lock Screen widgets, including one for every Mac\n- A Lock Screen and Dynamic Island countdown with Add Time and Stop\n- A Control Center and Action Button control\n- Siri and Shortcuts actions that can name the Mac they act on\n- Alerts when a session ends, the battery runs low, the Mac runs hot or it charges to a level you pick\n\nEverything goes through your private iCloud database. Nothing reaches the developer, and there is nothing to pair.\n\nTo look around before you set up a Mac, tap Try a Sample Mac on the first screen.",
   "keywords": "mac,macbook,battery,keep awake,caffeinate,charge,widget,lock screen,sleep,battery health",
-  "marketingUrl": "https://battistics.apps.doguyilmaz.com",
+  "marketingUrl": "https://battistics.doguyilmaz.com",
   "promotionalText": "See your Mac's battery and keep it awake from your iPhone, through your own iCloud. No account, no server.",
-  "supportUrl": "https://battistics.apps.doguyilmaz.com",
+  "supportUrl": "https://battistics.doguyilmaz.com",
   "whatsNew": "Keep Awake stays quiet while your Mac is working. Delayed background updates no longer trigger premature “no word from the Mac” alerts.\n\nFixed\n- Fewer repeated battery, heat and connection warnings during the same session.\n- The Lock Screen activity stays visible when a status update is delayed, with a clear indication of when the Mac last updated.\n- Turning notifications off clears previously scheduled alerts immediately.\n- Normal task completion and healthy connection changes no longer interrupt you.\n\nBattery and heat protections remain active. Update Battistics on your Mac too for the complete notification improvements."
 }

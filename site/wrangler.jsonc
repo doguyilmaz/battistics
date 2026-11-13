@@ -3,6 +3,10 @@
   "name": "battistics-site",
   "compatibility_date": "2026-10-20",
   "assets": { "directory": "./dist", "not_found_handling": "404-page" },
-  // Cloudflare creates the DNS record and certificate for this itself.
-  "routes": [{ "pattern": "battistics.apps.doguyilmaz.com", "custom_domain": true }]
+  // Keep both bindings: Cloudflare provides DNS/TLS for the legacy redirect too.
+  // The zone redirect rules are documented in ../docs/hosting.md.
+  "routes": [
+    { "pattern": "battistics.doguyilmaz.com", "custom_domain": true },
+    { "pattern": "battistics.apps.doguyilmaz.com", "custom_domain": true }
+  ]
 }

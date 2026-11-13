@@ -7,7 +7,7 @@ struct SetupGuide: View {
     @Environment(LocalPhoneMonitor.self) private var phone
     @Environment(\.dismiss) private var dismiss
 
-    private static let download = URL(string: "https://battistics.apps.doguyilmaz.com/#download")!
+    private static let download = URL(string: "https://battistics.doguyilmaz.com#download")!
 
     var body: some View {
         DashboardPage(refresh: { await store.refreshAll() }) {

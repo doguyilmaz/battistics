@@ -4,8 +4,8 @@
 
 - Name: Battistics Remote. Bundle ID: `com.doguyilmaz.Battistics.Remote`.
 - Category: Utilities. Age rating: 4+.
-- Privacy Policy URL: https://www.doguyilmaz.com/legal/privacy/battistics
-- Support URL: https://battistics.apps.doguyilmaz.com
+- Privacy Policy URL: https://battistics.doguyilmaz.com/docs/privacy/
+- Support URL: https://battistics.doguyilmaz.com
 - Contact email: battistics@doguyilmaz.com
 - Listing: https://apps.apple.com/app/id6827062128
 - App Privacy: Data Not Collected. The app reads its Mac through the user's
@@ -21,7 +21,7 @@ countdown, the Control Center control and the Shortcuts actions.
 ## Review notes
 
 > Battistics Remote is the companion to Battistics, a free Mac app
-> (https://battistics.apps.doguyilmaz.com). It shows a Mac's battery and
+> (https://battistics.doguyilmaz.com). It shows a Mac's battery and
 > controls Keep Awake through the user's private iCloud database, so it needs
 > a Mac signed in to the same Apple Account.
 >

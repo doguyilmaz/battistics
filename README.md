@@ -7,7 +7,7 @@
 <p align="center">Battery statistics for the Mac. Free, open source, native.<br>
 macOS 14+ · Apple Silicon</p>
 
-<p align="center"><a href="https://battistics.apps.doguyilmaz.com"><b>battistics.apps.doguyilmaz.com</b></a> · <a href="https://battistics.apps.doguyilmaz.com/docs/">Documentation</a></p>
+<p align="center"><a href="https://battistics.doguyilmaz.com"><b>battistics.doguyilmaz.com</b></a> · <a href="https://battistics.doguyilmaz.com/docs/">Documentation</a></p>
 
 ![Dashboard](docs/overview.png)
 
@@ -79,7 +79,7 @@ Screen countdown and a Control Center control come with it. Turn on
 **iPhone** in Battistics; any iPhone on the same Apple Account finds the Mac through
 your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
 to join hotspots automatically uses the iPhone's hotspot. See
-[remote companion](docs/remote.md) and the [iPhone guide](https://battistics.apps.doguyilmaz.com/docs/iphone/).
+[remote companion](docs/remote.md) and the [iPhone guide](https://battistics.doguyilmaz.com/docs/iphone/).
 
 ## Light by design
 
@@ -91,13 +91,16 @@ Uses power-change notifications with a low-frequency battery refresh fallback. D
 brew install --cask doguyilmaz/tap/battistics
 ```
 
-Or download the DMG from [the website](https://battistics.apps.doguyilmaz.com/#download) or [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications.
+Or download the DMG from [the website](https://battistics.doguyilmaz.com#download) or [Releases](https://github.com/doguyilmaz/battistics/releases) and drag Battistics to Applications.
 
 Either way updates arrive in-app: Battistics updates itself, so Homebrew is told to leave it alone once installed.
 
 ## Website
 
 The site and its documentation live in `site/` (Astro and Starlight, built with Bun). Cloudflare Workers Builds deploys it whenever `site/` changes on `main`; app changes never trigger it, and site changes never trigger CI or a release. Run it locally with `cd site && bun install && bun run dev`.
+
+See [hosting and email](docs/hosting.md) for domain redirects and deployment.
+For support, email [battistics@doguyilmaz.com](mailto:battistics@doguyilmaz.com).
 
 ## Build
 
@@ -119,6 +122,7 @@ to try it in Simulator with sample Macs.
 Runs entirely on your Mac. The only network request is the optional update
 check. Sharing with your iPhone is off by default; when on, the Mac's status
 goes through your private iCloud, encrypted, and no port is opened.
+Read the [privacy policy](https://battistics.doguyilmaz.com/docs/privacy/) for both apps.
 
 ## License
 
