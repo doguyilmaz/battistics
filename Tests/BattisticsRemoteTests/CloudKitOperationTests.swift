@@ -52,9 +52,10 @@ struct CloudKitOperationTests {
         return record
     }
 
-    /// Answers a status query with these records and accepts subscription saves.
+    /// Answers discovery and direct reads, optionally simulating a lagging index.
     private static func answering(_ records: [Result<CKRecord, Error>], queries: CloudKitBuffer<Int>? = nil,
-                                  failing error: Error? = nil) -> @Sendable (CKDatabaseOperation) -> Void {
+                                  current: [CKRecord]? = nil, reads: CloudKitBuffer<Int>? = nil,
+                                  readError: Error? = nil, failing error: Error? = nil) -> @Sendable (CKDatabaseOperation) -> Void {
         { operation in
             if let query = operation as? CKQueryOperation {
                 queries?.update { $0 += 1 }
@@ -66,19 +67,64 @@ struct CloudKitOperationTests {
                     query.recordMatchedBlock?(id, record)
                 }
                 query.queryResultBlock?(.success(nil))
+            } else if let read = operation as? CKFetchRecordsOperation {
+                reads?.update { $0 += 1 }
+                if let readError { read.fetchRecordsResultBlock?(.failure(readError)); return }
+                let available = current ?? records.compactMap { try? $0.get() }
+                for id in read.recordIDs ?? [] {
+                    if let record = available.first(where: { $0.recordID == id }) {
+                        read.perRecordResultBlock?(id, .success(record))
+                    } else {
+                        read.perRecordResultBlock?(id, .failure(CKError(.unknownItem)))
+                    }
+                }
+                read.fetchRecordsResultBlock?(.success(()))
             } else if let subscription = operation as? CKModifySubscriptionsOperation {
                 subscription.modifySubscriptionsResultBlock?(.success(()))
-            } else { Issue.record("Discovery must be one query, not \(operation)") }
+            } else { Issue.record("Discovery must not set up or replay the zone: \(operation)") }
         }
     }
 
-    @Test func discoveryIsOneQueryWithoutZoneSetupOrHistory() async throws {
+    @Test func discoveryReadsCurrentRecordsWithoutZoneSetupOrHistory() async throws {
         let queries = CloudKitBuffer(0)
-        let cloud = RemoteCloud(operations: .init(submit: Self.answering([.success(Self.statusRecord("mac"))], queries: queries)))
+        let reads = CloudKitBuffer(0)
+        let cloud = RemoteCloud(operations: .init(submit: Self.answering(
+            [.success(Self.statusRecord("mac"))], queries: queries, reads: reads)))
         let snapshot = try await cloud.fetch()
         _ = try await cloud.fetch()
         #expect(snapshot.statuses["mac"]?.machineName == "Mac")
         #expect(queries.read() == 2)
+        #expect(reads.read() == 2)
+    }
+
+    @Test func aLaggingQueryCannotKeepAnOldReadingOnThePhone() async throws {
+        let old = RemoteStatus(machineName: "Mac", readAt: .now.addingTimeInterval(-3 * 3600))
+        let fresh = RemoteStatus(machineName: "Mac", readAt: Date(timeIntervalSince1970: floor(Date.now.timeIntervalSince1970)))
+        let cloud = RemoteCloud(operations: .init(submit: Self.answering(
+            [.success(Self.statusRecord("mac", old))], current: [Self.statusRecord("mac", fresh)])))
+        let snapshot = try await cloud.fetch()
+        #expect(snapshot.statuses["mac"]?.readAt == fresh.readAt)
+        #expect(snapshot.statuses["mac"]?.isFresh() == true)
+    }
+
+    @Test func aKnownMacMissingFromTheIndexIsStillRead() async throws {
+        let fresh = RemoteStatus(machineName: "Mac", readAt: Date(timeIntervalSince1970: floor(Date.now.timeIntervalSince1970)))
+        let cloud = RemoteCloud(operations: .init(submit: Self.answering([], current: [Self.statusRecord("mac", fresh)])))
+        let snapshot = try await cloud.fetch(knownMacIDs: ["mac"])
+        #expect(snapshot.statuses["mac"]?.readAt == fresh.readAt)
+    }
+
+    @Test func aDeletedRecordStillInTheIndexDoesNotResurrectTheMac() async throws {
+        let cloud = RemoteCloud(operations: .init(submit: Self.answering([.success(Self.statusRecord("mac"))], current: [])))
+        let snapshot = try await cloud.fetch(knownMacIDs: ["mac"])
+        #expect(snapshot.statuses.isEmpty)
+        #expect(snapshot.unreadable.isEmpty)
+    }
+
+    @Test func aFailedDirectReadDoesNotFallBackToTheIndexedStatus() async {
+        let cloud = RemoteCloud(operations: .init(submit: Self.answering(
+            [.success(Self.statusRecord("mac"))], readError: CKError(.networkFailure))))
+        await #expect(throws: CKError.self) { try await cloud.fetch(knownMacIDs: ["mac"]) }
     }
 
     @Test func aZoneNoMacCreatedYetMeansNoMacs() async throws {

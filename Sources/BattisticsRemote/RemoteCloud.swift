@@ -3,9 +3,8 @@ import Foundation
 
 /// The iCloud side of the companion: one private zone holding a status record
 /// and a command slot per Mac. Payloads live in encrypted fields, so only the
-/// account's own devices can read them. Reads ask for records as they are now,
-/// by query or by name, so first contact costs one request however long the
-/// account has used Battistics.
+/// account's own devices can read them. Discovery supplies record IDs; direct
+/// reads supply current values without replaying the account's history.
 public actor RemoteCloud {
     public static let containerID = "iCloud.com.doguyilmaz.Battistics"
     static let zoneID = CKRecordZone.ID(zoneName: "Remote")
@@ -101,14 +100,20 @@ public actor RemoteCloud {
         }
     }
 
-    /// Every sharing Mac, for the phone. A zone no Mac has created yet means
-    /// no Mac shares, so reading never waits for zone setup.
-    public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
+    /// The query discovers IDs; direct reads get current values because the
+    /// query index can lag writes and deletions. Known Macs are read even if
+    /// the index temporarily omits them. Reading never creates the zone.
+    public func fetch(knownMacIDs: [String] = [],
+                      until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
         try await attempt {
             var snapshot = Snapshot()
             let records: [CKRecord]
             do {
-                records = try await operations.query(Self.statusType, until: deadline)
+                let discovered = try await operations.query(Self.statusType, until: deadline)
+                let ids = Set(discovered.map(\.recordID)).union(knownMacIDs.map {
+                    CKRecord.ID(recordName: $0, zoneID: Self.zoneID)
+                })
+                records = ids.isEmpty ? [] : Array(try await operations.records(Array(ids), until: deadline).values)
             } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
                 return snapshot
             }

@@ -6,6 +6,84 @@ import XCTest
 
 final class NotificationsTests: XCTestCase {
     @MainActor
+    func testQueuedStopAndRestartKeepsTheNewActivity() async throws {
+        let now = Date()
+        let mac = MacStore.Mac(id: "activity-restart-test", name: "Test Mac")
+        var status = RemoteStatus(machineName: mac.name, readAt: now,
+                                  session: .init(mode: .displayMaySleep, origin: .phone,
+                                                 startedAt: now.addingTimeInterval(-3600), deadline: nil),
+                                  heartbeatSeconds: RemoteStatus.sessionHeartbeat)
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        await WidgetBridge.settle()
+        let original = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id })
+
+        status.session = nil
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        status.readAt = now.addingTimeInterval(1)
+        status.session = .init(mode: .displayOn, origin: .phone, startedAt: now, deadline: nil)
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        status.readAt = now.addingTimeInterval(2)
+        status.session?.deadline = now.addingTimeInterval(3600)
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        await WidgetBridge.settle()
+
+        let activities = Activity<KeepAwakeActivityAttributes>.activities.filter { $0.attributes.macID == mac.id }
+        XCTAssertEqual(activities.count, 1)
+        let restarted = try XCTUnwrap(activities.first)
+        let content = try await Self.content(of: restarted.id, updatedAt: status.readAt)
+        XCTAssertNotEqual(restarted.id, original.id)
+        XCTAssertEqual(content.startedAt, now)
+        XCTAssertEqual(content.lastUpdate, status.readAt)
+        XCTAssertEqual(content.deadline, status.session?.deadline)
+
+        WidgetBridge.syncActivities([], confirmed: true)
+        await WidgetBridge.settle()
+    }
+
+    @MainActor
+    func testAnEndedActivityIsReplacedForAnOngoingSession() async throws {
+        let now = Date()
+        let mac = MacStore.Mac(id: "activity-ended-test", name: "Test Mac")
+        let status = RemoteStatus(machineName: mac.name, readAt: now,
+                                  session: .init(mode: .displayMaySleep, origin: .phone,
+                                                 startedAt: now.addingTimeInterval(-9 * 3600), deadline: nil),
+                                  heartbeatSeconds: RemoteStatus.sessionHeartbeat)
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        await WidgetBridge.settle()
+        let original = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id })
+        await Self.endRetainingActivity(original.id, until: now.addingTimeInterval(3600))
+        XCTAssertEqual(original.activityState, .ended)
+
+        WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
+        await WidgetBridge.settle()
+        let replacement = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first {
+            $0.attributes.macID == mac.id && ($0.activityState == .active || $0.activityState == .stale)
+        })
+        XCTAssertNotEqual(replacement.id, original.id)
+        XCTAssertEqual(replacement.content.state.startedAt, status.session?.startedAt)
+
+        WidgetBridge.syncActivities([], confirmed: true)
+        await WidgetBridge.settle()
+    }
+
+    private nonisolated static func endRetainingActivity(_ id: String, until date: Date) async {
+        await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?
+            .end(nil, dismissalPolicy: .after(date))
+    }
+
+    /// ActivityKit propagates updates asynchronously, even after update returns.
+    private nonisolated static func content(of id: String, updatedAt date: Date) async throws -> KeepAwakeActivityAttributes.ContentState {
+        try await RemoteDeadline.perform(until: .now.advanced(by: .seconds(5))) {
+            let activity = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id })
+            if activity.content.state.lastUpdate >= date { return activity.content.state }
+            for await content in activity.contentUpdates where content.state.lastUpdate >= date {
+                return content.state
+            }
+            throw CancellationError()
+        }
+    }
+
+    @MainActor
     func testOldTelemetryKeepsAStaleActivityUntilAnExplicitEnd() async throws {
         let now = Date()
         let mac = MacStore.Mac(id: "stale-activity-test", name: "Test Mac")

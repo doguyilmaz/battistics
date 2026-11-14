@@ -218,7 +218,7 @@ final class MacStore {
         }
         defer { slow.cancel(); waitingForUpdate = false }
         do {
-            snapshot = try await cloud.fetch(until: deadline)
+            snapshot = try await cloud.fetch(knownMacIDs: Array(readings.keys), until: deadline)
             slow.cancel()
             problem = nil
         } catch is CancellationError {

@@ -43,17 +43,27 @@ enum WidgetBridge {
     /// `confirmed` is false before this launch's first read, when a saved
     /// reading too old to be live says nothing about the Mac.
     static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) {
+        // Reconcile in publication order, including lookup and creation. A
+        // queued end must finish before a new session chooses its activity.
+        let previous = changes.last
+        changes.append(Task {
+            await previous?.value
+            await reconcileActivities(macs, confirmed: confirmed)
+        })
+    }
+
+    private static func reconcileActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) async {
         let ids = Set(macs.map(\.mac.id))
         // A Mac that stopped sharing takes its countdown with it.
         for activity in Activity<KeepAwakeActivityAttributes>.activities
         where confirmed && !ids.contains(activity.attributes.macID) {
             let id = activity.id
-            changes.append(Task { await end(id) })
+            await end(id)
         }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         for (mac, reading) in macs {
             if !confirmed, reading?.reachable != true { continue }
-            syncActivity(mac, reading: reading)
+            await syncActivity(mac, reading: reading)
         }
     }
 
@@ -80,16 +90,18 @@ enum WidgetBridge {
         lastReload = .now
     }
 
-    private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
+    private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) async {
         // An old status makes the activity stale; it does not establish that
         // the background task or Keep Awake ended.
         guard reading?.status?.sleptAt == nil,
               let status = reading?.status, let session = status.session,
               session.isActive(at: .now) else {
-            endActivities(of: mac.id)
+            await endActivities(of: mac.id)
             return
         }
-        let existing = Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id }
+        let existing = Activity<KeepAwakeActivityAttributes>.activities.first {
+            $0.attributes.macID == mac.id && ($0.activityState == .active || $0.activityState == .stale)
+        }
 
         let state = KeepAwakeActivityAttributes.ContentState(
             mode: session.mode,
@@ -110,18 +122,18 @@ enum WidgetBridge {
         let content = ActivityContent(state: state, staleDate: status.unheardDate)
         if let activity = existing {
             let id = activity.id
-            if activity.content.state != state { changes.append(Task { await update(id, content) }) }
-            endActivities(of: mac.id, except: id)
-        } else {
-            _ = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
+            if activity.content.state != state { await update(id, content) }
+            await endActivities(of: mac.id, except: id)
+        } else if let activity = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content) {
+            await endActivities(of: mac.id, except: activity.id)
         }
     }
 
-    private static func endActivities(of macID: String, except kept: String? = nil) {
+    private static func endActivities(of macID: String, except kept: String? = nil) async {
         for activity in Activity<KeepAwakeActivityAttributes>.activities
         where activity.attributes.macID == macID && activity.id != kept {
             let id = activity.id
-            changes.append(Task { await end(id) })
+            await end(id)
         }
     }
 
