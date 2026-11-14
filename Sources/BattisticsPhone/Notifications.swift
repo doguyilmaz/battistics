@@ -2,10 +2,13 @@ import BackgroundTasks
 import BattisticsRemote
 import UIKit
 import UserNotifications
+import os
 
 /// Notifications for observed events and known session deadlines. Missing
 /// background updates never schedule a speculative notification.
 enum Notifications {
+    private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "PhoneUpdates")
+
     static let enabledKey = "notificationsEnabled"
     static var isEnabled: Bool { UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true }
     /// Whether iCloud shows the Mac's own alerts on this phone, so the app does not repeat them.
@@ -53,9 +56,12 @@ enum Notifications {
             nonisolated(unsafe) let refresh = task
             schedule()
             let work = Task { @MainActor in
+                let started = ContinuousClock.now
+                logger.info("Background refresh started")
                 LocalPhoneMonitor.shared.refresh()
-                _ = await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
-                refresh.setTaskCompleted(success: !Task.isCancelled)
+                let result = await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
+                logger.info("Background refresh finished in \(String(describing: started.duration(to: .now)), privacy: .public); result \(result.rawValue), cancelled \(Task.isCancelled)")
+                refresh.setTaskCompleted(success: result != .failed && !Task.isCancelled)
             }
             refresh.expirationHandler = { work.cancel() }
         }

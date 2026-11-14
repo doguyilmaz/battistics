@@ -2,6 +2,7 @@ import BattisticsRemote
 import SwiftUI
 import UIKit
 import UserNotifications
+import os
 
 @main
 struct PhoneApp: App {
@@ -31,6 +32,8 @@ struct PhoneApp: App {
 
 /// iCloud wakes the app with a silent push when a Mac's record changes.
 final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "PhoneUpdates")
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -40,6 +43,15 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
             Task { await MacStore.shared.syncAlertSubscription() }
         }
         return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Self.logger.info("Remote notification registration succeeded")
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        let failure = error as NSError
+        Self.logger.error("Remote notification registration failed; domain \(failure.domain, privacy: .public), code \(failure.code)")
     }
 
     /// Over the app, an alert shows as a banner unless its Mac is on screen,
@@ -99,8 +111,11 @@ final class PhoneAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificatio
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
         -> UIBackgroundFetchResult {
+        let started = ContinuousClock.now
+        Self.logger.info("Remote push received; app state \(application.applicationState.rawValue), background refresh \(application.backgroundRefreshStatus.rawValue)")
         LocalPhoneMonitor.shared.refresh()
-        await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
-        return .newData
+        let result = await MacStore.shared.refreshAll(until: .now.advanced(by: MacStore.backgroundRead))
+        Self.logger.info("Remote push finished in \(String(describing: started.duration(to: .now)), privacy: .public); result \(result.rawValue)")
+        return result
     }
 }

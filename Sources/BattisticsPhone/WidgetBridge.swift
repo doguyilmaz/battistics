@@ -3,12 +3,15 @@ import BattisticsRemote
 import Foundation
 import UIKit
 import WidgetKit
+import os
 
 /// Hands the Macs' readings to the widgets and keeps a lock-screen countdown
 /// for each Mac kept awake. Without push, both update when the app or its
 /// background refresh runs; the countdown itself runs on the system clock.
 @MainActor
 enum WidgetBridge {
+    private nonisolated static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "LiveActivity")
+
     /// Activity updates still running, which a background task awaits before it completes.
     private static var changes: [Task<Void, Never>] = []
 
@@ -124,8 +127,15 @@ enum WidgetBridge {
             let id = activity.id
             if activity.content.state != state { await update(id, content) }
             await endActivities(of: mac.id, except: id)
-        } else if let activity = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content) {
-            await endActivities(of: mac.id, except: activity.id)
+        } else {
+            do {
+                let activity = try Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
+                logger.info("Live Activity created; sample age \(Int(-status.readAt.timeIntervalSinceNow))s")
+                await endActivities(of: mac.id, except: activity.id)
+            } catch {
+                let failure = error as NSError
+                logger.error("Live Activity creation failed; domain \(failure.domain, privacy: .public), code \(failure.code)")
+            }
         }
     }
 
@@ -140,6 +150,7 @@ enum WidgetBridge {
     /// Looked up by id off the main actor, since `Activity` is not Sendable.
     private nonisolated static func update(_ id: String, _ content: ActivityContent<KeepAwakeActivityAttributes.ContentState>) async {
         await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?.update(content)
+        logger.info("Live Activity update submitted; sample age \(Int(-content.state.lastUpdate.timeIntervalSinceNow))s")
     }
 
     private nonisolated static func end(_ id: String) async {

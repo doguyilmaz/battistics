@@ -197,16 +197,17 @@ final class MacStore {
     /// the widgets, Live Activity and alerts still need time after the read.
     static let backgroundRead: Duration = .seconds(20)
 
-    /// Reads every Mac and returns the alerts their changes call for.
+    /// Reads every Mac and reports the actual result to iOS background callers.
     @discardableResult
-    func refreshAll(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async -> [(Mac, [RemoteAlert])] {
+    func refreshAll(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async -> UIBackgroundFetchResult {
+        guard !Task.isCancelled, .now < deadline else { return .failed }
         // A push during a refresh may carry a newer change, and its handler
         // must not complete before that change is read.
         while refreshing {
-            guard .now < deadline else { return [] }
-            do { try await Task.sleep(for: .milliseconds(200)) } catch { return [] }
+            guard .now < deadline else { return .failed }
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return .failed }
         }
-        if isSample { return [] }
+        if isSample { return .noData }
         refreshing = true
         defer { refreshing = false }
         let snapshot: RemoteCloud.Snapshot
@@ -223,18 +224,20 @@ final class MacStore {
             problem = nil
         } catch is CancellationError {
             interruptSilenceConfirmation()
-            return []
+            return .failed
         } catch {
-            guard !isSample else { return [] }
+            guard !isSample else { return .noData }
             interruptSilenceConfirmation()
             problem = Self.describe(error)
-            return []
+            return .failed
         }
         // One that ended after the sample replaced the Macs says nothing about them.
-        guard !isSample else { return [] }
+        guard !isSample else { return .noData }
         checking = false
         let subscriptionDue = alertSubscriptionChecked.map { -$0.timeIntervalSinceNow > 120 } ?? true
-        let alerts = await apply(snapshot)
+        let previousReadings = readings
+        let previousOutdated = outdated
+        await apply(snapshot)
         // Notification housekeeping is independent of readings and commands.
         // Until confirmed, this phone retains the existing local-alert fallback.
         if subscriptionDue, subscriptionWork == nil {
@@ -243,10 +246,10 @@ final class MacStore {
                 self?.subscriptionWork = nil
             }
         }
-        return alerts
+        return readings == previousReadings && outdated == previousOutdated ? .noData : .newData
     }
 
-    private func apply(_ snapshot: RemoteCloud.Snapshot) async -> [(Mac, [RemoteAlert])] {
+    private func apply(_ snapshot: RemoteCloud.Snapshot) async {
         var alerts: [(Mac, [RemoteAlert])] = []
         // Also a Mac never read before, so setup can say why it does not appear.
         outdated = snapshot.unreadable
@@ -295,7 +298,6 @@ final class MacStore {
         LocalPhoneMonitor.shared.learnHotspotName(from: readings)
         // Awaited so a background task does not complete before the alerts are added.
         await Notifications.deliver(alerts)
-        return alerts
     }
 
     /// Keeps iCloud's alert subscription in step with the Notifications

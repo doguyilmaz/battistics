@@ -1,10 +1,29 @@
 import ActivityKit
 import BattisticsRemote
+import UIKit
 import UserNotifications
 import XCTest
 @testable import Battistics_Remote
 
 final class NotificationsTests: XCTestCase {
+    @MainActor
+    func testBackgroundPushDoesNotClaimNewRemoteDataForSampleReadings() async {
+        XCTAssertTrue(MacStore.shared.isSample)
+        let result = await PhoneAppDelegate().application(UIApplication.shared, didReceiveRemoteNotification: [:])
+        XCTAssertEqual(result, .noData)
+    }
+
+    @MainActor
+    func testExpiredAndCancelledRefreshesReportFailure() async {
+        let expired = await MacStore.shared.refreshAll(until: .now.advanced(by: .seconds(-1)))
+        XCTAssertEqual(expired, .failed)
+        let cancelled = await Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return await MacStore.shared.refreshAll()
+        }.value
+        XCTAssertEqual(cancelled, .failed)
+    }
+
     @MainActor
     func testQueuedStopAndRestartKeepsTheNewActivity() async throws {
         let now = Date()
