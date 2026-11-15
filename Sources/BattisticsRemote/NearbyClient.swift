@@ -25,7 +25,8 @@ public final class NearbyClient {
         for peer in Array(peers.values) where !credentials.contains(peer.credential) { peer.close() }
         if foreground, !credentials.isEmpty { browser.start(); connectLAN() }
         else { browser.stop() }
-        if foreground || CBCentralManager.authorization == .allowedAlways { bluetooth.configure(self.credentials) }
+        if CBCentralManager.authorization == .denied || CBCentralManager.authorization == .restricted { bluetooth.stop() }
+        else if foreground || CBCentralManager.authorization == .allowedAlways { bluetooth.configure(self.credentials) }
     }
 
     public func setForeground(_ foreground: Bool) {

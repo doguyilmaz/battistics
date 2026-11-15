@@ -125,7 +125,8 @@ final class KeepAwakeModel {
     func start(mode: KeepAwakeMode, duration: KeepAwakeDuration, now: Date = Date(),
                id: String = UUID().uuidString, allowHelperSetup: Bool = true, name: String? = nil,
                origin: RemoteStatus.Origin = .manual,
-               continuing previous: KeepAwakeSession? = nil) -> Task<Void, Never>? {
+               continuing previous: KeepAwakeSession? = nil,
+               authorizing isAuthorized: @escaping @MainActor () -> Bool = { true }) -> Task<Void, Never>? {
         guard !isChanging else { return nil }
         let unattended = Self.isUnattended(origin: origin, mode: mode)
         if let event = safety.blockingEvent(unattended: unattended) {
@@ -151,6 +152,7 @@ final class KeepAwakeModel {
             }
             var releasingPrevious = previousLeaseID != nil
             do {
+                guard isAuthorized(), !Task.isCancelled else { throw CancellationError() }
                 if let previousLeaseID {
                     let result = try await helper.releaseLidSleepLease(previousLeaseID)
                     guard result == .success || result == .inactive else {
@@ -164,8 +166,9 @@ final class KeepAwakeModel {
                 if mode == .lidClosed {
                     if allowHelperSetup { try await helper.prepareForLidSleep() }
                     guard sessionID == id else { return }
+                    guard isAuthorized(), !Task.isCancelled else { throw CancellationError() }
                     let result = try await helper.acquireLidSleepLease(id) { [weak self] in
-                        self?.sessionID == id
+                        self?.sessionID == id && isAuthorized()
                     }
                     guard sessionID == id else {
                         if result == .success {
@@ -182,6 +185,7 @@ final class KeepAwakeModel {
                 }
                 // Authorization can take long enough for charge or thermal
                 // conditions to change. Recheck before creating the assertion.
+                guard isAuthorized(), !Task.isCancelled else { throw CancellationError() }
                 if let event = safety.blockingEvent(unattended: unattended) { throw StartFailure.protection(event) }
                 let new = previous?.switching(to: mode) ?? KeepAwakeSession(mode: mode, duration: duration, startedAt: now)
                 guard !new.hasExpired(at: Date()),

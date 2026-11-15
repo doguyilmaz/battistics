@@ -68,7 +68,8 @@ final class MacStore {
     @ObservationIgnored private var applying: Task<Void, Never>?
     @ObservationIgnored private var subscriptionWork: Task<Void, Never>?
     @ObservationIgnored private var alertSubscriptionChecked: Date?
-    @ObservationIgnored private var sending: Set<String> = []
+    @ObservationIgnored private var sending: [String: Int] = [:]
+    @ObservationIgnored private var commandTasks: [String: Task<RemoteStatus, Error>] = [:]
     @ObservationIgnored private var commandAnsweredAt: [String: Date] = [:]
     /// The Macs Siri and Spotlight last offered by name.
     @ObservationIgnored private var shortcutMacs: [Mac] = []
@@ -139,6 +140,10 @@ final class MacStore {
 
     private func accountChanged() async {
         accountGeneration += 1
+        for task in commandTasks.values { task.cancel() }
+        commandTasks = [:]
+        sending = [:]
+        pending = [:]
         nearbyTrustWork?.cancel()
         subscriptionWork?.cancel()
         nearby.stop()
@@ -181,6 +186,14 @@ final class MacStore {
                 do {
                     let accountID = try await self.cloud.accountIdentity()
                     guard !Task.isCancelled, generation == self.accountGeneration, !self.isSample else { return }
+                    let defaults = UserDefaults.standard
+                    if defaults.string(forKey: "nearbyAccountBinding") != accountID {
+                        defaults.set(accountID, forKey: "nearbyAccountBinding")
+                        // Also catches an account switch while the app was quit:
+                        // discard readings, alerts and activities before reusing them.
+                        await self.accountChanged()
+                        return
+                    }
                     self.nearbyAccountID = accountID
                     for (id, reading) in self.readings {
                         if let credential = try? NearbyKeychain.load(.phone, macID: id, accountID: accountID),
@@ -544,18 +557,23 @@ final class MacStore {
     /// Writes the command, then watches the Mac's record for its answer.
     private func send(_ request: RemoteRequest, to mac: Mac) async -> String? {
         var request = request
-        guard !sending.contains(mac.id) else {
+        let generation = accountGeneration
+        guard sending[mac.id] == nil else {
             return String(localized: "Wait for the current change to finish.", table: "RemoteSync")
         }
         request.deviceName = LocalPhoneMonitor.shared.commandName
         // A second change to the same Mac is refused, not queued indefinitely.
         let locks = request.operation != .inspect
         if locks { pending[mac.id] = request.operation }
-        defer { if locks, pending[mac.id] == request.operation { pending[mac.id] = nil } }
-        sending.insert(mac.id)
-        defer { sending.remove(mac.id) }
+        sending[mac.id] = generation
+        defer {
+            if sending[mac.id] == generation {
+                sending[mac.id] = nil
+                commandTasks[mac.id] = nil
+                if locks, pending[mac.id] == request.operation { pending[mac.id] = nil }
+            }
+        }
         request.sentAt = .now
-        let generation = accountGeneration
         if isSample, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
             guard isSample else { return nil }
@@ -565,7 +583,16 @@ final class MacStore {
             return nil
         }
         do {
-            let status = try await RemoteHandoff.execute(request, routes: nearby.routes(to: mac.id), to: mac.id, cloud: cloud)
+            let routes = nearby.routes(to: mac.id)
+            let cloud = cloud
+            let command = request
+            let work = Task { [weak self] in
+                try await RemoteHandoff.execute(command, routes: routes, to: mac.id, cloud: cloud, authorizing: { [weak self] in
+                    await self?.allowsCommand(generation: generation) ?? false
+                })
+            }
+            commandTasks[mac.id] = work
+            let status = try await work.value
             guard generation == accountGeneration else { return String(localized: "The Apple Account changed. Check the Mac before trying again.") }
             commandAnsweredAt[mac.id] = .now
             if readings[mac.id]?.status.map({ status.isAtLeastAsRecent(as: $0) }) ?? true {
@@ -586,6 +613,8 @@ final class MacStore {
             return Self.describe(error)
         }
     }
+
+    private func allowsCommand(generation: Int) -> Bool { generation == accountGeneration && !isSample }
 
     private func save() {
         UserDefaults.standard.set(try? RemoteWire.encode(readings), forKey: "readings")

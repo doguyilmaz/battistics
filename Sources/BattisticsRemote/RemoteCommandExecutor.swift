@@ -7,12 +7,19 @@ public enum RemoteCommandExecutor {
     private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "Commands")
 
     public static func execute(_ request: RemoteRequest, to macID: String, cloud: RemoteCloud,
-                               until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(RemoteRequest.answerWait))) async throws -> RemoteStatus {
-        try await execute(request, macID: macID, timeout: ContinuousClock.now.duration(to: deadline), pollInterval: .seconds(1.5),
-                          write: { request, deadline in try await cloud.send(request, to: macID, until: deadline) },
-                          read: { deadline in try await cloud.status(macID: macID, until: deadline) },
+                               until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(RemoteRequest.answerWait)),
+                               authorizing: @escaping @Sendable () async -> Bool = { true }) async throws -> RemoteStatus {
+        let epoch = await cloud.accountEpoch()
+        return try await execute(request, macID: macID, timeout: ContinuousClock.now.duration(to: deadline), pollInterval: .seconds(1.5),
+                          write: { request, deadline in
+                              try Task.checkCancellation()
+                              guard await authorizing() else { throw CancellationError() }
+                              try await cloud.send(request, to: macID, until: deadline, accountEpoch: epoch)
+                          },
+                          read: { deadline in try await cloud.status(macID: macID, until: deadline, accountEpoch: epoch) },
                           cleanup: { commandID in
-                              try? await cloud.cancelCommand(commandID, macID: macID, until: .now.advanced(by: .seconds(5)))
+                              guard await authorizing() else { return }
+                              try? await cloud.cancelCommand(commandID, macID: macID, until: .now.advanced(by: .seconds(5)), accountEpoch: epoch)
                           })
     }
 

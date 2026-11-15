@@ -84,7 +84,11 @@ final class NearbyPeer {
                 if let response = received.response { try link.send(NearbyFrameBuffer.frame(response)) }
                 if session.authenticated {
                     lastReceived = clock()
-                    if !authenticated { handshakeDeadline?.cancel(); onReady?() }
+                    if !authenticated {
+                        handshakeDeadline?.cancel()
+                        (link as? NearbyBLELink)?.authenticated = true
+                        onReady?()
+                    }
                 }
                 if let message = received.message {
                     if case .status(let id?, let status) = message {

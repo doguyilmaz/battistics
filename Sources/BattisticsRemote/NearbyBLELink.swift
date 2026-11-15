@@ -6,6 +6,8 @@ final class NearbyBLELink: NearbyLink {
     let kind = RemoteRoute.Kind.bluetooth
     var onData: ((Data) -> Void)?
     var onClose: (() -> Void)?
+    var onAuthenticated: (() -> Void)?
+    var authenticated = false { didSet { if authenticated { onAuthenticated?() } } }
     private let sender: (Data) throws -> Void
     private let closer: () -> Void
     private var closed = false
@@ -30,5 +32,6 @@ final class NearbyBLELink: NearbyLink {
         onClose?()
         onData = nil
         onClose = nil
+        onAuthenticated = nil
     }
 }

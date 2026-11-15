@@ -85,6 +85,7 @@ public actor RemoteCloud {
     /// Subscriptions belong to the account, not the device, so every device
     /// saves the same one.
     public func prepare(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(45))) async throws {
+        let generation = zoneGeneration
         if !prepared {
             let work: Task<Void, Error>
             if let preparing {
@@ -94,8 +95,9 @@ public actor RemoteCloud {
                 work = Task { try await operations.createZone(until: deadline) }
                 preparing = work
             }
-            defer { preparing = nil }
+            defer { if generation == zoneGeneration { preparing = nil } }
             try await work.value
+            guard generation == zoneGeneration else { throw CancellationError() }
             prepared = true
         }
         scheduleSubscription()
@@ -178,10 +180,12 @@ public actor RemoteCloud {
     /// This Mac's record and its command slot, read by name in one request.
     public func inbox(macID: String, until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Inbox {
         try await attempt {
-            try await guarded(until: deadline) {
+            let generation = accountGeneration
+            return try await guarded(until: deadline) {
                 let statusID = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
                 let commandID = Self.commandRecordID(for: macID)
                 let records = try await self.operations.records([statusID, commandID], until: deadline)
+                guard generation == self.accountGeneration else { throw CancellationError() }
                 var inbox = Inbox()
                 if let record = records[statusID] {
                     self.statusRecords[macID] = record
@@ -221,11 +225,13 @@ public actor RemoteCloud {
     public func publishNearbyCredential(_ credential: NearbyCredential) async throws {
         guard credential.isValid else { throw NearbyError.authentication }
         try await attempt {
+            let generation = accountGeneration
             let deadline = ContinuousClock.now.advanced(by: .seconds(15))
             try await prepare(until: deadline)
             let id = CKRecord.ID(recordName: Self.nearbyCredentialRecordName(for: credential.macID, discoveryID: credential.discoveryID), zoneID: Self.zoneID)
             let record = try await operations.record(id, until: deadline)
                 ?? CKRecord(recordType: Self.commandType, recordID: id)
+            guard generation == accountGeneration else { throw CancellationError() }
             guard record.recordType == Self.commandType else { throw NearbyError.authentication }
             record.encryptedValues["payload"] = try RemoteWire.encode(credential)
             _ = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
@@ -240,6 +246,8 @@ public actor RemoteCloud {
         invalidateZone()
         retryAt = nil
     }
+
+    public func accountEpoch() -> Int { accountGeneration }
 
     /// Verify once per process/account before reusing nearby credentials. A
     /// notification cannot tell us about an account change while the app quit.
@@ -276,6 +284,8 @@ public actor RemoteCloud {
     }
 
     private func invalidateZone() {
+        preparing?.cancel()
+        preparing = nil
         prepared = false
         subscribed = false
         subscriptionCheckAt = nil
@@ -295,6 +305,7 @@ public actor RemoteCloud {
     public func publish(_ status: RemoteStatus, macID: String,
                         until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
         try await attempt {
+            let generation = accountGeneration
             try await prepare(until: deadline)
             let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
             let record: CKRecord
@@ -305,14 +316,17 @@ public actor RemoteCloud {
             } else {
                 record = CKRecord(recordType: Self.statusType, recordID: id)
             }
+            guard generation == accountGeneration else { throw CancellationError() }
             record.encryptedValues["payload"] = try RemoteWire.encode(status)
             let saved = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
+            guard generation == accountGeneration else { throw CancellationError() }
             statusRecords[macID] = saved[id]
         }
     }
 
     public func send(_ request: RemoteRequest, to macID: String,
-                     until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws {
+                     until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30)), accountEpoch: Int? = nil) async throws {
+        guard accountEpoch == nil || accountEpoch == accountGeneration else { throw CancellationError() }
         try await attempt {
             try await guarded(until: deadline) {
                 let record = CKRecord(recordType: Self.commandType, recordID: Self.commandRecordID(for: macID))
@@ -326,13 +340,17 @@ public actor RemoteCloud {
 
     /// Cancel only this command, using the fetched change tag. A late cleanup
     /// must not delete/overwrite a newer command occupying the shared slot.
-    public func cancelCommand(_ commandID: String, macID: String,
-                              until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(5))) async throws {
+    /// Nil clears the observed mailbox version during sharing withdrawal.
+    public func cancelCommand(_ commandID: String?, macID: String,
+                              until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(5)), accountEpoch: Int? = nil) async throws {
+        guard accountEpoch == nil || accountEpoch == accountGeneration else { throw CancellationError() }
         try await attempt {
+            let generation = accountGeneration
             guard let record = try await operations.record(Self.commandRecordID(for: macID), until: deadline),
                   record.recordType == Self.commandType,
                   let payload = record.encryptedValues["payload"] as? Data,
-                  Self.request(from: payload)?.id == commandID else { return }
+                  commandID == nil || Self.request(from: payload)?.id == commandID else { return }
+            guard generation == accountGeneration else { throw CancellationError() }
             record.encryptedValues["payload"] = Data("{}".utf8)
             _ = try await operations.modifyRecords(saving: [record], policy: .ifServerRecordUnchanged, until: deadline)
         }
@@ -340,8 +358,9 @@ public actor RemoteCloud {
 
     /// A command answer reads only its Mac, independent of discovery and alert
     /// subscriptions. No zone replay or unrelated Mac can hold the answer up.
-    public func status(macID: String, until deadline: ContinuousClock.Instant) async throws -> RemoteStatus? {
-        try await attempt {
+    public func status(macID: String, until deadline: ContinuousClock.Instant, accountEpoch: Int? = nil) async throws -> RemoteStatus? {
+        guard accountEpoch == nil || accountEpoch == accountGeneration else { throw CancellationError() }
+        return try await attempt {
             let id = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
             guard let record = try await operations.record(id, until: deadline) else { return nil }
             guard let payload = record.encryptedValues["payload"] as? Data else { throw CKError(.internalError) }
@@ -424,11 +443,17 @@ public actor RemoteCloud {
     }
 
     private func attempt<Value>(_ body: () async throws -> Value) async throws -> Value {
+        let generation = accountGeneration
         if let retryAt, retryAt > .now {
             throw CKError(.requestRateLimited, userInfo: [CKErrorRetryAfterKey: retryAt.timeIntervalSinceNow])
         }
-        do { return try await body() }
+        do {
+            let value = try await body()
+            guard generation == accountGeneration else { throw CancellationError() }
+            return value
+        }
         catch {
+            guard generation == accountGeneration else { throw CancellationError() }
             if let seconds = (error as? CKError)?.retryAfterSeconds {
                 retryAt = .now.addingTimeInterval(seconds)
             }

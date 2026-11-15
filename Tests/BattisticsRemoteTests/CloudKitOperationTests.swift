@@ -23,7 +23,8 @@ struct CloudKitOperationTests {
         #expect(writes.read() == 0)
     }
 
-    @Test func cleanupUsesAConditionalTombstoneInsteadOfDeletingTheSlot() async throws {
+    @Test(arguments: [false, true])
+    func cleanupUsesAConditionalTombstoneInsteadOfDeletingTheSlot(clearingObserved: Bool) async throws {
         let request = RemoteRequest(operation: .start)
         let writes = CloudKitBuffer(0)
         let cloud = RemoteCloud(operations: .init { operation in
@@ -43,7 +44,7 @@ struct CloudKitOperationTests {
                 write.modifyRecordsResultBlock?(.success(()))
             } else { Issue.record("Unexpected cleanup operation") }
         })
-        try await cloud.cancelCommand(request.id, macID: "mac")
+        try await cloud.cancelCommand(clearingObserved ? nil : request.id, macID: "mac")
         #expect(writes.read() == 1)
     }
 

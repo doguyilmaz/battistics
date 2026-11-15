@@ -59,7 +59,11 @@ final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelega
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
-        guard characteristic.uuid == NearbyBLE.output, links.count < 8, links[central.identifier] == nil else { return }
+        guard peripheral === manager, characteristic.uuid == NearbyBLE.output, links[central.identifier] == nil else { return }
+        if links.count >= 8 {
+            guard let pending = links.values.first(where: { !$0.authenticated }) else { return }
+            pending.close()
+        }
         centrals[central.identifier] = central
         let id = central.identifier
         let link = NearbyBLELink(id: id, send: { [weak self] data in
@@ -77,10 +81,12 @@ final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelega
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
+        guard peripheral === manager else { return }
         links[central.identifier]?.close()
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
+        guard peripheral === manager else { return }
         for request in requests {
             guard request.characteristic.uuid == NearbyBLE.input, request.offset == 0,
                   let value = request.value, let link = links[request.central.identifier] else {
@@ -93,6 +99,7 @@ final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelega
     }
 
     func peripheralManagerIsReady(toUpdateSubscribers peripheral: CBPeripheralManager) {
+        guard peripheral === manager else { return }
         for id in Array(pending.keys) { drain(id) }
     }
 

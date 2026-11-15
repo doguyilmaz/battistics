@@ -10,11 +10,14 @@ final class NearbyLANLink: NearbyLink {
     var onData: ((Data) -> Void)?
     var onClose: (() -> Void)?
     private var closed = false
+    private var started = false
     private var queuedBytes = 0
 
     init(connection: NWConnection) { self.connection = connection }
 
     func start() {
+        guard !started, !closed else { return }
+        started = true
         connection.stateUpdateHandler = { [weak self] state in
             Task { @MainActor in
                 guard let self, !self.closed else { return }

@@ -4,6 +4,19 @@ import Testing
 
 @Suite("Remote transport handoff")
 struct RemoteHandoffTests {
+    @Test func revocationDuringNearbyFailureCannotSendToTheReplacementCloudAccount() async {
+        let authorized = CloudKitBuffer(true)
+        let route = RemoteRoute(kind: .lan) { _, _ in
+            authorized.update { $0 = false }
+            throw NearbyError.unavailable
+        }
+        await #expect(throws: CancellationError.self) {
+            try await RemoteHandoff.execute(.init(operation: .stop), routes: [route], authorizing: { authorized.read() }) { _, _ in
+                Issue.record("Revoked command crossed into the replacement CloudKit account")
+                throw NearbyError.unavailable
+            }
+        }
+    }
     private static func answer(_ request: RemoteRequest, failure: RemoteFailure? = nil) -> RemoteStatus {
         var status = RemoteStatus(machineName: "Mac", readAt: .now)
         status.lastCommand = .init(id: request.id, failure: failure)

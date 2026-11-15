@@ -13,14 +13,20 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
     private var links: [UUID: NearbyBLELink] = [:]
     private var pending: [UUID: Data] = [:]
     private var writing: Set<UUID> = []
-    private var retryAfter: [UUID: ContinuousClock.Instant] = [:]
+    private var candidates = NearbyCandidates()
+    private var reconnectAfterDisconnect: Set<UUID> = []
+    private var closing: Set<UUID> = []
+    private var setupDeadlines: [UUID: Task<Void, Never>] = [:]
+    private var setupTokens: [UUID: UUID] = [:]
+    private var stopping = false
     private var restoring: Set<UUID> = []
+    private var rejectedRestorations: [CBPeripheral] = []
 
     func configure(_ credentials: [NearbyCredential]) {
         if self.credentials == credentials, manager != nil { reconnect(); return }
         self.credentials = credentials
         for id in Array(owners.keys) where !credentials.contains(owners[id]!) {
-            close(id)
+            close(id, reason: .rejected)
             owners[id] = nil
             peripherals[id] = nil
         }
@@ -34,31 +40,51 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
     }
 
     func stop() {
+        stopping = true
         manager?.stopScan()
-        for id in Array(peripherals.keys) { close(id) }
+        if manager?.state == .poweredOn {
+            for peripheral in rejectedRestorations { manager?.cancelPeripheralConnection(peripheral) }
+        }
+        rejectedRestorations = []
+        for id in Array(peripherals.keys) { close(id, reason: .rejected) }
         manager?.delegate = nil
         manager = nil
         peripherals = [:]
         owners = [:]
         restoring = []
+        reconnectAfterDisconnect = []
+        candidates.clear()
+        stopping = false
     }
 
     func reconnect() {
         guard let manager, manager.state == .poweredOn else { return }
         for (id, peripheral) in peripherals where peripheral.state == .disconnected {
             guard !restoring.contains(id) else { continue }
-            if retryAfter[id].map({ .now < $0 }) == true { continue }
             manager.connect(peripheral)
         }
     }
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn { restoreConnections(); scan(); reconnect() }
+        guard central === manager else { return }
+        if central.state == .poweredOn {
+            for peripheral in rejectedRestorations { central.cancelPeripheralConnection(peripheral) }
+            rejectedRestorations = []
+            restoreConnections()
+            scan()
+            reconnect()
+        }
         else { for link in Array(links.values) { link.close() } }
     }
 
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String: Any]) {
+        guard central === manager else { return }
         for peripheral in dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] ?? [] {
+            guard candidates.admit(peripheral.identifier, macID: "restored.\(peripheral.identifier)") else {
+                if central.state == .poweredOn { central.cancelPeripheralConnection(peripheral) }
+                else { rejectedRestorations.append(peripheral) }
+                continue
+            }
             peripherals[peripheral.identifier] = peripheral
             peripheral.delegate = self
             // Session keys belong to the old process. Reconnect to obtain a
@@ -68,47 +94,71 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
         restoreConnections()
     }
 
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
+    func centralManager(_ central: CBCentralManager, didDiscover discovered: CBPeripheral,
                         advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        guard peripherals.count < 8 || peripherals[peripheral.identifier] != nil else { return }
+        guard central === manager else { return }
+        // Keep the delegate/characteristics attached to the connected object;
+        // an advertising callback is not a new connection or a new session.
+        let peripheral = peripherals[discovered.identifier] ?? discovered
         let services = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
         guard let credential = credentials.first(where: { services.contains(CBUUID(nsuuid: $0.serviceUUID)) }) else { return }
+        guard candidates.admit(peripheral.identifier, macID: credential.macID) else { return }
         peripherals[peripheral.identifier] = peripheral
         owners[peripheral.identifier] = credential
         peripheral.delegate = self
-        if peripheral.state == .disconnected, retryAfter[peripheral.identifier].map({ .now >= $0 }) ?? true {
+        if peripheral.state == .disconnected {
+            beginSetup(peripheral)
             central.connect(peripheral)
         }
     }
 
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) { discover(peripheral); scan() }
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        guard central === manager, peripherals[peripheral.identifier] === peripheral else {
+            if central.state == .poweredOn, central !== manager || peripherals[peripheral.identifier] == nil {
+                central.cancelPeripheralConnection(peripheral)
+            }
+            return
+        }
+        beginSetup(peripheral)
+        discover(peripheral)
+        scan()
+    }
 
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) { close(peripheral.identifier) }
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        guard central === manager, peripherals[peripheral.identifier] === peripheral else { return }
+        close(peripheral.identifier, reason: .setup)
+    }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        guard central === manager, peripherals[peripheral.identifier] === peripheral else { return }
+        if reconnectAfterDisconnect.remove(peripheral.identifier) != nil {
+            if central.state == .poweredOn { beginSetup(peripheral); central.connect(peripheral) }
+            return
+        }
         let restored = restoring.remove(peripheral.identifier) != nil
-        let automatic = links[peripheral.identifier] != nil || restored
-        close(peripheral.identifier)
-        // A pending Core Bluetooth connection can be restored when the Mac returns.
-        if automatic, !credentials.isEmpty, central.state == .poweredOn { central.connect(peripheral) }
+        let reason: NearbyCandidates.Failure = links[peripheral.identifier]?.authenticated == true ? .disconnected : .setup
+        close(peripheral.identifier, reason: restored ? .setup : reason)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard error == nil else { close(peripheral.identifier); return }
+        guard peripherals[peripheral.identifier] === peripheral else { return }
+        guard error == nil else { close(peripheral.identifier, reason: .setup); return }
         guard let service = peripheral.services?.first(where: { service in
             credentials.contains { CBUUID(nsuuid: $0.serviceUUID) == service.uuid }
         }), let credential = credentials.first(where: { CBUUID(nsuuid: $0.serviceUUID) == service.uuid }) else {
             close(peripheral.identifier); return
         }
+        guard candidates.admit(peripheral.identifier, macID: credential.macID) else { close(peripheral.identifier); return }
         owners[peripheral.identifier] = credential
         peripheral.discoverCharacteristics([NearbyBLE.input, NearbyBLE.output], for: service)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard peripherals[peripheral.identifier] === peripheral else { return }
         guard error == nil,
               let input = service.characteristics?.first(where: { $0.uuid == NearbyBLE.input }),
               let output = service.characteristics?.first(where: { $0.uuid == NearbyBLE.output }) else {
-            close(peripheral.identifier); return
+            close(peripheral.identifier, reason: .setup); return
         }
         inputs[peripheral.identifier] = input
         makeLink(peripheral)
@@ -116,8 +166,9 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        guard peripherals[peripheral.identifier] === peripheral else { return }
         guard error == nil, characteristic.uuid == NearbyBLE.output, characteristic.isNotifying else {
-            close(peripheral.identifier); return
+            close(peripheral.identifier, reason: .setup); return
         }
     }
 
@@ -132,10 +183,14 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
             self.drain(id)
         }, close: { [weak self] in self?.close(id) })
         links[id] = link
+        setupDeadlines.removeValue(forKey: id)?.cancel()
+        setupTokens[id] = nil
+        link.onAuthenticated = { [weak self] in self?.candidates.authenticate(id) }
         onConnection?(credential, link)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard peripherals[peripheral.identifier] === peripheral else { return }
         guard error == nil, characteristic.uuid == NearbyBLE.output, let data = characteristic.value else {
             close(peripheral.identifier); return
         }
@@ -143,12 +198,13 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard peripherals[peripheral.identifier] === peripheral else { return }
         writing.remove(peripheral.identifier)
         if error != nil { close(peripheral.identifier) } else { drain(peripheral.identifier) }
     }
 
     private func scan() {
-        guard manager?.state == .poweredOn, !credentials.isEmpty else { return }
+        guard !stopping, manager?.state == .poweredOn, !credentials.isEmpty else { return }
         let missing = credentials.filter { credential in
             !peripherals.contains { id, peripheral in owners[id] == credential && peripheral.state != .disconnected }
         }
@@ -166,6 +222,7 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
         guard let manager, manager.state == .poweredOn else { return }
         for id in Array(restoring) {
             guard let peripheral = peripherals[id] else { restoring.remove(id); continue }
+            beginSetup(peripheral)
             if peripheral.state == .disconnected {
                 restoring.remove(id)
                 manager.connect(peripheral)
@@ -183,14 +240,42 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
         peripheral.writeValue(chunk, for: input, type: .withResponse)
     }
 
-    private func close(_ id: UUID) {
+    private func beginSetup(_ peripheral: CBPeripheral) {
+        let id = peripheral.identifier, token = UUID()
+        setupDeadlines[id]?.cancel()
+        setupTokens[id] = token
+        setupDeadlines[id] = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(8)) } catch { return }
+            guard let self, self.setupTokens[id] == token else { return }
+            self.close(id, reason: .rejected)
+        }
+    }
+
+    private func close(_ id: UUID, reason: NearbyCandidates.Failure? = nil) {
+        guard closing.insert(id).inserted else { return }
+        defer { closing.remove(id) }
         let link = links.removeValue(forKey: id)
+        let retry = candidates.failed(id, reason: reason ?? (link?.authenticated == true ? .disconnected : .rejected))
+        setupDeadlines.removeValue(forKey: id)?.cancel()
+        setupTokens[id] = nil
         inputs[id] = nil
         pending[id] = nil
         writing.remove(id)
-        retryAfter[id] = .now.advanced(by: .seconds(30))
         link?.close()
-        if let peripheral = peripherals[id], peripheral.state != .disconnected { manager?.cancelPeripheralConnection(peripheral) }
+        if let peripheral = peripherals[id] {
+            if !retry {
+                peripherals[id] = nil
+                owners[id] = nil
+                restoring.remove(id)
+                reconnectAfterDisconnect.remove(id)
+                peripheral.delegate = nil
+            }
+            if peripheral.state != .disconnected {
+                if retry { reconnectAfterDisconnect.insert(id) }
+                manager?.cancelPeripheralConnection(peripheral)
+            } else if retry, manager?.state == .poweredOn { beginSetup(peripheral); manager?.connect(peripheral) }
+        }
+        scan()
     }
 }
 #endif

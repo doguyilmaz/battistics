@@ -4,7 +4,43 @@ import Testing
 
 @Suite("Durable command admission")
 struct RemoteCommandJournalTests {
+    @Test func cancellationBeforeAdmissionLeavesNoUncertainCommand() async throws {
+        let url = Self.path()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let journal = RemoteCommandJournal(url: url)
+        let request = RemoteRequest(operation: .start)
+        let cancelled = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try await journal.claim(request)
+        }
+        await #expect(throws: CancellationError.self) { try await cancelled.value }
+        guard case .execute = try await journal.claim(request) else {
+            Issue.record("A cancelled task persisted an uncertain admission"); return
+        }
+    }
     private static func path() -> URL { FileManager.default.temporaryDirectory.appendingPathComponent("battistics-journal-\(UUID()).json") }
+
+    @Test func accountsCannotReadOrCompleteEachOthersCommandResults() async throws {
+        let url = Self.path()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let journal = RemoteCommandJournal(url: url)
+        let request = RemoteRequest(operation: .extend, durationMinutes: 30)
+        _ = try await journal.claim(request, accountID: "account-a")
+        try await journal.complete(.init(id: request.id, failure: nil), accountID: "account-a")
+        await #expect(throws: NearbyError.self) {
+            try await journal.complete(.init(id: request.id, failure: .init(.busy)), accountID: "account-b")
+        }
+        guard case .execute = try await journal.claim(request, accountID: "account-b") else {
+            Issue.record("Account B inherited account A's result"); return
+        }
+        try await journal.complete(.init(id: request.id, failure: .init(.busy)), accountID: "account-b")
+        guard case .completed(let result) = try await journal.claim(request, accountID: "account-a") else {
+            Issue.record("Returning to account A would execute the change twice"); return
+        }
+        #expect(result.failure == nil)
+        #expect(try await journal.nextRevision() == 1)
+        #expect(try await RemoteCommandJournal(url: url).nextRevision() == 2)
+    }
 
     @Test func aLostReplyReturnsTheSavedResultAfterRelaunch() async throws {
         let url = Self.path()

@@ -4,6 +4,17 @@ import Testing
 
 @Suite("Authenticated nearby protocol")
 struct NearbyProtocolTests {
+    @Test func anUnpublishedCommandAnswerCannotBeSuppressedAsAnUnchangedHeartbeat() {
+        let previous = RemoteStatus(machineName: "Mac", readAt: .now)
+        var answer = previous
+        answer.lastCommand = .init(id: "completed-nearby-command", failure: nil)
+        answer.revision = 100
+        #expect(answer.differsNoticeably(from: previous))
+        var same = answer
+        same.revision = 101
+        same.readAt = same.readAt.addingTimeInterval(1)
+        #expect(!same.differsNoticeably(from: answer))
+    }
     private static func credential(_ byte: UInt8 = 7, macID: String = "test-mac") throws -> NearbyCredential {
         try .init(macID: macID, key: Data(repeating: byte, count: 32))
     }
