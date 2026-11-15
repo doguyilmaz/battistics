@@ -23,8 +23,11 @@ struct RemoteHarness {
                                          endpoint: .init(directory: "/private/tmp/battistics-remote-\(UUID())"),
                                          initiallyEnabled: false)
         let network = NetworkMonitor()
+        let journalURL = FileManager.default.temporaryDirectory.appendingPathComponent("remote-handoff-\(UUID()).json")
+        defer { try? FileManager.default.removeItem(at: journalURL) }
         let remote = RemoteAccessModel(
             awake: awake, automation: automation, helper: helper, network: network, cloud: nil,
+            commandJournal: RemoteCommandJournal(url: journalURL),
             chargeHistory: {
                 let now = Date()
                 return (0..<48).map { .init(at: now.addingTimeInterval(Double($0 - 47) * 1800), percent: 50) }
@@ -79,10 +82,24 @@ struct RemoteHarness {
         let extras = try require(await remote.fullStatus().extras)
         precondition(inspected == nil && abs(extras.sampledAt.timeIntervalSinceNow) < 30 && extras.apps.count <= 5)
 
+        let start = RemoteRequest(operation: .start, mode: .displayMaySleep, durationMinutes: 15)
+        let first = try await remote.executeCommand(start)
+        let repeated = try await remote.executeCommand(start)
+        precondition(first.lastCommand?.failure == nil && repeated.lastCommand?.failure == nil)
+        precondition(first.session?.startedAt == repeated.session?.startedAt)
+        let addTime = RemoteRequest(operation: .extend, durationMinutes: 30)
+        let extendedOnce = try await remote.executeCommand(addTime)
+        let extendedAgain = try await remote.executeCommand(addTime)
+        precondition(extendedOnce.session?.deadline == extendedAgain.session?.deadline)
+        precondition(extendedOnce.session?.deadline == first.session?.deadline?.addingTimeInterval(30 * 60))
+        precondition((extendedAgain.revision ?? 0) > (extendedOnce.revision ?? 0))
+        let stoppedOnce = try await remote.executeCommand(.init(operation: .stop))
+        precondition(stoppedOnce.session == nil && !awake.isActive)
+
         remote.enabled = false
         let off = await command(.stop)
         precondition(off?.code == .unavailable)
-        print("PASS: start limits, extend, busy, closed-lid gate, phone stop reason, history, inspect, disabled")
+        print("PASS: start limits, extend, busy, closed-lid gate, phone stop reason, history, inspect, disabled, handoff replay and revisions")
     }
 
     private static func require<T>(_ value: T?) throws -> T {

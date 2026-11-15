@@ -86,12 +86,21 @@
 	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Battistics Remote connects securely to your nearby Macs to keep their status up to date and send Keep Awake controls over Bluetooth.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_battistics._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Battistics Remote connects securely to your Macs over local Wi-Fi or Ethernet to receive current status and send Keep Awake controls.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
+		<string>bluetooth-central</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>

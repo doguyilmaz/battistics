@@ -17,11 +17,12 @@ struct PhoneApp: App {
             HomeView()
                 .environment(store)
                 .environment(phone)
-                .onAppear { theme.apply() }
+                .onAppear { theme.apply(); store.setForeground(UIApplication.shared.applicationState == .active) }
                 .onOpenURL { store.open($0) }
                 .onChange(of: theme) { theme.apply() }
         }
         .onChange(of: scenePhase) {
+            store.setForeground(scenePhase == .active)
             if scenePhase == .background {
                 Notifications.schedule()
                 store.publishSelected()

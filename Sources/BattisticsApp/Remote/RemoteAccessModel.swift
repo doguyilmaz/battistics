@@ -18,8 +18,10 @@ final class RemoteAccessModel {
             updateNapActivity()
             if enabled {
                 NSApplication.shared.registerForRemoteNotifications()
+                startNearby()
                 Task { await sync() }
             } else {
+                stopNearby(revoke: true)
                 Task {
                     await withdraw()
                     startTicker()
@@ -59,6 +61,7 @@ final class RemoteAccessModel {
     @ObservationIgnored private var lastCommandAt: Date?
     /// A phone asked the Mac to sleep; it does once the answer is out.
     @ObservationIgnored private var sleepRequested = false
+    @ObservationIgnored private var sleepCommandID: String?
     /// Published as the Mac's last word before sleeping.
     @ObservationIgnored private var sleptAt: Date?
     @ObservationIgnored private var sleepWatcher: SleepWatcher?
@@ -74,11 +77,22 @@ final class RemoteAccessModel {
     @ObservationIgnored private var napActivity: NSObjectProtocol?
     @ObservationIgnored private var pushObserver: NSObjectProtocol?
     @ObservationIgnored private var powerStateObserver: NSObjectProtocol?
+    @ObservationIgnored private var accountObserver: NSObjectProtocol?
+    @ObservationIgnored private let nearby = NearbyHost()
+    @ObservationIgnored private var nearbyCredential: NearbyCredential?
+    @ObservationIgnored private var nearbySetup: Task<Void, Never>?
+    @ObservationIgnored private var nearbyRegistered = false
+    @ObservationIgnored private var nearbyGeneration = 0
+    @ObservationIgnored private var nearbyRetryAt = Date.distantPast
+    @ObservationIgnored private var activeCommandID: String?
+    @ObservationIgnored private var commandWork: [String: (request: RemoteRequest, work: Task<RemoteStatus, Error>)] = [:]
+    @ObservationIgnored private let commandJournal: RemoteCommandJournal
     @ObservationIgnored let macID: String
 
     init(awake: KeepAwakeModel, automation: AutomationModel, helper: PowerHelperClient,
          network: NetworkMonitor, powerSettings: PowerSettingsModel? = nil,
          cloud: RemoteCloud? = RemoteCloud.isEntitled ? RemoteCloud() : nil,
+         commandJournal: RemoteCommandJournal? = nil,
          battery: @escaping @MainActor () -> BatterySnapshot? = { BatteryReader.read() },
          chargeHistory: @escaping @Sendable () async -> [RemoteStatus.ChargePoint] = { [] }) {
         self.awake = awake
@@ -89,7 +103,11 @@ final class RemoteAccessModel {
         self.cloud = cloud
         self.chargeHistory = chargeHistory
         self.battery = battery
-        macID = Self.savedMacID()
+        let id = Self.savedMacID()
+        macID = id
+        self.commandJournal = commandJournal ?? RemoteCommandJournal(url:
+            FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("Battistics/Remote/\(id).json"))
         enabled = UserDefaults.standard.bool(forKey: Prefs.remoteEnabled)
         closedLidAllowed = UserDefaults.standard.bool(forKey: Prefs.remoteClosedLidAllowed)
         network.onChange = { [weak self] in self?.publishSoon() }
@@ -112,8 +130,18 @@ final class RemoteAccessModel {
                                     didWake: { [weak self] in self?.woke() })
         startTicker()
         updateNapActivity()
+        accountObserver = NotificationCenter.default.addObserver(forName: .CKAccountChanged, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.stopNearby(revoke: true)
+                await self.cloud?.accountDidChange()
+                self.startNearby()
+                self.publishSoon(force: true)
+            }
+        }
         if enabled, cloud != nil {
             NSApplication.shared.registerForRemoteNotifications()
+            startNearby()
             Task { await sync() }
         }
     }
@@ -140,18 +168,21 @@ final class RemoteAccessModel {
         var failure: Error?
         var handled = false
         var recordMissing = false
+        let generation = nearbyGeneration
         do {
             let inbox = try await cloud.inbox(macID: macID)
+            guard enabled, generation == nearbyGeneration else { return }
             // After a relaunch, alerts compare against what the phones last saw.
             if lastStatus == nil { lastStatus = inbox.status }
             recordMissing = inbox.status == nil
+            if recordMissing { nearbyRegistered = false; startNearby() }
             // The slot keeps its last command. One answered before a relaunch
             // is named in this Mac's own record, so it never runs twice.
             let answered = lastCommand?.id ?? inbox.status?.lastCommand?.id
             if let request = inbox.command, request.id != answered,
                -request.sentAt.timeIntervalSinceNow < RemoteRequest.lifetime {
-                lastCommand = .init(id: request.id, failure: await handle(request))
-                lastCommandAt = .now
+                let answer = try await executeCommand(request)
+                lastCommand = answer.lastCommand
                 try await publish(force: true, quick: request.operation != .setLowPower)
                 handled = true
             }
@@ -177,10 +208,116 @@ final class RemoteAccessModel {
             retryAt = .now.addingTimeInterval(seconds)
         }
         problem = failure.map(Self.describe)
-        if sleepRequested {
+        if sleepRequested, let id = sleepCommandID, lastStatus?.lastCommand?.id == id {
             sleepRequested = false
+            sleepCommandID = nil
             try? await SystemSleep.now()
         }
+    }
+
+    private func startNearby() {
+        guard enabled, let cloud, nearbySetup == nil, !nearbyRegistered, Date.now >= nearbyRetryAt else { return }
+        let generation = nearbyGeneration
+        nearbySetup = Task { [weak self] in
+            guard let self else { return }
+            defer { self.nearbySetup = nil }
+            do {
+                try Task.checkCancellation()
+                guard self.enabled, generation == self.nearbyGeneration else { return }
+                let accountID = try await cloud.accountIdentity()
+                try Task.checkCancellation()
+                guard self.enabled, generation == self.nearbyGeneration else { return }
+                let rotate = UserDefaults.standard.bool(forKey: "remoteNearbyRekeyRequired")
+                let saved = rotate ? nil : try NearbyKeychain.load(.mac, macID: self.macID, accountID: accountID)
+                let credential = try saved ?? NearbyCredential.generate(macID: self.macID)
+                try NearbyKeychain.save(credential, owner: .mac, accountID: accountID)
+                UserDefaults.standard.set(false, forKey: "remoteNearbyRekeyRequired")
+                self.nearbyCredential = credential
+                self.nearby.start(credential, read: { [weak self] in
+                    guard let self, self.enabled else { throw NearbyError.unavailable }
+                    return try await self.stamped(self.reusingEnrichment(self.status()))
+                }, command: { [weak self] request in
+                    guard let self else { throw NearbyError.unavailable }
+                    return try await self.executeCommand(request)
+                }, delivered: { [weak self] id in
+                    guard let self, self.sleepRequested, self.sleepCommandID == id else { return }
+                    self.sleepRequested = false
+                    self.sleepCommandID = nil
+                    try? await SystemSleep.now()
+                })
+                let name = RemoteCloud.nearbyCredentialRecordName(for: self.macID, discoveryID: credential.discoveryID)
+                var names = Set(UserDefaults.standard.stringArray(forKey: "remoteNearbyRecords") ?? [])
+                names.insert(name)
+                UserDefaults.standard.set(Array(names), forKey: "remoteNearbyRecords")
+                try await cloud.publishNearbyCredential(credential)
+                guard self.enabled, generation == self.nearbyGeneration else { return }
+                self.nearbyRegistered = true
+                self.publishSoon(force: true)
+            } catch { self.nearbyRetryAt = .now.addingTimeInterval(60) }
+        }
+    }
+
+    private func stopNearby(revoke: Bool) {
+        nearbyGeneration += 1
+        nearbySetup?.cancel()
+        nearby.stop()
+        nearbyRegistered = false
+        nearbyRetryAt = .distantPast
+        nearbyCredential = nil
+        if revoke {
+            // Even a locked/unavailable Keychain must not make the next enable
+            // silently reuse a credential whose trust has been revoked.
+            UserDefaults.standard.set(true, forKey: "remoteNearbyRekeyRequired")
+            try? NearbyKeychain.remove(.mac, macID: macID)
+        }
+    }
+
+    private func stamped(_ status: RemoteStatus) async throws -> RemoteStatus {
+        var status = status
+        status.revision = try await commandJournal.nextRevision()
+        return status
+    }
+
+    func executeCommand(_ request: RemoteRequest) async throws -> RemoteStatus {
+        guard enabled else { throw NearbyError.unavailable }
+        if let existing = commandWork[request.id] {
+            guard existing.request.isSameCommand(as: request) else { throw NearbyError.commandCollision }
+            return try await existing.work.value
+        }
+        let mayExecute = activeCommandID == nil && !sleepRequested
+        let generation = nearbyGeneration
+        if mayExecute { activeCommandID = request.id }
+        let work = Task<RemoteStatus, Error> { [weak self] in
+            guard let self else { throw NearbyError.unavailable }
+            let result: RemoteStatus.CommandResult
+            switch try await self.commandJournal.claim(request) {
+            case .completed(let previous): result = previous
+            case .uncertain:
+                result = .init(id: request.id, failure: .init(.startFailed,
+                    String(localized: "This change may already have been applied. Check the Mac before trying again.")))
+                try await self.commandJournal.complete(result)
+            case .execute:
+                let allowed = self.enabled && generation == self.nearbyGeneration
+                result = .init(id: request.id, failure: allowed ? (mayExecute ? await self.handle(request) : .init(.busy)) : .init(.unavailable))
+                if request.operation == .sleep, result.failure == nil { self.sleepCommandID = request.id }
+                try await self.commandJournal.complete(result)
+            }
+            self.lastCommand = result
+            self.lastCommandAt = .now
+            // Order the sample before asynchronous enrichment. A slow settings
+            // read must not outrank a newer nearby sample collected meanwhile.
+            var status = try await self.stamped(self.status())
+            status = request.operation == .setLowPower ? await self.enriched(status) : self.reusingEnrichment(status)
+            status.lastCommand = result
+            self.publishSoon(force: true)
+            return status
+        }
+        commandWork[request.id] = (request, work)
+        defer {
+            commandWork[request.id] = nil
+            if activeCommandID == request.id { activeCommandID = nil }
+        }
+        return try await work.value
     }
 
     /// The system is already committed to sleep, shutdown or restart. Keep Awake
@@ -233,6 +370,7 @@ final class RemoteAccessModel {
     /// nothing costs no history query and no `pmset` spawn.
     private func publishNow(force: Bool, quick: Bool = false) async throws {
         guard enabled, let cloud else { return }
+        let generation = nearbyGeneration
         var status = status()
         status.lastCommand = lastCommand
         if !force, let lastCheap, let lastPublished, -lastPublished.timeIntervalSinceNow < status.heartbeatSeconds,
@@ -240,14 +378,16 @@ final class RemoteAccessModel {
             return
         }
         let cheap = status
+        status = try await stamped(status)
         status = quick ? reusingEnrichment(status) : await enriched(status)
-        guard enabled else { return }
+        guard enabled, generation == nearbyGeneration else { return }
         try await cloud.publish(status, macID: macID)
         // Sharing was turned off while the save was in flight: take the record back down.
         guard enabled else {
             try? await cloud.delete([macID])
             return
         }
+        guard generation == nearbyGeneration else { return }
         lastCheap = cheap
         lastPublished = Date()
         alertOutbox.record(from: lastStatus, to: status)
@@ -297,10 +437,12 @@ final class RemoteAccessModel {
         saveAlertOutbox()
         problem = nil
         // Retried by the ticker until it lands, or phones keep a ghost of this Mac.
-        guard let cloud else { return }
+        guard !enabled, let cloud else { return }
         let removed: Bool
         do {
-            try await cloud.delete([macID, RemoteCloud.commandRecordName(for: macID)] + postedEvents.keys)
+            let nearbyRecords = UserDefaults.standard.stringArray(forKey: "remoteNearbyRecords") ?? []
+            try await cloud.delete([macID, RemoteCloud.commandRecordName(for: macID)] + postedEvents.keys + nearbyRecords)
+            UserDefaults.standard.removeObject(forKey: "remoteNearbyRecords")
             postedEvents = [:]
             removed = true
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
@@ -347,6 +489,7 @@ final class RemoteAccessModel {
                 let interval = self?.pollInterval ?? 15
                 try? await Task.sleep(for: .seconds(interval))
                 guard let self, !Task.isCancelled else { return }
+                self.startNearby()
                 if !self.enabled {
                     guard UserDefaults.standard.bool(forKey: Prefs.remoteWithdrawPending) else {
                         self.ticker = nil
@@ -612,6 +755,10 @@ final class RemoteAccessModel {
         )
         status.extras = extras
         status.sleptAt = sleptAt
+        if let nearbyCredential {
+            status.nearbyProtocol = 1
+            status.nearbyID = nearbyCredential.discoveryID
+        }
         return status
     }
 

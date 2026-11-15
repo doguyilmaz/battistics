@@ -225,6 +225,10 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// macOS version string on the Mac (e.g. "macOS 15.4").
     public var osVersion: String?
     public var readAt: Date
+    /// A Mac-owned durable sequence shared by every transport. Absent on older Macs.
+    public var revision: UInt64?
+    public var nearbyProtocol: Int?
+    public var nearbyID: String?
     public var battery: Battery?
     public var session: Session?
     public var lastEnd: LastEnd?
@@ -288,6 +292,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public func differsNoticeably(from old: RemoteStatus) -> Bool {
         var compared = self
         compared.readAt = old.readAt
+        compared.revision = old.revision
         if var battery = compared.battery, let before = old.battery {
             battery.watts = before.watts
             battery.temperatureC = before.temperatureC
@@ -306,6 +311,11 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     /// Whether this reading is recent enough to call the Mac reachable.
     public func isFresh(at now: Date = Date()) -> Bool {
         now < staleDate
+    }
+
+    public func isAtLeastAsRecent(as old: RemoteStatus) -> Bool {
+        if let revision, let previous = old.revision { return revision >= previous }
+        return readAt >= old.readAt
     }
 
     public init(

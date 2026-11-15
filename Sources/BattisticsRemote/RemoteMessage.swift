@@ -47,6 +47,14 @@ public struct RemoteRequest: Codable, Sendable, Equatable {
         deviceName.map { String($0.prefix(64)) }.flatMap { $0.isEmpty ? nil : $0 }
     }
 
+    /// JSON date conversion may round a fraction of a millisecond. Every
+    /// operation argument must still match before an ID can reuse a result.
+    public func isSameCommand(as other: RemoteRequest) -> Bool {
+        id == other.id && operation == other.operation && mode == other.mode
+            && durationMinutes == other.durationMinutes && lowPowerPolicy == other.lowPowerPolicy
+            && deviceName == other.deviceName && abs(sentAt.timeIntervalSince(other.sentAt)) < 0.001
+    }
+
     /// Finite durations a phone may request; the app and Shortcuts each offer a subset.
     public static let durations = [15, 30, 60, 120, 240, 360, 720]
 

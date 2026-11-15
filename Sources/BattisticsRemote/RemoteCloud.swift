@@ -23,6 +23,13 @@ public actor RemoteCloud {
         public var statuses: [String: RemoteStatus] = [:]
         /// Status records written by a newer build that this one cannot read.
         public var unreadable: Set<String> = []
+        /// Nearby telemetry is a partial update and cannot remove other Macs.
+        public var isComplete = true
+
+        public init(statuses: [String: RemoteStatus] = [:], isComplete: Bool = true) {
+            self.statuses = statuses
+            self.isComplete = isComplete
+        }
     }
 
     /// What a Mac reads each poll: its own record and its command slot.
@@ -34,6 +41,10 @@ public actor RemoteCloud {
 
     private let operations: CloudKitOperations
     private let subscriptionClock: @Sendable () -> ContinuousClock.Instant
+    private let identity: @Sendable () async throws -> String
+    private var identityWork: Task<String, Error>?
+    private var verifiedIdentity: String?
+    private var accountGeneration = 0
     private var prepared = false
     private var preparing: Task<Void, Error>?
     private var subscribed = false
@@ -44,13 +55,17 @@ public actor RemoteCloud {
     private var statusRecords: [String: CKRecord] = [:]
 
     public init() {
-        operations = CloudKitOperations(database: CKContainer(identifier: Self.containerID).privateCloudDatabase)
+        let container = CKContainer(identifier: Self.containerID)
+        operations = CloudKitOperations(database: container.privateCloudDatabase)
         subscriptionClock = { .now }
+        identity = { try await container.userRecordID().recordName }
     }
 
-    init(operations: CloudKitOperations, subscriptionClock: @escaping @Sendable () -> ContinuousClock.Instant = { .now }) {
+    init(operations: CloudKitOperations, subscriptionClock: @escaping @Sendable () -> ContinuousClock.Instant = { .now },
+         identity: @escaping @Sendable () async throws -> String = { throw NearbyError.unavailable }) {
         self.operations = operations
         self.subscriptionClock = subscriptionClock
+        self.identity = identity
     }
 
     /// Whether this process is signed for the container; CloudKit traps
@@ -188,6 +203,63 @@ public actor RemoteCloud {
     /// at a time and a phone never sends a second before the first is answered.
     public static func commandRecordName(for macID: String) -> String { "command.\(macID)" }
 
+    /// Uses the existing encrypted Command schema, outside the command mailbox.
+    public static func nearbyCredentialRecordName(for macID: String, discoveryID: String) -> String { "nearby.\(macID).\(discoveryID)" }
+
+    public func nearbyCredential(macID: String, discoveryID: String) async throws -> NearbyCredential? {
+        try await attempt {
+            let id = CKRecord.ID(recordName: Self.nearbyCredentialRecordName(for: macID, discoveryID: discoveryID), zoneID: Self.zoneID)
+            guard let record = try await operations.record(id, until: .now.advanced(by: .seconds(15))) else { return nil }
+            guard record.recordType == Self.commandType,
+                  let data = record.encryptedValues["payload"] as? Data else { throw NearbyError.authentication }
+            let credential = try RemoteWire.decode(NearbyCredential.self, from: data)
+            guard credential.isValid, credential.macID == macID, credential.discoveryID == discoveryID else { throw NearbyError.authentication }
+            return credential
+        }
+    }
+
+    public func publishNearbyCredential(_ credential: NearbyCredential) async throws {
+        guard credential.isValid else { throw NearbyError.authentication }
+        try await attempt {
+            let deadline = ContinuousClock.now.advanced(by: .seconds(15))
+            try await prepare(until: deadline)
+            let id = CKRecord.ID(recordName: Self.nearbyCredentialRecordName(for: credential.macID, discoveryID: credential.discoveryID), zoneID: Self.zoneID)
+            let record = try await operations.record(id, until: deadline)
+                ?? CKRecord(recordType: Self.commandType, recordID: id)
+            guard record.recordType == Self.commandType else { throw NearbyError.authentication }
+            record.encryptedValues["payload"] = try RemoteWire.encode(credential)
+            _ = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
+        }
+    }
+
+    public func accountDidChange() {
+        accountGeneration += 1
+        identityWork?.cancel()
+        identityWork = nil
+        verifiedIdentity = nil
+        invalidateZone()
+        retryAt = nil
+    }
+
+    /// Verify once per process/account before reusing nearby credentials. A
+    /// notification cannot tell us about an account change while the app quit.
+    public func accountIdentity() async throws -> String {
+        if let verifiedIdentity { return verifiedIdentity }
+        let generation = accountGeneration
+        let work: Task<String, Error>
+        if let identityWork { work = identityWork }
+        else {
+            let identity = identity
+            work = Task { try await RemoteDeadline.perform(until: .now.advanced(by: .seconds(15)), operation: identity) }
+            identityWork = work
+        }
+        defer { if generation == accountGeneration { identityWork = nil } }
+        let value = try await work.value
+        guard generation == accountGeneration, !value.isEmpty else { throw NearbyError.authentication }
+        verifiedIdentity = value
+        return value
+    }
+
     static func commandRecordID(for macID: String) -> CKRecord.ID {
         .init(recordName: commandRecordName(for: macID), zoneID: zoneID)
     }
@@ -249,6 +321,20 @@ public actor RemoteCloud {
                 record.encryptedValues["payload"] = try RemoteWire.encode(request)
                 _ = try await operations.modifyRecords(saving: [record], policy: .allKeys, until: deadline)
             }
+        }
+    }
+
+    /// Cancel only this command, using the fetched change tag. A late cleanup
+    /// must not delete/overwrite a newer command occupying the shared slot.
+    public func cancelCommand(_ commandID: String, macID: String,
+                              until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(5))) async throws {
+        try await attempt {
+            guard let record = try await operations.record(Self.commandRecordID(for: macID), until: deadline),
+                  record.recordType == Self.commandType,
+                  let payload = record.encryptedValues["payload"] as? Data,
+                  Self.request(from: payload)?.id == commandID else { return }
+            record.encryptedValues["payload"] = Data("{}".utf8)
+            _ = try await operations.modifyRecords(saving: [record], policy: .ifServerRecordUnchanged, until: deadline)
         }
     }
 

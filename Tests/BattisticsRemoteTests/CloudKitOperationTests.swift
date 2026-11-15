@@ -5,6 +5,78 @@ import Testing
 
 @Suite("CloudKit operation boundary")
 struct CloudKitOperationTests {
+    @Test func lateCleanupCannotEraseAnotherPhonesCommand() async throws {
+        let newer = RemoteRequest(operation: .stop)
+        let writes = CloudKitBuffer(0)
+        let cloud = RemoteCloud(operations: .init { operation in
+            if let read = operation as? CKFetchRecordsOperation, let id = read.recordIDs?.first {
+                let record = CKRecord(recordType: RemoteCloud.commandType, recordID: id)
+                record.encryptedValues["payload"] = try! RemoteWire.encode(newer)
+                read.perRecordResultBlock?(id, .success(record))
+                read.fetchRecordsResultBlock?(.success(()))
+            } else if let write = operation as? CKModifyRecordsOperation {
+                writes.update { $0 += 1 }
+                write.modifyRecordsResultBlock?(.success(()))
+            } else { Issue.record("Unexpected cleanup operation") }
+        })
+        try await cloud.cancelCommand("older-command", macID: "mac")
+        #expect(writes.read() == 0)
+    }
+
+    @Test func cleanupUsesAConditionalTombstoneInsteadOfDeletingTheSlot() async throws {
+        let request = RemoteRequest(operation: .start)
+        let writes = CloudKitBuffer(0)
+        let cloud = RemoteCloud(operations: .init { operation in
+            if let read = operation as? CKFetchRecordsOperation, let id = read.recordIDs?.first {
+                let record = CKRecord(recordType: RemoteCloud.commandType, recordID: id)
+                record.encryptedValues["payload"] = try! RemoteWire.encode(request)
+                read.perRecordResultBlock?(id, .success(record))
+                read.fetchRecordsResultBlock?(.success(()))
+            } else if let write = operation as? CKModifyRecordsOperation {
+                writes.update { $0 += 1 }
+                #expect(write.savePolicy == .ifServerRecordUnchanged)
+                #expect(write.recordIDsToDelete?.isEmpty ?? true)
+                for record in write.recordsToSave ?? [] {
+                    #expect(record.encryptedValues["payload"] as? Data == Data("{}".utf8))
+                    write.perRecordSaveBlock?(record.recordID, .success(record))
+                }
+                write.modifyRecordsResultBlock?(.success(()))
+            } else { Issue.record("Unexpected cleanup operation") }
+        })
+        try await cloud.cancelCommand(request.id, macID: "mac")
+        #expect(writes.read() == 1)
+    }
+
+    @Test func nearbyCredentialsUseAnImmutableNameInTheExistingEncryptedSchema() async throws {
+        let credential = try NearbyCredential(macID: "mac", key: Data(repeating: 42, count: 32))
+        let stored = CloudKitBuffer<Data?>(nil)
+        let cloud = RemoteCloud(operations: .init { operation in
+            if let zone = operation as? CKModifyRecordZonesOperation { zone.modifyRecordZonesResultBlock?(.success(())) }
+            else if let subscription = operation as? CKModifySubscriptionsOperation { subscription.modifySubscriptionsResultBlock?(.success(())) }
+            else if let read = operation as? CKFetchRecordsOperation {
+                for id in read.recordIDs ?? [] {
+                    if let payload = stored.read() {
+                        let record = CKRecord(recordType: RemoteCloud.commandType, recordID: id)
+                        record.encryptedValues["payload"] = payload
+                        read.perRecordResultBlock?(id, .success(record))
+                    } else { read.perRecordResultBlock?(id, .failure(CKError(.unknownItem))) }
+                }
+                read.fetchRecordsResultBlock?(.success(()))
+            } else if let write = operation as? CKModifyRecordsOperation {
+                for record in write.recordsToSave ?? [] {
+                    #expect(record.recordType == RemoteCloud.commandType)
+                    #expect(record.recordID.recordName == RemoteCloud.nearbyCredentialRecordName(for: "mac", discoveryID: credential.discoveryID))
+                    stored.update { $0 = record.encryptedValues["payload"] as? Data }
+                    write.perRecordSaveBlock?(record.recordID, .success(record))
+                }
+                write.modifyRecordsResultBlock?(.success(()))
+            } else { Issue.record("Unexpected credential operation") }
+        })
+        try await cloud.publishNearbyCredential(credential)
+        #expect(try await cloud.nearbyCredential(macID: "mac", discoveryID: credential.discoveryID) == credential)
+        await #expect(throws: NearbyError.self) { try await cloud.nearbyCredential(macID: "mac", discoveryID: "wrong-id") }
+    }
+
     @Test func retryingAnUncertainEventSaveDoesNotCreateAnotherPush() async throws {
         let stored = CloudKitBuffer<CKRecord?>(nil)
         let creations = CloudKitBuffer(0)

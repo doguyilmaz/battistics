@@ -134,9 +134,12 @@ targets:
         CFBundleVersion: "46"
         LSUIElement: true
         NSBluetoothAlwaysUsageDescription: >-
-          Battistics reads the battery level that connected keyboards, mice and
-          headphones publish over Bluetooth. It is only used to show those levels
-          in the Peripherals view, and nothing leaves this Mac.
+          Battistics reads connected accessory batteries and securely exchanges
+          this Mac's status and Keep Awake controls with your nearby iPhone.
+        NSLocalNetworkUsageDescription: >-
+          Battistics connects securely to your iPhone over local Wi-Fi or Ethernet
+          to share this Mac's status and receive Keep Awake controls.
+        NSBonjourServices: [_battistics._tcp]
         NSLocationUsageDescription: >-
           Battistics reads the current Wi‑Fi or Personal Hotspot network name so
           Battistics Remote on your iPhone can show which network your Mac is on.
@@ -210,7 +213,14 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UIBackgroundModes: [fetch, remote-notification]
+        UIBackgroundModes: [fetch, remote-notification, bluetooth-central]
+        NSBluetoothAlwaysUsageDescription: >-
+          Battistics Remote connects securely to your nearby Macs to keep their
+          status up to date and send Keep Awake controls over Bluetooth.
+        NSLocalNetworkUsageDescription: >-
+          Battistics Remote connects securely to your Macs over local Wi-Fi or
+          Ethernet to receive current status and send Keep Awake controls.
+        NSBonjourServices: [_battistics._tcp]
         NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers: [com.doguyilmaz.Battistics.Remote.refresh]
         CFBundleIcons:

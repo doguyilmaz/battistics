@@ -57,6 +57,15 @@ final class MacStore {
     }
 
     @ObservationIgnored private lazy var cloud = RemoteCloud()
+    @ObservationIgnored private let nearby = NearbyClient()
+    @ObservationIgnored private var nearbyTrust: [String: NearbyCredential] = [:]
+    @ObservationIgnored private var nearbyAccountID: String?
+    @ObservationIgnored private var nearbyAccountRetry = Date.distantPast
+    @ObservationIgnored private var nearbyTrustWork: Task<Void, Never>?
+    @ObservationIgnored private var nearbyTrustRetry: [String: Date] = [:]
+    @ObservationIgnored private var accountObserver: NSObjectProtocol?
+    @ObservationIgnored private var accountGeneration = 0
+    @ObservationIgnored private var applying: Task<Void, Never>?
     @ObservationIgnored private var subscriptionWork: Task<Void, Never>?
     @ObservationIgnored private var alertSubscriptionChecked: Date?
     @ObservationIgnored private var sending: Set<String> = []
@@ -98,6 +107,109 @@ final class MacStore {
             await Notifications.report(await self.extend(mac, minutes: minutes), for: mac)
         }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+        nearby.onStatus = { [weak self] id, status in
+            Task { @MainActor in
+                guard let self, !self.isSample, self.nearbyTrust[id]?.discoveryID == status.nearbyID else { return }
+                self.checking = false
+                await self.apply(.init(statuses: [id: status], isComplete: false))
+            }
+        }
+        if !isSample {
+            accountObserver = NotificationCenter.default.addObserver(forName: .CKAccountChanged, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor in await self?.accountChanged() }
+            }
+            updateNearbyTrust()
+        }
+    }
+
+    /// A local store with an already available snapshot; used for deterministic
+    /// reconciliation checks without registering bridges or contacting iCloud.
+    init(initialReadings: [String: Reading]) {
+        readings = initialReadings
+        macID = nil
+        selectedID = nil
+        isSample = false
+    }
+
+    func setForeground(_ active: Bool) {
+        guard !isSample else { return }
+        nearby.setForeground(active)
+        if active { updateNearbyTrust() }
+    }
+
+    private func accountChanged() async {
+        accountGeneration += 1
+        nearbyTrustWork?.cancel()
+        subscriptionWork?.cancel()
+        nearby.stop()
+        nearbyTrust = [:]
+        nearbyAccountID = nil
+        nearbyAccountRetry = .distantPast
+        nearbyTrustRetry = [:]
+        try? NearbyKeychain.remove(.phone)
+        await cloud.accountDidChange()
+        await applying?.value
+        Notifications.cancelAll()
+        UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
+        readings = [:]
+        outdated = []
+        alertStates = [:]
+        silenceStates = [:]
+        checking = true
+        alertSubscriptionChecked = nil
+        save()
+        WidgetBridge.syncActivities([], confirmed: true)
+        await WidgetBridge.settle()
+    }
+
+    private func updateNearbyTrust() {
+        guard !isSample, nearbyTrustWork == nil, nearbyAccountRetry <= .now else { return }
+        for (id, credential) in nearbyTrust where readings[id]?.status?.nearbyID != credential.discoveryID {
+            nearbyTrust[id] = nil
+            try? NearbyKeychain.remove(.phone, macID: id)
+        }
+        nearby.configure(Array(nearbyTrust.values))
+        guard nearbyAccountID == nil || readings.contains(where: { id, reading in
+            reading.status?.nearbyProtocol == 1 && reading.status?.nearbyID != nil &&
+            nearbyTrust[id] == nil && (nearbyTrustRetry[id].map({ $0 <= .now }) ?? true)
+        }) else { return }
+        let generation = accountGeneration
+        nearbyTrustWork = Task { [weak self] in
+            guard let self else { return }
+            defer { self.nearbyTrustWork = nil }
+            if self.nearbyAccountID == nil {
+                do {
+                    let accountID = try await self.cloud.accountIdentity()
+                    guard !Task.isCancelled, generation == self.accountGeneration, !self.isSample else { return }
+                    self.nearbyAccountID = accountID
+                    for (id, reading) in self.readings {
+                        if let credential = try? NearbyKeychain.load(.phone, macID: id, accountID: accountID),
+                           credential.discoveryID == reading.status?.nearbyID { self.nearbyTrust[id] = credential }
+                    }
+                    self.nearby.configure(Array(self.nearbyTrust.values))
+                } catch {
+                    if generation == self.accountGeneration { self.nearbyAccountRetry = .now.addingTimeInterval(60) }
+                    return
+                }
+            }
+            guard let accountID = self.nearbyAccountID else { return }
+            let wanted = self.readings.compactMap { id, reading -> (String, String)? in
+                guard reading.status?.nearbyProtocol == 1, let keyID = reading.status?.nearbyID,
+                      self.nearbyTrust[id] == nil, self.nearbyTrustRetry[id].map({ $0 <= .now }) ?? true else { return nil }
+                return (id, keyID)
+            }
+            for (id, keyID) in wanted {
+                guard !Task.isCancelled, self.accountGeneration == generation, !self.isSample else { return }
+                self.nearbyTrustRetry[id] = .now.addingTimeInterval(60)
+                do {
+                    guard let credential = try await self.cloud.nearbyCredential(macID: id, discoveryID: keyID),
+                          self.accountGeneration == generation, self.readings[id]?.status?.nearbyID == keyID else { continue }
+                    try NearbyKeychain.save(credential, owner: .phone, accountID: accountID)
+                    self.nearbyTrust[id] = credential
+                    self.nearby.configure(Array(self.nearbyTrust.values))
+                } catch {}
+            }
+        }
     }
 
     var macs: [Mac] {
@@ -169,6 +281,8 @@ final class MacStore {
     // MARK: Sample
 
     func showSample() {
+        nearbyTrustWork?.cancel()
+        nearby.stop()
         isSample = true
         problem = nil
         readings = DemoData.readings
@@ -210,6 +324,8 @@ final class MacStore {
         if isSample { return .noData }
         refreshing = true
         defer { refreshing = false }
+        let generation = accountGeneration
+        let startingReadings = readings
         let snapshot: RemoteCloud.Snapshot
         waitingForUpdate = false
         let slow = Task { [weak self] in
@@ -220,14 +336,20 @@ final class MacStore {
         defer { slow.cancel(); waitingForUpdate = false }
         do {
             snapshot = try await cloud.fetch(knownMacIDs: Array(readings.keys), until: deadline)
+            guard generation == accountGeneration else { return .failed }
             slow.cancel()
             problem = nil
         } catch is CancellationError {
             interruptSilenceConfirmation()
             return .failed
         } catch {
-            guard !isSample else { return .noData }
+            guard !isSample, generation == accountGeneration else { return .noData }
             interruptSilenceConfirmation()
+            if let selected, nearby.hasFreshConnection(to: selected.id) {
+                await applying?.value
+                problem = nil
+                return startingReadings == readings ? .noData : .newData
+            }
             problem = Self.describe(error)
             return .failed
         }
@@ -238,6 +360,7 @@ final class MacStore {
         let previousReadings = readings
         let previousOutdated = outdated
         await apply(snapshot)
+        updateNearbyTrust()
         // Notification housekeeping is independent of readings and commands.
         // Until confirmed, this phone retains the existing local-alert fallback.
         if subscriptionDue, subscriptionWork == nil {
@@ -249,13 +372,26 @@ final class MacStore {
         return readings == previousReadings && outdated == previousOutdated ? .noData : .newData
     }
 
-    private func apply(_ snapshot: RemoteCloud.Snapshot) async {
+    func apply(_ snapshot: RemoteCloud.Snapshot) async {
+        let previous = applying
+        let generation = accountGeneration
+        let next = Task { [weak self] in
+            await previous?.value
+            guard let self, !self.isSample, generation == self.accountGeneration else { return }
+            await self.applyNow(snapshot)
+        }
+        applying = next
+        await next.value
+        if applying == next { applying = nil }
+    }
+
+    private func applyNow(_ snapshot: RemoteCloud.Snapshot) async {
         var alerts: [(Mac, [RemoteAlert])] = []
         // Also a Mac never read before, so setup can say why it does not appear.
-        outdated = snapshot.unreadable
+        if snapshot.isComplete { outdated = snapshot.unreadable }
         for (id, status) in snapshot.statuses {
             // A direct command answer may have arrived while discovery ran.
-            if let current = readings[id]?.status, current.readAt > status.readAt { continue }
+            if let current = readings[id]?.status, !status.isAtLeastAsRecent(as: current) { continue }
             let previous: RemoteStatus?? = readings[id].map { $0.reachable ? $0.status : nil }
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
@@ -286,8 +422,9 @@ final class MacStore {
             silenceStates[id]?.interrupt()
         }
         // A Mac that stopped sharing is gone, not silent.
-        for id in readings.keys where snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {
+        for id in readings.keys where snapshot.isComplete && snapshot.statuses[id] == nil && !snapshot.unreadable.contains(id) {
             if commandAnsweredAt[id].map({ $0 > snapshot.requestedAt }) == true { continue }
+            if nearby.hasFreshConnection(to: id) { continue }
             readings[id] = nil
             alertStates[id] = nil
             silenceStates[id] = nil
@@ -310,6 +447,7 @@ final class MacStore {
         if !Notifications.isEnabled { Notifications.cancelAll() }
         // Sample controls must not contact or change the real iCloud account.
         guard !isSample else { return }
+        let generation = accountGeneration
         alertSubscriptionChecked = .now
         let wanted = Notifications.isEnabled
         let defaults = UserDefaults.standard
@@ -319,8 +457,10 @@ final class MacStore {
             if wanted {
                 defaults.set(false, forKey: Self.removalPendingKey)
                 let subscribed = try await cloud.hasAlertSubscription()
+                guard generation == accountGeneration else { return }
                 if !subscribed {
                     try await cloud.subscribeToAlerts()
+                    guard generation == accountGeneration else { return }
                     // Confirmed by the next refresh, which then leaves the Mac's alerts to iCloud.
                     alertSubscriptionChecked = nil
                 }
@@ -329,11 +469,13 @@ final class MacStore {
             } else {
                 if defaults.bool(forKey: Self.removalPendingKey) {
                     try await cloud.unsubscribeFromAlerts()
+                    guard generation == accountGeneration else { return }
                     defaults.set(false, forKey: Self.removalPendingKey)
                 }
                 UserDefaults.standard.set(false, forKey: Notifications.pushedKey)
             }
         } catch {
+            guard generation == accountGeneration else { return }
             // A failed check does not establish that an accepted subscription
             // disappeared. Switching to local alerts here can duplicate pushes.
             if let error = error as? CKError, [.zoneNotFound, .userDeletedZone].contains(error.code) {
@@ -358,6 +500,9 @@ final class MacStore {
             return Self.describe(error)
         }
         readings[mac.id] = nil
+        nearbyTrust[mac.id] = nil
+        try? NearbyKeychain.remove(.phone, macID: mac.id)
+        nearby.configure(Array(nearbyTrust.values))
         await Notifications.syncReminders(for: mac, reading: nil)
         alertStates[mac.id] = nil
         silenceStates[mac.id] = nil
@@ -410,6 +555,7 @@ final class MacStore {
         sending.insert(mac.id)
         defer { sending.remove(mac.id) }
         request.sentAt = .now
+        let generation = accountGeneration
         if isSample, var status = readings[mac.id]?.status {
             try? await Task.sleep(for: .seconds(request.operation == .inspect ? 2 : 0.6))
             guard isSample else { return nil }
@@ -419,9 +565,10 @@ final class MacStore {
             return nil
         }
         do {
-            let status = try await RemoteCommandExecutor.execute(request, to: mac.id, cloud: cloud)
+            let status = try await RemoteHandoff.execute(request, routes: nearby.routes(to: mac.id), to: mac.id, cloud: cloud)
+            guard generation == accountGeneration else { return String(localized: "The Apple Account changed. Check the Mac before trying again.") }
             commandAnsweredAt[mac.id] = .now
-            if readings[mac.id]?.status.map({ $0.readAt <= status.readAt }) ?? true {
+            if readings[mac.id]?.status.map({ status.isAtLeastAsRecent(as: $0) }) ?? true {
                 let reading = Reading(status: status, reachable: status.isFresh())
                 readings[mac.id] = reading
                 var silence = silenceStates[mac.id] ?? RemoteSilenceState()
