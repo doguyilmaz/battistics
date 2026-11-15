@@ -1,0 +1,106 @@
+---
+import { Image } from "astro:assets";
+import Page from "../layouts/Page.astro";
+import PhoneScreen from "./PhoneScreen.astro";
+import { appStoreURL } from "../lib/links";
+import bat from "../../../marketing/public/artwork/companion/nightwatch-cutout.png";
+import pocket from "../../../marketing/public/artwork/companion/pocket.png";
+import journey from "../../../marketing/public/artwork/companion/journey.png";
+import enPhone from "../../../marketing/public/screenshots/apple/iphone/en/01-nearby.png";
+import trPhone from "../../../marketing/public/screenshots/apple/iphone/tr/01-nearby.png";
+import enActivity from "../../../marketing/public/artwork/companion/en/activity.svg?url";
+import trActivity from "../../../marketing/public/artwork/companion/tr/activity.svg?url";
+
+interface Props { locale?: "en" | "tr"; }
+const {locale="en"}=Astro.props;
+const tr=locale==="tr";
+const copy=tr?{
+  title:"Battistics Remote — Mac’in elinin altında",headline:["Mac’in","elinin altında."],
+  intro:"Mac’inin pilini gör. Uyanık Tut’u iPhone’undan yönet. Masandan uzaklaşınca kontrol de seninle gelsin.",
+  requirement:"Battistics’in çalıştığı bir Mac ve iki cihazda aynı Apple Hesabı gerekir.",download:"App Store’dan indir",mac:"Mac için Battistics",language:"English",languageURL:"/remote/",
+  pocket:["Masan cebinde.","Şarj, kalan süre, pil sağlığı, sıcaklık ve Uyanık Tut. Mac’inin durumu tek ekranda; bağlı aksesuarlarının pilini ve enerji kullanan uygulamaları da görebilirsin."],
+  journey:["Kapak kapalı. Kontrol sende.","Süreyi Kilit Ekranından uzat ya da oturumu durdur. Ana Ekran widget’ları, Denetim Merkezi ve Kestirmeler ile sık kullandığın işlemlere ulaş."],
+  modes:["Süresini seç. Uyanık kalsın.","Ekran açık, ekran kapalı veya kapak kapalı. Kapak kapalı oturumları önce Mac’indeki iPhone ayarlarından etkinleştir."],
+  routes:["Yan yana da. Uzaktayken de.","Özel iCloud cihazlarını bir araya getirir. Yakındaki bağlantılar, Remote 1.1.0 ve Mac için Battistics 1.6.0 ile geliyor: yerel ağ veya Bluetooth, bağlantı koptuğunda otomatik geçiş."],
+  privacy:["Cihazların arasında kalır.","Ek hesap, eşleştirme kodu veya geliştirici sunucusu yok. Mac’inin verileri özel iCloud hesabın ve kimliği doğrulanmış, şifreli yakındaki bağlantılar üzerinden taşınır."],
+  limits:"Arka plan güncellemeleri iOS’a ve bağlantıya bağlıdır. Canlı Etkinlik’in süresinin dolması Mac’teki Uyanık Tut’u sonlandırmaz.",
+  sample:"Mac’in henüz hazır değil mi? İlk ekranda Örnek Bir Mac ile Dene’ye dokun. Örnek verilerle kontrolleri deneyebilirsin; hiçbir yere komut gönderilmez.",
+  preview:"Görseller Remote 1.1.0 önizlemesidir. Mevcut App Store sürümü iCloud üzerinden bağlanır.",help:"Kurulum ve yardım",policy:"Gizlilik politikası",contact:"İletişim",
+}: {
+  title:"Battistics Remote — Your Mac. Within reach.",headline:["Your Mac.","Within reach."],
+  intro:"Check your Mac’s battery. Control Keep Awake from your iPhone. Take the controls with you when you leave the desk.",
+  requirement:"Requires a Mac running Battistics and the same Apple Account on both devices.",download:"Download on the App Store",mac:"Battistics for Mac",language:"Türkçe",languageURL:"/tr/remote/",
+  pocket:["Your desk. In your pocket.","Charge, time left, battery health, temperature and Keep Awake. Your Mac at a glance, with connected accessory batteries and the apps using the most energy."],
+  journey:["Lid closed. Still in control.","Add time or stop your session from the Lock Screen. Home Screen widgets, Control Center and Shortcuts put everyday actions within reach."],
+  modes:["Pick a time. Keep it awake.","Screen on, screen off or lid closed. Enable closed-lid sessions in the Mac app’s iPhone settings first."],
+  routes:["Close by. Or far away.","Private iCloud brings your devices together. Nearby connections arrive with Remote 1.1.0 and Battistics 1.6.0 for Mac: local network or Bluetooth, with automatic handoff when a connection drops."],
+  privacy:["Between your devices.","No extra account, pairing code or developer server. Your Mac’s data travels through your private iCloud account and authenticated, encrypted nearby connections."],
+  limits:"Background updates depend on iOS and the connection. An expired Live Activity does not end Keep Awake on your Mac.",
+  sample:"No Mac set up yet? Choose Try a Sample Mac on the first screen. Explore the controls with sample readings; no commands are sent anywhere.",
+  preview:"Images preview Remote 1.1.0. The current App Store version connects through iCloud.",help:"Setup and help",policy:"Privacy policy",contact:"Contact",
+};
+---
+
+<Page title={copy.title} description={copy.intro} lang={locale} ogImage={tr?"/remote-og-tr.png":"/remote-og.png"}>
+  <div class="remote-page">
+    <nav class="nav" aria-label={tr?"Gezinme":"Navigation"}>
+      <a href="/">Battistics</a><a href={copy.languageURL} lang={tr?"en":"tr"}>{copy.language}</a>
+    </nav>
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Battistics Remote · iPhone</p>
+          <h1>{copy.headline[0]}<br />{copy.headline[1]}</h1>
+          <p class="intro">{copy.intro}</p>
+          <a class="download" href={appStoreURL}>{copy.download}<span aria-hidden="true"> ↗</span></a>
+          <p class="requirement">{copy.requirement}</p><a class="mac-link" href="/#download">{copy.mac}</a>
+        </div>
+        <Image src={bat} alt="" widths={[500,800,1200]} sizes="(max-width: 760px) 100vw, 55vw" class="bat" loading="eager" />
+      </section>
+      <section class="pocket feature">
+        <div class="pocket-art">
+          <Image src={pocket} alt="" widths={[500,800,1100]} sizes="(max-width: 760px) 100vw, 50vw" class="pocket-photo" />
+          <div class="phone"><PhoneScreen id={"remote-"+locale} src={tr?trPhone:enPhone} alt={tr?"MacBook Air’in pil durumu ve Uyanık Tut kontrolleri":"MacBook Air battery status and Keep Awake controls"} captureIncludesStatusBar={true} /></div>
+        </div>
+        <div class="feature-copy"><h2>{copy.pocket[0]}</h2><p>{copy.pocket[1]}</p><h3>{copy.modes[0]}</h3><p>{copy.modes[1]}</p><p class="preview">{copy.preview}</p></div>
+      </section>
+      <section class="journey feature">
+        <div class="feature-copy"><h2>{copy.journey[0]}</h2><p>{copy.journey[1]}</p><p class="limits">{copy.limits}</p></div>
+        <div class="journey-art"><Image src={journey} alt={tr?"Tren masasının üzerinde kapalı bir dizüstü bilgisayar":"A closed laptop on a train’s window table"} widths={[500,800]} sizes="(max-width: 760px) 100vw, 50vw" class="journey-photo" /><img src={tr?trActivity:enActivity} alt={tr?"Süre Ekle ve Durdur düğmeleriyle gerçek Canlı Etkinlik":"The actual Live Activity with Add Time and Stop controls"} class="activity" loading="lazy" /></div>
+      </section>
+      <section class="connection"><div><h2>{copy.routes[0]}</h2><p>{copy.routes[1]}</p></div><div><h2>{copy.privacy[0]}</h2><p>{copy.privacy[1]}</p></div></section>
+      <section class="try"><p>{copy.sample}</p><a class="download" href={appStoreURL}>{copy.download}<span aria-hidden="true"> ↗</span></a></section>
+    </main>
+    <footer><a href="/docs/iphone/">{copy.help}</a><a href="/docs/privacy/">{copy.policy}</a><a href="mailto:battistics@doguyilmaz.com">{copy.contact}</a><span>© 2026 Battistics</span></footer>
+  </div>
+</Page>
+
+<style>
+  @font-face { font-family:"Remote Instrument"; src:url("/fonts/instrument-sans.ttf") format("truetype"); font-weight:400 700; font-display:swap; }
+  .remote-page { --night:#002d30; --ivory:#f3f0e7; --mint:#eaf1ee; --citron:#d5ef80; color:var(--ivory); background:var(--night); font-family:"Remote Instrument",sans-serif; }
+  .nav,.hero,.feature,.connection,.try,footer { max-width:1280px; margin:auto; padding-left:clamp(24px,5vw,72px); padding-right:clamp(24px,5vw,72px); }
+  .nav { display:flex; justify-content:space-between; align-items:center; padding-top:28px; padding-bottom:24px; font-size:15px; font-weight:600; }
+  a { color:inherit; } .nav a { text-decoration:none; } .nav a:last-child { color:var(--citron); }
+  .hero { display:grid; grid-template-columns:1fr 1fr; align-items:center; min-height:690px; padding-top:65px; padding-bottom:90px; gap:24px; }
+  .hero-copy { position:relative; z-index:1; } .eyebrow { color:var(--citron); font-size:14px; font-weight:600; margin:0 0 25px; }
+  h1 { font-size:clamp(52px,6.3vw,88px); line-height:1.02; letter-spacing:-.045em; font-weight:620; margin:0 0 28px; }
+  .intro { color:#bed4c9; max-width:32ch; font-size:20px; line-height:1.5; margin:0 0 28px; }
+  .download { display:inline-flex; gap:12px; background:var(--citron); color:var(--night); padding:15px 21px; border-radius:14px; text-decoration:none; font-weight:600; font-size:16px; }
+  .download:hover { background:#e4f8ab; } .requirement { max-width:45ch; font-size:13px; line-height:1.5; color:#a9c8bc; margin:19px 0 9px; } .mac-link { font-size:13px; color:#d5ef80; }
+  .bat { width:115%; max-width:none; margin-left:-7%; }
+  .feature { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,5vw,72px); align-items:center; padding-top:75px; padding-bottom:75px; }
+  .pocket { background:var(--ivory); color:#163e42; border-radius:40px 40px 0 0; } .feature-copy { padding:20px 0; }
+  h2 { font-size:clamp(36px,4.2vw,56px); font-weight:620; letter-spacing:-.035em; line-height:1.08; margin:0 0 23px; text-wrap:balance; }
+  h3 { font-size:25px; font-weight:600; letter-spacing:-.02em; line-height:1.2; margin:40px 0 15px; }
+  .feature p,.connection p { font-size:18px; line-height:1.6; margin:0; max-width:48ch; }
+  .pocket-art { position:relative; min-width:0; padding:30px 0; } .pocket-photo { display:block; width:100%; border-radius:28px; }
+  .phone { position:absolute; width:56%; right:0; top:6%; padding:6px; border-radius:34px; background:#101313; border:1px solid #62696a; box-shadow:0 18px 35px #082f3240; transform:rotate(4deg); }
+  .phone :global(.screen) { border-radius:28px; }
+  .feature .preview { font-size:12px; line-height:1.5; margin-top:28px; color:#507071; }
+  .journey { background:var(--mint); color:#163e42; padding-bottom:110px; } .journey-art { position:relative; padding:0 0 45px; } .journey-photo { display:block; width:100%; border-radius:48% 48% 16px 16px; }
+  .activity { position:absolute; bottom:0; left:-4%; width:108%; height:auto; transform:rotate(-2deg); } .feature .limits { color:#527375; font-size:14px; margin-top:26px; }
+  .connection { display:grid; grid-template-columns:1fr 1fr; gap:70px; padding-top:100px; padding-bottom:80px; } .connection h2 { font-size:38px; max-width:17ch; } .connection p { color:#bed4c9; }
+  .try { padding-top:35px; padding-bottom:90px; text-align:center; } .try p { max-width:64ch; margin:0 auto 25px; color:#bed4c9; line-height:1.6; }
+  footer { border-top:1px solid #315a59; display:flex; flex-wrap:wrap; gap:20px 28px; padding-top:28px; padding-bottom:34px; font-size:13px; color:#bed4c9; } footer span { margin-left:auto; }
+  @media(max-width:760px) { .hero,.feature,.connection { grid-template-columns:1fr; } .hero { padding-top:35px; padding-bottom:40px; gap:0; min-height:0; } .bat { width:100%; margin:15px 0 0; } .feature { gap:20px; padding-top:45px; padding-bottom:60px; } .pocket .feature-copy { order:-1; } .pocket-art { width:90%; margin:0 auto; } .journey-art { width:90%; margin:0 auto; } .connection { gap:45px; padding-top:60px; padding-bottom:45px; } footer span { margin-left:0; flex-basis:100%; } .pocket { border-radius:24px 24px 0 0; } .intro { font-size:18px; } }
+</style>

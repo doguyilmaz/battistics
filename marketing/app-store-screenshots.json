@@ -1433,41 +1433,226 @@
     ],
     "creative-universal": [
       {
-        "id": "s_mvohbu91_1e",
-        "layout": "split-landscape",
+        "id": "companion-universal",
+        "layout": "no-device",
         "label": {
-          "en": "NEW"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "Your app,\nat a glance."
+          "en": "",
+          "tr": ""
         },
-        "screenshot": ""
+        "screenshot": "",
+        "backgroundColor": "#002D30",
+        "inverted": false,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          }
+        },
+        "textElements": [
+          {
+            "id": "message",
+            "text": {
+              "en": "Within reach.",
+              "tr": "Elinin altında."
+            },
+            "transform": {
+              "x": 1970,
+              "y": 690,
+              "width": 1300,
+              "height": 180,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 142,
+            "fontWeight": 620,
+            "lineHeight": 1.06,
+            "letterSpacing": -2,
+            "color": "#F3F0E7",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "nightwatch",
+            "src": "/artwork/companion/nightwatch-cutout.png",
+            "transform": {
+              "x": 2000,
+              "y": 905,
+              "width": 1240,
+              "height": 700,
+              "rotation": 0,
+              "zIndex": 3
+            },
+            "fit": "contain"
+          }
+        ]
       }
     ],
     "creative-header": [
       {
-        "id": "s_mvohbu91_1f",
-        "layout": "split-landscape",
+        "id": "companion-header",
+        "layout": "no-device",
         "label": {
-          "en": "NEW"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "Your app,\nat a glance."
+          "en": "",
+          "tr": ""
         },
-        "screenshot": ""
+        "screenshot": "",
+        "backgroundColor": "#002D30",
+        "inverted": false,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          }
+        },
+        "textElements": [
+          {
+            "id": "message",
+            "text": {
+              "en": "Your Mac.\nWithin reach.",
+              "tr": "Mac’in\nelinin altında."
+            },
+            "transform": {
+              "x": 1130,
+              "y": 600,
+              "width": 790,
+              "height": 400,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 118,
+            "fontWeight": 620,
+            "lineHeight": 1.06,
+            "letterSpacing": -2,
+            "color": "#F3F0E7",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "nightwatch",
+            "src": "/artwork/companion/nightwatch-cutout.png",
+            "transform": {
+              "x": 1925,
+              "y": 515,
+              "width": 790,
+              "height": 615,
+              "rotation": 0,
+              "zIndex": 3
+            },
+            "fit": "contain"
+          }
+        ]
       }
     ],
     "creative-search": [
       {
-        "id": "s_mvohbu91_1g",
-        "layout": "split-landscape",
+        "id": "companion-search",
+        "layout": "no-device",
         "label": {
-          "en": "NEW"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "Your app,\nat a glance."
+          "en": "",
+          "tr": ""
         },
-        "screenshot": ""
+        "screenshot": "/screenshots/apple/iphone/{locale}/01-nearby.png",
+        "backgroundColor": "#002D30",
+        "inverted": false,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          },
+          "device": {
+            "x": 2420,
+            "y": 790,
+            "width": 435,
+            "height": 945,
+            "rotation": 0,
+            "zIndex": 7
+          }
+        },
+        "textElements": [
+          {
+            "id": "message",
+            "text": {
+              "en": "Your Mac.\nWithin reach.",
+              "tr": "Mac’in\nelinin altında."
+            },
+            "transform": {
+              "x": 900,
+              "y": 830,
+              "width": 1120,
+              "height": 440,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 162,
+            "fontWeight": 620,
+            "lineHeight": 1.06,
+            "letterSpacing": -2,
+            "color": "#F3F0E7",
+            "align": "left"
+          },
+          {
+            "id": "detail",
+            "text": {
+              "en": "Battery. Keep Awake.",
+              "tr": "Pil. Uyanık Tut."
+            },
+            "transform": {
+              "x": 910,
+              "y": 1350,
+              "width": 1060,
+              "height": 130,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 70,
+            "fontWeight": 420,
+            "lineHeight": 1.06,
+            "letterSpacing": -2,
+            "color": "#BED4C9",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "mascot",
+            "src": "/artwork/companion/mascot-wave.png",
+            "transform": {
+              "x": 1770,
+              "y": 1215,
+              "width": 640,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          }
+        ]
       }
     ]
   },

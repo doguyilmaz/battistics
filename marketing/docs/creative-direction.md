@@ -20,6 +20,8 @@ The reference review covered Paylog's subscription passes and statement slips, R
 
 The opening page says Battistics is required on the Mac. The final page explains nearby local-network/Bluetooth routes, private iCloud away, the same-Apple-Account setup requirement and iOS background limits. The copy does not promise uninterrupted delivery. Readings come from sample-mode app captures, not performance or reliability measurements.
 
+The same visual system now includes universal (5244×2950), header (3840×1646) and search (3840×2560 / 1920×1280) assets in English and Turkish. They use a transparent adaptation of the accepted bat/laptop scene, short localized copy and an actual app capture in search. The seed/export scripts preserve the accepted iPhone deck. All eight PNG exports pass text layout, opaque RGB, dimensions and art-safe-bound checks. Six high-resolution creatives are uploaded; dedicated header/search variants are assigned to the 1.1.0 localizations. The universal variants remain reusable alternatives in Asset Library.
+
 ## Typography
 
 Instrument Sans is self-hosted from the official [Google Fonts source](https://github.com/google/fonts/tree/main/ofl/instrumentsans), with its SIL Open Font License in `public/fonts/instrument-sans/OFL.txt`. The selected file is `public/fonts/imported/b24f181258481695.ttf` (SHA-256 `b24f1812584816958afcf22e22d08e44318c5e51651e25d2438efdde389b33b1`). Its real 400–700 variable weight range is declared in the editor: 620 for headlines, 420 for supporting copy and 600 for the small wordmark. Leading and tracking are editable and stored per text element. The old condensed face and automatic text shadows are removed.

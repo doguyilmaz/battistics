@@ -54,6 +54,7 @@ jobs:
           check MACOS_CERT_P12      "${{ secrets.MACOS_CERT_P12 != '' }}"
           check MACOS_CERT_PASSWORD "${{ secrets.MACOS_CERT_PASSWORD != '' }}"
           check MACOS_SIGN_IDENTITY "${{ secrets.MACOS_SIGN_IDENTITY != '' }}"
+          check MACOS_PROVISIONING_PROFILE "${{ secrets.MACOS_PROVISIONING_PROFILE != '' }}"
           check APPLE_ID            "${{ secrets.APPLE_ID != '' }}"
           check APPLE_TEAM_ID       "${{ secrets.APPLE_TEAM_ID != '' }}"
           check NOTARY_PASSWORD     "${{ secrets.NOTARY_PASSWORD != '' }}"
