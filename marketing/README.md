@@ -1,14 +1,14 @@
 # Battistics Remote marketing
 
-The iPhone campaign is **Still On**: six English/Turkish compositions built around Battistics’ own Keep Awake countdown, Live Activity and battery readings. A closed metal laptop and orange power-key still life introduces the app; enlarged native interface details, a timer, industrial typography and connection routes carry the rest. One page uses a full phone. This is a review draft for the upcoming coordinated nearby release, not a submitted store package.
+The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The three visual directions were liked by the owner; this complete typography/copy revision is ready for review, not a submitted store package.
 
-Exported previews: [English](docs/still-on-en.png) · [Türkçe](docs/still-on-tr.png).
+Exported previews: [English](docs/companion-en.png) · [Türkçe](docs/companion-tr.png).
 
-The editable source is `app-store-screenshots.json`. [The creative brief](docs/creative-direction.md) records references, copy choices, artwork provenance and limits. Native captures, selected artwork, the OFL-licensed Barlow Condensed font and its licence are tracked. Unselected uploads and Apple device bezels stay local; the editor falls back to a built-in frame when a bezel is absent.
+The editable source is `app-store-screenshots.json`; localized wording lives in [copy/companion.json](copy/companion.json). [The creative brief](docs/creative-direction.md) records the visual system, typography, sources and limits. The selected artwork, native captures, Instrument Sans variable font and OFL licence are tracked. Exact image-generation prompts and a reusable transparent mascot pose are included. Optional Apple bezels stay local; the editor falls back to a built-in frame.
 
-To rebuild the original vector decorations and native capture viewports, run `node scripts/build-campaign-assets.mjs`. `node scripts/seed-campaign.mjs` restores this campaign’s starting iPhone compositions and preserves other device decks; it overwrites subsequent iPhone edits, so use it deliberately. The UI remains the normal screenshot editor. It supports `{locale}` in overlay image paths as well as phone captures.
+Run `node scripts/build-companion-assets.mjs` to rebuild native viewports and scene crops. `node scripts/seed-companion.mjs` restores this starting iPhone composition from the copy file while preserving other device decks; it overwrites later iPhone edits. The existing editor supports localized overlay paths, variable font weights, text leading and tracking.
 
-For a reproducible export, run `bun run build`, `bun run start --port 3116`, then in another terminal `node scripts/export-campaign.mjs http://127.0.0.1:3116 ../.build/app-store-still-on`. The script uses the existing editor exporter in an isolated browser, intercepts project autosaves, checks all 48 opaque RGB PNGs, and writes English/Turkish contact sheets and 160px thumbnail sheets. Review those images and final App Store previews; automated checks do not establish aesthetic approval.
+For a reproducible export, run `bun run build`, `bun run start --hostname 127.0.0.1 --port 3116`, then in another terminal `node scripts/export-campaign.mjs http://127.0.0.1:3116 ../.build/app-store-companion`. It drives the existing exporter in an isolated browser, intercepts autosaves, measures text for clipping/unintended wraps and checks all 56 opaque RGB PNGs. It also writes contact sheets, 160px thumbnails and validation JSON. Review the images and final App Store previews; automated checks do not establish aesthetic approval.
 
 The existing Next.js + ShadCN editor was scaffolded by the `app-store-screenshots` skill. Its editing/export workflow is documented below.
 

@@ -15,5 +15,10 @@ export function cleanImportedFont(value: unknown): ImportedFont | undefined {
   if (typeof font.src !== "string" || !/^\/fonts\/imported\/[a-z0-9]+\.(woff2|woff|ttf|otf)$/i.test(font.src)) return undefined;
   if (!FORMATS.includes(font.format as ImportedFont["format"])) return undefined;
   const name = cleanFontName(font.name);
-  return { src: font.src, format: font.format as ImportedFont["format"], ...(name ? { name } : {}) };
+  const range = font.weightRange;
+  const weightRange = Array.isArray(range) && range.length === 2 &&
+    range.every(n => typeof n === "number" && Number.isFinite(n) && n >= 100 && n <= 900) && range[0] <= range[1]
+    ? range as [number, number] : undefined;
+  return { src: font.src, format: font.format as ImportedFont["format"], ...(name ? { name } : {}),
+    ...(weightRange ? { weightRange } : {}) };
 }

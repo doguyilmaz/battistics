@@ -1,46 +1,39 @@
-# Battistics Remote: Still On
+# Battistics Remote: Companion
 
-Six iPhone App Store compositions in English and Turkish. This replaces the rejected Field Notes draft. It is a design for the upcoming coordinated nearby release and has not been submitted to App Store Connect. It is a review draft, not recorded owner approval.
+Seven iPhone App Store compositions in English and Turkish, combining the three visual directions the owner liked: the night-watch bat, a miniature desk in a pocket, and a closed Mac on a train. The bat direction was the favourite. This revision replaces the rejected typography and copy with Instrument Sans and short, localized feature statements. The complete new series still needs the owner's aesthetic review; it has not been submitted to App Store Connect.
 
-Review the exported [English](still-on-en.png) and [Turkish](still-on-tr.png) contact sheets.
+Review the exported [English](companion-en.png) and [Turkish](companion-tr.png) contact sheets. Copy lives in [companion.json](../copy/companion.json).
 
-## Reference review
+## Visual language
 
-The actual local artwork was inspected:
+The reference review covered Paylog's subscription passes and statement slips, Recesso's varied physical scenes and native windows, and Elpee's current dark iPhone posters. Battistics uses a tactile bat character, deep petrol, warm ivory, pale mint and restrained citron. Each scene gives the feature a context while real app captures show what the app does.
 
-- Paylog: `budget-manager/docs/diagnostics/store-marketing/contact-sheet.png` — subscription passes, statement slips and budget bars carry each idea without a full phone.
-- Recesso: `recesso/store/screenshots/en-US/01-three-rhythms.png`, `03-water.png` and `06-menu-bar.png` — one meaningful scene per page, native windows, varied scale and physical metaphors.
-- Elpee: `elpee/release/screenshots/selected/posters/iphone/en/01-hero.png` — a consistent dark identity, large typography and actual content. Its older light contact sheet was examined but is not the current reference.
-
-Battistics uses its own material: orange Keep Awake controls, an actual countdown, Live Activity, battery instrumentation and routes between Mac and iPhone. Charcoal, warm silver/paper and signal orange support compact industrial typography. The six-page rhythm is still life + session, timer + Live Activity, one full phone, enlarged battery details, accessories + app readings, and a connection diagram. Every page stands alone.
-
-## Copy
-
-| Page | Selected English / Turkish | Other directions considered |
+| Page | English / Turkish headline | Visual evidence |
 | --- | --- | --- |
-| 1 | Your Mac. Still on. / Sen uzakta. Mac uyanık. | Leave the desk. Let it finish. / Keep your Mac awake from iPhone. |
-| 2 | One tap. More time. / Dokun. Süre ekle. | Thirty more minutes. / Your session, within reach. |
-| 3 | Your hours. Your rules. / Süre senin. Mod senin. | Keep it running your way. / Screen on, off, or lid closed. |
-| 4 | Behind the percentage. / Yüzdenin ötesini gör. | Know your Mac’s charge. / Read the whole battery story. |
-| 5 | All your batteries. / Tüm piller. Tek bakış. | Your desk, at a glance. / See what’s using energy. |
-| 6 | Near. Far. Yours. / Yakında. Uzakta. Senin. | Your devices, your connection. / Nearby Bluetooth, private iCloud away. |
+| 1 | Your Mac. Within reach. / Mac’in elinin altında. | Bat watching a closed laptop, actual Live Activity |
+| 2 | Your desk. In your pocket. / Masan cebinde. | Miniature desk in a fabric pocket, actual nearby dashboard |
+| 3 | Pick a time. Keep it awake. / Süresini seç. Uyanık kalsın. | Actual dashboard and enlarged Keep Awake controls |
+| 4 | Lid closed. Still in control. / Kapak kapalı. Kontrol sende. | Train-window photograph and actual Live Activity |
+| 5 | Know your Mac’s battery. / Pilini yakından tanı. | Actual battery detail table, gauge and metric crops |
+| 6 | Check your accessories, too. / Aksesuarlarının pilini de gör. | Actual accessories and energy-using apps |
+| 7 | Close by. Or far away. / Yan yana da. Uzaktayken de. | Actual nearby dashboard and reusable bat pose |
 
-Copy describes available routes without promising uninterrupted background delivery. The last page states the same-Apple-Account requirement and iOS background constraint. Synthetic status numbers are demo readings, not adoption, performance or reliability claims.
+The opening page says Battistics is required on the Mac. The final page explains nearby local-network/Bluetooth routes, private iCloud away, the same-Apple-Account setup requirement and iOS background limits. The copy does not promise uninterrupted delivery. Readings come from sample-mode app captures, not performance or reliability measurements.
+
+## Typography
+
+Instrument Sans is self-hosted from the official [Google Fonts source](https://github.com/google/fonts/tree/main/ofl/instrumentsans), with its SIL Open Font License in `public/fonts/instrument-sans/OFL.txt`. The selected file is `public/fonts/imported/b24f181258481695.ttf` (SHA-256 `b24f1812584816958afcf22e22d08e44318c5e51651e25d2438efdde389b33b1`). Its real 400–700 variable weight range is declared in the editor: 620 for headlines, 420 for supporting copy and 600 for the small wordmark. Leading and tracking are editable and stored per text element. The old condensed face and automatic text shadows are removed.
+
+Headlines use deliberate line breaks, sentence case and left alignment. Turkish and English are composed separately. The export helper measures every text element in the actual export canvas for clipping and unintended wrapping before rendering.
 
 ## Sources and reproducibility
 
-`../app-store-screenshots.json` is the editable source in the existing screenshot editor. `scripts/seed-campaign.mjs` restores this starting iPhone deck; save later editor changes before rerunning it. Other device decks are preserved and are not completed campaigns.
+`app-store-screenshots.json` remains the editable source in the existing screenshot editor. `scripts/seed-companion.mjs` restores this starting iPhone deck from the copy file; it overwrites later iPhone edits. Other device decks are preserved and are not completed campaigns.
 
-`scripts/build-campaign-assets.mjs` creates original vector decoration and SVG viewports containing the unmodified real EN/TR captures in `public/screenshots/apple/iphone`. These enlarge actual interface details; crop coordinates differ where Turkish layout differs. No app control is generated or redrawn. Overlay image paths support `{locale}` for both preview and export.
+`scripts/build-companion-assets.mjs` builds self-contained SVG viewports containing unmodified captured pixels from `public/screenshots/apple/iphone/{en,tr}`. Native controls, labels and readings are not generated or redrawn. The Turkish crop coordinates follow its actual layout. Phone and overlay paths support `{locale}` in preview and export. Optional Apple bezels remain local; the editor provides a fallback frame.
 
-Barlow Condensed ExtraBold comes from [Google Fonts](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). Its SIL Open Font License is `public/fonts/barlow-condensed/OFL.txt`; the selected font is `public/fonts/imported/724c9c25952d5f4a.ttf`. No proprietary system font is redistributed. Optional Apple bezels remain local; the editor has a fallback frame.
-
-The built-in image generation tool produced `public/artwork/on-duty/power-key.png` on 2026-11-16. It is an original editorial still life, not an Apple product photograph or hardware sold with the app. The project contains the selected file. The rejected ribbon/laptop illustration is unused.
-
-Prompt: ads-marketing, transparent cutout for Battistics Remote, an iPhone companion controlling Mac Keep Awake sessions. A thin closed unbranded aluminum laptop, lid fully shut, floating diagonally behind an oversized burnt-orange mechanical keyboard key bearing a recessed simple power symbol. The key is a sculptural metaphor. Restrained industrial design; warm silver anodized metal, matte orange #FF7A32 keycap, dark charcoal sides, fine illuminated edge, realistic microtexture. Laptop dominant, clear three-quarter top view, dark hinge and tiny warm status light. All objects contained; strong directional studio lighting and convincing shadow; compact landscape silhouette and transparent surroundings. No ribbons, infinity shapes, rings, glossy blobs, scenery, cables, coffee, people, logos, letters, numbers, watermark, phone screens or generated UI. Only marking: a standard simple power glyph.
+`public/artwork/companion` contains the selected generated scenes and reusable transparent bat. Exact prompts and generation date are recorded in [artwork-prompts.json](artwork-prompts.json); [mascot.md](mascot.md) records the character direction. These are campaign illustrations, not Apple product photographs or hardware sold with the app.
 
 ## Export checks
 
-`scripts/export-campaign.mjs` drives the existing editor exporter in an isolated browser and intercepts autosaves. It writes a ZIP, 48 PNGs (six pages × two locales × four configured sizes), contact sheets, 160px thumbnail sheets and validation JSON under `.build/app-store-still-on`. Checks cover image/font loading, dimensions, RGB, absence of alpha and source preservation. The actual PNGs are visually inspected. Automated checks do not establish aesthetic approval; final App Store preview crops remain part of submission.
-
-Export diagnostics use full overlay bounds and a 32px high-quality fingerprint so sparse vector artwork is checked without disappearing between probe samples. This retains the missing-image warning rather than suppressing it.
+`scripts/export-campaign.mjs` drives the existing editor exporter in an isolated browser and intercepts autosaves. It writes a ZIP, 56 PNGs (seven pages × two locales × four configured sizes), contact sheets, 160px thumbnail sheets and validation JSON under `.build/app-store-companion`. Checks cover text layout, image/font loading, dimensions, RGB, absence of alpha and source preservation. The exported images are also inspected visually; automated checks do not establish aesthetic approval. Final App Store preview crops remain part of submission.

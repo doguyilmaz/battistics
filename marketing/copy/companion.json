@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "headline": { "tr": "Mac’in\nelinin altında.", "en": "Your Mac.\nWithin reach." },
+    "body": { "tr": "Mac’inin pilini gör, Uyanık Tut’u\niPhone’undan yönet.", "en": "Check your Mac’s battery and control\nKeep Awake from your iPhone." },
+    "note": { "tr": "Mac’inde Battistics gerekir.", "en": "Requires Battistics on your Mac." }
+  },
+  "pocket": {
+    "headline": { "tr": "Masan\ncebinde.", "en": "Your desk.\nIn your pocket." },
+    "body": { "tr": "Pil, bağlantı ve Uyanık Tut.\nMac’inin durumu tek ekranda.", "en": "Battery, connection and Keep Awake.\nYour Mac at a glance." }
+  },
+  "keepAwake": {
+    "headline": { "tr": "Süresini seç.\nUyanık kalsın.", "en": "Pick a time.\nKeep it awake." },
+    "body": { "tr": "Ekran açık, ekran kapalı\nveya kapak kapalı.", "en": "Screen on, screen off,\nor lid closed." }
+  },
+  "journey": {
+    "headline": { "tr": "Kapak kapalı.\nKontrol sende.", "en": "Lid closed.\nStill in control." },
+    "body": { "tr": "Süreyi Kilit Ekranından uzat\nya da oturumu durdur.", "en": "Add time or stop your session\nright from the Lock Screen." }
+  },
+  "battery": {
+    "headline": { "tr": "Pilini\nyakından tanı.", "en": "Know your\nMac’s battery." },
+    "body": { "tr": "Sağlık, döngü, kapasite,\ngüç ve sıcaklık.", "en": "Health, cycles, capacity,\npower and temperature." }
+  },
+  "accessories": {
+    "headline": { "tr": "Aksesuarlarının\npilini de gör.", "en": "Check your\naccessories, too." },
+    "body": { "tr": "Mac’ine bağlı cihazların pilini ve\nenerji kullanan uygulamaları gör.", "en": "Accessory battery levels and the apps\nusing your Mac’s energy." }
+  },
+  "connection": {
+    "headline": { "tr": "Yan yana da.\nUzaktayken de.", "en": "Close by.\nOr far away." },
+    "body": { "tr": "Yakında yerel ağ veya Bluetooth,\nuzakta özel iCloud devreye girer.", "en": "Local network and Bluetooth nearby.\nPrivate iCloud when you’re farther away." },
+    "note": { "tr": "İlk kurulumda aynı Apple Hesabı gerekir.\nArka plan güncellemeleri iOS’a bağlıdır.", "en": "The same Apple Account is required for setup.\nBackground updates depend on iOS." }
+  }
+}

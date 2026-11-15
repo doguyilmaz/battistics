@@ -1,50 +1,380 @@
 {
   "schemaVersion": 3,
   "appName": "Battistics Remote",
-  "themeId": "battistics-on-duty",
+  "themeId": "battistics-companion",
   "fontId": "self-hosted",
-  "connectedCanvas": true,
+  "connectedCanvas": false,
   "locales": [
     "en",
     "tr"
   ],
-  "locale": "en",
+  "locale": "tr",
   "device": "iphone",
   "orientation": "portrait",
   "appIcon": "/screenshots/app-icon.png",
   "slidesByDevice": {
     "iphone": [
       {
-        "id": "still-on",
+        "id": "companion-hero",
         "layout": "no-device",
         "label": {
-          "en": "BATTISTICS REMOTE / MAC + IPHONE",
-          "tr": "BATTISTICS REMOTE / MAC + IPHONE"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "YOUR MAC.\n*STILL ON.*",
-          "tr": "SEN UZAKTA.\n*MAC UYANIK.*"
+          "en": "",
+          "tr": ""
         },
         "screenshot": "",
+        "backgroundColor": "#002D30",
         "inverted": false,
-        "typography": {
-          "headlineScale": 1.8,
-          "labelScale": 1
-        },
         "transforms": {
           "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 650,
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
             "rotation": 0,
-            "zIndex": 12
+            "zIndex": 5
           }
         },
+        "textElements": [
+          {
+            "id": "brand",
+            "text": {
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
+            },
+            "transform": {
+              "x": 100,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#D5EF80",
+            "align": "left"
+          },
+          {
+            "id": "headline",
+            "text": {
+              "tr": "Mac’in\nelinin altında.",
+              "en": "Your Mac.\nWithin reach."
+            },
+            "transform": {
+              "x": 90,
+              "y": 180,
+              "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 160,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#F3F0E7",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Mac’inin pilini gör, Uyanık Tut’u\niPhone’undan yönet.",
+              "en": "Check your Mac’s battery and control\nKeep Awake from your iPhone."
+            },
+            "transform": {
+              "x": 100,
+              "y": 720,
+              "width": 1120,
+              "height": 190,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#BED4C9",
+            "align": "left"
+          },
+          {
+            "id": "requirement",
+            "text": {
+              "tr": "Mac’inde Battistics gerekir.",
+              "en": "Requires Battistics on your Mac."
+            },
+            "transform": {
+              "x": 100,
+              "y": 915,
+              "width": 1120,
+              "height": 100,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 38,
+            "fontWeight": 400,
+            "lineHeight": 1.15,
+            "letterSpacing": 0,
+            "color": "#BED4C9",
+            "align": "left"
+          }
+        ],
         "imageElements": [
           {
-            "id": "signal",
-            "src": "/artwork/on-duty/signal.svg",
+            "id": "night-scene",
+            "src": "/artwork/companion/night-scene.svg",
+            "transform": {
+              "x": -20,
+              "y": 990,
+              "width": 1360,
+              "height": 1255,
+              "rotation": 0,
+              "zIndex": 2
+            },
+            "fit": "contain",
+            "fade": {
+              "edge": "top",
+              "amount": 15
+            }
+          },
+          {
+            "id": "activity",
+            "src": "/artwork/companion/{locale}/activity.svg",
+            "transform": {
+              "x": 65,
+              "y": 2225,
+              "width": 1190,
+              "height": 545,
+              "rotation": 0,
+              "zIndex": 9
+            },
+            "fit": "contain"
+          }
+        ]
+      },
+      {
+        "id": "companion-pocket",
+        "layout": "hero",
+        "label": {
+          "en": "",
+          "tr": ""
+        },
+        "headline": {
+          "en": "",
+          "tr": ""
+        },
+        "screenshot": "/screenshots/apple/iphone/{locale}/01-nearby.png",
+        "backgroundColor": "#F3F0E7",
+        "inverted": true,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          },
+          "device": {
+            "x": 500,
+            "y": 1080,
+            "width": 740,
+            "height": 1609,
+            "rotation": 5,
+            "zIndex": 7
+          }
+        },
+        "textElements": [
+          {
+            "id": "brand",
+            "text": {
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
+            },
+            "transform": {
+              "x": 100,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "headline",
+            "text": {
+              "tr": "Masan\ncebinde.",
+              "en": "Your desk.\nIn your pocket."
+            },
+            "transform": {
+              "x": 90,
+              "y": 180,
+              "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 156,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Pil, bağlantı ve Uyanık Tut.\nMac’inin durumu tek ekranda.",
+              "en": "Battery, connection and Keep Awake.\nYour Mac at a glance."
+            },
+            "transform": {
+              "x": 100,
+              "y": 765,
+              "width": 1120,
+              "height": 180,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#426568",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "pocket",
+            "src": "/artwork/companion/pocket.png",
+            "transform": {
+              "x": -160,
+              "y": 1070,
+              "width": 1450,
+              "height": 1812,
+              "rotation": 0,
+              "zIndex": 2
+            },
+            "fit": "contain",
+            "fade": {
+              "edge": "top",
+              "amount": 20
+            }
+          }
+        ]
+      },
+      {
+        "id": "companion-keepAwake",
+        "layout": "device-top",
+        "label": {
+          "en": "",
+          "tr": ""
+        },
+        "headline": {
+          "en": "",
+          "tr": ""
+        },
+        "screenshot": "/screenshots/apple/iphone/{locale}/03.png",
+        "backgroundColor": "#EAF1EE",
+        "inverted": true,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          },
+          "device": {
+            "x": 110,
+            "y": 900,
+            "width": 780,
+            "height": 1696,
+            "rotation": -5,
+            "zIndex": 6
+          }
+        },
+        "textElements": [
+          {
+            "id": "brand",
+            "text": {
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
+            },
+            "transform": {
+              "x": 100,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "headline",
+            "text": {
+              "tr": "Süresini seç.\nUyanık kalsın.",
+              "en": "Pick a time.\nKeep it awake."
+            },
+            "transform": {
+              "x": 90,
+              "y": 180,
+              "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 160,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Ekran açık, ekran kapalı\nveya kapak kapalı.",
+              "en": "Screen on, screen off,\nor lid closed."
+            },
+            "transform": {
+              "x": 100,
+              "y": 690,
+              "width": 1120,
+              "height": 180,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#426568",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "arc",
+            "src": "/artwork/companion/mint-arc.svg",
             "transform": {
               "x": 0,
               "y": 0,
@@ -56,582 +386,513 @@
             "fit": "contain"
           },
           {
-            "id": "power",
-            "src": "/artwork/on-duty/power-key.png",
+            "id": "keep-awake",
+            "src": "/artwork/companion/{locale}/keep-awake.svg",
             "transform": {
-              "x": 0,
-              "y": 700,
-              "width": 1320,
-              "height": 885,
-              "rotation": 0,
-              "zIndex": 4
+              "x": 275,
+              "y": 1890,
+              "width": 1010,
+              "height": 605,
+              "rotation": 5,
+              "zIndex": 9
             },
             "fit": "contain"
-          },
-          {
-            "id": "session",
-            "src": "/artwork/on-duty/{locale}/session.svg",
-            "transform": {
-              "x": 70,
-              "y": 1610,
-              "width": 1180,
-              "height": 765,
-              "rotation": -3,
-              "zIndex": 8
-            },
-            "fit": "contain"
-          }
-        ],
-        "textElements": [
-          {
-            "id": "benefit",
-            "text": {
-              "en": "KEEP AWAKE. FROM YOUR IPHONE.",
-              "tr": "IPHONE’UNDAN UYANIK TUT."
-            },
-            "transform": {
-              "x": 100,
-              "y": 2490,
-              "width": 1140,
-              "height": 100,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 65,
-            "fontWeight": 800,
-            "color": "#EEEAE2",
-            "align": "left"
-          },
-          {
-            "id": "requirement",
-            "text": {
-              "en": "Requires Battistics on your Mac.",
-              "tr": "Mac’inde Battistics gerektirir."
-            },
-            "transform": {
-              "x": 100,
-              "y": 2640,
-              "width": 1100,
-              "height": 110,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 42,
-            "fontWeight": 800,
-            "color": "#A9ACAD",
-            "align": "left"
           }
         ]
       },
       {
-        "id": "one-more-tap",
+        "id": "companion-journey",
         "layout": "no-device",
         "label": {
-          "en": "LIVE ACTIVITIES",
-          "tr": "CANLI ETKİNLİKLER"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "ONE TAP.\n*MORE TIME.*",
-          "tr": "DOKUN.\n*SÜRE EKLE.*"
+          "en": "",
+          "tr": ""
         },
         "screenshot": "",
+        "backgroundColor": "#F3F0E7",
         "inverted": true,
-        "typography": {
-          "headlineScale": 1.8,
-          "labelScale": 1
-        },
         "transforms": {
           "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 650,
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
             "rotation": 0,
-            "zIndex": 12
+            "zIndex": 5
           }
         },
-        "imageElements": [
-          {
-            "id": "timer",
-            "src": "/artwork/on-duty/timer.svg",
-            "transform": {
-              "x": 0,
-              "y": 1050,
-              "width": 1320,
-              "height": 1500,
-              "rotation": 0,
-              "zIndex": 2
-            },
-            "fit": "contain"
-          },
-          {
-            "id": "activity",
-            "src": "/artwork/on-duty/{locale}/activity.svg",
-            "transform": {
-              "x": 70,
-              "y": 1620,
-              "width": 1180,
-              "height": 545,
-              "rotation": -5,
-              "zIndex": 8
-            },
-            "fit": "contain"
-          },
-          {
-            "id": "pointer",
-            "src": "/artwork/on-duty/pointer.svg",
-            "transform": {
-              "x": 690,
-              "y": 2170,
-              "width": 400,
-              "height": 250,
-              "rotation": -6,
-              "zIndex": 10
-            },
-            "fit": "contain"
-          }
-        ],
         "textElements": [
           {
-            "id": "30",
+            "id": "brand",
             "text": {
-              "en": "+30",
-              "tr": "+30"
-            },
-            "transform": {
-              "x": 80,
-              "y": 700,
-              "width": 1070,
-              "height": 680,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 660,
-            "fontWeight": 800,
-            "color": "#17191B",
-            "align": "left"
-          },
-          {
-            "id": "minutes",
-            "text": {
-              "en": "MINUTES",
-              "tr": "DAKİKA"
-            },
-            "transform": {
-              "x": 720,
-              "y": 1230,
-              "width": 470,
-              "height": 150,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 100,
-            "fontWeight": 800,
-            "color": "#A9360A",
-            "align": "left"
-          },
-          {
-            "id": "live-actions",
-            "text": {
-              "en": "ADD TIME. OR STOP.\nRIGHT FROM YOUR LOCK SCREEN.",
-              "tr": "SÜRE EKLE. YA DA DURDUR.\nKİLİT EKRANINDAN."
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
             },
             "transform": {
               "x": 100,
-              "y": 2570,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "headline",
+            "text": {
+              "tr": "Kapak kapalı.\nKontrol sende.",
+              "en": "Lid closed.\nStill in control."
+            },
+            "transform": {
+              "x": 90,
+              "y": 180,
+              "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 153,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Süreyi Kilit Ekranından uzat\nya da oturumu durdur.",
+              "en": "Add time or stop your session\nright from the Lock Screen."
+            },
+            "transform": {
+              "x": 100,
+              "y": 700,
               "width": 1120,
               "height": 190,
               "rotation": 0,
               "zIndex": 5
             },
-            "fontSize": 60,
-            "fontWeight": 800,
-            "color": "#17191B",
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#426568",
             "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "window",
+            "src": "/artwork/companion/journey-window.svg",
+            "transform": {
+              "x": 60,
+              "y": 920,
+              "width": 1200,
+              "height": 1500,
+              "rotation": 0,
+              "zIndex": 3
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "activity",
+            "src": "/artwork/companion/{locale}/activity.svg",
+            "transform": {
+              "x": 85,
+              "y": 2240,
+              "width": 1150,
+              "height": 535,
+              "rotation": -2,
+              "zIndex": 9
+            },
+            "fit": "contain"
           }
         ]
       },
       {
-        "id": "your-rules",
+        "id": "companion-battery",
         "layout": "hero",
         "label": {
-          "en": "KEEP AWAKE",
-          "tr": "UYANIK TUT"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "YOUR HOURS.\nYOUR RULES.",
-          "tr": "SÜRE SENİN.\nMOD SENİN."
+          "en": "",
+          "tr": ""
         },
-        "screenshot": "/screenshots/apple/iphone/{locale}/03.png",
-        "inverted": true,
-        "typography": {
-          "headlineScale": 1.8,
-          "labelScale": 1
-        },
+        "screenshot": "/screenshots/apple/iphone/{locale}/05.png",
+        "backgroundColor": "#002D30",
+        "inverted": false,
         "transforms": {
           "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 640,
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
             "rotation": 0,
-            "zIndex": 12
+            "zIndex": 5
           },
           "device": {
-            "x": 460,
-            "y": 920,
-            "width": 760,
-            "height": 1652,
-            "rotation": 4,
+            "x": 455,
+            "y": 930,
+            "width": 750,
+            "height": 1630,
+            "rotation": 5,
             "zIndex": 6
           }
         },
-        "backgroundColor": "#FF793B",
         "textElements": [
           {
-            "id": "times",
+            "id": "brand",
             "text": {
-              "en": "15m\n1h\n∞",
-              "tr": "15dk\n1sa\n∞"
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
             },
             "transform": {
-              "x": 80,
-              "y": 1250,
-              "width": 310,
-              "height": 860,
+              "x": 100,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
               "rotation": 0,
               "zIndex": 5
             },
-            "fontSize": 170,
-            "fontWeight": 800,
-            "color": "#17191B",
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#D5EF80",
             "align": "left"
           },
           {
-            "id": "modes",
+            "id": "headline",
             "text": {
-              "en": "SCREEN ON. SCREEN OFF. LID CLOSED.",
-              "tr": "EKRAN AÇIK. EKRAN KAPALI. KAPAK KAPALI."
+              "tr": "Pilini\nyakından tanı.",
+              "en": "Know your\nMac’s battery."
             },
             "transform": {
-              "x": 96,
-              "y": 2660,
+              "x": 90,
+              "y": 180,
+              "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 150,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#F3F0E7",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Sağlık, döngü, kapasite,\ngüç ve sıcaklık.",
+              "en": "Health, cycles, capacity,\npower and temperature."
+            },
+            "transform": {
+              "x": 100,
+              "y": 720,
               "width": 1120,
-              "height": 130,
+              "height": 190,
               "rotation": 0,
               "zIndex": 5
             },
             "fontSize": 52,
-            "fontWeight": 800,
-            "color": "#17191B",
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#BED4C9",
             "align": "left"
           }
-        ]
-      },
-      {
-        "id": "behind-charge",
-        "layout": "no-device",
-        "label": {
-          "en": "BATTERY DETAILS",
-          "tr": "PİLİN AYRINTILARI"
-        },
-        "headline": {
-          "en": "BEHIND THE\n*PERCENTAGE.*",
-          "tr": "YÜZDENİN\n*ÖTESİNİ GÖR.*"
-        },
-        "screenshot": "",
-        "inverted": false,
-        "typography": {
-          "headlineScale": 1.8,
-          "labelScale": 1
-        },
-        "transforms": {
-          "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 650,
-            "rotation": 0,
-            "zIndex": 12
-          }
-        },
+        ],
         "imageElements": [
           {
             "id": "battery-gauge",
-            "src": "/artwork/on-duty/{locale}/battery-gauge.svg",
+            "src": "/artwork/companion/{locale}/battery-gauge.svg",
             "transform": {
               "x": 55,
-              "y": 800,
-              "width": 760,
-              "height": 790,
-              "rotation": -8,
-              "zIndex": 8
+              "y": 1120,
+              "width": 390,
+              "height": 410,
+              "rotation": -6,
+              "zIndex": 9
             },
             "fit": "contain"
           },
           {
-            "id": "battery-metrics",
-            "src": "/artwork/on-duty/{locale}/battery-metrics.svg",
+            "id": "battery-power",
+            "src": "/artwork/companion/{locale}/battery-power.svg",
             "transform": {
-              "x": 30,
-              "y": 1550,
-              "width": 1260,
-              "height": 235,
+              "x": 50,
+              "y": 1620,
+              "width": 430,
+              "height": 218,
               "rotation": -3,
-              "zIndex": 8
+              "zIndex": 9
             },
             "fit": "contain"
           },
           {
-            "id": "capacity",
-            "src": "/artwork/on-duty/{locale}/capacity.svg",
+            "id": "battery-health",
+            "src": "/artwork/companion/{locale}/battery-health.svg",
             "transform": {
-              "x": 100,
-              "y": 1890,
-              "width": 1120,
-              "height": 510,
-              "rotation": 4,
-              "zIndex": 8
+              "x": 50,
+              "y": 1865,
+              "width": 430,
+              "height": 218,
+              "rotation": -3,
+              "zIndex": 9
             },
             "fit": "contain"
-          }
-        ],
-        "textElements": [
-          {
-            "id": "beyond",
-            "text": {
-              "en": "W\n°C\nmAh",
-              "tr": "W\n°C\nmAh"
-            },
-            "transform": {
-              "x": 900,
-              "y": 860,
-              "width": 330,
-              "height": 650,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 170,
-            "fontWeight": 800,
-            "color": "#FF793B",
-            "align": "left"
           },
           {
-            "id": "battery-proof",
-            "text": {
-              "en": "CHARGE. HEALTH. WATTS. TEMPERATURE.",
-              "tr": "ŞARJ. SAĞLIK. GÜÇ. SICAKLIK."
-            },
+            "id": "battery-temperature",
+            "src": "/artwork/companion/{locale}/battery-temperature.svg",
             "transform": {
-              "x": 100,
-              "y": 2570,
-              "width": 1140,
-              "height": 170,
-              "rotation": 0,
-              "zIndex": 5
+              "x": 50,
+              "y": 2110,
+              "width": 430,
+              "height": 218,
+              "rotation": -3,
+              "zIndex": 9
             },
-            "fontSize": 61,
-            "fontWeight": 800,
-            "color": "#EEEAE2",
-            "align": "left"
+            "fit": "contain"
           }
         ]
       },
       {
-        "id": "whole-desk",
-        "layout": "no-device",
+        "id": "companion-accessories",
+        "layout": "device-top",
         "label": {
-          "en": "ACCESSORIES + APPS",
-          "tr": "AKSESUARLAR + UYGULAMALAR"
+          "en": "",
+          "tr": ""
         },
         "headline": {
-          "en": "ALL YOUR\n*BATTERIES.*",
-          "tr": "TÜM PİLLER.\n*TEK BAKIŞ.*"
+          "en": "",
+          "tr": ""
         },
-        "screenshot": "",
+        "screenshot": "/screenshots/apple/iphone/{locale}/04.png",
+        "backgroundColor": "#EAF1EE",
         "inverted": true,
-        "typography": {
-          "headlineScale": 1.8,
-          "labelScale": 1
-        },
         "transforms": {
           "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 650,
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
             "rotation": 0,
-            "zIndex": 12
+            "zIndex": 5
+          },
+          "device": {
+            "x": 140,
+            "y": -100,
+            "width": 820,
+            "height": 1783,
+            "rotation": -4,
+            "zIndex": 6
           }
         },
-        "imageElements": [
-          {
-            "id": "accessory-lines",
-            "src": "/artwork/on-duty/accessory-lines.svg",
-            "transform": {
-              "x": 0,
-              "y": 850,
-              "width": 1320,
-              "height": 900,
-              "rotation": 0,
-              "zIndex": 2
-            },
-            "fit": "contain"
-          },
-          {
-            "id": "accessories",
-            "src": "/artwork/on-duty/{locale}/accessories.svg",
-            "transform": {
-              "x": 50,
-              "y": 1500,
-              "width": 1220,
-              "height": 840,
-              "rotation": -4,
-              "zIndex": 8
-            },
-            "fit": "contain"
-          }
-        ],
         "textElements": [
           {
-            "id": "apps",
+            "id": "headline",
             "text": {
-              "en": "SEE WHAT’S\nUSING ENERGY.",
-              "tr": "ENERJİYİ NEYİN\nKULLANDIĞINI GÖR."
+              "tr": "Aksesuarlarının\npilini de gör.",
+              "en": "Check your\naccessories, too."
+            },
+            "transform": {
+              "x": 90,
+              "y": 1860,
+              "width": 1140,
+              "height": 485,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 145,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#163E42",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Mac’ine bağlı cihazların pilini ve\nenerji kullanan uygulamaları gör.",
+              "en": "Accessory battery levels and the apps\nusing your Mac’s energy."
             },
             "transform": {
               "x": 100,
-              "y": 2440,
+              "y": 2380,
+              "width": 1120,
+              "height": 230,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#426568",
+            "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "accessories",
+            "src": "/artwork/companion/{locale}/accessories.svg",
+            "transform": {
+              "x": 375,
+              "y": 1040,
+              "width": 915,
+              "height": 620,
+              "rotation": 5,
+              "zIndex": 9
+            },
+            "fit": "contain"
+          }
+        ]
+      },
+      {
+        "id": "companion-connection",
+        "layout": "no-device",
+        "label": {
+          "en": "",
+          "tr": ""
+        },
+        "headline": {
+          "en": "",
+          "tr": ""
+        },
+        "screenshot": "/screenshots/apple/iphone/{locale}/01-nearby.png",
+        "backgroundColor": "#002D30",
+        "inverted": false,
+        "transforms": {
+          "caption": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "rotation": 0,
+            "zIndex": 5
+          },
+          "device": {
+            "x": 100,
+            "y": 865,
+            "width": 650,
+            "height": 1413,
+            "rotation": -4,
+            "zIndex": 6
+          }
+        },
+        "textElements": [
+          {
+            "id": "brand",
+            "text": {
+              "en": "Battistics Remote",
+              "tr": "Battistics Remote"
+            },
+            "transform": {
+              "x": 100,
+              "y": 65,
+              "width": 1100,
+              "height": 115,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 39,
+            "fontWeight": 600,
+            "lineHeight": 1.1,
+            "letterSpacing": 0,
+            "color": "#D5EF80",
+            "align": "left"
+          },
+          {
+            "id": "headline",
+            "text": {
+              "tr": "Yan yana da.\nUzaktayken de.",
+              "en": "Close by.\nOr far away."
+            },
+            "transform": {
+              "x": 90,
+              "y": 180,
               "width": 1140,
+              "height": 560,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 150,
+            "fontWeight": 620,
+            "lineHeight": 1.04,
+            "letterSpacing": -5,
+            "color": "#F3F0E7",
+            "align": "left"
+          },
+          {
+            "id": "body",
+            "text": {
+              "tr": "Yakında yerel ağ veya Bluetooth,\nuzakta özel iCloud devreye girer.",
+              "en": "Local network and Bluetooth nearby.\nPrivate iCloud when you’re farther away."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2250,
+              "width": 1120,
               "height": 210,
               "rotation": 0,
               "zIndex": 5
             },
-            "fontSize": 88,
-            "fontWeight": 800,
-            "color": "#17191B",
-            "align": "left"
-          }
-        ]
-      },
-      {
-        "id": "your-connection",
-        "layout": "no-device",
-        "label": {
-          "en": "YOUR DEVICES. YOUR CONNECTION.",
-          "tr": "SENİN CİHAZLARIN. SENİN BAĞLANTIN."
-        },
-        "headline": {
-          "en": "NEAR.\nFAR.\n*YOURS.*",
-          "tr": "YAKINDA.\nUZAKTA.\n*SENİN.*"
-        },
-        "screenshot": "",
-        "inverted": false,
-        "typography": {
-          "headlineScale": 2.4,
-          "labelScale": 0.92
-        },
-        "transforms": {
-          "caption": {
-            "x": 96,
-            "y": 160,
-            "width": 1130,
-            "height": 1090,
-            "rotation": 0,
-            "zIndex": 12
-          }
-        },
-        "imageElements": [
-          {
-            "id": "routes",
-            "src": "/artwork/on-duty/routes.svg",
-            "transform": {
-              "x": 0,
-              "y": 0,
-              "width": 1320,
-              "height": 2868,
-              "rotation": 0,
-              "zIndex": 2
-            },
-            "fit": "contain"
-          }
-        ],
-        "textElements": [
-          {
-            "id": "lan",
-            "text": {
-              "en": "WI-FI + ETHERNET",
-              "tr": "WI-FI + ETHERNET"
-            },
-            "transform": {
-              "x": 220,
-              "y": 1170,
-              "width": 970,
-              "height": 150,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 88,
-            "fontWeight": 800,
-            "color": "#FF793B",
+            "fontSize": 52,
+            "fontWeight": 420,
+            "lineHeight": 1.24,
+            "letterSpacing": -0.3,
+            "color": "#BED4C9",
             "align": "left"
           },
           {
-            "id": "ble",
+            "id": "account-note",
             "text": {
-              "en": "BLUETOOTH NEARBY",
-              "tr": "YAKINDA BLUETOOTH"
-            },
-            "transform": {
-              "x": 220,
-              "y": 1560,
-              "width": 970,
-              "height": 150,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 88,
-            "fontWeight": 800,
-            "color": "#EEEAE2",
-            "align": "left"
-          },
-          {
-            "id": "cloud",
-            "text": {
-              "en": "PRIVATE ICLOUD AWAY",
-              "tr": "UZAKTA ÖZEL ICLOUD"
-            },
-            "transform": {
-              "x": 220,
-              "y": 1930,
-              "width": 970,
-              "height": 150,
-              "rotation": 0,
-              "zIndex": 5
-            },
-            "fontSize": 88,
-            "fontWeight": 800,
-            "color": "#A9CBD5",
-            "align": "left"
-          },
-          {
-            "id": "account",
-            "text": {
-              "en": "MAC + IPHONE. SAME APPLE ACCOUNT.\nBACKGROUND UPDATES DEPEND ON IOS.",
-              "tr": "MAC + IPHONE. AYNI APPLE HESABI.\nARKA PLAN GÜNCELLEMELERİ IOS’A BAĞLIDIR."
+              "tr": "İlk kurulumda aynı Apple Hesabı gerekir.\nArka plan güncellemeleri iOS’a bağlıdır.",
+              "en": "The same Apple Account is required for setup.\nBackground updates depend on iOS."
             },
             "transform": {
               "x": 100,
               "y": 2590,
-              "width": 1140,
-              "height": 170,
+              "width": 1120,
+              "height": 180,
               "rotation": 0,
               "zIndex": 5
             },
-            "fontSize": 45,
-            "fontWeight": 800,
-            "color": "#EEEAE2",
+            "fontSize": 37,
+            "fontWeight": 400,
+            "lineHeight": 1.24,
+            "letterSpacing": 0,
+            "color": "#BED4C9",
             "align": "left"
+          }
+        ],
+        "imageElements": [
+          {
+            "id": "mascot",
+            "src": "/artwork/companion/mascot-wave.png",
+            "transform": {
+              "x": 620,
+              "y": 1120,
+              "width": 740,
+              "height": 970,
+              "rotation": 0,
+              "zIndex": 8
+            },
+            "fit": "contain"
           }
         ]
       }
@@ -1214,17 +1475,21 @@
     "backdrop": "solid",
     "span": false,
     "decoration": "none",
-    "shadow": 48,
+    "shadow": 40,
     "glow": 0,
     "tilt": 0,
-    "headlineWeight": 800,
-    "headlineScale": 1.1,
+    "headlineWeight": 620,
+    "headlineScale": 1,
     "headlineCase": "as-typed",
     "captionAlign": "left"
   },
   "importedFont": {
-    "src": "/fonts/imported/724c9c25952d5f4a.ttf",
+    "src": "/fonts/imported/b24f181258481695.ttf",
     "format": "truetype",
-    "name": "Barlow Condensed ExtraBold"
+    "name": "Instrument Sans",
+    "weightRange": [
+      400,
+      700
+    ]
   }
 }

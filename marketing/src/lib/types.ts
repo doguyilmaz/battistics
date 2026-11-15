@@ -66,6 +66,9 @@ export type TextElement = {
   transform: ElementTransform;
   fontSize?: number;
   fontWeight?: number;
+  /** Unitless leading and letter spacing in canvas pixels. */
+  lineHeight?: number;
+  letterSpacing?: number;
   color?: string;
   align?: "left" | "center" | "right";
 };
@@ -162,6 +165,8 @@ export type ImportedFont = {
   format: "woff2" | "woff" | "truetype" | "opentype";
   /** Display name, taken from the uploaded file name. */
   name?: string;
+  /** Actual supported weight range of an imported variable font. */
+  weightRange?: [number, number];
 };
 
 export type Theme = {

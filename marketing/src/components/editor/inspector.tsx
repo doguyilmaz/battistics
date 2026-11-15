@@ -940,6 +940,26 @@ function TextElementPanel({
           </div>
         </div>
       </div>
+      <div className="grid grid-cols-3 gap-2">
+        <label className="space-y-1 text-[11px] text-muted-foreground">
+          <span>Weight</span>
+          <Input type="number" min={100} max={900} step={50} value={element.fontWeight ?? 700}
+            aria-label="Text weight" className="h-8 text-xs"
+            onChange={(event) => onTextPatch({ fontWeight: Math.max(100, Math.min(900, Number(event.target.value) || 700)) })} />
+        </label>
+        <label className="space-y-1 text-[11px] text-muted-foreground">
+          <span>Line height</span>
+          <Input type="number" min={0.8} max={2} step={0.05} value={element.lineHeight ?? 1.05}
+            aria-label="Text line height" className="h-8 text-xs"
+            onChange={(event) => onTextPatch({ lineHeight: Math.max(0.8, Math.min(2, Number(event.target.value) || 1.05)) })} />
+        </label>
+        <label className="space-y-1 text-[11px] text-muted-foreground">
+          <span>Tracking (px)</span>
+          <Input type="number" min={-20} max={40} step={0.5} value={element.letterSpacing ?? 0}
+            aria-label="Text letter spacing" className="h-8 text-xs"
+            onChange={(event) => onTextPatch({ letterSpacing: Math.max(-20, Math.min(40, Number(event.target.value) || 0)) })} />
+        </label>
+      </div>
       <div className="grid grid-cols-[76px_1fr] gap-2">
         <div className="space-y-1">
           <Label className="text-[11px] text-muted-foreground">Color</Label>

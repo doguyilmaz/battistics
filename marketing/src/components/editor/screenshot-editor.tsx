@@ -933,10 +933,11 @@ function useImportedFontFace(font: ImportedFont | undefined) {
     if (!font) return;
     const style = document.createElement("style");
     style.dataset.importedScreenshotFont = "";
-    style.textContent = `@font-face { font-family: "${IMPORTED_FONT_FAMILY}"; src: url("${font.src}") format("${font.format}"); font-display: block; }`;
+    const weight = font.weightRange?.join(" ") || "normal";
+    style.textContent = `@font-face { font-family: "${IMPORTED_FONT_FAMILY}"; src: url("${font.src}") format("${font.format}"); font-weight: ${weight}; font-display: block; }`;
     document.head.appendChild(style);
     return () => style.remove();
-  }, [font?.src, font?.format]);
+  }, [font?.src, font?.format, font?.weightRange?.[0], font?.weightRange?.[1]]);
 }
 
 // Measures any Apple bezels the user added to public/frames/ before the

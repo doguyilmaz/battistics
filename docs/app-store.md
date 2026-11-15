@@ -33,7 +33,7 @@ countdown, the Control Center control and the Shortcuts actions.
 ## Screenshots
 
 `marketing/` holds the screenshot editor (`bun install`, `bun dev`). The
-curated synthetic iPhone captures referenced by the Still On deck are tracked; other captures/uploads and Apple bezels remain local. Capture fresh app states with `-demo`. The editor exports the six-slide EN/TR series at all four configured iPhone sizes, with actual UI plus a separately generated closed-laptop illustration. See [the creative brief](../marketing/docs/creative-direction.md). Do not present this upcoming nearby release's screenshots as the older App Store binary.
+curated sample-mode iPhone captures referenced by the Companion deck are tracked; other captures/uploads and Apple bezels remain local. Capture fresh app states with `-demo`. The editor exports the seven-slide EN/TR series at all four configured iPhone sizes, combining actual UI with the bat, pocket and journey campaign scenes. Copy, typography, character references and artwork prompts are recorded in [the creative brief](../marketing/docs/creative-direction.md). Do not present this upcoming nearby release's screenshots as the older App Store binary.
 
 Released metadata in `metadata/version/1.0.1/` records what shipped. Upcoming nearby copy is staged separately under `metadata/drafts/nearby/`; select the actual next SemVer and complete release validation before moving it into version metadata or submitting it. Do not publish an unreleased feature as available in the current App Store binary.
 
