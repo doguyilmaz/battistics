@@ -6,6 +6,8 @@ import Network
 @MainActor
 public final class NearbyClient {
     public var onStatus: ((String, RemoteStatus) -> Void)?
+    public var onBluetoothState: ((NearbyBluetoothState) -> Void)?
+    public var onLocalNetworkState: ((NearbyLocalNetworkState) -> Void)?
     private let browser = NearbyLANBrowser()
     private let bluetooth = NearbyBLEClient()
     private var credentials: [NearbyCredential] = []
@@ -16,6 +18,8 @@ public final class NearbyClient {
     private var ticker: Task<Void, Never>?
 
     public init() {
+        bluetooth.onState = { [weak self] in self?.onBluetoothState?($0) }
+        browser.onState = { [weak self] in self?.onLocalNetworkState?($0) }
         browser.onEndpoints = { [weak self] endpoints in self?.endpoints = endpoints; self?.connectLAN() }
         bluetooth.onConnection = { [weak self] credential, link in self?.adopt(link, credential: credential) }
     }
@@ -27,6 +31,14 @@ public final class NearbyClient {
         else { browser.stop() }
         if CBCentralManager.authorization == .denied || CBCentralManager.authorization == .restricted { bluetooth.stop() }
         else if foreground || CBCentralManager.authorization == .allowedAlways { bluetooth.configure(self.credentials) }
+        bluetooth.refreshState()
+    }
+
+    public func refreshAccess() {
+        if foreground, !credentials.isEmpty, browser.accessState == .denied || browser.accessState == .unavailable {
+            browser.stop()
+        }
+        configure(credentials)
     }
 
     public func setForeground(_ foreground: Bool) {

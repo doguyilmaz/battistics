@@ -5,6 +5,7 @@ import Foundation
 @MainActor
 final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelegate {
     var onConnection: ((NearbyBLELink) -> Void)?
+    var onState: ((NearbyBluetoothState) -> Void)?
     private var manager: CBPeripheralManager?
     private var credential: NearbyCredential?
     private var output: CBMutableCharacteristic?
@@ -32,6 +33,7 @@ final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelega
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         guard peripheral === manager else { return }
+        refreshState()
         guard peripheral.state == .poweredOn, let credential else {
             for link in Array(links.values) { link.close() }
             return
@@ -45,6 +47,8 @@ final class NearbyBLEServer: NSObject, @preconcurrency CBPeripheralManagerDelega
         service.characteristics = [input, output]
         peripheral.add(service)
     }
+
+    func refreshState() { onState?(.current(manager?.state)) }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
         guard peripheral === manager, error == nil, let credential else { return }

@@ -30,6 +30,8 @@ final class MacStore {
     private(set) var pending: [String: RemoteRequest.Operation] = [:]
     /// Why iCloud could not be read, in the user's language.
     private(set) var problem: String?
+    private(set) var bluetoothState = NearbyBluetoothState.current()
+    private(set) var localNetworkState = NearbyLocalNetworkState.inactive
     /// Until this launch's first successful read, a saved reading too old to be
     /// live says nothing about the Mac, so it shows as updating, not offline.
     private(set) var checking = true
@@ -108,9 +110,13 @@ final class MacStore {
             await Notifications.report(await self.extend(mac, minutes: minutes), for: mac)
         }
         WidgetBridge.publish(selected, reading: selected.flatMap { readings[$0.id] })
+        nearby.onBluetoothState = { [weak self] in self?.bluetoothState = $0 }
+        nearby.onLocalNetworkState = { [weak self] in self?.localNetworkState = $0 }
         nearby.onStatus = { [weak self] id, status in
             Task { @MainActor in
                 guard let self, !self.isSample, self.nearbyTrust[id]?.discoveryID == status.nearbyID else { return }
+                RemoteTrace.record(.nearbyReceived, macID: id, status: status,
+                                   appState: UIApplication.shared.applicationState.rawValue)
                 self.checking = false
                 await self.apply(.init(statuses: [id: status], isComplete: false))
             }
@@ -136,6 +142,11 @@ final class MacStore {
         guard !isSample else { return }
         nearby.setForeground(active)
         if active { updateNearbyTrust() }
+    }
+
+    func refreshNearbyAccess() {
+        guard !isSample else { return }
+        nearby.refreshAccess()
     }
 
     private func accountChanged() async {
@@ -350,6 +361,10 @@ final class MacStore {
         do {
             snapshot = try await cloud.fetch(knownMacIDs: Array(readings.keys), until: deadline)
             guard generation == accountGeneration else { return .failed }
+            for (id, status) in snapshot.statuses {
+                RemoteTrace.record(.cloudReceived, macID: id, status: status,
+                                   appState: UIApplication.shared.applicationState.rawValue)
+            }
             slow.cancel()
             problem = nil
         } catch is CancellationError {
@@ -409,6 +424,8 @@ final class MacStore {
             let fresh = status.isFresh()
             let reading = Reading(status: status, reachable: fresh)
             readings[id] = reading
+            RemoteTrace.record(.applied, macID: id, status: status,
+                               appState: UIApplication.shared.applicationState.rawValue)
             let mac = Mac(id: id, name: status.machineName)
             let pushed = UserDefaults.standard.bool(forKey: Notifications.pushedKey)
             var state = alertStates[id] ?? RemoteAlertState()

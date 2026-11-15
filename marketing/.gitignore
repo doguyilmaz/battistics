@@ -10,11 +10,13 @@ next-env.d.ts
 # often forbid redistributing them), so keep them out of the template as well.
 public/fonts/imported/*
 !public/fonts/imported/.gitkeep
+!public/fonts/imported/724c9c25952d5f4a.ttf
 
 # Tester Army output
 .e2e/
 
 
-# Captures and bezels stay local only
+# Unselected captures, uploads and Apple bezels stay local. The curated
+# synthetic iPhone captures used by the Still On deck are tracked explicitly.
 public/screenshots/
 public/frames/

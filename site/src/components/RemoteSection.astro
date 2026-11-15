@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import PhoneScreen from "./PhoneScreen.astro";
-import bagReady from "../assets/shots/phone-dashboard.png";
+import bagReady from "../assets/shots/phone-dashboard-nearby.png";
 import charging from "../assets/shots/phone-charging.png";
 import liveActivity from "../assets/shots/live-activity.png";
 import { symbolHTML } from "../lib/symbols";
@@ -11,10 +11,10 @@ import qrSVG from "../assets/app-store-qr.svg?raw";
 const features = [
   { icon: "laptopcomputer", title: "The whole battery, anywhere", text: "Charge and its last day, time left, power, health and heat, plus the network the Mac is on and whether its lid is shut." },
   { icon: "cup.and.saucer.fill", title: "Keep Awake from your pocket", text: "Start any mode for any duration, lid closed included, and stop it again. Switch Low Power Mode or turn the display off." },
-  { icon: "personalhotspot", title: "Ready for the bag", text: "Set the Mac to join your Hotspot and it stays online with the lid shut. Bag Ready tells you when it is safe to close it." },
+  { icon: "personalhotspot", title: "Ready for the bag", text: "Set the Mac to join your Hotspot for internet with its lid shut. Bag Ready checks the connection before you close it." },
   { icon: "lock.fill", title: "Lock Screen and Control Center", text: "A Live Activity counts down with buttons for 30 more minutes and Stop, next to widgets and Control Center and Action Button controls." },
-  { icon: "bell.badge", title: "Alerts that matter", text: "Hear about it when a session ends, the battery runs low, the Mac stops answering or it reaches the charge you picked. They arrive at once, even with the app closed." },
-  { icon: "icloud", title: "Through your own iCloud", text: "Every Mac on your Apple Account shows up by itself. Nothing to pair, no server, no account, and Siri knows the Mac too." },
+  { icon: "bell.badge", title: "Alerts that matter", text: "Hear about unexpected session endings, low battery, a Mac that stops answering or the charge level you picked. Apple push notifications can arrive while the app is closed; delivery depends on the system and connection." },
+  { icon: "icloud", title: "Connected near and far", text: "Your Apple Account brings your Macs together through private iCloud. The next update adds encrypted local Wi-Fi/Ethernet and nearby Bluetooth connections, with automatic command fallback. No extra account or relay." },
 ];
 
 const phones = [
@@ -26,6 +26,7 @@ const phones = [
   },
   {
     id: "bag-phone", position: "front", image: bagReady,
+    captureIncludesStatusBar: true,
     alt: "Battistics Remote showing a MacBook Air kept awake with the lid closed and Bag Ready",
     caption: "A MacBook Air kept awake with its lid closed, online through the iPhone's Hotspot: Bag Ready.",
     label: "Enlarge: MacBook Air in Bag mode",
@@ -51,8 +52,8 @@ const phones = [
       <h2 id="iphone-title">Your Mac, from your iPhone</h2>
     </div>
     <p class="lede">
-      Battistics Remote finds every Mac on your Apple Account through your own iCloud and keeps working when the Mac is
-      in a bag, lid closed, on your Hotspot.
+      Check the battery, keep a task running and give your Mac time to finish — from your iPhone.
+      Private iCloud connects your devices when they are apart; a Hotspot can keep the Mac online on the move.
     </p>
   </div>
 
@@ -73,7 +74,7 @@ const phones = [
     <div class="devices">
       {phones.map((phone) => (
         <div class:list={["phone", phone.position]} role="button" tabindex="0" data-zoom={phone.image.src} data-caption={phone.caption} aria-label={phone.label}>
-          <PhoneScreen id={phone.id} src={phone.image} alt={phone.alt} />
+          <PhoneScreen id={phone.id} src={phone.image} alt={phone.alt} captureIncludesStatusBar={phone.captureIncludesStatusBar} />
         </div>
       ))}
       <div class="activity" role="button" tabindex="0" data-zoom={liveActivity.src} data-caption="The Live Activity on the Lock Screen: time left, the connection, 30 more minutes and Stop." aria-label="Enlarge: the Live Activity">

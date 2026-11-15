@@ -8053,6 +8053,533 @@
           }
         }
       }
+    },
+    "Access denied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Access denied"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erişim reddedildi"
+          }
+        }
+      }
+    },
+    "Allow Bluetooth and Local Network for Battistics Remote in Settings. On the Mac, allow Battistics in System Settings › Privacy & Security. A denied permission can be changed later; iCloud continues when nearby connections are unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Bluetooth and Local Network for Battistics Remote in Settings. On the Mac, allow Battistics in System Settings › Privacy & Security. A denied permission can be changed later; iCloud continues when nearby connections are unavailable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar’da Battistics Remote için Bluetooth ve Yerel Ağ erişimine izin ver. Mac’te Sistem Ayarları › Gizlilik ve Güvenlik’te Battistics’e izin ver. Reddedilen bir izin sonradan değiştirilebilir; yakındaki bağlantılar kullanılamadığında iCloud çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Allow Bluetooth and Local Network on both devices when asked. You can change these permissions later in Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Bluetooth and Local Network on both devices when asked. You can change these permissions later in Settings."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorulduğunda iki cihazda da Bluetooth ve Yerel Ağ erişimine izin ver. Bu izinleri daha sonra Ayarlar’da değiştirebilirsin."
+          }
+        }
+      }
+    },
+    "Allow nearby connections": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow nearby connections"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bağlantılara izin ver"
+          }
+        }
+      }
+    },
+    "Available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullanılabilir"
+          }
+        }
+      }
+    },
+    "Background updates depend on iOS and available connections. Bluetooth access does not guarantee continuous Live Activity updates.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Background updates depend on iOS and available connections. Bluetooth access does not guarantee continuous Live Activity updates."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arka plan güncellemeleri iOS’a ve kullanılabilir bağlantılara bağlıdır. Bluetooth izni, Canlı Etkinliğin kesintisiz güncelleneceğini garanti etmez."
+          }
+        }
+      }
+    },
+    "Bluetooth Privacy Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth Privacy Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth Gizlilik Ayarları"
+          }
+        }
+      }
+    },
+    "Bluetooth access is restricted by iOS or device management.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth access is restricted by iOS or device management."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth erişimi iOS veya cihaz yönetimi tarafından kısıtlandı."
+          }
+        }
+      }
+    },
+    "Bluetooth access is restricted by macOS or device management. Contact your administrator if this Mac is managed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth access is restricted by macOS or device management. Contact your administrator if this Mac is managed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth erişimi macOS veya cihaz yönetimi tarafından kısıtlandı. Bu Mac yönetiliyorsa yöneticinle iletişime geç."
+          }
+        }
+      }
+    },
+    "Bluetooth connects nearby devices, even on different networks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth connects nearby devices, even on different networks."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth, farklı ağlarda olsalar da yakındaki cihazları bağlar."
+          }
+        }
+      }
+    },
+    "Bluetooth is off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth is off"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth kapalı"
+          }
+        }
+      }
+    },
+    "Bluetooth unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth kullanılamıyor"
+          }
+        }
+      }
+    },
+    "Bluetooth works with a nearby iPhone even on different networks. Local Network adds a connection over reachable Wi‑Fi or Ethernet. If access was denied, allow Battistics in Privacy & Security on this Mac and in Settings on the iPhone. iCloud continues when nearby connections are unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth works with a nearby iPhone even on different networks. Local Network adds a connection over reachable Wi‑Fi or Ethernet. If access was denied, allow Battistics in Privacy & Security on this Mac and in Settings on the iPhone. iCloud continues when nearby connections are unavailable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth, farklı ağlarda olsanız da yakındaki iPhone ile çalışır. Yerel Ağ, erişilebilir Wi‑Fi veya Ethernet üzerinden bağlantı ekler. Erişim reddedildiyse bu Mac’te Gizlilik ve Güvenlik’te, iPhone’da Ayarlar’da Battistics’e izin ver. Yakındaki bağlantılar kullanılamadığında iCloud çalışmaya devam eder."
+          }
+        }
+      }
+    },
+    "Checking Bluetooth…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking Bluetooth…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth denetleniyor…"
+          }
+        }
+      }
+    },
+    "Local Network Privacy Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local Network Privacy Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel Ağ Gizlilik Ayarları"
+          }
+        }
+      }
+    },
+    "Local Network access denied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local Network access denied"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel Ağ erişimi reddedildi"
+          }
+        }
+      }
+    },
+    "Local Network connects devices over reachable Wi‑Fi or Ethernet while this app is open.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local Network connects devices over reachable Wi‑Fi or Ethernet while this app is open."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel Ağ, bu uygulama açıkken erişilebilir Wi‑Fi veya Ethernet üzerinden cihazları bağlar."
+          }
+        }
+      }
+    },
+    "Local discovery unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local discovery unavailable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel ağda bulma kullanılamıyor"
+          }
+        }
+      }
+    },
+    "Nearby Connections": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby Connections"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki Bağlantılar"
+          }
+        }
+      }
+    },
+    "Not requested": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not requested"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz istenmedi"
+          }
+        }
+      }
+    },
+    "Open App Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open App Settings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama Ayarlarını Aç"
+          }
+        }
+      }
+    },
+    "Permissions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzinler"
+          }
+        }
+      }
+    },
+    "Restricted by the system": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restricted by the system"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem tarafından kısıtlandı"
+          }
+        }
+      }
+    },
+    "See your Mac’s battery and control Keep Awake through private iCloud, with Bluetooth and local network connections nearby.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See your Mac’s battery and control Keep Awake through private iCloud, with Bluetooth and local network connections nearby."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’inin pilini gör ve Uyanık Tut’u özel iCloud üzerinden kontrol et; yakındayken Bluetooth ve yerel ağ bağlantılarını da kullan."
+          }
+        }
+      }
+    },
+    "Sharing uses your private iCloud. Allow Bluetooth and Local Network on both devices to add nearby connections.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharing uses your private iCloud. Allow Bluetooth and Local Network on both devices to add nearby connections."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paylaşım özel iCloud’unu kullanır. Yakındaki bağlantılar için iki cihazda da Bluetooth ve Yerel Ağ erişimine izin ver."
+          }
+        }
+      }
+    },
+    "Turn on Bluetooth in Settings to connect to a nearby Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Bluetooth in Settings to connect to a nearby Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bir Mac’e bağlanmak için Ayarlar’da Bluetooth’u aç."
+          }
+        }
+      }
+    },
+    "Turn on Bluetooth in System Settings to use the nearby Bluetooth connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Bluetooth in System Settings to use the nearby Bluetooth connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki Bluetooth bağlantısını kullanmak için Sistem Ayarları’nda Bluetooth’u aç."
+          }
+        }
+      }
+    },
+    "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Use the same Apple Account for private iCloud sharing. Nearby devices also exchange encrypted updates and controls over Bluetooth or the local network.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Use the same Apple Account for private iCloud sharing. Nearby devices also exchange encrypted updates and controls over Bluetooth or the local network."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone’un pil, bağlantı ve Uyanık Tut durumunu görür; Uyanık Tut’u başlatıp durdurabilir. Özel iCloud paylaşımı için aynı Apple Hesabını kullan. Yakındaki cihazlar Bluetooth veya yerel ağ üzerinden de şifreli güncellemeler ve komutlar paylaşır."
+          }
+        }
+      }
+    },
+    "Your private iCloud connects devices when they are apart. The first setup requires the same Apple Account and an internet connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your private iCloud connects devices when they are apart. The first setup requires the same Apple Account and an internet connection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Özel iCloud’un, cihazlar birbirinden uzakken bağlantı sağlar. İlk kurulum için aynı Apple Hesabı ve internet bağlantısı gerekir."
+          }
+        }
+      }
+    },
+    "Battery history stays on this Mac. Optional iPhone sharing uses private iCloud and encrypted nearby Bluetooth or local-network connections. Update checks use GitHub. No analytics or tracking.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery history stays on this Mac. Optional iPhone sharing uses private iCloud and encrypted nearby Bluetooth or local-network connections. Update checks use GitHub. No analytics or tracking."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pil geçmişi bu Mac’te kalır. İsteğe bağlı iPhone paylaşımı, özel iCloud’u ve yakındaki şifreli Bluetooth veya yerel ağ bağlantılarını kullanır. Güncelleme denetimleri GitHub üzerinden yapılır. Analitik veya izleme yoktur."
+          }
+        }
+      }
+    },
+    "Allowed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzin verildi"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

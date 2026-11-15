@@ -43,6 +43,8 @@ final class RemoteAccessModel {
     /// Why sharing is not working right now, in the user's language.
     private(set) var problem: String?
     private(set) var lastPublished: Date?
+    private(set) var bluetoothState = NearbyBluetoothState.current()
+    private(set) var localNetworkState = NearbyLocalNetworkState.inactive
 
     @ObservationIgnored private let awake: KeepAwakeModel
     @ObservationIgnored private let automation: AutomationModel
@@ -113,6 +115,8 @@ final class RemoteAccessModel {
                 .appendingPathComponent("Battistics/Remote/\(id).json"))
         enabled = UserDefaults.standard.bool(forKey: Prefs.remoteEnabled)
         closedLidAllowed = UserDefaults.standard.bool(forKey: Prefs.remoteClosedLidAllowed)
+        nearby.onBluetoothState = { [weak self] in self?.bluetoothState = $0 }
+        nearby.onLocalNetworkState = { [weak self] in self?.localNetworkState = $0 }
         network.onChange = { [weak self] in self?.publishSoon() }
         pushObserver = NotificationCenter.default.addObserver(
             forName: .battisticsRemotePush, object: nil, queue: .main
@@ -158,6 +162,8 @@ final class RemoteAccessModel {
 
     /// False for builds not signed for iCloud, such as local ad-hoc builds.
     var isAvailable: Bool { cloud != nil }
+
+    func refreshNearbyAccess() { nearby.refreshAccess() }
 
     // MARK: iCloud
 
@@ -461,6 +467,7 @@ final class RemoteAccessModel {
         // publisher must never delete a replacement sharing session's status.
         guard enabled, generation == nearbyGeneration else { return }
         lastCheap = cheap
+        RemoteTrace.record(.cloudPublished, macID: macID, status: status)
         lastPublished = Date()
         alertOutbox.record(from: lastStatus, to: status)
         saveAlertOutbox()

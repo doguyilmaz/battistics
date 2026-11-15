@@ -12,6 +12,8 @@ struct RemotePane: View {
             Section {
                 Toggle("Show this Mac in Battistics Remote", isOn: $remote.enabled)
                     .disabled(!remote.isAvailable)
+                Text("Sharing uses your private iCloud. Allow Bluetooth and Local Network on both devices to add nearby connections.")
+                    .font(.caption).foregroundStyle(.secondary)
                 if !remote.isAvailable {
                     Label("This copy of Battistics is not signed for iCloud.", systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
@@ -30,8 +32,14 @@ struct RemotePane: View {
                 RemoteAppStoreRow()
             } header: {
                 InfoHeader("Battistics Remote",
-                           info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Both devices use the same Apple Account; everything goes through your private iCloud, encrypted. Nothing is opened on this Mac.",
+                           info: "Your iPhone sees battery, connection and Keep Awake, and can start or stop it. Use the same Apple Account for private iCloud sharing. Nearby devices also exchange encrypted updates and controls over Bluetooth or the local network.",
                            "Allowing closed-lid sessions sets up the power helper they need. A closed-lid session from iPhone always stops at 10% battery and under high thermal pressure.")
+            }
+
+            if remote.enabled {
+                Section("Nearby Connections") {
+                    NearbyAccessView(bluetooth: remote.bluetoothState, localNetwork: remote.localNetworkState)
+                }
             }
 
             Section {
@@ -61,6 +69,10 @@ struct RemotePane: View {
             }
         }
         .formStyle(.grouped)
+        .onAppear { remote.refreshNearbyAccess() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            remote.refreshNearbyAccess()
+        }
     }
 }
 

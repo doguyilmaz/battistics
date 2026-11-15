@@ -6,9 +6,10 @@ interface Props {
   id: string;
   src: ImageMetadata;
   alt: string;
+  captureIncludesStatusBar?: boolean;
 }
 
-const { id, src, alt } = Astro.props;
+const { id, src, alt, captureIncludesStatusBar = false } = Astro.props;
 const image = await getImage({ src, width: 600, format: "webp" });
 const width = 1170;
 const bodyHeight = src.height * width / src.width;
@@ -18,7 +19,9 @@ const whiteIcons = `${id}-white-icons`;
 ---
 
 <div class="screen">
-  <!-- All screen content, including the status bar, scales in this one viewBox. -->
+  {captureIncludesStatusBar ? (
+    <img class="screen-image" src={image.src} width={src.width} height={src.height} alt={alt} loading="lazy" />
+  ) : (
   <svg class="screen-image" viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label={alt}>
     <defs>
       <filter id={whiteIcons} x="0" y="0" width="100%" height="100%">
@@ -40,6 +43,7 @@ const whiteIcons = `${id}-white-icons`;
       </g>
     </g>
   </svg>
+  )}
 </div>
 
 <style>

@@ -1,0 +1,2 @@
+"NSBluetoothAlwaysUsageDescription" = "Battistics Remote durumlarını güncel tutmak ve Bluetooth üzerinden Uyanık Tut komutları göndermek için yakındaki Mac’lerine güvenli biçimde bağlanır.";
+"NSLocalNetworkUsageDescription" = "Battistics Remote güncel durumu almak ve Uyanık Tut komutları göndermek için yerel Wi-Fi veya Ethernet üzerinden Mac’lerine güvenli biçimde bağlanır.";

@@ -4,6 +4,8 @@ import Network
 @MainActor
 final class NearbyLANServer {
     var onConnection: ((NearbyLANLink) -> Void)?
+    var onState: ((NearbyLocalNetworkState) -> Void)?
+    private(set) var accessState = NearbyLocalNetworkState.inactive
     private(set) var listener: NWListener?
     private var pending: [UUID: NearbyLANLink] = [:]
     private var deadlines: [UUID: Task<Void, Never>] = [:]
@@ -37,10 +39,15 @@ final class NearbyLANServer {
             }
         }
         listener.stateUpdateHandler = { [weak self] state in
-            if case .failed = state {
-                Task { @MainActor in
-                    guard let self, self.listener === listener else { return }
+            Task { @MainActor in
+                guard let self, self.listener === listener else { return }
+                switch state {
+                case .ready: self.report(.discovering)
+                case .waiting(let error): self.report(.failure(error))
+                case .failed(let error):
                     self.stop()
+                    self.report(.failure(error))
+                default: break
                 }
             }
         }
@@ -57,5 +64,11 @@ final class NearbyLANServer {
         listener?.newConnectionHandler = nil
         listener?.cancel()
         listener = nil
+        report(.inactive)
+    }
+
+    private func report(_ state: NearbyLocalNetworkState) {
+        accessState = state
+        onState?(state)
     }
 }

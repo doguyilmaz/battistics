@@ -4,6 +4,8 @@ import os
 
 @MainActor
 public final class NearbyHost {
+    public var onBluetoothState: ((NearbyBluetoothState) -> Void)?
+    public var onLocalNetworkState: ((NearbyLocalNetworkState) -> Void)?
     private let startsTransports: Bool
     private let lan = NearbyLANServer()
     private let bluetooth = NearbyBLEServer()
@@ -20,7 +22,18 @@ public final class NearbyHost {
     public convenience init() { self.init(startsTransports: true) }
 
     /// Allows protocol/controller checks without opening radios or sockets.
-    init(startsTransports: Bool) { self.startsTransports = startsTransports }
+    init(startsTransports: Bool) {
+        self.startsTransports = startsTransports
+        bluetooth.onState = { [weak self] in self?.onBluetoothState?($0) }
+        lan.onState = { [weak self] in self?.onLocalNetworkState?($0) }
+    }
+
+    public func refreshAccess() {
+        bluetooth.refreshState()
+        if startsTransports, let credential, lan.accessState == .denied || lan.accessState == .unavailable {
+            try? lan.start(credential)
+        }
+    }
 
     public func start(_ credential: NearbyCredential,
                       read: @escaping () async throws -> RemoteStatus,

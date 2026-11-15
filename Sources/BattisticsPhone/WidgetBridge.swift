@@ -125,11 +125,18 @@ enum WidgetBridge {
         let content = ActivityContent(state: state, staleDate: status.unheardDate)
         if let activity = existing {
             let id = activity.id
-            if activity.content.state != state { await update(id, content) }
+            if activity.content.state != state {
+                if await update(id, content) {
+                    RemoteTrace.record(.activitySubmitted, macID: mac.id, status: status,
+                                       appState: UIApplication.shared.applicationState.rawValue)
+                }
+            }
             await endActivities(of: mac.id, except: id)
         } else {
             do {
                 let activity = try Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
+                RemoteTrace.record(.activityCreated, macID: mac.id, status: status,
+                                   appState: UIApplication.shared.applicationState.rawValue)
                 logger.info("Live Activity created; sample age \(Int(-status.readAt.timeIntervalSinceNow))s")
                 await endActivities(of: mac.id, except: activity.id)
             } catch {
@@ -148,9 +155,11 @@ enum WidgetBridge {
     }
 
     /// Looked up by id off the main actor, since `Activity` is not Sendable.
-    private nonisolated static func update(_ id: String, _ content: ActivityContent<KeepAwakeActivityAttributes.ContentState>) async {
-        await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?.update(content)
+    private nonisolated static func update(_ id: String, _ content: ActivityContent<KeepAwakeActivityAttributes.ContentState>) async -> Bool {
+        guard let activity = Activity<KeepAwakeActivityAttributes>.activities.first(where: { $0.id == id }) else { return false }
+        await activity.update(content)
         logger.info("Live Activity update submitted; sample age \(Int(-content.state.lastUpdate.timeIntervalSinceNow))s")
+        return true
     }
 
     private nonisolated static func end(_ id: String) async {

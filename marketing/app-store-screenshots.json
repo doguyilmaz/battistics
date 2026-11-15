@@ -1,8 +1,8 @@
 {
   "schemaVersion": 3,
   "appName": "Battistics Remote",
-  "themeId": "battistics-glow",
-  "fontId": "system-sans",
+  "themeId": "battistics-on-duty",
+  "fontId": "self-hosted",
   "connectedCanvas": true,
   "locales": [
     "en",
@@ -15,127 +15,623 @@
   "slidesByDevice": {
     "iphone": [
       {
-        "id": "br_hero",
-        "layout": "hero",
-        "label": {
-          "en": "Battistics Remote",
-          "tr": "Battistics Remote"
-        },
-        "headline": {
-          "en": "Your Mac\n*in your pocket*",
-          "tr": "Mac’in\n*cebinde*"
-        },
-        "screenshot": "/screenshots/apple/iphone/{locale}/01.png"
-      },
-      {
-        "id": "br_live",
-        "layout": "device-bottom",
-        "label": {
-          "en": "Live Activity",
-          "tr": "Canlı Etkinlik"
-        },
-        "headline": {
-          "en": "Keeps running\n*with the lid closed*",
-          "tr": "Kapak kapalıyken de\n*çalışmaya devam*"
-        },
-        "screenshot": "/screenshots/apple/iphone/{locale}/02.png"
-      },
-      {
-        "id": "br_awake",
-        "layout": "device-top",
-        "label": {
-          "en": "Keep Awake",
-          "tr": "Uyanık Tut"
-        },
-        "headline": {
-          "en": "Keep Awake\n*with one tap*",
-          "tr": "Tek dokunuşla\n*Uyanık Tut*"
-        },
-        "screenshot": "/screenshots/apple/iphone/{locale}/03.png"
-      },
-      {
-        "id": "br_accessories",
-        "layout": "device-bottom",
-        "label": {
-          "en": "Accessories & Apps",
-          "tr": "Aksesuarlar ve Uygulamalar"
-        },
-        "headline": {
-          "en": "Every battery\n*at a glance*",
-          "tr": "Tüm piller\n*tek bakışta*"
-        },
-        "screenshot": "/screenshots/apple/iphone/{locale}/04.png"
-      },
-      {
-        "id": "br_details",
-        "layout": "two-devices",
-        "label": {
-          "en": "Battery Details",
-          "tr": "Pil Ayrıntıları"
-        },
-        "headline": {
-          "en": "Every detail\n*down to the mAh*",
-          "tr": "Her ayrıntı\n*mAh düzeyinde*"
-        },
-        "screenshot": "/screenshots/apple/iphone/{locale}/05.png",
-        "screenshotSecondary": "/screenshots/apple/iphone/{locale}/03.png"
-      },
-      {
-        "id": "br_closer",
+        "id": "still-on",
         "layout": "no-device",
         "label": {
-          "en": "Privacy",
-          "tr": "Gizlilik"
+          "en": "BATTISTICS REMOTE / MAC + IPHONE",
+          "tr": "BATTISTICS REMOTE / MAC + IPHONE"
         },
         "headline": {
-          "en": "Nothing in between\n*but your iCloud*",
-          "tr": "Arada sadece\n*senin iCloud’un var*"
+          "en": "YOUR MAC.\n*STILL ON.*",
+          "tr": "SEN UZAKTA.\n*MAC UYANIK.*"
         },
         "screenshot": "",
+        "inverted": false,
+        "typography": {
+          "headlineScale": 1.8,
+          "labelScale": 1
+        },
         "transforms": {
           "caption": {
-            "x": 106,
-            "y": 1000,
-            "width": 1108,
-            "height": 560,
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 650,
             "rotation": 0,
-            "zIndex": 4
+            "zIndex": 12
           }
         },
         "imageElements": [
           {
-            "id": "icon",
-            "src": "/screenshots/app-icon-rounded.png",
+            "id": "signal",
+            "src": "/artwork/on-duty/signal.svg",
             "transform": {
-              "x": 500,
-              "y": 600,
-              "width": 320,
-              "height": 320,
+              "x": 0,
+              "y": 0,
+              "width": 1320,
+              "height": 2868,
               "rotation": 0,
-              "zIndex": 5
+              "zIndex": 1
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "power",
+            "src": "/artwork/on-duty/power-key.png",
+            "transform": {
+              "x": 0,
+              "y": 700,
+              "width": 1320,
+              "height": 885,
+              "rotation": 0,
+              "zIndex": 4
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "session",
+            "src": "/artwork/on-duty/{locale}/session.svg",
+            "transform": {
+              "x": 70,
+              "y": 1610,
+              "width": 1180,
+              "height": 765,
+              "rotation": -3,
+              "zIndex": 8
             },
             "fit": "contain"
           }
         ],
         "textElements": [
           {
-            "id": "features",
+            "id": "benefit",
             "text": {
-              "en": "Home Screen widgets\nLive Activity\nControl Center\nShortcuts\nQuick Actions",
-              "tr": "Ana Ekran widget’ları\nCanlı Etkinlik\nDenetim Merkezi\nKestirmeler\nHızlı Eylemler"
+              "en": "KEEP AWAKE. FROM YOUR IPHONE.",
+              "tr": "IPHONE’UNDAN UYANIK TUT."
             },
             "transform": {
-              "x": 106,
-              "y": 1700,
-              "width": 1108,
-              "height": 760,
+              "x": 100,
+              "y": 2490,
+              "width": 1140,
+              "height": 100,
               "rotation": 0,
-              "zIndex": 4
+              "zIndex": 5
             },
-            "fontSize": 74,
-            "fontWeight": 600,
-            "color": "#B4B9C6",
-            "align": "center"
+            "fontSize": 65,
+            "fontWeight": 800,
+            "color": "#EEEAE2",
+            "align": "left"
+          },
+          {
+            "id": "requirement",
+            "text": {
+              "en": "Requires Battistics on your Mac.",
+              "tr": "Mac’inde Battistics gerektirir."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2640,
+              "width": 1100,
+              "height": 110,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 42,
+            "fontWeight": 800,
+            "color": "#A9ACAD",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "one-more-tap",
+        "layout": "no-device",
+        "label": {
+          "en": "LIVE ACTIVITIES",
+          "tr": "CANLI ETKİNLİKLER"
+        },
+        "headline": {
+          "en": "ONE TAP.\n*MORE TIME.*",
+          "tr": "DOKUN.\n*SÜRE EKLE.*"
+        },
+        "screenshot": "",
+        "inverted": true,
+        "typography": {
+          "headlineScale": 1.8,
+          "labelScale": 1
+        },
+        "transforms": {
+          "caption": {
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 650,
+            "rotation": 0,
+            "zIndex": 12
+          }
+        },
+        "imageElements": [
+          {
+            "id": "timer",
+            "src": "/artwork/on-duty/timer.svg",
+            "transform": {
+              "x": 0,
+              "y": 1050,
+              "width": 1320,
+              "height": 1500,
+              "rotation": 0,
+              "zIndex": 2
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "activity",
+            "src": "/artwork/on-duty/{locale}/activity.svg",
+            "transform": {
+              "x": 70,
+              "y": 1620,
+              "width": 1180,
+              "height": 545,
+              "rotation": -5,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "pointer",
+            "src": "/artwork/on-duty/pointer.svg",
+            "transform": {
+              "x": 690,
+              "y": 2170,
+              "width": 400,
+              "height": 250,
+              "rotation": -6,
+              "zIndex": 10
+            },
+            "fit": "contain"
+          }
+        ],
+        "textElements": [
+          {
+            "id": "30",
+            "text": {
+              "en": "+30",
+              "tr": "+30"
+            },
+            "transform": {
+              "x": 80,
+              "y": 700,
+              "width": 1070,
+              "height": 680,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 660,
+            "fontWeight": 800,
+            "color": "#17191B",
+            "align": "left"
+          },
+          {
+            "id": "minutes",
+            "text": {
+              "en": "MINUTES",
+              "tr": "DAKİKA"
+            },
+            "transform": {
+              "x": 720,
+              "y": 1230,
+              "width": 470,
+              "height": 150,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 100,
+            "fontWeight": 800,
+            "color": "#A9360A",
+            "align": "left"
+          },
+          {
+            "id": "live-actions",
+            "text": {
+              "en": "ADD TIME. OR STOP.\nRIGHT FROM YOUR LOCK SCREEN.",
+              "tr": "SÜRE EKLE. YA DA DURDUR.\nKİLİT EKRANINDAN."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2570,
+              "width": 1120,
+              "height": 190,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 60,
+            "fontWeight": 800,
+            "color": "#17191B",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "your-rules",
+        "layout": "hero",
+        "label": {
+          "en": "KEEP AWAKE",
+          "tr": "UYANIK TUT"
+        },
+        "headline": {
+          "en": "YOUR HOURS.\nYOUR RULES.",
+          "tr": "SÜRE SENİN.\nMOD SENİN."
+        },
+        "screenshot": "/screenshots/apple/iphone/{locale}/03.png",
+        "inverted": true,
+        "typography": {
+          "headlineScale": 1.8,
+          "labelScale": 1
+        },
+        "transforms": {
+          "caption": {
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 640,
+            "rotation": 0,
+            "zIndex": 12
+          },
+          "device": {
+            "x": 460,
+            "y": 920,
+            "width": 760,
+            "height": 1652,
+            "rotation": 4,
+            "zIndex": 6
+          }
+        },
+        "backgroundColor": "#FF793B",
+        "textElements": [
+          {
+            "id": "times",
+            "text": {
+              "en": "15m\n1h\n∞",
+              "tr": "15dk\n1sa\n∞"
+            },
+            "transform": {
+              "x": 80,
+              "y": 1250,
+              "width": 310,
+              "height": 860,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 170,
+            "fontWeight": 800,
+            "color": "#17191B",
+            "align": "left"
+          },
+          {
+            "id": "modes",
+            "text": {
+              "en": "SCREEN ON. SCREEN OFF. LID CLOSED.",
+              "tr": "EKRAN AÇIK. EKRAN KAPALI. KAPAK KAPALI."
+            },
+            "transform": {
+              "x": 96,
+              "y": 2660,
+              "width": 1120,
+              "height": 130,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 52,
+            "fontWeight": 800,
+            "color": "#17191B",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "behind-charge",
+        "layout": "no-device",
+        "label": {
+          "en": "BATTERY DETAILS",
+          "tr": "PİLİN AYRINTILARI"
+        },
+        "headline": {
+          "en": "BEHIND THE\n*PERCENTAGE.*",
+          "tr": "YÜZDENİN\n*ÖTESİNİ GÖR.*"
+        },
+        "screenshot": "",
+        "inverted": false,
+        "typography": {
+          "headlineScale": 1.8,
+          "labelScale": 1
+        },
+        "transforms": {
+          "caption": {
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 650,
+            "rotation": 0,
+            "zIndex": 12
+          }
+        },
+        "imageElements": [
+          {
+            "id": "battery-gauge",
+            "src": "/artwork/on-duty/{locale}/battery-gauge.svg",
+            "transform": {
+              "x": 55,
+              "y": 800,
+              "width": 760,
+              "height": 790,
+              "rotation": -8,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "battery-metrics",
+            "src": "/artwork/on-duty/{locale}/battery-metrics.svg",
+            "transform": {
+              "x": 30,
+              "y": 1550,
+              "width": 1260,
+              "height": 235,
+              "rotation": -3,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "capacity",
+            "src": "/artwork/on-duty/{locale}/capacity.svg",
+            "transform": {
+              "x": 100,
+              "y": 1890,
+              "width": 1120,
+              "height": 510,
+              "rotation": 4,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          }
+        ],
+        "textElements": [
+          {
+            "id": "beyond",
+            "text": {
+              "en": "W\n°C\nmAh",
+              "tr": "W\n°C\nmAh"
+            },
+            "transform": {
+              "x": 900,
+              "y": 860,
+              "width": 330,
+              "height": 650,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 170,
+            "fontWeight": 800,
+            "color": "#FF793B",
+            "align": "left"
+          },
+          {
+            "id": "battery-proof",
+            "text": {
+              "en": "CHARGE. HEALTH. WATTS. TEMPERATURE.",
+              "tr": "ŞARJ. SAĞLIK. GÜÇ. SICAKLIK."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2570,
+              "width": 1140,
+              "height": 170,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 61,
+            "fontWeight": 800,
+            "color": "#EEEAE2",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "whole-desk",
+        "layout": "no-device",
+        "label": {
+          "en": "ACCESSORIES + APPS",
+          "tr": "AKSESUARLAR + UYGULAMALAR"
+        },
+        "headline": {
+          "en": "ALL YOUR\n*BATTERIES.*",
+          "tr": "TÜM PİLLER.\n*TEK BAKIŞ.*"
+        },
+        "screenshot": "",
+        "inverted": true,
+        "typography": {
+          "headlineScale": 1.8,
+          "labelScale": 1
+        },
+        "transforms": {
+          "caption": {
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 650,
+            "rotation": 0,
+            "zIndex": 12
+          }
+        },
+        "imageElements": [
+          {
+            "id": "accessory-lines",
+            "src": "/artwork/on-duty/accessory-lines.svg",
+            "transform": {
+              "x": 0,
+              "y": 850,
+              "width": 1320,
+              "height": 900,
+              "rotation": 0,
+              "zIndex": 2
+            },
+            "fit": "contain"
+          },
+          {
+            "id": "accessories",
+            "src": "/artwork/on-duty/{locale}/accessories.svg",
+            "transform": {
+              "x": 50,
+              "y": 1500,
+              "width": 1220,
+              "height": 840,
+              "rotation": -4,
+              "zIndex": 8
+            },
+            "fit": "contain"
+          }
+        ],
+        "textElements": [
+          {
+            "id": "apps",
+            "text": {
+              "en": "SEE WHAT’S\nUSING ENERGY.",
+              "tr": "ENERJİYİ NEYİN\nKULLANDIĞINI GÖR."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2440,
+              "width": 1140,
+              "height": 210,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 88,
+            "fontWeight": 800,
+            "color": "#17191B",
+            "align": "left"
+          }
+        ]
+      },
+      {
+        "id": "your-connection",
+        "layout": "no-device",
+        "label": {
+          "en": "YOUR DEVICES. YOUR CONNECTION.",
+          "tr": "SENİN CİHAZLARIN. SENİN BAĞLANTIN."
+        },
+        "headline": {
+          "en": "NEAR.\nFAR.\n*YOURS.*",
+          "tr": "YAKINDA.\nUZAKTA.\n*SENİN.*"
+        },
+        "screenshot": "",
+        "inverted": false,
+        "typography": {
+          "headlineScale": 2.4,
+          "labelScale": 0.92
+        },
+        "transforms": {
+          "caption": {
+            "x": 96,
+            "y": 160,
+            "width": 1130,
+            "height": 1090,
+            "rotation": 0,
+            "zIndex": 12
+          }
+        },
+        "imageElements": [
+          {
+            "id": "routes",
+            "src": "/artwork/on-duty/routes.svg",
+            "transform": {
+              "x": 0,
+              "y": 0,
+              "width": 1320,
+              "height": 2868,
+              "rotation": 0,
+              "zIndex": 2
+            },
+            "fit": "contain"
+          }
+        ],
+        "textElements": [
+          {
+            "id": "lan",
+            "text": {
+              "en": "WI-FI + ETHERNET",
+              "tr": "WI-FI + ETHERNET"
+            },
+            "transform": {
+              "x": 220,
+              "y": 1170,
+              "width": 970,
+              "height": 150,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 88,
+            "fontWeight": 800,
+            "color": "#FF793B",
+            "align": "left"
+          },
+          {
+            "id": "ble",
+            "text": {
+              "en": "BLUETOOTH NEARBY",
+              "tr": "YAKINDA BLUETOOTH"
+            },
+            "transform": {
+              "x": 220,
+              "y": 1560,
+              "width": 970,
+              "height": 150,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 88,
+            "fontWeight": 800,
+            "color": "#EEEAE2",
+            "align": "left"
+          },
+          {
+            "id": "cloud",
+            "text": {
+              "en": "PRIVATE ICLOUD AWAY",
+              "tr": "UZAKTA ÖZEL ICLOUD"
+            },
+            "transform": {
+              "x": 220,
+              "y": 1930,
+              "width": 970,
+              "height": 150,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 88,
+            "fontWeight": 800,
+            "color": "#A9CBD5",
+            "align": "left"
+          },
+          {
+            "id": "account",
+            "text": {
+              "en": "MAC + IPHONE. SAME APPLE ACCOUNT.\nBACKGROUND UPDATES DEPEND ON IOS.",
+              "tr": "MAC + IPHONE. AYNI APPLE HESABI.\nARKA PLAN GÜNCELLEMELERİ IOS’A BAĞLIDIR."
+            },
+            "transform": {
+              "x": 100,
+              "y": 2590,
+              "width": 1140,
+              "height": 170,
+              "rotation": 0,
+              "zIndex": 5
+            },
+            "fontSize": 45,
+            "fontWeight": 800,
+            "color": "#EEEAE2",
+            "align": "left"
           }
         ]
       }
@@ -715,15 +1211,20 @@
     ]
   },
   "scene": {
-    "backdrop": "spotlight",
+    "backdrop": "solid",
     "span": false,
     "decoration": "none",
-    "shadow": 70,
-    "glow": 55,
+    "shadow": 48,
+    "glow": 0,
     "tilt": 0,
-    "headlineWeight": 700,
-    "headlineScale": 1,
+    "headlineWeight": 800,
+    "headlineScale": 1.1,
     "headlineCase": "as-typed",
-    "captionAlign": "center"
+    "captionAlign": "left"
+  },
+  "importedFont": {
+    "src": "/fonts/imported/724c9c25952d5f4a.ttf",
+    "format": "truetype",
+    "name": "Barlow Condensed ExtraBold"
   }
 }

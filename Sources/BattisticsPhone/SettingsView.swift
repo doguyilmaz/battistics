@@ -54,6 +54,9 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    NavigationLink { NearbyConnectionsView() } label: {
+                        Label("Nearby Connections", systemImage: "antenna.radiowaves.left.and.right")
+                    }
                     NavigationLink {
                         SetupGuide().navigationTitle("Set Up a Mac").navigationBarTitleDisplayMode(.inline)
                     } label: {

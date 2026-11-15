@@ -3,7 +3,16 @@ import Foundation
 
 /// Made-up Macs to try the app without one, also for screenshots with the `-demo` launch argument.
 enum DemoData {
-    static let isEnabled = ProcessInfo.processInfo.arguments.contains("-demo")
+    static let isEnabled: Bool = {
+        if ProcessInfo.processInfo.arguments.contains("-demo") { return true }
+        #if DEBUG
+        // The test scheme supplies this at process launch, before XCTest is
+        // injected. An unsigned host must never construct real CloudKit.
+        return ProcessInfo.processInfo.environment["BATTISTICS_REMOTE_TEST_HOST"] == "1"
+        #else
+        return false
+        #endif
+    }()
     static let firstID = "demo-desk"
 
     static var readings: [String: MacStore.Reading] {
@@ -34,7 +43,7 @@ enum DemoData {
             session: .init(mode: .lidClosed, origin: .phone, name: "iPhone", startedAt: now.addingTimeInterval(-1500),
                            deadline: now.addingTimeInterval(3900)),
             network: .hotspot, networkName: String(localized: "Ada’s iPhone", comment: "A sample iPhone name"), lidClosed: true,
-            protection: .init(warnAtPercent: 20, closedLidAllowed: true),
+            protection: .init(stopAtPercent: 10, warnAtPercent: 20, closedLidAllowed: true),
             heartbeatSeconds: RemoteStatus.sessionHeartbeat)
         let mini = RemoteStatus(machineName: "Mac mini", readAt: now.addingTimeInterval(-25), network: .wired,
                                 macModel: "Mac mini (Mac16,10)", osVersion: "macOS 26.1",

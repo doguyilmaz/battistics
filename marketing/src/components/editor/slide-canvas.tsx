@@ -1548,7 +1548,7 @@ function SlideElements({
         onSelect={() => edit?.onSelectElement?.(elementId)}
         allowOverflow={allowCrossScreen}
       >
-        <ImageElementCanvas element={imageElement} editable={editable} />
+        <ImageElementCanvas element={{ ...imageElement, src: resolveScreenshot(imageElement.src, locale) }} editable={editable} />
       </Movable>
     );
   }

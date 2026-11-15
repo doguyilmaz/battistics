@@ -34,6 +34,12 @@ struct RemoteHarness {
             })
         precondition(!remote.isAvailable)
         try await render(RemotePane().environment(remote).environment(network), name: "remote-pane")
+        try await render(Form {
+            Section("Nearby Connections") { NearbyAccessView(bluetooth: .denied, localNetwork: .denied) }
+        }.formStyle(.grouped), name: "nearby-permissions-denied")
+        try await render(Form {
+            Section("Nearby Connections") { NearbyAccessView(bluetooth: .poweredOff, localNetwork: .inactive) }
+        }.formStyle(.grouped), name: "nearby-bluetooth-off")
 
         let withdrawal = RemoteWithdrawal()
         let entered = AsyncStream<Void>.makeStream()

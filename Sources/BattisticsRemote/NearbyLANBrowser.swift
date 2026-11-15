@@ -4,6 +4,8 @@ import Network
 @MainActor
 final class NearbyLANBrowser {
     var onEndpoints: (([String: NWEndpoint]) -> Void)?
+    var onState: ((NearbyLocalNetworkState) -> Void)?
+    private(set) var accessState = NearbyLocalNetworkState.inactive
     private var browser: NWBrowser?
 
     func start() {
@@ -15,11 +17,22 @@ final class NearbyLANBrowser {
             let endpoints = results.reduce(into: [String: NWEndpoint]()) { endpoints, result in
                 if case .service(let name, _, _, _) = result.endpoint { endpoints[name] = result.endpoint }
             }
-            Task { @MainActor in self?.onEndpoints?(endpoints) }
+            Task { @MainActor in
+                guard let self, self.browser === browser else { return }
+                self.onEndpoints?(endpoints)
+            }
         }
         browser.stateUpdateHandler = { [weak self] state in
-            if case .failed = state {
-                Task { @MainActor in if self?.browser === browser { self?.stop() } }
+            Task { @MainActor in
+                guard let self, self.browser === browser else { return }
+                switch state {
+                case .ready: self.report(.discovering)
+                case .waiting(let error): self.report(.failure(error))
+                case .failed(let error):
+                    self.stop()
+                    self.report(.failure(error))
+                default: break
+                }
             }
         }
         self.browser = browser
@@ -32,5 +45,11 @@ final class NearbyLANBrowser {
         browser?.cancel()
         browser = nil
         onEndpoints?([:])
+        report(.inactive)
+    }
+
+    private func report(_ state: NearbyLocalNetworkState) {
+        accessState = state
+        onState?(state)
     }
 }

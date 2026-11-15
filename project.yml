@@ -343,6 +343,8 @@ schemes:
       config: Debug
     test:
       config: Debug
+      environmentVariables:
+        BATTISTICS_REMOTE_TEST_HOST: "1"
       commandLineArguments:
         "-demo": true
       targets: [BattisticsPhoneTests]

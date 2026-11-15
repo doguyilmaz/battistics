@@ -100,8 +100,7 @@ final class NotificationsTests: XCTestCase {
         WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
         await WidgetBridge.settle()
         let original = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id })
-        await Self.endRetainingActivity(original.id, until: now.addingTimeInterval(3600))
-        XCTAssertEqual(original.activityState, .ended)
+        try await Self.endRetainingActivity(original.id, until: now.addingTimeInterval(3600))
 
         WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
         await WidgetBridge.settle()
@@ -115,9 +114,17 @@ final class NotificationsTests: XCTestCase {
         await WidgetBridge.settle()
     }
 
-    private nonisolated static func endRetainingActivity(_ id: String, until date: Date) async {
-        await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?
-            .end(nil, dismissalPolicy: .after(date))
+    private nonisolated static func endRetainingActivity(_ id: String, until date: Date) async throws {
+        // end() returns before ActivityKit propagates the state change. Wait
+        // for the system event before exercising ended-activity recovery.
+        try await RemoteDeadline.perform(until: .now.advanced(by: .seconds(5))) {
+            let activity = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id })
+            let updates = activity.activityStateUpdates
+            await activity.end(nil, dismissalPolicy: .after(date))
+            if activity.activityState == .ended { return }
+            for await state in updates where state == .ended { return }
+            throw CancellationError()
+        }
     }
 
     /// ActivityKit propagates updates asynchronously, even after update returns.

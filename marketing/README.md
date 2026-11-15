@@ -1,6 +1,16 @@
-# App Store Screenshots — Editor Template
+# Battistics Remote marketing
 
-A pre-built Next.js + ShadCN editor for generating App Store and Google Play screenshots. Scaffolded by the `app-store-screenshots` skill.
+The iPhone campaign is **Still On**: six English/Turkish compositions built around Battistics’ own Keep Awake countdown, Live Activity and battery readings. A closed metal laptop and orange power-key still life introduces the app; enlarged native interface details, a timer, industrial typography and connection routes carry the rest. One page uses a full phone. This is a review draft for the upcoming coordinated nearby release, not a submitted store package.
+
+Exported previews: [English](docs/still-on-en.png) · [Türkçe](docs/still-on-tr.png).
+
+The editable source is `app-store-screenshots.json`. [The creative brief](docs/creative-direction.md) records references, copy choices, artwork provenance and limits. Native captures, selected artwork, the OFL-licensed Barlow Condensed font and its licence are tracked. Unselected uploads and Apple device bezels stay local; the editor falls back to a built-in frame when a bezel is absent.
+
+To rebuild the original vector decorations and native capture viewports, run `node scripts/build-campaign-assets.mjs`. `node scripts/seed-campaign.mjs` restores this campaign’s starting iPhone compositions and preserves other device decks; it overwrites subsequent iPhone edits, so use it deliberately. The UI remains the normal screenshot editor. It supports `{locale}` in overlay image paths as well as phone captures.
+
+For a reproducible export, run `bun run build`, `bun run start --port 3116`, then in another terminal `node scripts/export-campaign.mjs http://127.0.0.1:3116 ../.build/app-store-still-on`. The script uses the existing editor exporter in an isolated browser, intercepts project autosaves, checks all 48 opaque RGB PNGs, and writes English/Turkish contact sheets and 160px thumbnail sheets. Review those images and final App Store previews; automated checks do not establish aesthetic approval.
+
+The existing Next.js + ShadCN editor was scaffolded by the `app-store-screenshots` skill. Its editing/export workflow is documented below.
 
 ## Quick start
 

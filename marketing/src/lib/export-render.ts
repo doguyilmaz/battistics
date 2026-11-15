@@ -28,7 +28,8 @@ import { encodeCanvasPng } from "./png-encode";
 
 const SETTLE_POLL_MS = 50;
 const SETTLE_TIMEOUT_MS = 8000;
-const FINGERPRINT_SIZE = 12;
+// Thin vector paths and small badges can fall between a 12px grid's samples.
+const FINGERPRINT_SIZE = 32;
 const BLANK_GIF = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const SVG_PREFIX = "data:image/svg+xml;charset=utf-8,";
 
@@ -132,6 +133,7 @@ export async function renderSlide(
   await Promise.all(visible.map((image) => image.decode().catch(() => undefined)));
 
   const { ctx: scratch } = createContext(FINGERPRINT_SIZE, FINGERPRINT_SIZE, true);
+  scratch.imageSmoothingQuality = "high";
 
   // Inner 60% of each visible image, in canvas pixels. The inset keeps bezels,
   // rounded corners and overlapping frames out of the comparison. An image

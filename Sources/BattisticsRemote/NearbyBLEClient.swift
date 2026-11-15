@@ -5,6 +5,7 @@ import Foundation
 @MainActor
 final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate, @preconcurrency CBPeripheralDelegate {
     var onConnection: ((NearbyCredential, NearbyBLELink) -> Void)?
+    var onState: ((NearbyBluetoothState) -> Void)?
     private var manager: CBCentralManager?
     private var credentials: [NearbyCredential] = []
     private var peripherals: [UUID: CBPeripheral] = [:]
@@ -67,6 +68,7 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         guard central === manager else { return }
+        refreshState()
         if central.state == .poweredOn {
             for peripheral in rejectedRestorations { central.cancelPeripheralConnection(peripheral) }
             rejectedRestorations = []
@@ -76,6 +78,8 @@ final class NearbyBLEClient: NSObject, @preconcurrency CBCentralManagerDelegate,
         }
         else { for link in Array(links.values) { link.close() } }
     }
+
+    func refreshState() { onState?(.current(manager?.state)) }
 
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String: Any]) {
         guard central === manager else { return }

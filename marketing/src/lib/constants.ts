@@ -481,6 +481,17 @@ export const THEMES: Record<string, Theme> = {
     accentAlt: "#0B6E64",
     muted: "#B4B9C6",
   },
+  "battistics-on-duty": {
+    id: "battistics-on-duty",
+    name: "Battistics · Still On",
+    bg: "#17191B",
+    bgAlt: "#EEEAE2",
+    fg: "#EEEAE2",
+    fgAlt: "#17191B",
+    accent: "#FF793B",
+    accentAlt: "#A9360A",
+    muted: "#A9ACAD",
+  },
   "risograph-zine": {
     id: "risograph-zine",
     name: "Risograph Zine",

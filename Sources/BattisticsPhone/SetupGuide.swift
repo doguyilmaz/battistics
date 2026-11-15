@@ -18,7 +18,7 @@ struct SetupGuide: View {
                     .padding(.bottom, 4)
                 Text("Your Mac on your iPhone")
                     .font(.title2.weight(.bold))
-                Text("See your Mac’s battery and control Keep Awake through your own iCloud.")
+                Text("See your Mac’s battery and control Keep Awake through private iCloud, with Bluetooth and local network connections nearby.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -29,6 +29,10 @@ struct SetupGuide: View {
                 step(1, "Install Battistics on the Mac", "macOS 14 or later.")
                 step(2, "Turn on iPhone access", "In Battistics on the Mac, open iPhone and turn on Show this Mac in Battistics Remote.")
                 step(3, "Use the same Apple Account", "This iPhone and the Mac must be signed in to iCloud with the same Apple Account.")
+                step(4, "Allow nearby connections", "Allow Bluetooth and Local Network on both devices when asked. You can change these permissions later in Settings.")
+                NavigationLink { NearbyConnectionsView() } label: {
+                    Label("Nearby Connections", systemImage: "antenna.radiowaves.left.and.right")
+                }
                 HStack(spacing: 10) {
                     Link(destination: Self.download) {
                         Label("Get for Mac", systemImage: "arrow.down.circle.fill")
