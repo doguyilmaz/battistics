@@ -1,6 +1,6 @@
 # Battistics Remote marketing
 
-The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The three visual directions were liked by the owner; this complete typography/copy revision is ready for review, not a submitted store package.
+The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The owner accepted this screenshot series on 2026-11-16 and asked to preserve it. It is saved in git and exported locally; it has not been submitted. Search/header creatives are not complete; see [asset status](docs/asset-status.md).
 
 Exported previews: [English](docs/companion-en.png) · [Türkçe](docs/companion-tr.png).
 

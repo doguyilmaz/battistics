@@ -1,6 +1,6 @@
 # Battistics Remote: Companion
 
-Seven iPhone App Store compositions in English and Turkish, combining the three visual directions the owner liked: the night-watch bat, a miniature desk in a pocket, and a closed Mac on a train. The bat direction was the favourite. This revision replaces the rejected typography and copy with Instrument Sans and short, localized feature statements. The complete new series still needs the owner's aesthetic review; it has not been submitted to App Store Connect.
+Seven iPhone App Store compositions in English and Turkish, combining the three visual directions the owner liked: the night-watch bat, a miniature desk in a pocket, and a closed Mac on a train. The bat direction was the favourite. This revision replaces the rejected typography and copy with Instrument Sans and short, localized feature statements. The owner accepted the complete screenshot series on 2026-11-16 and asked to preserve it. It has not been submitted to App Store Connect. Search/header creative assets remain unfinished; see [asset-status.md](asset-status.md).
 
 Review the exported [English](companion-en.png) and [Turkish](companion-tr.png) contact sheets. Copy lives in [companion.json](../copy/companion.json).
 
