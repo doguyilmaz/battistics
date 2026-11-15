@@ -3,12 +3,15 @@ import BattisticsRemote
 import Foundation
 import UIKit
 import WidgetKit
+import os
 
 /// Hands the Macs' readings to the widgets and keeps a lock-screen countdown
 /// for each Mac kept awake. Without push, both update when the app or its
 /// background refresh runs; the countdown itself runs on the system clock.
 @MainActor
 enum WidgetBridge {
+    private nonisolated static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "LiveActivity")
+
     /// Activity updates still running, which a background task awaits before it completes.
     private static var changes: [Task<Void, Never>] = []
 
@@ -43,17 +46,27 @@ enum WidgetBridge {
     /// `confirmed` is false before this launch's first read, when a saved
     /// reading too old to be live says nothing about the Mac.
     static func syncActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) {
+        // Reconcile in publication order, including lookup and creation. A
+        // queued end must finish before a new session chooses its activity.
+        let previous = changes.last
+        changes.append(Task {
+            await previous?.value
+            await reconcileActivities(macs, confirmed: confirmed)
+        })
+    }
+
+    private static func reconcileActivities(_ macs: [(mac: MacStore.Mac, reading: MacStore.Reading?)], confirmed: Bool) async {
         let ids = Set(macs.map(\.mac.id))
         // A Mac that stopped sharing takes its countdown with it.
         for activity in Activity<KeepAwakeActivityAttributes>.activities
         where confirmed && !ids.contains(activity.attributes.macID) {
             let id = activity.id
-            changes.append(Task { await end(id) })
+            await end(id)
         }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         for (mac, reading) in macs {
             if !confirmed, reading?.reachable != true { continue }
-            syncActivity(mac, reading: reading)
+            await syncActivity(mac, reading: reading)
         }
     }
 
@@ -80,16 +93,18 @@ enum WidgetBridge {
         lastReload = .now
     }
 
-    private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) {
+    private static func syncActivity(_ mac: MacStore.Mac, reading: MacStore.Reading?) async {
         // An old status makes the activity stale; it does not establish that
         // the background task or Keep Awake ended.
         guard reading?.status?.sleptAt == nil,
               let status = reading?.status, let session = status.session,
               session.isActive(at: .now) else {
-            endActivities(of: mac.id)
+            await endActivities(of: mac.id)
             return
         }
-        let existing = Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id }
+        let existing = Activity<KeepAwakeActivityAttributes>.activities.first {
+            $0.attributes.macID == mac.id && ($0.activityState == .active || $0.activityState == .stale)
+        }
 
         let state = KeepAwakeActivityAttributes.ContentState(
             mode: session.mode,
@@ -110,24 +125,32 @@ enum WidgetBridge {
         let content = ActivityContent(state: state, staleDate: status.unheardDate)
         if let activity = existing {
             let id = activity.id
-            if activity.content.state != state { changes.append(Task { await update(id, content) }) }
-            endActivities(of: mac.id, except: id)
+            if activity.content.state != state { await update(id, content) }
+            await endActivities(of: mac.id, except: id)
         } else {
-            _ = try? Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
+            do {
+                let activity = try Activity.request(attributes: KeepAwakeActivityAttributes(macName: mac.name, macID: mac.id), content: content)
+                logger.info("Live Activity created; sample age \(Int(-status.readAt.timeIntervalSinceNow))s")
+                await endActivities(of: mac.id, except: activity.id)
+            } catch {
+                let failure = error as NSError
+                logger.error("Live Activity creation failed; domain \(failure.domain, privacy: .public), code \(failure.code)")
+            }
         }
     }
 
-    private static func endActivities(of macID: String, except kept: String? = nil) {
+    private static func endActivities(of macID: String, except kept: String? = nil) async {
         for activity in Activity<KeepAwakeActivityAttributes>.activities
         where activity.attributes.macID == macID && activity.id != kept {
             let id = activity.id
-            changes.append(Task { await end(id) })
+            await end(id)
         }
     }
 
     /// Looked up by id off the main actor, since `Activity` is not Sendable.
     private nonisolated static func update(_ id: String, _ content: ActivityContent<KeepAwakeActivityAttributes.ContentState>) async {
         await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?.update(content)
+        logger.info("Live Activity update submitted; sample age \(Int(-content.state.lastUpdate.timeIntervalSinceNow))s")
     }
 
     private nonisolated static func end(_ id: String) async {

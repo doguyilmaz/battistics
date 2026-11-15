@@ -3,9 +3,8 @@ import Foundation
 
 /// The iCloud side of the companion: one private zone holding a status record
 /// and a command slot per Mac. Payloads live in encrypted fields, so only the
-/// account's own devices can read them. Reads ask for records as they are now,
-/// by query or by name, so first contact costs one request however long the
-/// account has used Battistics.
+/// account's own devices can read them. Discovery supplies record IDs; direct
+/// reads supply current values without replaying the account's history.
 public actor RemoteCloud {
     public static let containerID = "iCloud.com.doguyilmaz.Battistics"
     static let zoneID = CKRecordZone.ID(zoneName: "Remote")
@@ -13,6 +12,9 @@ public actor RemoteCloud {
     static let commandType = "Command"
     static let eventType = "Event"
     static let alertSubscriptionID = "remote-alerts"
+    static let zoneSubscriptionID = "remote-zone"
+    static let subscriptionCheckInterval: Duration = .seconds(30 * 60)
+    static let subscriptionRetryInterval: Duration = .seconds(5 * 60)
 
     public struct Snapshot: Sendable {
         /// Phone-side time, used to keep an earlier discovery read from
@@ -31,19 +33,25 @@ public actor RemoteCloud {
     }
 
     private let operations: CloudKitOperations
+    private let subscriptionClock: @Sendable () -> ContinuousClock.Instant
     private var prepared = false
     private var preparing: Task<Void, Error>?
     private var subscribed = false
     private var subscribing = false
+    private var subscriptionCheckAt: ContinuousClock.Instant?
     private var zoneGeneration = 0
     private var retryAt: Date?
     private var statusRecords: [String: CKRecord] = [:]
 
     public init() {
         operations = CloudKitOperations(database: CKContainer(identifier: Self.containerID).privateCloudDatabase)
+        subscriptionClock = { .now }
     }
 
-    init(operations: CloudKitOperations) { self.operations = operations }
+    init(operations: CloudKitOperations, subscriptionClock: @escaping @Sendable () -> ContinuousClock.Instant = { .now }) {
+        self.operations = operations
+        self.subscriptionClock = subscriptionClock
+    }
 
     /// Whether this process is signed for the container; CloudKit traps
     /// instead of throwing when it is not.
@@ -79,37 +87,60 @@ public actor RemoteCloud {
     }
 
     private func scheduleSubscription() {
-        guard !subscribed, !subscribing else { return }
-        subscribing = true
-        let generation = zoneGeneration
-        Task { await subscribe(generation: generation) }
+        guard !subscribing, subscriptionCheckDue else { return }
+        Task { await refreshPushSubscription() }
     }
 
-    private func subscribe(generation: Int) async {
+    private var subscriptionCheckDue: Bool {
+        subscriptionCheckAt.map { subscriptionClock() >= $0 } ?? true
+    }
+
+    /// Maintenance runs during existing app activity, independently of reads.
+    /// A saved subscription may disappear while this process keeps running.
+    func refreshPushSubscription() async {
+        guard !subscribing, subscriptionCheckDue else { return }
+        subscribing = true
         defer { subscribing = false }
-        let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: "remote-zone")
-        let info = CKSubscription.NotificationInfo()
-        info.shouldSendContentAvailable = true
-        subscription.notificationInfo = info
+        let generation = zoneGeneration
+        subscriptionCheckAt = subscriptionClock().advanced(by: Self.subscriptionRetryInterval)
         do {
             try await attempt {
-                try await operations.modifySubscriptions(saving: [subscription], until: .now.advanced(by: .seconds(30)))
+                let deadline = ContinuousClock.now.advanced(by: .seconds(30))
+                if subscribed,
+                   let existing = try await operations.subscription(Self.zoneSubscriptionID, until: deadline) as? CKRecordZoneSubscription,
+                   existing.zoneID == Self.zoneID, existing.recordType == nil,
+                   existing.notificationInfo?.shouldSendContentAvailable == true { return }
+                let subscription = CKRecordZoneSubscription(zoneID: Self.zoneID, subscriptionID: Self.zoneSubscriptionID)
+                let info = CKSubscription.NotificationInfo()
+                info.shouldSendContentAvailable = true
+                subscription.notificationInfo = info
+                try await operations.modifySubscriptions(saving: [subscription], until: deadline)
             }
-            if generation == zoneGeneration { subscribed = true }
+            if generation == zoneGeneration {
+                subscribed = true
+                subscriptionCheckAt = subscriptionClock().advanced(by: Self.subscriptionCheckInterval)
+            }
         } catch {
             // A failed push subscription does not stop a direct read or command.
         }
     }
 
-    /// Every sharing Mac, for the phone. A zone no Mac has created yet means
-    /// no Mac shares, so reading never waits for zone setup.
-    public func fetch(until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
+    /// The query discovers IDs; direct reads get current values because the
+    /// query index can lag writes and deletions. Known Macs are read even if
+    /// the index temporarily omits them. Reading never creates the zone.
+    public func fetch(knownMacIDs: [String] = [],
+                      until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(30))) async throws -> Snapshot {
         try await attempt {
             var snapshot = Snapshot()
             let records: [CKRecord]
             do {
-                records = try await operations.query(Self.statusType, until: deadline)
+                let discovered = try await operations.query(Self.statusType, until: deadline)
+                let ids = Set(discovered.map(\.recordID)).union(knownMacIDs.map {
+                    CKRecord.ID(recordName: $0, zoneID: Self.zoneID)
+                })
+                records = ids.isEmpty ? [] : Array(try await operations.records(Array(ids), until: deadline).values)
             } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
+                invalidateZone()
                 return snapshot
             }
             for record in records {
@@ -166,13 +197,18 @@ public actor RemoteCloud {
         do {
             return try await body()
         } catch let error as CKError where [.zoneNotFound, .userDeletedZone].contains(error.code) {
-            prepared = false
-            subscribed = false
-            zoneGeneration += 1
-            statusRecords = [:]
+            invalidateZone()
             try await prepare(until: deadline)
             return try await body()
         }
+    }
+
+    private func invalidateZone() {
+        prepared = false
+        subscribed = false
+        subscriptionCheckAt = nil
+        zoneGeneration += 1
+        statusRecords = [:]
     }
 
     /// A command from a newer phone, with a mode or policy this Mac does not

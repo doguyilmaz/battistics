@@ -16,9 +16,9 @@ struct CloudKitOperations: Sendable {
         self.submit = submit
     }
 
-    /// The records of one type as they are now. Never the zone's change log:
-    /// every heartbeat a Mac ever wrote stays in that log, and replaying it
-    /// grows slower for as long as the account uses Battistics.
+    /// Discovers records by type. Indexes can lag, so callers must read the
+    /// returned IDs directly before relying on their values or presence.
+    /// Never replays the zone's growing history of heartbeats.
     func query(_ recordType: CKRecord.RecordType, until deadline: ContinuousClock.Instant) async throws -> [CKRecord] {
         var records: [CKRecord] = []
         var cursor: CKQueryOperation.Cursor?
