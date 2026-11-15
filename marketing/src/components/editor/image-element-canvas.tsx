@@ -33,6 +33,7 @@ export function ImageElementCanvas({ element, editable }: Props) {
       src={source}
       alt=""
       draggable={false}
+      data-export-check="full"
       style={{
         width: "100%",
         height: "100%",

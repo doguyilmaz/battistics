@@ -7,6 +7,36 @@ import XCTest
 
 final class NotificationsTests: XCTestCase {
     @MainActor
+    func testPartialUpdatesPreserveOtherMacsAndRejectOlderCloudRevisions() async {
+        let defaults = UserDefaults.standard
+        let keys = ["readings", "remoteAlertStates", "remoteSilenceStates"]
+        let saved = keys.map { ($0, defaults.object(forKey: $0)) }
+        defer {
+            for (key, value) in saved {
+                if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
+            }
+            MacStore.shared.publishSelected()
+        }
+        let now = Date()
+        var initial = RemoteStatus(machineName: "Fixture A", readAt: now)
+        initial.revision = 10
+        let other = RemoteStatus(machineName: "Fixture B", readAt: now)
+        let store = MacStore(initialReadings: ["fixture-a": .init(status: initial, reachable: true),
+                                             "fixture-b": .init(status: other, reachable: true)])
+        var nearby = initial
+        nearby.revision = 12
+        nearby.readAt = now.addingTimeInterval(-5)
+        await store.apply(.init(statuses: ["fixture-a": nearby], isComplete: false))
+        XCTAssertEqual(store.readings["fixture-b"]?.status, other)
+        var olderCloud = initial
+        olderCloud.revision = 11
+        await store.apply(.init(statuses: ["fixture-a": olderCloud, "fixture-b": other]))
+        XCTAssertEqual(store.readings["fixture-a"]?.status?.revision, 12)
+        await store.apply(.init())
+        XCTAssertTrue(store.readings.isEmpty)
+    }
+
+    @MainActor
     func testBackgroundPushDoesNotClaimNewRemoteDataForSampleReadings() async {
         XCTAssertTrue(MacStore.shared.isSample)
         let result = await PhoneAppDelegate().application(UIApplication.shared, didReceiveRemoteNotification: [:])
@@ -70,8 +100,7 @@ final class NotificationsTests: XCTestCase {
         WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
         await WidgetBridge.settle()
         let original = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.attributes.macID == mac.id })
-        await Self.endRetainingActivity(original.id, until: now.addingTimeInterval(3600))
-        XCTAssertEqual(original.activityState, .ended)
+        try await Self.endRetainingActivity(original.id, until: now.addingTimeInterval(3600))
 
         WidgetBridge.syncActivities([(mac, .init(status: status, reachable: true))], confirmed: true)
         await WidgetBridge.settle()
@@ -85,9 +114,17 @@ final class NotificationsTests: XCTestCase {
         await WidgetBridge.settle()
     }
 
-    private nonisolated static func endRetainingActivity(_ id: String, until date: Date) async {
-        await Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id }?
-            .end(nil, dismissalPolicy: .after(date))
+    private nonisolated static func endRetainingActivity(_ id: String, until date: Date) async throws {
+        // end() returns before ActivityKit propagates the state change. Wait
+        // for the system event before exercising ended-activity recovery.
+        try await RemoteDeadline.perform(until: .now.advanced(by: .seconds(5))) {
+            let activity = try XCTUnwrap(Activity<KeepAwakeActivityAttributes>.activities.first { $0.id == id })
+            let updates = activity.activityStateUpdates
+            await activity.end(nil, dismissalPolicy: .after(date))
+            if activity.activityState == .ended { return }
+            for await state in updates where state == .ended { return }
+            throw CancellationError()
+        }
     }
 
     /// ActivityKit propagates updates asynchronously, even after update returns.

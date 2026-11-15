@@ -1483,6 +1483,7 @@ function SlideElements({
         allowOverflow={allowCrossScreen}
       >
         <div
+          data-text-element={textElement.id}
           style={{
             width: "100%",
             height: "100%",
@@ -1509,9 +1510,9 @@ function SlideElements({
               color: textColor,
               fontSize: textElement.fontSize ?? defaultTextElementFontSize(cW, cH),
               fontWeight: textElement.fontWeight ?? 700,
-              lineHeight: 1.05,
+              lineHeight: textElement.lineHeight ?? 1.05,
+              letterSpacing: textElement.letterSpacing,
               textAlign: textElement.align ?? "center",
-              textShadow: isDark(slide.backgroundColor || (inverted ? theme.bgAlt : theme.bg)) ? "0 2px 18px rgba(0,0,0,0.22)" : "0 2px 18px rgba(255,255,255,0.2)",
             }}
           />
         </div>
@@ -1548,7 +1549,7 @@ function SlideElements({
         onSelect={() => edit?.onSelectElement?.(elementId)}
         allowOverflow={allowCrossScreen}
       >
-        <ImageElementCanvas element={imageElement} editable={editable} />
+        <ImageElementCanvas element={{ ...imageElement, src: resolveScreenshot(imageElement.src, locale) }} editable={editable} />
       </Movable>
     );
   }

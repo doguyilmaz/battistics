@@ -10,7 +10,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 harness = "TourHarness" if "--tour" in sys.argv else "RemoteHarness" if "--remote" in sys.argv else "AutomationHarness"
-products = root / ".build/xcode/Build/Products/Debug"
+products = Path(os.environ.get("BATTISTICS_QA_PRODUCTS_DIR", str(root / ".build/xcode/Build/Products/Debug")))
 assert (products / "BattisticsCore.o").exists(), "Run make build first"
 with tempfile.TemporaryDirectory(prefix="battistics-qa-") as temporary:
     bundle = Path(temporary) / "BattisticsAutomationQA.app"

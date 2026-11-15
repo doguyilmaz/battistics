@@ -65,6 +65,10 @@ export function projectValidationError(value: unknown): string | null {
           if (!transform(element.transform)) return `${device}: invalid ${key} transform`;
           if (key === "textElements" && (!localized(element.text) ||
             [element.fontSize, element.fontWeight].some(n => n !== undefined && (!finite(n) || n <= 0)))) return `${device}: invalid text element`;
+          if (key === "textElements" && (
+            (element.lineHeight !== undefined && (!finite(element.lineHeight) || element.lineHeight < 0.8 || element.lineHeight > 2)) ||
+            (element.letterSpacing !== undefined && (!finite(element.letterSpacing) || element.letterSpacing < -20 || element.letterSpacing > 40))
+          )) return `${device}: invalid text spacing`;
           if (key === "imageElements" && typeof element.src !== "string") return `${device}: image src must be a string`;
         }
       }

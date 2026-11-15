@@ -23,7 +23,9 @@ export function exportAssetPaths(state: ProjectState): string[] {
         }
       }
     }
-    for (const image of slide.imageElements || []) add(image.src);
+    for (const image of slide.imageElements || []) {
+      for (const locale of state.locales) add(resolveScreenshot(image.src, locale));
+    }
   }
   return [...paths];
 }

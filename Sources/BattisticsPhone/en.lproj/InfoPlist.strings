@@ -1,0 +1,2 @@
+"NSBluetoothAlwaysUsageDescription" = "Battistics Remote connects securely to your nearby Macs to keep their status up to date and send Keep Awake controls over Bluetooth.";
+"NSLocalNetworkUsageDescription" = "Battistics Remote connects securely to your Macs over local Wi-Fi or Ethernet to receive current status and send Keep Awake controls.";

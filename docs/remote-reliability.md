@@ -2,9 +2,11 @@
 
 Assessment: 2026-11-15. This describes the implementation in PR #57 and evaluates further work against Apple documentation. It does not establish the cause of the previously reported daytime incident: there is no matching iPhone log from that incident.
 
+Follow-up: [LAN/BLE communication and automatic handoff](nearby-handoff.md) are now implemented on a separate branch. The nearby section below records the assessment that preceded implementation; its physical-device validation requirements still apply. The new transport code does not migrate to CKSyncEngine or add an ActivityKit push provider.
+
 ## Decision
 
-Keep private CloudKit as the shared source of Mac state and the command mailbox. Improve recovery and make the existing delivery stages observable before adding another transport. This preserves access across different networks without operating a service or distributing provider credentials.
+Keep private CloudKit as the shared source of Mac state and the command mailbox. PR #57 improves recovery and makes the existing delivery stages observable. The follow-up adds cooperating nearby paths while preserving access across different networks without operating a service or distributing provider credentials.
 
 Background delivery is a separate constraint. Apple's [background notification documentation](https://developer.apple.com/documentation/usernotifications/pushing-background-updates-to-your-app) says delivery can be deferred and coalesced. More Mac writes cannot guarantee more iPhone execution time. A [background task's earliest begin date](https://developer.apple.com/documentation/backgroundtasks/bgtaskrequest/earliestbegindate) is a lower bound, not an execution appointment. These are not problems a different CloudKit read API can eliminate.
 

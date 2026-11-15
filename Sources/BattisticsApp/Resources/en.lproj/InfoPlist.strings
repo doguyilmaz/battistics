@@ -1,0 +1,2 @@
+"NSBluetoothAlwaysUsageDescription" = "Battistics reads connected accessory batteries and securely exchanges this Mac's status and Keep Awake controls with your nearby iPhone.";
+"NSLocalNetworkUsageDescription" = "Battistics connects securely to your iPhone over local Wi-Fi or Ethernet to share this Mac's status and receive Keep Awake controls.";

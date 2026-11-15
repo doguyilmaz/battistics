@@ -27,7 +27,7 @@ macOS 14+ · Apple Silicon</p>
 - Keep Awake for 15 minutes to 12 hours or until turned off, including with the lid closed, with ready-made profiles
 - Optional stop at a battery level or under heat, low-battery and unplug warnings
 - Keep Awake for terminal commands and AI tasks through a bundled CLI and local MCP server
-- [Battistics Remote for iPhone](https://apps.apple.com/app/id6827062128): battery, connection and Keep Awake through your iCloud
+- [Battistics Remote for iPhone](https://apps.apple.com/app/id6827062128): battery, connection and Keep Awake through private iCloud, with authenticated nearby LAN and Bluetooth connections
 - A short tour and searchable help, with optional on-device answers on macOS 26
 - CSV export and import of the full history
 - English and Turkish
@@ -77,8 +77,9 @@ its connection, lid and heat, its accessory batteries and busiest apps, and
 starts or stops Keep Awake, even with the lid closed in a bag. Widgets, a Lock
 Screen countdown and a Control Center control come with it. Turn on
 **iPhone** in Battistics; any iPhone on the same Apple Account finds the Mac through
-your private iCloud, with nothing to pair or install. With no Wi‑Fi, a Mac set
-to join hotspots automatically uses the iPhone's hotspot. See
+your private iCloud, with no pairing code or additional service. Updated versions of both apps also use encrypted local Wi‑Fi/Ethernet and Bluetooth connections; older releases continue through iCloud. Commands try an available local network connection, then Bluetooth, then iCloud, retaining the same request so a lost reply does not apply a change twice. Allow **Bluetooth** and **Local Network** on both devices; the Mac's **iPhone** pane and the phone's **Settings › Nearby Connections** explain recovery after a denied permission.
+
+Bluetooth can connect nearby devices on different networks. Away from Bluetooth range, both devices need internet for iCloud; a Mac set to join hotspots automatically can use the iPhone's hotspot. Live Activity updates depend on iOS background opportunities and available connections. The Mac's 30-second nearby send interval is not a delivery guarantee. See
 [remote companion](docs/remote.md) and the [iPhone guide](https://battistics.doguyilmaz.com/docs/iphone/).
 
 ## Light by design
@@ -119,10 +120,10 @@ to try it in Simulator with sample Macs.
 
 ## Privacy
 
-Runs entirely on your Mac. The only network request is the optional update
-check. Sharing with your iPhone is off by default; when on, the Mac's status
-goes through your private iCloud, encrypted, and no port is opened.
+Battery history stays on your Mac. Without iPhone sharing, the app's network activity is its optional update check. Sharing is off by default; when enabled it uses your private encrypted iCloud records and can advertise an authenticated local TLS listener and Bluetooth service. Nearby credentials are bootstrapped through private iCloud and stored in account-bound Keychain entries. Turning sharing off closes local connections and rotates trust before the next enable; CloudKit cleanup is retried if offline. No developer-operated relay, analytics or tracking is added.
 Read the [privacy policy](https://battistics.doguyilmaz.com/docs/privacy/) for both apps.
+
+Release validation and its current limits: [nearby handoff](docs/nearby-handoff.md) and [physical background/energy test procedure](docs/remote-device-validation.md).
 
 ## License
 

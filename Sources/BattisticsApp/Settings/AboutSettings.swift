@@ -86,7 +86,7 @@ struct AboutSettings: View {
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                InfoHeader("Updates", info: "Updates are the only network traffic Battistics starts. When you share this Mac with your iPhone, its status goes through your private iCloud, encrypted. No analytics, no tracking.")
+                InfoHeader("Updates", info: "Battery history stays on this Mac. Optional iPhone sharing uses private iCloud and encrypted nearby Bluetooth or local-network connections. Update checks use GitHub. No analytics or tracking.")
             }
         }
         .formStyle(.grouped)

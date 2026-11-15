@@ -88,3 +88,5 @@ the Homebrew cask homepage also use the new host. The cask generator lives in
 
 After a deployment, verify HTTPS, the sitemap/canonical URLs, documentation,
 download and contact links, plus redirects with a nested path and query string.
+
+Documentation routes use a trailing slash because `site/astro.config.mjs` sets `trailingSlash: "always"`; links match that canonical form. Marketing, support and domain-root URLs remain slashless.

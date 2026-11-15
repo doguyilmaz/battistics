@@ -1,6 +1,16 @@
-# App Store Screenshots — Editor Template
+# Battistics Remote marketing
 
-A pre-built Next.js + ShadCN editor for generating App Store and Google Play screenshots. Scaffolded by the `app-store-screenshots` skill.
+The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The owner accepted this screenshot series on 2026-11-16 and asked to preserve it. It is saved in git and exported locally; it has not been submitted. Search/header creatives are not complete; see [asset status](docs/asset-status.md).
+
+Exported previews: [English](docs/companion-en.png) · [Türkçe](docs/companion-tr.png).
+
+The editable source is `app-store-screenshots.json`; localized wording lives in [copy/companion.json](copy/companion.json). [The creative brief](docs/creative-direction.md) records the visual system, typography, sources and limits. The selected artwork, native captures, Instrument Sans variable font and OFL licence are tracked. Exact image-generation prompts and a reusable transparent mascot pose are included. Optional Apple bezels stay local; the editor falls back to a built-in frame.
+
+Run `node scripts/build-companion-assets.mjs` to rebuild native viewports and scene crops. `node scripts/seed-companion.mjs` restores this starting iPhone composition from the copy file while preserving other device decks; it overwrites later iPhone edits. The existing editor supports localized overlay paths, variable font weights, text leading and tracking.
+
+For a reproducible export, run `bun run build`, `bun run start --hostname 127.0.0.1 --port 3116`, then in another terminal `node scripts/export-campaign.mjs http://127.0.0.1:3116 ../.build/app-store-companion`. It drives the existing exporter in an isolated browser, intercepts autosaves, measures text for clipping/unintended wraps and checks all 56 opaque RGB PNGs. It also writes contact sheets, 160px thumbnails and validation JSON. Review the images and final App Store previews; automated checks do not establish aesthetic approval.
+
+The existing Next.js + ShadCN editor was scaffolded by the `app-store-screenshots` skill. Its editing/export workflow is documented below.
 
 ## Quick start
 

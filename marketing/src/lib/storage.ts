@@ -51,6 +51,10 @@ function cleanTextElement(value: unknown): TextElement | undefined {
     ...(typeof raw.fontWeight === "number" && Number.isFinite(raw.fontWeight)
       ? { fontWeight: raw.fontWeight }
       : {}),
+    ...(typeof raw.lineHeight === "number" && Number.isFinite(raw.lineHeight)
+      ? { lineHeight: Math.max(0.8, Math.min(2, raw.lineHeight)) } : {}),
+    ...(typeof raw.letterSpacing === "number" && Number.isFinite(raw.letterSpacing)
+      ? { letterSpacing: Math.max(-20, Math.min(40, raw.letterSpacing)) } : {}),
     ...(typeof raw.color === "string" ? { color: raw.color } : {}),
     ...(raw.align === "left" || raw.align === "center" || raw.align === "right"
       ? { align: raw.align }

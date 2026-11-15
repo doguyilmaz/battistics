@@ -3,7 +3,7 @@ title: Privacy Policy
 description: What Battistics and Battistics Remote read, store and send.
 ---
 
-**Last Updated: November 13, 2026**
+**Last Updated: November 15, 2026**
 
 ## Overview
 
@@ -14,7 +14,7 @@ Battistics is a menu bar app for the Mac that shows battery health, power and hi
 - Battistics has no accounts, no analytics, no ads and no tracking.
 - Nothing is sent to us. We run no server and cannot see your data.
 - Battery history stays on your Mac. What Battistics Remote reads about your iPhone stays on your iPhone.
-- If you share a Mac with your iPhone, the two talk through your own private iCloud database, which only your Apple Account can read.
+- If you share a Mac with your iPhone, they use your private iCloud database. The next update also adds encrypted nearby local-network and Bluetooth connections, authenticated with keys shared through that database.
 
 ## Information We Collect
 
@@ -39,7 +39,9 @@ Sharing is off by default. When you turn on **Show this Mac in Battistics Remote
 - The status and commands are stored in encrypted fields. We have no access to your private iCloud database. Apple’s handling of iCloud data is described in Apple’s privacy policy.
 - Alerts the Mac sends to your iPhone, such as Keep Awake ending or the battery running low, carry one short sentence that push notifications cannot encrypt, without the Mac’s name or network. Your iPhone adds the Mac’s name itself. The Mac deletes them after 10 minutes.
 - Alerts such as “Keep Awake ended” are delivered as push notifications through Apple. Their text names the event and, where relevant, a battery percentage or a remaining time. It does not include the Mac’s name or network.
-- Turning sharing off removes the Mac’s record from iCloud. You can also remove a Mac from the iPhone app, or manage the app’s iCloud data in your Apple Account settings.
+- Nearby connections in the next update exchange the same status and commands directly over local Wi-Fi/Ethernet or Bluetooth after authentication. The Mac advertises a local TLS listener and Bluetooth service while sharing is on. No router port forwarding or developer-operated relay is used. Discovery exposes an opaque identifier to nearby scanners; it is stable for the lifetime of the sharing key.
+- Nearby trust keys are generated randomly, bootstrapped through encrypted private CloudKit records and stored in account-bound Keychain entries on your devices. They are not included in public status or discovery advertisements.
+- Turning sharing off closes local connections, removes the local key and attempts to remove the Mac's shared records from iCloud. Failed cleanup is retried when possible, so already cached or offline data may remain visible temporarily. Re-enabling creates a new nearby key. Removing a Mac on one iPhone removes that phone's cached trust; it is not permanent per-phone revocation, and an actively sharing Mac can reappear. You can also manage the app's iCloud data in your Apple Account settings.
 
 ## Data That Stays on Your iPhone
 
@@ -49,11 +51,16 @@ Battistics Remote reads what iOS shares with apps: battery level and state, Low 
 
 Battistics on the Mac reads the name of the Wi‑Fi network or Personal Hotspot it is connected to, so the iPhone can show it. It takes the name from macOS, and asks for Location access only when macOS will not give it otherwise. Battistics never reads or stores your location. Battistics Remote does not request Location.
 
+## Bluetooth and Local Network
+
+Bluetooth access on the Mac supports accessory batteries and, in the next update, nearby iPhone communication. On the iPhone it supports nearby Mac communication. Local Network access supports discovery and authenticated direct status/control connections. These permissions can be denied or changed later in system settings; private iCloud sharing can continue without a nearby path. Bluetooth and local discovery do not need Location permission.
+
 ## Network Activity
 
 - **Software updates (Mac):** Battistics checks for updates through GitHub, where the app is published. This request contains the app version, like any download. You can turn automatic checks off in Battistics › About.
 - **iCloud:** used only when you share a Mac with your iPhone, as described above.
-- Battistics makes no other network requests.
+- **Nearby sharing (next update):** Bonjour discovery and encrypted local connections, plus Bluetooth communication, while sharing is enabled.
+- No analytics, advertising or developer-operated data relay is added.
 
 ## Third-Party Services
 

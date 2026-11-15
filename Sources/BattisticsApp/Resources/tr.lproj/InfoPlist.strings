@@ -1,0 +1,2 @@
+"NSBluetoothAlwaysUsageDescription" = "Battistics bağlı aksesuarların pillerini okur ve yakındaki iPhone’unla bu Mac’in durumunu ve Uyanık Tut komutlarını güvenli biçimde paylaşır.";
+"NSLocalNetworkUsageDescription" = "Battistics bu Mac’in durumunu paylaşmak ve Uyanık Tut komutlarını almak için yerel Wi-Fi veya Ethernet üzerinden iPhone’una güvenli biçimde bağlanır.";

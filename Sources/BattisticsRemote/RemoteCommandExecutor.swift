@@ -6,12 +6,20 @@ import os
 public enum RemoteCommandExecutor {
     private static let logger = Logger(subsystem: "com.doguyilmaz.Battistics.Remote", category: "Commands")
 
-    public static func execute(_ request: RemoteRequest, to macID: String, cloud: RemoteCloud) async throws -> RemoteStatus {
-        try await execute(request, macID: macID, timeout: .seconds(RemoteRequest.answerWait), pollInterval: .seconds(1.5),
-                          write: { request, deadline in try await cloud.send(request, to: macID, until: deadline) },
-                          read: { deadline in try await cloud.status(macID: macID, until: deadline) },
-                          cleanup: { _ in
-                              try? await cloud.delete([RemoteCloud.commandRecordName(for: macID)], until: .now.advanced(by: .seconds(5)))
+    public static func execute(_ request: RemoteRequest, to macID: String, cloud: RemoteCloud,
+                               until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(RemoteRequest.answerWait)),
+                               authorizing: @escaping @Sendable () async -> Bool = { true }) async throws -> RemoteStatus {
+        let epoch = await cloud.accountEpoch()
+        return try await execute(request, macID: macID, timeout: ContinuousClock.now.duration(to: deadline), pollInterval: .seconds(1.5),
+                          write: { request, deadline in
+                              try Task.checkCancellation()
+                              guard await authorizing() else { throw CancellationError() }
+                              try await cloud.send(request, to: macID, until: deadline, accountEpoch: epoch)
+                          },
+                          read: { deadline in try await cloud.status(macID: macID, until: deadline, accountEpoch: epoch) },
+                          cleanup: { commandID in
+                              guard await authorizing() else { return }
+                              try? await cloud.cancelCommand(commandID, macID: macID, until: .now.advanced(by: .seconds(5)), accountEpoch: epoch)
                           })
     }
 
@@ -22,8 +30,6 @@ public enum RemoteCommandExecutor {
         cleanup: @escaping @Sendable (String) async -> Void
     ) async throws -> RemoteStatus {
         let deadline = ContinuousClock.now.advanced(by: timeout)
-        var request = request
-        request.sentAt = .now
         let command = request
         let started = ContinuousClock.now
         logger.notice("Command \(command.id, privacy: .public) \(command.operation.rawValue, privacy: .public) started for \(macID, privacy: .private(mask: .hash))")
