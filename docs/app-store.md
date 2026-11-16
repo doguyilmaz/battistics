@@ -35,7 +35,7 @@ countdown, the Control Center control and the Shortcuts actions.
 `marketing/` holds the screenshot editor (`bun install`, `bun dev`). The
 curated sample-mode iPhone captures referenced by the Companion deck are tracked; other captures/uploads and Apple bezels remain local. Capture fresh app states with `-demo`. The editor exports the seven-slide EN/TR series at all four configured iPhone sizes, combining actual UI with the bat, pocket and journey campaign scenes. Copy, typography, character references and artwork prompts are recorded in [the creative brief](../marketing/docs/creative-direction.md). Do not present this upcoming nearby release's screenshots as the older App Store binary.
 
-Released metadata in `metadata/version/1.0.1/` records what shipped. Upcoming nearby copy is staged separately under `metadata/drafts/nearby/`; select the actual next SemVer and complete release validation before moving it into version metadata or submitting it. Do not publish an unreleased feature as available in the current App Store binary.
+Released metadata in `metadata/version/1.0.1/` records the current public iOS version. The coordinated nearby release is iOS `1.1.0` (build `18`) with Mac `1.6.0`; its canonical copy is `metadata/version/1.1.0/`, with reviewer instructions in `metadata/review-information.json`. The accepted Companion screenshots and localized header/search creatives are uploaded. iOS `1.1.0` and its assigned creative assets are waiting for review, submitted on 2026-11-16; Mac `1.6.0` is live. See [the release audit](releases/1.1.0-review.md) for the submission receipt and owner-deferred long device trial. The iOS version uses manual release; do not describe it as publicly available before it is released.
 
 ## Before submitting
 

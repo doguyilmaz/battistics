@@ -86,9 +86,9 @@ and the review contact uses the support alias. GitHub's repository homepage and
 the Homebrew cask homepage also use the new host. The cask generator lives in
 `scripts/update-tap.sh`.
 
-The Companion release adds dedicated English `/remote/` and Turkish `/tr/remote/` pages, with the accepted bat, pocket and journey artwork, real localized app captures, Instrument Sans and localized social images. Metadata for iOS `1.1.0` points to these pages and to `/docs/iphone/` for support. The website labels the new nearby feature as upcoming until the coordinated release is live. Cloudflare deployment `6862125e-7c65-4687-b78a-a82ebee263f5` serves these changes. Both pages passed image decoding, language, canonical and overflow checks at 390px and 1440px. Their slashless routes redirect with 307 to the canonical trailing-slash form.
+The Companion release adds dedicated English `/remote/` and Turkish `/tr/remote/` pages, with the accepted bat, pocket and journey artwork, real localized app captures, Instrument Sans and localized social images. Metadata for iOS `1.1.0` points to these pages and to `/docs/iphone/` for support. The website labels the new nearby feature as upcoming until the coordinated release is live. Cloudflare deployment `30739a4c-e8da-4879-a5bb-c56a254afcd4` restored these pages after the transport merge's main-branch build briefly deployed older routes. After the Companion PR merged, the main-branch build published version `e646bf07-793b-4a8c-b484-7881ed28eec2`, and both localized pages remained available. Both pages passed image decoding, language, canonical and overflow checks at 390px and 1440px. Their slashless routes redirect with 307 to the canonical trailing-slash form. Future main-branch builds must retain the Companion page sources.
 
 After a deployment, verify HTTPS, the sitemap/canonical URLs, documentation,
 download and contact links, plus redirects with a nested path and query string.
 
-Documentation routes use a trailing slash because `site/astro.config.mjs` sets `trailingSlash: "always"`; links match that canonical form. Marketing, support and domain-root URLs remain slashless.
+Page routes use a trailing slash because `site/astro.config.mjs` sets `trailingSlash: "always"`; marketing, support and documentation links match that canonical form. Domain-root URLs remain slashless.
