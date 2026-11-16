@@ -1,8 +1,10 @@
 # Battistics Remote marketing
 
-The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The owner accepted this screenshot series on 2026-11-16 and asked to preserve it. It is saved in git and exported locally; it has not been submitted. Search/header creatives are not complete; see [asset status](docs/asset-status.md).
+The iPhone campaign is **Companion**: seven English/Turkish compositions combining the night-watch bat, a miniature desk in a pocket and a closed Mac on a train. Real app screenshots and enlarged native panels show the nearby dashboard, Keep Awake, Live Activity, battery details and accessories. The owner accepted this screenshot series on 2026-11-16 and asked to preserve it. Universal/header/search creatives are also complete, exported and uploaded to ASC; see [asset status](docs/asset-status.md) for placement and submission status.
 
 Exported previews: [English](docs/companion-en.png) · [Türkçe](docs/companion-tr.png).
+
+Creative previews: [header EN](docs/creatives/creative-header-en.png) · [header TR](docs/creatives/creative-header-tr.png) · [search EN](docs/creatives/creative-search-en.png) · [search TR](docs/creatives/creative-search-tr.png). Run `node scripts/seed-creatives.mjs` to restore these three localized decks without changing the accepted iPhone deck, then `node scripts/export-creatives.mjs` against the running editor. Eight opaque RGB exports are checked for dimensions, text layout and art-safe bounds.
 
 The editable source is `app-store-screenshots.json`; localized wording lives in [copy/companion.json](copy/companion.json). [The creative brief](docs/creative-direction.md) records the visual system, typography, sources and limits. The selected artwork, native captures, Instrument Sans variable font and OFL licence are tracked. Exact image-generation prompts and a reusable transparent mascot pose are included. Optional Apple bezels stay local; the editor falls back to a built-in frame.
 

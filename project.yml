@@ -36,8 +36,8 @@ settings:
 settingGroups:
   # The iPhone app and its extensions must carry the same version.
   Phone:
-    MARKETING_VERSION: "1.0.1"
-    CURRENT_PROJECT_VERSION: "17"
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "18"
 
 targets:
   BattisticsCLI:
@@ -130,8 +130,8 @@ targets:
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, tr]
         CFBundleDisplayName: Battistics
-        CFBundleShortVersionString: "1.5.7"
-        CFBundleVersion: "46"
+        CFBundleShortVersionString: "1.6.0"
+        CFBundleVersion: "47"
         LSUIElement: true
         NSBluetoothAlwaysUsageDescription: >-
           Battistics reads connected accessory batteries and securely exchanges
@@ -223,20 +223,6 @@ targets:
         NSBonjourServices: [_battistics._tcp]
         NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers: [com.doguyilmaz.Battistics.Remote.refresh]
-        CFBundleIcons:
-          CFBundlePrimaryIcon:
-            CFBundleIconFiles: [original]
-            UIPrerenderedIcon: true
-          CFBundleAlternateIcons:
-            gauge:
-              CFBundleIconFiles: [gauge]
-              UIPrerenderedIcon: true
-            batbattery:
-              CFBundleIconFiles: [batbattery]
-              UIPrerenderedIcon: true
-            stats:
-              CFBundleIconFiles: [stats]
-              UIPrerenderedIcon: true
     settings:
       groups: [Phone]
       base:

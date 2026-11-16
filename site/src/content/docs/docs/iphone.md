@@ -18,9 +18,9 @@ Battistics Remote is [free on the App Store](https://apps.apple.com/app/id682706
 
 There is no pairing code or additional account. Private iCloud establishes trust between your devices and carries encrypted readings and commands. Closed-lid sessions from the iPhone are allowed only if you turn that on in the same pane.
 
-## Nearby connections in the next update
+## Nearby connections in Remote 1.1.0 and Battistics 1.6.0
 
-Updated versions of **both** apps add authenticated local-network and Bluetooth connections alongside iCloud. Earlier releases continue through iCloud.
+This upcoming release of **both** apps adds authenticated local-network and Bluetooth connections alongside iCloud. Earlier releases continue through iCloud. See the [Battistics Remote overview](/remote/) for the new visual guide.
 
 - **Local Network:** reachable Wi-Fi or Ethernet, including a wired Mac and an iPhone on Wi-Fi. This path is used while Remote is foregrounded. Guest-network isolation or a firewall can prevent discovery.
 - **Bluetooth:** nearby devices can connect even on different networks, such as a Mac on office Wi-Fi and an iPhone on cellular. Background delivery depends on iOS and the radio connection.

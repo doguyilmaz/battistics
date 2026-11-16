@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.6.0
+
+- Connect Battistics Remote over reachable local Wi-Fi/Ethernet or nearby
+  Bluetooth, alongside your private iCloud. Update the iPhone app to 1.1.0
+  for the new nearby connections; earlier versions continue through iCloud.
+- When a connection drops, a command continues through another available
+  route without applying the same change twice after a lost reply.
+- Check nearby permission status in the iPhone pane, with guidance for
+  Bluetooth and Local Network access. Returning from Settings refreshes
+  discovery when access changes.
+- Nearby trust belongs to your Apple Account. Turning sharing off closes
+  nearby connections and rotates the credential before sharing is enabled
+  again.
+- Battistics Remote 1.1.0 also improves last-update readings and Live
+  Activity recovery. Background delivery remains subject to iOS and the
+  available connections.
+
 ## 1.5.7
 
 - Keep Awake sends fewer repeated battery, heat and Wi-Fi warnings while

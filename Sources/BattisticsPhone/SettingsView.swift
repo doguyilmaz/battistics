@@ -95,7 +95,6 @@ struct SettingsView: View {
 struct AppearanceSettingsView: View {
     @Environment(LocalPhoneMonitor.self) private var phone
     @AppStorage(PhoneTheme.key) private var theme = PhoneTheme.automatic
-    @State private var icon = PhoneIcon.current
 
     var body: some View {
         @Bindable var phone = phone
@@ -107,36 +106,6 @@ struct AppearanceSettingsView: View {
                 .pickerStyle(.segmented)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
-            }
-
-            Section("App Icon") {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 12)], spacing: 12) {
-                    ForEach(PhoneIcon.allCases) { option in
-                        Button {
-                            Task {
-                                guard (try? await UIApplication.shared.setAlternateIconName(option.alternateName)) != nil else { return }
-                                icon = option
-                            }
-                        } label: {
-                            VStack(spacing: 6) {
-                                Image(uiImage: UIImage(named: option.previewName) ?? UIImage())
-                                    .resizable()
-                                    .frame(width: 60, height: 60)
-                                    .clipShape(.rect(cornerRadius: 14))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: 14)
-                                            .strokeBorder(icon == option ? Color.accentColor : .clear, lineWidth: 2.5)
-                                    }
-                                Text(option.label)
-                                    .font(.caption)
-                                    .foregroundStyle(icon == option ? .primary : .secondary)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityAddTraits(icon == option ? .isSelected : [])
-                    }
-                }
-                .padding(.vertical, 6)
             }
 
             Section {
@@ -179,28 +148,5 @@ enum PhoneTheme: String, CaseIterable, Identifiable {
         for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
             scene.windows.forEach { $0.overrideUserInterfaceStyle = style }
         }
-    }
-}
-
-enum PhoneIcon: String, CaseIterable, Identifiable {
-    case original, gauge, batbattery, stats
-
-    var id: Self { self }
-
-    var alternateName: String? { self == .original ? nil : rawValue }
-    var previewName: String { rawValue }
-
-    var label: String {
-        switch self {
-        case .original: String(localized: "Original")
-        case .gauge: String(localized: "Gauge")
-        case .batbattery: String(localized: "Bat")
-        case .stats: String(localized: "Stats")
-        }
-    }
-
-    @MainActor
-    static var current: PhoneIcon {
-        allCases.first { $0.alternateName == UIApplication.shared.alternateIconName } ?? .original
     }
 }

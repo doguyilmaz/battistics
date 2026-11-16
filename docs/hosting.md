@@ -86,6 +86,8 @@ and the review contact uses the support alias. GitHub's repository homepage and
 the Homebrew cask homepage also use the new host. The cask generator lives in
 `scripts/update-tap.sh`.
 
+The Companion release adds dedicated English `/remote/` and Turkish `/tr/remote/` pages, with the accepted bat, pocket and journey artwork, real localized app captures, Instrument Sans and localized social images. Metadata for iOS `1.1.0` points to these pages and to `/docs/iphone/` for support. The website labels the new nearby feature as upcoming until the coordinated release is live. Cloudflare deployment `6862125e-7c65-4687-b78a-a82ebee263f5` serves these changes. Both pages passed image decoding, language, canonical and overflow checks at 390px and 1440px. Their slashless routes redirect with 307 to the canonical trailing-slash form.
+
 After a deployment, verify HTTPS, the sitemap/canonical URLs, documentation,
 download and contact links, plus redirects with a nested path and query string.
 

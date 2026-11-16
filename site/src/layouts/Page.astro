@@ -5,13 +5,15 @@ import Lightbox from "../components/Lightbox.astro";
 interface Props {
   title: string;
   description: string;
+  lang?: string;
+  ogImage?: string;
 }
-const { title, description } = Astro.props;
+const { title, description, lang = "en", ogImage = "/og.png" } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,7 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL("/og.png", Astro.site)} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
