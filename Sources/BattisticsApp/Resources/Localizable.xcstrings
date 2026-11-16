@@ -8580,6 +8580,176 @@
           }
         }
       }
+    },
+    "%@ has not shared its %@ version. Open an updated copy on that device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ has not shared its %@ version. Open an updated copy on that device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@ sürümünü henüz paylaşmadı. O cihazda uygulamanın güncel bir sürümünü açın."
+          }
+        }
+      }
+    },
+    "Update %@ on %@ to %@ or later for nearby connections.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update %@ on %@ to %@ or later for nearby connections."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bağlantılar için %2$@ üzerindeki %1$@ uygulamasını %3$@ veya sonraki bir sürüme güncelleyin."
+          }
+        }
+      }
+    },
+    "Nearby connections with %@ require %@ %@ or later on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby connections with %@ require %@ %@ or later on this device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ile yakındaki bağlantılar için bu cihazda %2$@ %3$@ veya sonraki bir sürüm gerekir."
+          }
+        }
+      }
+    },
+    "This version could not be checked. Update the app on that device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This version could not be checked. Update the app on that device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu sürüm kontrol edilemedi. O cihazdaki uygulamayı güncelleyin."
+          }
+        }
+      }
+    },
+    "App versions support nearby connections. Bluetooth and Local Network permissions are checked separately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App versions support nearby connections. Bluetooth and Local Network permissions are checked separately."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama sürümleri yakındaki bağlantıları destekliyor. Bluetooth ve Yerel Ağ izinleri ayrıca kontrol edilir."
+          }
+        }
+      }
+    },
+    "iPhone App Versions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone App Versions"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone Uygulama Sürümleri"
+          }
+        }
+      }
+    },
+    "No iPhone app version received yet. Open Battistics Remote on your iPhone with the same Apple Account. Older apps may not share version information.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No iPhone app version received yet. Open Battistics Remote on your iPhone with the same Apple Account. Older apps may not share version information."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz iPhone uygulama sürümü alınmadı. Aynı Apple Hesabı’nı kullanan iPhone’unuzda Battistics Remote’u açın. Eski uygulamalar sürüm bilgisi paylaşmayabilir."
+          }
+        }
+      }
+    },
+    "Nearby connections require Battistics Remote 1.1.0 or later. Version information is the last report received through your private iCloud; it does not mean the phone is online.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby connections require Battistics Remote 1.1.0 or later. Version information is the last report received through your private iCloud; it does not mean the phone is online."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bağlantılar Battistics Remote 1.1.0 veya sonraki bir sürümü gerektirir. Sürüm bilgisi, özel iCloud hesabınızdan alınan son bildirimdir; telefonun çevrimiçi olduğunu göstermez."
+          }
+        }
+      }
+    },
+    "Last reported %@ ago": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last reported %@ ago"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son bildirim: %@ önce"
+          }
+        }
+      }
+    },
+    "This Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

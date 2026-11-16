@@ -229,7 +229,8 @@ struct CloudKitOperationTests {
         #expect(snapshot.unreadable == ["mac"])
     }
 
-    @Test func theMacReadsItsRecordAndCommandSlotByNameInOneRequest() async throws {
+    @Test(arguments: [false, true])
+    func theMacReadsItsRecordAndCommandSlotByNameInOneRequest(unreadableMetadata: Bool) async throws {
         let request = RemoteRequest(operation: .stop)
         let fetches = CloudKitBuffer<[[String]]>([])
         let cloud = RemoteCloud(operations: .init { operation in
@@ -244,13 +245,19 @@ struct CloudKitOperationTests {
                 let slot = CKRecord(recordType: RemoteCloud.commandType, recordID: ids[1])
                 slot.encryptedValues["payload"] = try! RemoteWire.encode(request)
                 read.perRecordResultBlock?(ids[1], .success(slot))
+                if unreadableMetadata {
+                    let roster = CKRecord(recordType: RemoteCloud.commandType, recordID: ids[2])
+                    roster.encryptedValues["payload"] = Data("unreadable optional metadata".utf8)
+                    read.perRecordResultBlock?(ids[2], .success(roster))
+                }
                 read.fetchRecordsResultBlock?(.failure(CKError(.partialFailure)))
             } else { Issue.record("The Mac must not query or replay the zone: \(operation)") }
         })
         let inbox = try await cloud.inbox(macID: "mac")
-        #expect(fetches.read() == [["mac", RemoteCloud.commandRecordName(for: "mac")]])
+        #expect(fetches.read() == [["mac", RemoteCloud.commandRecordName(for: "mac"), RemoteCloud.phoneRegistryRecordName(for: "mac")]])
         #expect(inbox.status == nil)
         #expect(inbox.command?.id == request.id)
+        #expect(inbox.phones.isEmpty)
     }
 
     @Test func aTimedOutRequestCancelsTheActualSDKOperation() async {

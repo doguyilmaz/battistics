@@ -35,6 +35,14 @@ struct RemoteHarness {
         precondition(!remote.isAvailable)
         try await render(RemotePane().environment(remote).environment(network), name: "remote-pane")
         try await render(Form {
+            Section("iPhone App Versions") {
+                RemotePhoneVersionsView(phones: [
+                    .init(id: UUID().uuidString, name: "Ada’s iPhone", app: .init(version: "1.0.1", build: "12", minimumPeerVersion: "1.0.0", nearbyProtocol: nil)),
+                    .init(id: UUID().uuidString, name: "iPhone 17", app: .init(version: "1.1.0", build: "18", minimumPeerVersion: "1.6.0"))
+                ])
+            }
+        }.formStyle(.grouped), name: "phone-version-compatibility")
+        try await render(Form {
             Section("Nearby Connections") { NearbyAccessView(bluetooth: .denied, localNetwork: .denied) }
         }.formStyle(.grouped), name: "nearby-permissions-denied")
         try await render(Form {

@@ -229,6 +229,7 @@ public struct RemoteStatus: Codable, Sendable, Equatable {
     public var revision: UInt64?
     public var nearbyProtocol: Int?
     public var nearbyID: String?
+    public var appInfo: RemoteAppInfo?
     public var battery: Battery?
     public var session: Session?
     public var lastEnd: LastEnd?

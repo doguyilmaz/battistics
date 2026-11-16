@@ -36,7 +36,7 @@ enum DemoData {
                             accessories: [.init(name: "Magic Mouse", percent: 64),
                                           .init(name: "AirPods Pro", percent: 12, detail: String(localized: "Left", comment: "The left AirPod"))],
                             apps: [.init(name: "Xcode", cpuPercent: 48.2), .init(name: "Safari", cpuPercent: 9.6)])
-        let bag = RemoteStatus(
+        var bag = RemoteStatus(
             machineName: "MacBook Air", readAt: now.addingTimeInterval(-90),
             battery: .init(percent: 57, isCharging: false, onAdapter: false, minutesRemaining: 260, healthPercent: 96,
                            lowPowerMode: true, lowPowerPolicy: .onlyOnBattery, watts: -6.2, temperatureC: 30.1, cycleCount: 88),
@@ -45,9 +45,18 @@ enum DemoData {
             network: .hotspot, networkName: String(localized: "Ada’s iPhone", comment: "A sample iPhone name"), lidClosed: true,
             protection: .init(stopAtPercent: 10, warnAtPercent: 20, closedLidAllowed: true),
             heartbeatSeconds: RemoteStatus.sessionHeartbeat)
-        let mini = RemoteStatus(machineName: "Mac mini", readAt: now.addingTimeInterval(-25), network: .wired,
+        var mini = RemoteStatus(machineName: "Mac mini", readAt: now.addingTimeInterval(-25), network: .wired,
                                 macModel: "Mac mini (Mac16,10)", osVersion: "macOS 26.1",
                                 heartbeatSeconds: RemoteStatus.heartbeat)
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-compatibility-demo") {
+            desk.appInfo = .init(version: "1.5.6", build: "40", minimumPeerVersion: "1.0.0", nearbyProtocol: nil)
+            bag.appInfo = .init(version: "1.6.0", build: "51", minimumPeerVersion: "1.1.0")
+            bag.nearbyProtocol = 1
+            mini.appInfo = .init(version: "2.0.0", build: "70", minimumPeerVersion: "1.2.0")
+            mini.nearbyProtocol = 1
+        }
+        #endif
         return ["demo-desk": .init(status: desk, reachable: true), "demo-bag": .init(status: bag, reachable: true),
                 "demo-mini": .init(status: mini, reachable: true)]
     }

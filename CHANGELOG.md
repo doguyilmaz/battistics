@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Share companion app versions through private iCloud. The iPhone shows each
+  Mac's reported version; the Mac's iPhone pane lists reporting phones and
+  their last reported app versions, with update guidance for incompatible
+  nearby connections. Older versions that do not report metadata are shown
+  as unknown rather than assigned an estimated version.
+- Explain when nearby permission requests are waiting for Mac setup. Open
+  App Settings is offered after a permission denial.
+
 ## 1.6.0
 
 - Connect Battistics Remote over reachable local Wi-Fi/Ethernet or nearby

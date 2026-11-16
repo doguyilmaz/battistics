@@ -45,6 +45,7 @@ final class RemoteAccessModel {
     private(set) var lastPublished: Date?
     private(set) var bluetoothState = NearbyBluetoothState.current()
     private(set) var localNetworkState = NearbyLocalNetworkState.inactive
+    private(set) var connectedPhones: [RemotePhoneInfo] = []
 
     @ObservationIgnored private let awake: KeepAwakeModel
     @ObservationIgnored private let automation: AutomationModel
@@ -185,6 +186,7 @@ final class RemoteAccessModel {
             try await ensureAccount()
             let inbox = try await cloud.inbox(macID: macID)
             guard enabled, generation == nearbyGeneration else { return }
+            connectedPhones = inbox.phones
             // After a relaunch, alerts compare against what the phones last saw.
             if lastStatus == nil { lastStatus = inbox.status }
             recordMissing = inbox.status == nil
@@ -282,6 +284,7 @@ final class RemoteAccessModel {
 
     private func stopNearby(revoke: Bool) {
         nearbyGeneration += 1
+        connectedPhones = []
         retryAt = nil
         problem = nil
         pendingPublish?.cancel()
@@ -315,6 +318,7 @@ final class RemoteAccessModel {
             lastCommand = nil
             lastCommandAt = nil
             extras = nil
+            connectedPhones = []
             postedEvents = [:]
             alertOutbox = RemoteAlertOutbox()
             saveAlertOutbox()
@@ -540,7 +544,7 @@ final class RemoteAccessModel {
             let nearbyRecords = UserDefaults.standard.stringArray(forKey: "remoteNearbyRecords") ?? []
             // Keep the mailbox as a conditional tombstone. An unconditional
             // slot delete could erase a newer phone command racing withdrawal.
-            try await cloud.delete([macID] + postedEvents.keys + nearbyRecords, until: deadline)
+            try await cloud.delete([macID, RemoteCloud.phoneRegistryRecordName(for: macID)] + postedEvents.keys + nearbyRecords, until: deadline)
             guard !enabled, generation == nearbyGeneration else { return }
             UserDefaults.standard.removeObject(forKey: "remoteNearbyRecords")
             postedEvents = [:]
@@ -861,6 +865,7 @@ final class RemoteAccessModel {
             heartbeatSeconds: RemoteStatus.heartbeat(duringSession: session != nil)
         )
         status.extras = extras
+        status.appInfo = RemoteAppInfo.current(minimumPeerVersion: RemoteCompatibility.minimumPhone)
         status.sleptAt = sleptAt
         if let nearbyCredential {
             status.nearbyProtocol = 1

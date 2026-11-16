@@ -3,6 +3,7 @@
 import json
 import os
 import plistlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -24,6 +25,13 @@ with tempfile.TemporaryDirectory(prefix="battistics-qa-") as temporary:
         "CFBundleDevelopmentRegion": "en", "CFBundleLocalizations": ["en", "tr"],
         "LSUIElement": True,
     }
+    # Version UI in the isolated harness should read the same bundle metadata
+    # as the generated Mac app, without running the installed application.
+    project = (root / "project.yml").read_text()
+    for key in ["CFBundleShortVersionString", "CFBundleVersion"]:
+        match = re.search(rf'{key}: "([^"]+)"', project)
+        if match:
+            plist[key] = match.group(1)
     (bundle / "Contents/Info.plist").write_bytes(plistlib.dumps(plist))
     catalog = json.loads((root / "Sources/BattisticsApp/Resources/Localizable.xcstrings").read_text())
     for language in ["en", "tr"]:

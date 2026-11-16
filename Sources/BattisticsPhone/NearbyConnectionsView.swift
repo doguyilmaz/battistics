@@ -8,6 +8,28 @@ struct NearbyConnectionsView: View {
 
     var body: some View {
         Form {
+            Section("App Versions") {
+                LabeledContent("This iPhone", value: RemoteAppInfo.current(minimumPeerVersion: RemoteCompatibility.minimumMac)?.displayVersion ?? "—")
+                ForEach(store.macs) { mac in
+                    if let status = store.readings[mac.id]?.status {
+                        VStack(alignment: .leading, spacing: 6) {
+                            LabeledContent(mac.name, value: status.appInfo?.displayVersion ?? String(localized: "Version not shared"))
+                            Text(RemoteCompatibility.message(peer: status.appInfo, name: mac.name, appName: "Battistics", localAppName: "Battistics Remote",
+                                local: .current(minimumPeerVersion: RemoteCompatibility.minimumMac), minimum: RemoteCompatibility.minimumMac))
+                                .font(.footnote).foregroundStyle(.secondary)
+                            if status.nearbyProtocol == nil {
+                                Text("This Mac has not made nearby connections available yet. Check its app version and iPhone sharing settings. iCloud remains available.")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                            Text("Last reported \(status.readAt, style: .relative) ago")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                if store.macs.isEmpty {
+                    Text("Connect a Mac through iCloud to check its app version.")
+                }
+            }
             Section {
                 LabeledContent("Bluetooth", value: store.bluetoothState.label)
                 if store.bluetoothState == .restricted {
@@ -21,13 +43,19 @@ struct NearbyConnectionsView: View {
                 } else if store.localNetworkState == .unavailable {
                     Label("Local discovery unavailable", systemImage: "wifi.exclamationmark")
                 }
-                Button("Open App Settings") {
-                    openURL(URL(string: UIApplication.openSettingsURLString)!)
+                if store.bluetoothState == .notDetermined {
+                    Text("Permission has not been requested. It will be requested when a compatible Mac finishes nearby setup through iCloud.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+                if store.bluetoothState == .denied || store.localNetworkState == .denied {
+                    Button("Open App Settings") {
+                        openURL(URL(string: UIApplication.openSettingsURLString)!)
+                    }
                 }
             } header: {
                 Text("Permissions")
             } footer: {
-                Text("Allow Bluetooth and Local Network for Battistics Remote in Settings. On the Mac, allow Battistics in System Settings › Privacy & Security. A denied permission can be changed later; iCloud continues when nearby connections are unavailable.")
+                Text("Nearby connections require Battistics 1.6.0 or later on the Mac and Battistics Remote 1.1.0 or later on iPhone. If a requested permission was denied, change it in Settings. iCloud continues when nearby connections are unavailable.")
             }
             Section {
                 Label("Bluetooth connects nearby devices, even on different networks.", systemImage: "antenna.radiowaves.left.and.right")
