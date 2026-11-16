@@ -37,6 +37,7 @@ public actor RemoteCloud {
         /// Nil when the record is gone, such as after a phone removed this Mac.
         public var status: RemoteStatus?
         public var command: RemoteRequest?
+        public var phones: [RemotePhoneInfo] = []
     }
 
     private let operations: CloudKitOperations
@@ -184,7 +185,8 @@ public actor RemoteCloud {
             return try await guarded(until: deadline) {
                 let statusID = CKRecord.ID(recordName: macID, zoneID: Self.zoneID)
                 let commandID = Self.commandRecordID(for: macID)
-                let records = try await self.operations.records([statusID, commandID], until: deadline)
+                let phonesID = CKRecord.ID(recordName: Self.phoneRegistryRecordName(for: macID), zoneID: Self.zoneID)
+                let records = try await self.operations.records([statusID, commandID, phonesID], until: deadline)
                 guard generation == self.accountGeneration else { throw CancellationError() }
                 var inbox = Inbox()
                 if let record = records[statusID] {
@@ -198,6 +200,10 @@ public actor RemoteCloud {
                 if let payload = records[commandID]?.encryptedValues["payload"] as? Data {
                     inbox.command = Self.request(from: payload)
                 }
+                if let payload = records[phonesID]?.encryptedValues["payload"] as? Data,
+                   let registry = try? RemoteWire.decode(RemotePhoneRegistry.self, from: payload) {
+                    inbox.phones = Array(registry.phones.filter { $0.isValid && $0.seenAt > Date.now.addingTimeInterval(-30 * 86400) && $0.seenAt <= Date.now.addingTimeInterval(300) }.prefix(8))
+                }
                 return inbox
             }
         }
@@ -206,6 +212,41 @@ public actor RemoteCloud {
     /// One slot per Mac, overwritten by each command. A Mac answers one change
     /// at a time and a phone never sends a second before the first is answered.
     public static func commandRecordName(for macID: String) -> String { "command.\(macID)" }
+
+    public static func phoneRegistryRecordName(for macID: String) -> String { "phones.\(macID)" }
+
+    /// Reuses the deployed encrypted Command payload; never overwrites a command.
+    public func reportPhone(_ phone: RemotePhoneInfo, to macID: String, accountEpoch: Int,
+                            until deadline: ContinuousClock.Instant = .now.advanced(by: .seconds(15))) async throws {
+        guard phone.isValid, accountEpoch == accountGeneration else { throw CancellationError() }
+        try await attempt {
+            try await guarded(until: deadline) {
+                let id = CKRecord.ID(recordName: Self.phoneRegistryRecordName(for: macID), zoneID: Self.zoneID)
+                for retry in 0..<3 {
+                    try Task.checkCancellation()
+                    guard accountEpoch == self.accountGeneration else { throw CancellationError() }
+                    let records = try await self.operations.records([id, CKRecord.ID(recordName: macID, zoneID: Self.zoneID)], until: deadline)
+                    guard accountEpoch == self.accountGeneration else { throw CancellationError() }
+                    guard records[CKRecord.ID(recordName: macID, zoneID: Self.zoneID)] != nil else { return }
+                    let record = records[id] ?? CKRecord(recordType: Self.commandType, recordID: id)
+                    guard record.recordType == Self.commandType else { throw CKError(.internalError) }
+                    var registry = RemotePhoneRegistry()
+                    if records[id] != nil {
+                        guard let payload = record.encryptedValues["payload"] as? Data else { throw CKError(.internalError) }
+                        registry = try RemoteWire.decode(RemotePhoneRegistry.self, from: payload)
+                    }
+                    registry.record(phone)
+                    record.encryptedValues["payload"] = try RemoteWire.encode(registry)
+                    do {
+                        _ = try await self.operations.modifyRecords(saving: [record], until: deadline)
+                        return
+                    } catch let error as CKError where error.code == .serverRecordChanged && retry < 2 {
+                        continue
+                    }
+                }
+            }
+        }
+    }
 
     /// Uses the existing encrypted Command schema, outside the command mailbox.
     public static func nearbyCredentialRecordName(for macID: String, discoveryID: String) -> String { "nearby.\(macID).\(discoveryID)" }

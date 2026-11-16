@@ -37,6 +37,9 @@ struct RemotePane: View {
             }
 
             if remote.enabled {
+                Section("iPhone App Versions") {
+                    RemotePhoneVersionsView(phones: remote.connectedPhones)
+                }
                 Section("Nearby Connections") {
                     NearbyAccessView(bluetooth: remote.bluetoothState, localNetwork: remote.localNetworkState)
                 }

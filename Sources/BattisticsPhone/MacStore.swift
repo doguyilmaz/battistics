@@ -65,6 +65,7 @@ final class MacStore {
     @ObservationIgnored private var nearbyAccountRetry = Date.distantPast
     @ObservationIgnored private var nearbyTrustWork: Task<Void, Never>?
     @ObservationIgnored private var nearbyTrustRetry: [String: Date] = [:]
+    @ObservationIgnored private let phoneVersionReporter = PhoneVersionReporter()
     @ObservationIgnored private var accountObserver: NSObjectProtocol?
     @ObservationIgnored private var accountGeneration = 0
     @ObservationIgnored private var applying: Task<Void, Never>?
@@ -140,6 +141,7 @@ final class MacStore {
 
     func setForeground(_ active: Bool) {
         guard !isSample else { return }
+        if !active { phoneVersionReporter.pause() }
         nearby.setForeground(active)
         if active { updateNearbyTrust() }
     }
@@ -151,6 +153,7 @@ final class MacStore {
 
     private func accountChanged() async {
         accountGeneration += 1
+        phoneVersionReporter.reset()
         for task in commandTasks.values { task.cancel() }
         commandTasks = [:]
         sending = [:]
@@ -305,6 +308,7 @@ final class MacStore {
     // MARK: Sample
 
     func showSample() {
+        phoneVersionReporter.reset()
         nearbyTrustWork?.cancel()
         nearby.stop()
         isSample = true
@@ -388,7 +392,11 @@ final class MacStore {
         let previousReadings = readings
         let previousOutdated = outdated
         await apply(snapshot)
+        guard generation == accountGeneration, !isSample else { return .noData }
         updateNearbyTrust()
+        if UIApplication.shared.applicationState == .active {
+            phoneVersionReporter.report(to: Array(snapshot.statuses.keys), name: LocalPhoneMonitor.shared.commandName, cloud: cloud)
+        }
         // Notification housekeeping is independent of readings and commands.
         // Until confirmed, this phone retains the existing local-alert fallback.
         if subscriptionDue, subscriptionWork == nil {
@@ -525,7 +533,7 @@ final class MacStore {
         refreshing = true
         defer { refreshing = false }
         do {
-            try await cloud.delete([mac.id, RemoteCloud.commandRecordName(for: mac.id)])
+            try await cloud.delete([mac.id, RemoteCloud.commandRecordName(for: mac.id), RemoteCloud.phoneRegistryRecordName(for: mac.id)])
         } catch {
             return Self.describe(error)
         }

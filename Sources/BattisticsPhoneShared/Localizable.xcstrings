@@ -7139,6 +7139,210 @@
           }
         }
       }
+    },
+    "%@ has not shared its %@ version. Open an updated copy on that device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ has not shared its %@ version. Open an updated copy on that device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@ sürümünü henüz paylaşmadı. O cihazda uygulamanın güncel bir sürümünü açın."
+          }
+        }
+      }
+    },
+    "Update %@ on %@ to %@ or later for nearby connections.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update %@ on %@ to %@ or later for nearby connections."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bağlantılar için %2$@ üzerindeki %1$@ uygulamasını %3$@ veya sonraki bir sürüme güncelleyin."
+          }
+        }
+      }
+    },
+    "Nearby connections with %@ require %@ %@ or later on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby connections with %@ require %@ %@ or later on this device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ile yakındaki bağlantılar için bu cihazda %2$@ %3$@ veya sonraki bir sürüm gerekir."
+          }
+        }
+      }
+    },
+    "This version could not be checked. Update the app on that device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This version could not be checked. Update the app on that device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu sürüm kontrol edilemedi. O cihazdaki uygulamayı güncelleyin."
+          }
+        }
+      }
+    },
+    "App versions support nearby connections. Bluetooth and Local Network permissions are checked separately.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App versions support nearby connections. Bluetooth and Local Network permissions are checked separately."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama sürümleri yakındaki bağlantıları destekliyor. Bluetooth ve Yerel Ağ izinleri ayrıca kontrol edilir."
+          }
+        }
+      }
+    },
+    "App Versions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Versions"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama Sürümleri"
+          }
+        }
+      }
+    },
+    "Version not shared": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version not shared"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sürüm paylaşılmadı"
+          }
+        }
+      }
+    },
+    "This Mac has not made nearby connections available yet. Check its app version and iPhone sharing settings. iCloud remains available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Mac has not made nearby connections available yet. Check its app version and iPhone sharing settings. iCloud remains available."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac yakındaki bağlantıları henüz kullanıma sunmadı. Uygulama sürümünü ve iPhone paylaşım ayarlarını kontrol edin. iCloud kullanılmaya devam eder."
+          }
+        }
+      }
+    },
+    "Connect a Mac through iCloud to check its app version.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect a Mac through iCloud to check its app version."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama sürümünü kontrol etmek için iCloud üzerinden bir Mac bağlayın."
+          }
+        }
+      }
+    },
+    "Permission has not been requested. It will be requested when a compatible Mac finishes nearby setup through iCloud.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permission has not been requested. It will be requested when a compatible Mac finishes nearby setup through iCloud."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzin henüz istenmedi. Uyumlu bir Mac, iCloud üzerinden yakındaki bağlantı kurulumunu tamamladığında izin istenecek."
+          }
+        }
+      }
+    },
+    "Nearby connections require Battistics 1.6.0 or later on the Mac and Battistics Remote 1.1.0 or later on iPhone. If a requested permission was denied, change it in Settings. iCloud continues when nearby connections are unavailable.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nearby connections require Battistics 1.6.0 or later on the Mac and Battistics Remote 1.1.0 or later on iPhone. If a requested permission was denied, change it in Settings. iCloud continues when nearby connections are unavailable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yakındaki bağlantılar Mac’te Battistics 1.6.0 veya sonraki bir sürümü, iPhone’da Battistics Remote 1.1.0 veya sonraki bir sürümü gerektirir. İstenen bir izin reddedildiyse Ayarlar’dan değiştirin. Yakındaki bağlantılar kullanılamadığında iCloud devam eder."
+          }
+        }
+      }
+    },
+    "Last reported %@ ago": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last reported %@ ago"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son bildirim: %@ önce"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
