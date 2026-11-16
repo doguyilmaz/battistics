@@ -18,7 +18,7 @@ final class PhoneVersionReporter {
 
     func report(to macIDs: [String], name: String, cloud: RemoteCloud) {
         guard work == nil, let app = RemoteAppInfo.current(minimumPeerVersion: RemoteCompatibility.minimumMac) else { return }
-        let due = macIDs.filter { reported[$0].map { -$0.timeIntervalSinceNow >= 300 } ?? true }
+        let due = Array(macIDs.filter { reported[$0].map { -$0.timeIntervalSinceNow >= 300 } ?? true }.sorted().prefix(8))
         guard !due.isEmpty else { return }
         let phone = RemotePhoneInfo(id: id, name: name, app: app)
         let generation = self.generation
@@ -37,10 +37,14 @@ final class PhoneVersionReporter {
         }
     }
 
-    func reset() {
+    func pause() {
         generation += 1
         work?.cancel()
         work = nil
+    }
+
+    func reset() {
+        pause()
         reported = [:]
     }
 }

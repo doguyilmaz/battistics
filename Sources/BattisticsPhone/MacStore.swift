@@ -141,6 +141,7 @@ final class MacStore {
 
     func setForeground(_ active: Bool) {
         guard !isSample else { return }
+        if !active { phoneVersionReporter.pause() }
         nearby.setForeground(active)
         if active { updateNearbyTrust() }
     }

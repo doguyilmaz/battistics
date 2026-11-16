@@ -3,7 +3,7 @@ title: Privacy Policy
 description: What Battistics and Battistics Remote read, store and send.
 ---
 
-**Last Updated: November 15, 2026**
+**Last Updated: November 16, 2026**
 
 ## Overview
 
@@ -36,7 +36,8 @@ Sharing is off by default. When you turn on **Show this Mac in Battistics Remote
 - The Mac writes its current status to a private CloudKit database in **your own iCloud account**: its name, model and macOS version, battery readings (charge, health, cycles, capacity, power, temperature and the adapter), the last day of charge, Keep Awake state, Low Power Mode and battery protection settings, heat, whether the lid is closed, the network type and the name of the Wi‑Fi network or Personal Hotspot it is connected to.
 - When you ask for it on the iPhone, the Mac also adds the battery level of connected accessories and the apps using the most energy, by name.
 - Your iPhone reads that status and writes short-lived commands back, such as starting or stopping Keep Awake. A command carries this iPhone’s name as it appears in the app, so the Mac can show which iPhone started a session.
-- The status and commands are stored in encrypted fields. We have no access to your private iCloud database. Apple’s handling of iCloud data is described in Apple’s privacy policy.
+- The upcoming version-compatibility check also shares each app's version/build and required companion version. iPhone reports include its display name, a randomly generated app installation identifier and the report time. A roster stores at most eight phone reports; the interface hides reports older than 30 days, and a later report removes expired entries from that roster. The identifier is used to merge reports from the same app installation, and does not grant access to a Mac.
+- Status, commands and version reports are stored in encrypted fields. We have no access to your private iCloud database. Apple’s handling of iCloud data is described in Apple’s privacy policy.
 - Alerts the Mac sends to your iPhone, such as Keep Awake ending or the battery running low, carry one short sentence that push notifications cannot encrypt, without the Mac’s name or network. Your iPhone adds the Mac’s name itself. The Mac deletes them after 10 minutes.
 - Alerts such as “Keep Awake ended” are delivered as push notifications through Apple. Their text names the event and, where relevant, a battery percentage or a remaining time. It does not include the Mac’s name or network.
 - Nearby connections in the next update exchange the same status and commands directly over local Wi-Fi/Ethernet or Bluetooth after authentication. The Mac advertises a local TLS listener and Bluetooth service while sharing is on. No router port forwarding or developer-operated relay is used. Discovery exposes an opaque identifier to nearby scanners; it is stable for the lifetime of the sharing key.
